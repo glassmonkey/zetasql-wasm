@@ -1,0 +1,32 @@
+.PHONY: build clean test help
+
+# Default target
+.DEFAULT_GOAL := help
+
+# Output files
+WASM_OUTPUT := zetasql.wasm
+
+help: ## Show this help message
+	@echo "ZetaSQL WASM Build System"
+	@echo ""
+	@echo "Usage:"
+	@echo "  make build    - Build ZetaSQL WASM (WASI-compatible)"
+	@echo "  make test     - Test WASI compatibility"
+	@echo "  make clean    - Remove build artifacts"
+	@echo "  make rebuild  - Clean and build"
+	@echo ""
+
+build: ## Build ZetaSQL WASM using Docker
+	@bash script/build.sh | tee build.log
+
+test: ## Test WASI compatibility
+	@if [ ! -f $(WASM_OUTPUT) ]; then \
+		echo "Error: $(WASM_OUTPUT) not found. Run 'make build' first."; \
+		exit 1; \
+	fi
+	@bash script/test-wasi.sh
+
+clean: ## Remove build artifacts
+	@bash script/clean.sh
+
+rebuild: clean build ## Clean and rebuild

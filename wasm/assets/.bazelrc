@@ -1,0 +1,38 @@
+# Enable MODULE.bazel-based dependency management (common to all commands)
+common --enable_bzlmod
+
+# Debug flags (common to all commands)
+common --verbose_failures
+common --experimental_ui_max_stdouterr_bytes=-1
+
+# Required for using Emscripten toolchain
+build --incompatible_enable_cc_toolchain_resolution
+build --sandbox_debug
+
+# ZetaSQL requires C++20
+build --cxxopt=-std=c++20
+build --host_cxxopt=-std=c++20
+build --action_env=BAZEL_CXXOPTS="-std=c++20"
+
+# Java runtime specification (ZetaSQL official configuration)
+build --java_runtime_version=remotejdk_11
+
+# Build optimization
+build --copt=-O3
+build --copt=-DNDEBUG
+
+# Warning suppression (applying ZetaSQL official clang settings)
+build --cxxopt=-Wno-module-import-in-extern-c
+build --cxxopt=-Wno-deprecated-declarations
+build --cxxopt=-Wno-range-loop-analysis
+build --cxxopt=-Wno-inconsistent-missing-override
+build --cxxopt=-Wno-char-subscripts
+build --cxxopt=-Wno-enum-compare-switch
+build --cxxopt=-Wno-defaulted-function-deleted
+build --cxxopt=-Wno-unused-private-field
+build --cxxopt=-Wno-return-std-move
+build --cxxopt=-Wno-reorder-ctor
+build --cxxopt=-Wno-unused-const-variable
+build --cxxopt=-Wno-unused-function
+build --cxxopt=-Wno-macro-redefined
+build --cxxopt=-Wno-sign-compare

@@ -1,0 +1,22 @@
+# Bazel関連（Bazelが自動的に依存を管理）
+bazel-*
+
+# ビルドキャッシュ
+.cache/
+
+# ビルド出力ディレクトリ
+output/
+
+# 成果物（ビルド時に生成される）
+# プロジェクトの方針次第でコメントアウト解除
+# zetasql.wasm
+
+# ビルド中間ファイル
+*.o
+*.a
+*.log
+*.tmp
+*.swp
+
+# 注意: .bazelversionはコミットします（Dependabot管理対象）
+# !.bazelversion は不要（ignoreされていないため）

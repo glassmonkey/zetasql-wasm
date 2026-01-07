@@ -1,0 +1,28 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["bazelisk"],
+      "matchFileNames": ["wasm/assets/.bazelversion"],
+      "description": "Bazelバージョン（週次更新）",
+      "schedule": ["every weekend"]
+    },
+    {
+      "matchManagers": ["bazel-module"],
+      "matchFileNames": ["wasm/assets/MODULE.bazel"],
+      "description": "ZetaSQL依存関係（週次更新）",
+      "schedule": ["every weekend"]
+    },
+    {
+      "matchManagers": ["gomod"],
+      "description": "Go依存関係（週次更新）",
+      "schedule": ["every weekend"]
+    }
+  ],
+  "labels": ["dependencies"],
+  "assignAutomerge": false,
+  "platformAutomerge": false
+}

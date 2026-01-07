@@ -1,0 +1,50 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
+
+# C++ bridge binary
+cc_binary(
+    name = "zetasql_bridge",
+    srcs = ["bridge.cc"],
+    deps = [
+        "@zetasql//zetasql/public:parse_helpers",
+        "@zetasql//zetasql/public:analyzer",
+        "@zetasql//zetasql/public:parse_resume_location",
+    ],
+    linkopts = [
+        # Export functions for WASI/standalone runtime
+        "-sEXPORTED_FUNCTIONS=_parse_statement,_analyze_statement,_free_string,_malloc,_free",
+        "-sEXPORTED_RUNTIME_METHODS=ccall,cwrap",
+
+        # Standalone WASM mode - compatible with WASI runtimes (wasmtime, wasmer)
+        "-sSTANDALONE_WASM=1",
+        "-sWASM_BIGINT=1",
+
+        # Reactor mode: no main function required (library mode)
+        "-Wl,--no-entry",
+
+        # Memory configuration
+        "-sALLOW_MEMORY_GROWTH=1",
+        "-sINITIAL_MEMORY=256MB",
+        "-sSTACK_SIZE=5MB",
+        "-sMAXIMUM_MEMORY=2GB",
+
+        # Disable pthread to avoid shared-memory/atomics issues
+        "-sPROXY_TO_PTHREAD=0",
+        "-sUSE_PTHREADS=0",
+
+        # Environment for WASI-like execution (Node.js, wasmtime, etc.)
+        "-sENVIRONMENT=node,shell",
+        "-sMODULARIZE=0",
+
+        # File system for WASI
+        "-sFORCE_FILESYSTEM=0",
+        "-sNO_FILESYSTEM=1",
+    ],
+)
+
+# WASM binary (built with Emscripten)
+# wasm_cc_binary automatically applies Emscripten toolchain using transition
+wasm_cc_binary(
+    name = "zetasql",
+    cc_target = ":zetasql_bridge",
+)

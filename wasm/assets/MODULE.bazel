@@ -1,0 +1,47 @@
+# ZetaSQL WASM Build Module
+# Dependabot automatically updates versions
+
+module(
+    name = "zetasql-wasm",
+    version = "0.0.1",
+)
+
+# Basic dependencies (fetched from BCR)
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "bazel_skylib", version = "1.8.1")
+bazel_dep(name = "rules_cc", version = "0.2.8")
+
+# Emscripten toolchain (for WASM generation)
+# Using the latest version registered in BCR
+bazel_dep(name = "emsdk", version = "4.0.17")
+
+# ZetaSQL dependency (automatically updated by Renovate Bot)
+# Since ZetaSQL is not registered in BCR, it is managed using a combination of bazel_dep and git_override
+# Note: bazel_dep has no actual implementation, but serves as a marker for Renovate Bot to track versions
+bazel_dep(name = "zetasql", version = "2025.12.1")
+
+# Specify the actual source for ZetaSQL
+# Apply patches to ICU BUILD file for WASM cross-compilation support
+git_override(
+    module_name = "zetasql",
+    remote = "https://github.com/google/zetasql.git",
+    tag = "2025.12.1",
+    patches = [
+        "//:patches/bazel_icu.patch",
+        "//:patches/zetasql_public_functions_date_time_util.patch",
+        "//:patches/zetasql_public_functions_regexp.patch",
+        "//:patches/zetasql_public_functions_string.patch",
+        "//:patches/zetasql_public_strings.patch",
+    ],
+    patch_strip = 1,
+)
+
+# Pin abseil-cpp to the version required by ZetaSQL
+# When using git_override, the child module's (ZetaSQL) single_version_override is
+# ignored, so it must be explicitly specified in the root module
+single_version_override(
+    module_name = "abseil-cpp",
+    version = "20240722.1",
+)
+
+

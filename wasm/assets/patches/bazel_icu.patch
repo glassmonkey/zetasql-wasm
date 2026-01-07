@@ -1,0 +1,11 @@
+--- a/bazel/icu.BUILD
++++ b/bazel/icu.BUILD
+@@ -48,7 +48,7 @@ configure_make(
+     configure_options = [
+         "--enable-option-checking",
+         "--enable-static",
+-        "--enable-tools",  # needed to build data
++        "--disable-tools",  # WASM: disable tools to avoid cross-compile execution issues
+         "--disable-shared",
+         "--disable-dyload",
+         "--disable-extras",

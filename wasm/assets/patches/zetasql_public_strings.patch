@@ -1,0 +1,55 @@
+--- a/zetasql/public/strings.cc
++++ b/zetasql/public/strings.cc
+@@ -73,12 +73,12 @@
+   if (closing_str.empty()) return true;
+ 
+   const char* p = source.data();
+-  const char* end = source.end();
++  const char* end = source.data() + source.size();
+ 
+   bool is_closed = false;
+   while (p + closing_str.length() <= end) {
+     if (*p != '\\') {
+-      const int cur_pos = p - source.begin();
++      const int cur_pos = p - source.data();
+       const bool is_closing =
+           absl::StartsWith(absl::ClippedSubstr(source, cur_pos), closing_str);
+       if (is_closing && p + closing_str.length() < end) {
+@@ -187,7 +187,7 @@
+ 
+   char* d = dest;
+   const char* p = source.data();
+-  const char* end = source.end();
++  const char* end = source.data() + source.size();
+   const char* last_byte = end - 1;
+ 
+   while (p < end) {
+@@ -511,7 +511,8 @@
+   std::string dest;
+   bool last_hex_escape = false;  // true if last output char was \xNN.
+ 
+-  for (const char* p = src.begin(); p < src.end(); ++p) {
++  const char* src_end = src.data() + src.size();
++  for (const char* p = src.data(); p < src_end; ++p) {
+     unsigned char c = *p;
+     bool is_hex_escape = false;
+     switch (c) {
+@@ -587,7 +588,8 @@
+ std::string EscapeBytes(absl::string_view str, bool escape_all_bytes,
+                         char escape_quote_char) {
+   std::string escaped_bytes;
+-  for (const char* p = str.begin(); p < str.end(); ++p) {
++  const char* str_end = str.data() + str.size();
++  for (const char* p = str.data(); p < str_end; ++p) {
+     unsigned char c = *p;
+     if (escape_all_bytes || !absl::ascii_isprint(c)) {
+       escaped_bytes += "\\x";
+@@ -1058,7 +1060,7 @@
+     }
+ 
+     // Extract the segment and attempt to parse as an identifier.
+-    absl::string_view segment(segment_start, std::distance(segment_start, p));
++    absl::string_view segment(&*segment_start, std::distance(segment_start, p));
+     ZETASQL_RETURN_IF_ERROR(
+         AddIdentifierPathSegment(segment, language_options, &temp_out));
+ 

@@ -1,0 +1,30 @@
+--- a/zetasql/public/functions/regexp.cc
++++ b/zetasql/public/functions/regexp.cc
+@@ -521,7 +521,7 @@
+         } else {
+           len = 1;
+         }
+-        out->append(p, len);
++        out->append(&*p, len);
+         p += len;
+       } else {
+         break;
+@@ -537,14 +537,14 @@
+                      absl::Span<const absl::string_view> groups,
+                      int32_t max_out_size, std::string* out,
+                      absl::Status* error) const {
+-  for (const char* s = rewrite.data(); s < rewrite.end(); ++s) {
++  for (const char* s = rewrite.data(); s < rewrite.data() + rewrite.size(); ++s) {
+     const char* start = s;
+-    while (s < rewrite.end() && *s != '\\') s++;
++    while (s < rewrite.data() + rewrite.size() && *s != '\\') s++;
+     out->append(start, s);
+ 
+-    if (s < rewrite.end()) {
++    if (s < rewrite.data() + rewrite.size()) {
+       s++;
+-      int c = (s < rewrite.end()) ? *s : -1;
++      int c = (s < rewrite.data() + rewrite.size()) ? *s : -1;
+       if (isdigit(c)) {
+         int n = (c - '0');
+         out->append(groups[n].data(), groups[n].size());
