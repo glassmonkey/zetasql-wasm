@@ -1,3 +1,9 @@
+# Bazel cache configuration for Docker persistence
+# Repository cache: Downloaded external dependencies (git repos, http archives, etc.)
+build --repository_cache=/home/builder/.cache/bazel/repository_cache
+# Disk cache: Build artifacts and action outputs
+build --disk_cache=/home/builder/.cache/bazel/disk_cache
+
 # Enable MODULE.bazel-based dependency management (common to all commands)
 common --enable_bzlmod
 
