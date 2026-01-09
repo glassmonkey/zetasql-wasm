@@ -17,7 +17,7 @@ help: ## Show this help message
 	@echo ""
 
 build: ## Build ZetaSQL WASM using Docker
-	@bash script/build.sh | tee build.log
+	@bash script/build.sh 2>&1 | tee build.log
 
 test: ## Test WASI compatibility
 	@if [ ! -f $(WASM_OUTPUT) ]; then \

@@ -11,21 +11,13 @@ echo ""
 USER_ID=$(id -u)
 GROUP_ID=$(id -g)
 
-# Create cache and output directories with correct ownership
+# Create cache and output directories
 mkdir -p "$WASM_DIR/.cache/bazel"
 mkdir -p "$WASM_DIR/output"
 
-# On macOS with Docker Desktop, ownership is automatically handled
-# Only set ownership on Linux if needed
-if [ "$(uname)" != "Darwin" ]; then
-  chown -R "$USER_ID:$GROUP_ID" "$WASM_DIR/.cache/bazel" 2>/dev/null || true
-  chown -R "$USER_ID:$GROUP_ID" "$WASM_DIR/output" 2>/dev/null || true
-fi
-chmod -R u+w "$WASM_DIR/output" 2>/dev/null || true
-
 echo "Building with USER_ID=$USER_ID, GROUP_ID=$GROUP_ID"
 
-# Build Docker image (build environment only)
+# Build Docker image
 IMAGE_NAME="zetasql-wasm-builder"
 echo "Building Docker image: $IMAGE_NAME"
 docker build \
@@ -49,15 +41,28 @@ docker run --rm \
 
 # Copy output to wasm directory
 if [ -f "$WASM_DIR/output/zetasql.wasm" ]; then
-  # Remove existing file if it exists (to avoid permission issues)
+  # Copy WASM file
   rm -f "$WASM_DIR/zetasql.wasm"
   cp "$WASM_DIR/output/zetasql.wasm" "$WASM_DIR/"
+
+  # Copy proto schemas
+  if [ -d "$WASM_DIR/output/schemas" ]; then
+    echo ""
+    echo "Copying proto schemas..."
+    rm -rf "$WASM_DIR/schemas"
+    cp -r "$WASM_DIR/output/schemas" "$WASM_DIR/"
+    echo "Proto schemas copied to $WASM_DIR/schemas/"
+    echo ""
+    echo "Proto schemas:"
+    find "$WASM_DIR/schemas" -name "*.proto" -type f -exec ls -lh {} \;
+  fi
+
   echo ""
-  echo "Build complete! Generated file:"
+  echo "Build complete! Generated files:"
   ls -lh "$WASM_DIR/zetasql.wasm"
+
   echo ""
   echo "WASI-compatible standalone WASM built successfully!"
-  echo "Run 'make test' to verify WASI compatibility"
 else
   echo "Error: Build failed - zetasql.wasm not found"
   exit 1
