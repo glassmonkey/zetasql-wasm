@@ -11,9 +11,10 @@ echo ""
 USER_ID=$(id -u)
 GROUP_ID=$(id -g)
 
-# Create cache and output directories
+# Create cache and output directories with correct permissions
 mkdir -p "$WASM_DIR/.cache/bazel"
 mkdir -p "$WASM_DIR/output"
+chmod -R 777 "$WASM_DIR/output"  # Ensure Docker can write to output directory
 
 echo "Building with USER_ID=$USER_ID, GROUP_ID=$GROUP_ID"
 
@@ -32,10 +33,10 @@ echo ""
 echo "Running build in container..."
 
 # Run container with volume mounts
+# Note: .cache/bazel mount is temporarily disabled due to permission issues
 docker run --rm \
   --platform=linux/amd64 \
   -v "$WASM_DIR/assets:/home/builder/workspace:rw" \
-  -v "$WASM_DIR/.cache/bazel:/home/builder/.cache/bazel:rw" \
   -v "$WASM_DIR/output:/home/builder/output:rw" \
   "$IMAGE_NAME"
 
@@ -52,9 +53,17 @@ if [ -f "$WASM_DIR/output/zetasql.wasm" ]; then
     rm -rf "$WASM_DIR/schemas"
     cp -r "$WASM_DIR/output/schemas" "$WASM_DIR/"
     echo "Proto schemas copied to $WASM_DIR/schemas/"
+    echo "  $(find "$WASM_DIR/schemas" -name '*.proto' -type f | wc -l) proto files"
+  fi
+
+  # Copy generated Go code
+  if [ -d "$WASM_DIR/output/generated" ]; then
     echo ""
-    echo "Proto schemas:"
-    find "$WASM_DIR/schemas" -name "*.proto" -type f -exec ls -lh {} \;
+    echo "Copying generated Go code..."
+    rm -rf "$WASM_DIR/generated"
+    cp -r "$WASM_DIR/output/generated" "$WASM_DIR/"
+    echo "Generated Go code copied to $WASM_DIR/generated/"
+    echo "  $(find "$WASM_DIR/generated" -name '*.pb.go' -type f | wc -l) Go files"
   fi
 
   echo ""

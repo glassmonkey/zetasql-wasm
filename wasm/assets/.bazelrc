@@ -13,12 +13,26 @@ common --experimental_ui_max_stdouterr_bytes=-1
 
 # Required for using Emscripten toolchain
 build --incompatible_enable_cc_toolchain_resolution
-build --sandbox_debug
+
+# Required for using prebuilt protoc toolchain (Bazel 7+)
+common --incompatible_enable_proto_toolchain_resolution
 
 # ZetaSQL requires C++20
 build --cxxopt=-std=c++20
 build --host_cxxopt=-std=c++20
 build --action_env=BAZEL_CXXOPTS="-std=c++20"
+
+# Fix for absolute path inclusion errors in Docker environment
+# Safe to disable in isolated Docker builds
+# References:
+#   - https://github.com/bazelbuild/bazel/issues/21718
+#   - https://pigweed.dev/blog/09-bazel-relative-toolchain-paths.html
+build --features=-layering_check
+build --host_features=-layering_check
+
+# Clang-compatible flag for relative paths (works with Emscripten)
+build --copt=-no-canonical-prefixes
+build --host_copt=-no-canonical-prefixes
 
 # Java runtime specification (ZetaSQL official configuration)
 build --java_runtime_version=remotejdk_11

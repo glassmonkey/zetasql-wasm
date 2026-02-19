@@ -9,6 +9,7 @@ cc_binary(
         "@zetasql//zetasql/public:parse_helpers",
         "@zetasql//zetasql/public:analyzer",
         "@zetasql//zetasql/public:parse_resume_location",
+        "@zetasql//zetasql/public:simple_catalog",
     ],
     linkopts = [
         # Export functions for WASI/standalone runtime
