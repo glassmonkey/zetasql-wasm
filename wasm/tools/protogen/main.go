@@ -78,33 +78,36 @@ func generate(protoPath, outputDir, goModule string, verbose bool) error {
 	fmt.Printf("📁 Output directory: %s\n", outputDir)
 	fmt.Println()
 
-	// Create output directory if it doesn't exist
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return fmt.Errorf("failed to create output directory: %w", err)
+	// Create temporary output directory for initial generation
+	tmpDir, err := os.MkdirTemp("", "protogen-*")
+	if err != nil {
+		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
+	defer os.RemoveAll(tmpDir)
 
 	// Generate M options
 	mOpts := generateMOptions(protoFiles, protoPath, goModule)
 
 	// Build protoc command
+	// Use paths=source_relative to maintain directory structure in temp dir
 	args := []string{
-		"--go_out=" + outputDir,
+		"--go_out=" + tmpDir,
 		"--go_opt=paths=source_relative",
 	}
 
 	// Add well-known types mapping to standard protobuf packages
 	wellKnownTypes := map[string]string{
-		"google/protobuf/descriptor.proto":   "google.golang.org/protobuf/types/descriptorpb",
-		"google/protobuf/timestamp.proto":    "google.golang.org/protobuf/types/known/timestamppb",
-		"google/protobuf/duration.proto":     "google.golang.org/protobuf/types/known/durationpb",
-		"google/protobuf/empty.proto":        "google.golang.org/protobuf/types/known/emptypb",
-		"google/protobuf/struct.proto":       "google.golang.org/protobuf/types/known/structpb",
-		"google/protobuf/wrappers.proto":     "google.golang.org/protobuf/types/known/wrapperspb",
-		"google/protobuf/any.proto":          "google.golang.org/protobuf/types/known/anypb",
-		"google/protobuf/field_mask.proto":   "google.golang.org/protobuf/types/known/fieldmaskpb",
+		"google/protobuf/descriptor.proto":     "google.golang.org/protobuf/types/descriptorpb",
+		"google/protobuf/timestamp.proto":      "google.golang.org/protobuf/types/known/timestamppb",
+		"google/protobuf/duration.proto":       "google.golang.org/protobuf/types/known/durationpb",
+		"google/protobuf/empty.proto":          "google.golang.org/protobuf/types/known/emptypb",
+		"google/protobuf/struct.proto":         "google.golang.org/protobuf/types/known/structpb",
+		"google/protobuf/wrappers.proto":       "google.golang.org/protobuf/types/known/wrapperspb",
+		"google/protobuf/any.proto":            "google.golang.org/protobuf/types/known/anypb",
+		"google/protobuf/field_mask.proto":     "google.golang.org/protobuf/types/known/fieldmaskpb",
 		"google/protobuf/source_context.proto": "google.golang.org/protobuf/types/known/sourcecontextpb",
-		"google/protobuf/type.proto":         "google.golang.org/protobuf/types/known/typepb",
-		"google/protobuf/api.proto":          "google.golang.org/protobuf/types/known/apipb",
+		"google/protobuf/type.proto":           "google.golang.org/protobuf/types/known/typepb",
+		"google/protobuf/api.proto":            "google.golang.org/protobuf/types/known/apipb",
 	}
 	for proto, goPkg := range wellKnownTypes {
 		args = append(args, fmt.Sprintf("--go_opt=M%s=%s", proto, goPkg))
@@ -145,6 +148,11 @@ func generate(protoPath, outputDir, goModule string, verbose bool) error {
 		}
 	}
 
+	// Flatten generated files with directory prefix
+	if err := flattenWithPrefix(tmpDir, outputDir, verbose); err != nil {
+		return fmt.Errorf("failed to flatten generated files: %w", err)
+	}
+
 	fmt.Println()
 	fmt.Println("✅ Code generation complete!")
 	fmt.Println()
@@ -156,6 +164,56 @@ func generate(protoPath, outputDir, goModule string, verbose bool) error {
 
 	fmt.Println("🎉 Done! Generated code is ready in:", outputDir+"/")
 	return nil
+}
+
+// flattenWithPrefix moves all .pb.go files to output directory with directory prefix in filename
+func flattenWithPrefix(srcDir, dstDir string, verbose bool) error {
+	// Create output directory
+	if err := os.MkdirAll(dstDir, 0755); err != nil {
+		return err
+	}
+
+	return filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		if !strings.HasSuffix(path, ".pb.go") {
+			return nil
+		}
+
+		// Get relative path from source directory
+		relPath, err := filepath.Rel(srcDir, path)
+		if err != nil {
+			return err
+		}
+
+		// Create prefixed filename: zetasql/proto/function.pb.go -> zetasql_proto_function.pb.go
+		prefix := strings.ReplaceAll(filepath.Dir(relPath), string(filepath.Separator), "_")
+		baseName := filepath.Base(relPath)
+		newName := prefix + "_" + baseName
+
+		dstPath := filepath.Join(dstDir, newName)
+
+		if verbose {
+			fmt.Printf("  → %s -> %s\n", relPath, newName)
+		}
+
+		// Copy file
+		return copyFile(path, dstPath)
+	})
+}
+
+func copyFile(src, dst string) error {
+	data, err := os.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(dst, data, 0644)
 }
 
 func collectProtoFiles(protoPath string) ([]string, error) {
@@ -195,18 +253,14 @@ func collectProtoFiles(protoPath string) ([]string, error) {
 func generateMOptions(protoFiles []string, protoPath, goModule string) []string {
 	var opts []string
 
+	// Use flat package structure to avoid circular imports
+	// All proto files are mapped to the same package (goModule itself)
 	for _, protoFile := range protoFiles {
 		// Remove protoPath prefix
 		relPath := strings.TrimPrefix(protoFile, protoPath+"/")
 
-		// Get directory path
-		dirPath := filepath.Dir(relPath)
-
-		// Generate Go package path
-		goPkg := filepath.Join(goModule, dirPath)
-
-		// Add M option
-		opts = append(opts, fmt.Sprintf("--go_opt=M%s=%s", relPath, goPkg))
+		// Add M option - all files go to the same flat package
+		opts = append(opts, fmt.Sprintf("--go_opt=M%s=%s", relPath, goModule))
 	}
 
 	return opts
