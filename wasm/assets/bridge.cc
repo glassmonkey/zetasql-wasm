@@ -8,10 +8,74 @@
 #include "zetasql/public/parse_helpers.h"
 #include "zetasql/public/analyzer.h"
 #include "zetasql/public/simple_catalog.h"
+#include "zetasql/public/builtin_function_options.h"
+#include "zetasql/public/language_options.h"
 #include "zetasql/resolved_ast/resolved_node.h"
 #include "zetasql/resolved_ast/serialization.pb.h"
+#include "zetasql/parser/parse_tree_serializer.h"
+#include "zetasql/parser/parse_tree.pb.h"
 
 extern "C" {
+
+// ============ Debug functions ============
+// These functions help identify where crashes occur
+// Note: No try/catch used because Emscripten has exceptions disabled by default
+
+// Test 1: Just return a string (basic WASM test)
+EMSCRIPTEN_KEEPALIVE
+char* debug_test_basic() {
+    return strdup("debug_test_basic: OK");
+}
+
+// Test 2: Test SimpleCatalog creation
+EMSCRIPTEN_KEEPALIVE
+char* debug_test_catalog() {
+    zetasql::SimpleCatalog catalog("test_catalog");
+    return strdup("debug_test_catalog: OK - SimpleCatalog created");
+}
+
+// Test 3: Test SimpleCatalog with AddZetaSQLFunctions
+EMSCRIPTEN_KEEPALIVE
+char* debug_test_catalog_with_functions() {
+    zetasql::SimpleCatalog catalog("test_catalog");
+    catalog.AddZetaSQLFunctions();
+    return strdup("debug_test_catalog_with_functions: OK - Functions added");
+}
+
+// Test 4: Test AnalyzerOptions creation with minimal settings
+EMSCRIPTEN_KEEPALIVE
+char* debug_test_analyzer_options() {
+    // Create AnalyzerOptions with explicit language options to avoid
+    // default initialization issues in WASM environment
+    zetasql::AnalyzerOptions options;
+
+    // Set minimal language options
+    zetasql::LanguageOptions language_options;
+    language_options.SetSupportsAllStatementKinds();
+    options.set_language(language_options);
+
+    return strdup("debug_test_analyzer_options: OK - AnalyzerOptions created");
+}
+
+// Test 5: Test full AnalyzeStatement with simple SQL
+EMSCRIPTEN_KEEPALIVE
+char* debug_test_analyze() {
+    zetasql::SimpleCatalog catalog("test_catalog");
+    catalog.AddZetaSQLFunctions();
+    zetasql::AnalyzerOptions options;
+
+    std::unique_ptr<const zetasql::AnalyzerOutput> output;
+    absl::Status status = zetasql::AnalyzeStatement(
+        "SELECT 1", options, &catalog, catalog.type_factory(), &output);
+
+    if (!status.ok()) {
+        std::string error = "debug_test_analyze: ANALYZE FAILED - " + status.ToString();
+        return strdup(error.c_str());
+    }
+    return strdup("debug_test_analyze: OK - AnalyzeStatement succeeded");
+}
+
+// ============ End Debug functions ============
 
 // Parse SQL and return AST string (legacy)
 EMSCRIPTEN_KEEPALIVE
@@ -33,23 +97,20 @@ char* parse_statement(const char* sql) {
     return strdup(result.c_str());
 }
 
-// Analyze SQL and return serialized Resolved AST proto bytes
+// Parse SQL and return serialized Parse Tree AST proto bytes
+// Uses ParseStatement + ParseTreeSerializer (does NOT require AnalyzeStatement)
 // Returns: pointer to struct { size: uint32, data: uint8[] }
 EMSCRIPTEN_KEEPALIVE
 void* parse_statement_proto(const char* sql) {
     std::string sql_str(sql);
+    zetasql::ParserOptions parser_options;
 
-    // Create a simple catalog (no tables defined)
-    zetasql::SimpleCatalog catalog("default_catalog");
-    zetasql::AnalyzerOptions options;
-
-    std::unique_ptr<const zetasql::AnalyzerOutput> output;
-    absl::Status status = zetasql::AnalyzeStatement(
-        sql_str, options, &catalog, catalog.type_factory(), &output);
+    std::unique_ptr<zetasql::ParserOutput> parser_output;
+    absl::Status status = zetasql::ParseStatement(
+        sql_str, parser_options, &parser_output);
 
     if (!status.ok()) {
         std::string error = "Error: " + status.ToString();
-        // Return error as string with size prefix
         uint32_t size = error.size();
         void* result = malloc(sizeof(uint32_t) + size + 1);
         memcpy(result, &size, sizeof(uint32_t));
@@ -57,11 +118,10 @@ void* parse_statement_proto(const char* sql) {
         return result;
     }
 
-    // Serialize Resolved AST to proto
-    zetasql::FileDescriptorSetMap file_descriptor_set_map;
-    zetasql::AnyResolvedNodeProto proto;
-    absl::Status serialize_status = output->resolved_statement()->SaveTo(
-        &file_descriptor_set_map, &proto);
+    // Serialize Parse Tree AST to proto using ParseTreeSerializer
+    zetasql::AnyASTStatementProto proto;
+    absl::Status serialize_status = zetasql::ParseTreeSerializer::Serialize(
+        parser_output->statement(), &proto);
 
     if (!serialize_status.ok()) {
         std::string error = "Error serializing: " + serialize_status.ToString();

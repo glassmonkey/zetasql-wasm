@@ -39,6 +39,8 @@ git_override(
         "//:patches/zetasql_public_functions_regexp.patch",
         "//:patches/zetasql_public_functions_string.patch",
         "//:patches/zetasql_public_strings.patch",
+        "//:patches/zetasql_resolved_ast_visibility.patch",
+        "//:patches/zetasql_parser_visibility.patch",
     ],
     patch_strip = 1,
 )

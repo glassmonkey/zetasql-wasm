@@ -10,10 +10,14 @@ cc_binary(
         "@zetasql//zetasql/public:analyzer",
         "@zetasql//zetasql/public:parse_resume_location",
         "@zetasql//zetasql/public:simple_catalog",
+        "@zetasql//zetasql/resolved_ast",
+        "@zetasql//zetasql/resolved_ast:serialization_cc_proto",
+        "@zetasql//zetasql/parser:parse_tree_serializer",
+        "@zetasql//zetasql/parser:parse_tree_cc_proto",
     ],
     linkopts = [
         # Export functions for WASI/standalone runtime
-        "-sEXPORTED_FUNCTIONS=_parse_statement,_analyze_statement,_free_string,_malloc,_free",
+        "-sEXPORTED_FUNCTIONS=_parse_statement,_parse_statement_proto,_analyze_statement,_free_string,_free_proto_buffer,_malloc,_free,_debug_test_basic,_debug_test_catalog,_debug_test_catalog_with_functions,_debug_test_analyzer_options,_debug_test_analyze",
         "-sEXPORTED_RUNTIME_METHODS=ccall,cwrap",
 
         # Standalone WASM mode - compatible with WASI runtimes (wasmtime, wasmer)
@@ -23,11 +27,14 @@ cc_binary(
         # Reactor mode: no main function required (library mode)
         "-Wl,--no-entry",
 
-        # Memory configuration
+        # Memory configuration - increased for ZetaSQL analyzer
         "-sALLOW_MEMORY_GROWTH=1",
-        "-sINITIAL_MEMORY=256MB",
-        "-sSTACK_SIZE=5MB",
-        "-sMAXIMUM_MEMORY=2GB",
+        "-sINITIAL_MEMORY=512MB",
+        "-sSTACK_SIZE=16MB",
+        "-sMAXIMUM_MEMORY=4GB",
+
+        # Disable assertions that cause unreachable in WASM
+        "-sASSERTIONS=0",
 
         # Disable pthread to avoid shared-memory/atomics issues
         "-sPROXY_TO_PTHREAD=0",
