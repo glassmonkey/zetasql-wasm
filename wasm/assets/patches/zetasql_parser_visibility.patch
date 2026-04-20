@@ -1,0 +1,18 @@
+--- a/zetasql/parser/BUILD
++++ b/zetasql/parser/BUILD
+@@ -131,6 +131,7 @@
+
+ cc_proto_library(
+     name = "parse_tree_cc_proto",
++    visibility = ["//visibility:public"],
+     deps = [":parse_tree_proto"],
+ )
+
+@@ -576,6 +577,7 @@
+
+ cc_library(
+     name = "parse_tree_serializer",
++    visibility = ["//visibility:public"],
+     srcs = ["parse_tree_serializer.cc"],
+     hdrs = [
+         "parse_tree_serializer.h",

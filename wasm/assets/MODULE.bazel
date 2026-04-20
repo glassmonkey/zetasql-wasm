@@ -15,6 +15,13 @@ bazel_dep(name = "rules_cc", version = "0.2.8")
 # Using the latest version registered in BCR
 bazel_dep(name = "emsdk", version = "4.0.17")
 
+# Prebuilt protoc toolchain (must be BEFORE protobuf to win toolchain registration)
+# toolchains_protoc provides prebuilt protoc binaries for protobuf < 33.4
+bazel_dep(name = "toolchains_protoc", version = "0.6.1")
+
+# Protobuf (explicitly declared for dependency management)
+bazel_dep(name = "protobuf", version = "29.1")
+
 # ZetaSQL dependency (automatically updated by Renovate Bot)
 # Since ZetaSQL is not registered in BCR, it is managed using a combination of bazel_dep and git_override
 # Note: bazel_dep has no actual implementation, but serves as a marker for Renovate Bot to track versions
@@ -32,6 +39,8 @@ git_override(
         "//:patches/zetasql_public_functions_regexp.patch",
         "//:patches/zetasql_public_functions_string.patch",
         "//:patches/zetasql_public_strings.patch",
+        "//:patches/zetasql_resolved_ast_visibility.patch",
+        "//:patches/zetasql_parser_visibility.patch",
     ],
     patch_strip = 1,
 )
@@ -44,4 +53,12 @@ single_version_override(
     version = "20240722.1",
 )
 
+# Override the toolchain registration from the protobuf module
+# This ensures toolchains_protoc wins the toolchain registration
+protoc = use_extension("@toolchains_protoc//protoc:extensions.bzl", "protoc")
+protoc.toolchain(
+    version = "v29.1",  # Match protobuf runtime version
+)
+use_repo(protoc, "toolchains_protoc_hub")
+register_toolchains("@toolchains_protoc_hub//:all")
 

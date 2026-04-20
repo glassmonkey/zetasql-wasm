@@ -12,6 +12,9 @@ rm -f "$WASM_DIR"/*.wasm
 # Remove output directory
 rm -rf "$WASM_DIR/output"
 
+# Remove Bazel cache directory
+rm -rf "$WASM_DIR/.cache"
+
 # Remove Docker image
 IMAGE_NAME="zetasql-wasm-builder"
 if docker images -q "$IMAGE_NAME" 2> /dev/null | grep -q .; then

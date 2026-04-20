@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package api.v1;
+
+option go_package = "github.com/glassmonkey/zetasql-wasm/wasm/tools/example/generated/api/v1";
+
+message User {
+  int64 id = 1;
+  string username = 2;
+  string email = 3;
+}
+
+message GetUserRequest {
+  int64 user_id = 1;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
