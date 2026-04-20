@@ -5,13 +5,12 @@ import (
 	"encoding/binary"
 	"fmt"
 
+	"github.com/glassmonkey/zetasql-wasm/ast"
 	"github.com/glassmonkey/zetasql-wasm/wasm"
-	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/imports/emscripten"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
-	"google.golang.org/protobuf/proto"
 )
 
 // init validates the WASM file structure
@@ -55,14 +54,16 @@ func (e *ParseError) Error() string {
 // Statement represents a successfully parsed SQL statement.
 type Statement struct {
 	sql  string
-	node *generated.AnyASTStatementProto
+	root ast.StatementNode
 }
 
 // SQL returns the original SQL string.
 func (s *Statement) SQL() string { return s.sql }
 
-// proto returns the internal proto AST node (unexported, for internal/generated code).
-func (s *Statement) proto() *generated.AnyASTStatementProto { return s.node }
+// RootNode returns the root AST node of the parsed statement.
+func (s *Statement) RootNode() ast.StatementNode {
+	return s.root
+}
 
 // NewParser creates a new ZetaSQL parser instance
 func NewParser(ctx context.Context) (*Parser, error) {
@@ -179,15 +180,15 @@ func (p *Parser) ParseStatement(ctx context.Context, sql string) (*Statement, er
 		return nil, &ParseError{Message: dataStr[7:]}
 	}
 
-	// Deserialize proto
-	astNode := &generated.AnyASTStatementProto{}
-	if err := proto.Unmarshal(dataBytes, astNode); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal proto: %w", err)
+	// Deserialize proto into AST
+	root, err := ast.StatementFromBytes(dataBytes)
+	if err != nil {
+		return nil, err
 	}
 
 	return &Statement{
 		sql:  sql,
-		node: astNode,
+		root: root,
 	}, nil
 }
 
