@@ -10,51 +10,111 @@ import (
 )
 
 func TestSimpleTableToProto(t *testing.T) {
-	table := NewSimpleTable("orders",
-		NewSimpleColumn("orders", "id", types.Int64Type()),
-		NewSimpleColumn("orders", "total", types.DoubleType()),
-	)
-	got := table.ToProto()
-	want := &generated.SimpleTableProto{
-		Name:         ptr("orders"),
-		IsValueTable: boolPtr(false),
-		Column: []*generated.SimpleColumnProto{
-			{
-				Name:             ptr("id"),
-				Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_INT64.Enum()},
-				IsPseudoColumn:   boolPtr(false),
-				IsWritableColumn: boolPtr(true),
+	tests := []struct {
+		name  string
+		table *SimpleTable
+		want  *generated.SimpleTableProto
+	}{
+		{
+			name: "multi-column table",
+			table: NewSimpleTable("orders",
+				NewSimpleColumn("orders", "id", types.Int64Type()),
+				NewSimpleColumn("orders", "total", types.DoubleType()),
+			),
+			want: &generated.SimpleTableProto{
+				Name:         ptr("orders"),
+				IsValueTable: boolPtr(false),
+				Column: []*generated.SimpleColumnProto{
+					{
+						Name:             ptr("id"),
+						Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_INT64.Enum()},
+						IsPseudoColumn:   boolPtr(false),
+						IsWritableColumn: boolPtr(true),
+					},
+					{
+						Name:             ptr("total"),
+						Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_DOUBLE.Enum()},
+						IsPseudoColumn:   boolPtr(false),
+						IsWritableColumn: boolPtr(true),
+					},
+				},
 			},
-			{
-				Name:             ptr("total"),
-				Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_DOUBLE.Enum()},
-				IsPseudoColumn:   boolPtr(false),
-				IsWritableColumn: boolPtr(true),
+		},
+		{
+			name:  "empty table",
+			table: NewSimpleTable("empty"),
+			want: &generated.SimpleTableProto{
+				Name:         ptr("empty"),
+				IsValueTable: boolPtr(false),
 			},
 		},
 	}
-	if diff := cmp.Diff(want, got, protocmp.Transform()); diff != "" {
-		t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if diff := cmp.Diff(tt.want, tt.table.ToProto(), protocmp.Transform()); diff != "" {
+				t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
+			}
+		})
 	}
 }
 
-func TestSimpleTableAddColumn(t *testing.T) {
-	table := NewSimpleTable("t")
-	table.AddColumn(NewSimpleColumn("t", "x", types.BoolType()))
-	got := table.ToProto()
-	want := &generated.SimpleTableProto{
-		Name:         ptr("t"),
-		IsValueTable: boolPtr(false),
-		Column: []*generated.SimpleColumnProto{
-			{
-				Name:             ptr("x"),
-				Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_BOOL.Enum()},
-				IsPseudoColumn:   boolPtr(false),
-				IsWritableColumn: boolPtr(true),
+func TestSimpleTableAddColumnToProto(t *testing.T) {
+	tests := []struct {
+		name string
+		add  []*SimpleColumn
+		want *generated.SimpleTableProto
+	}{
+		{
+			name: "add one column",
+			add:  []*SimpleColumn{NewSimpleColumn("t", "x", types.BoolType())},
+			want: &generated.SimpleTableProto{
+				Name:         ptr("t"),
+				IsValueTable: boolPtr(false),
+				Column: []*generated.SimpleColumnProto{
+					{
+						Name:             ptr("x"),
+						Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_BOOL.Enum()},
+						IsPseudoColumn:   boolPtr(false),
+						IsWritableColumn: boolPtr(true),
+					},
+				},
+			},
+		},
+		{
+			name: "add two columns",
+			add: []*SimpleColumn{
+				NewSimpleColumn("t", "a", types.StringType()),
+				NewSimpleColumn("t", "b", types.TimestampType()),
+			},
+			want: &generated.SimpleTableProto{
+				Name:         ptr("t"),
+				IsValueTable: boolPtr(false),
+				Column: []*generated.SimpleColumnProto{
+					{
+						Name:             ptr("a"),
+						Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_STRING.Enum()},
+						IsPseudoColumn:   boolPtr(false),
+						IsWritableColumn: boolPtr(true),
+					},
+					{
+						Name:             ptr("b"),
+						Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_TIMESTAMP.Enum()},
+						IsPseudoColumn:   boolPtr(false),
+						IsWritableColumn: boolPtr(true),
+					},
+				},
 			},
 		},
 	}
-	if diff := cmp.Diff(want, got, protocmp.Transform()); diff != "" {
-		t.Errorf("ToProto() after AddColumn mismatch (-want +got):\n%s", diff)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			table := NewSimpleTable("t")
+			for _, c := range tt.add {
+				table.AddColumn(c)
+			}
+			if diff := cmp.Diff(tt.want, table.ToProto(), protocmp.Transform()); diff != "" {
+				t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
+			}
+		})
 	}
 }
