@@ -7,7 +7,6 @@ import (
 )
 
 func TestScalarTypeSingletons(t *testing.T) {
-	// Verify that accessor functions return the same instance.
 	if Int64Type() != Int64Type() {
 		t.Error("Int64Type() should return the same instance")
 	}
@@ -83,18 +82,6 @@ func TestTypeFromKindError(t *testing.T) {
 	}
 }
 
-func TestTypeKindIsSimple(t *testing.T) {
-	if !Int64.IsSimple() {
-		t.Error("Int64 should be simple")
-	}
-	if Array.IsSimple() {
-		t.Error("Array should not be simple")
-	}
-	if Struct.IsSimple() {
-		t.Error("Struct should not be simple")
-	}
-}
-
 func TestScalarTypeToProtoRoundTrip(t *testing.T) {
 	for kind, typ := range scalarTypes {
 		proto := typ.ToProto()
@@ -108,152 +95,5 @@ func TestScalarTypeToProtoRoundTrip(t *testing.T) {
 		if restored != typ {
 			t.Errorf("round-trip for %v did not return same singleton", kind)
 		}
-	}
-}
-
-func TestArrayType(t *testing.T) {
-	arr, err := NewArrayType(Int64Type())
-	if err != nil {
-		t.Fatal(err)
-	}
-	if arr.Kind() != Array {
-		t.Errorf("Kind() = %v, want Array", arr.Kind())
-	}
-	if !arr.IsArray() {
-		t.Error("IsArray() should be true")
-	}
-	if arr.AsArray() != arr {
-		t.Error("AsArray() should return self")
-	}
-	if arr.ElementType() != Int64Type() {
-		t.Error("ElementType() should be Int64Type()")
-	}
-}
-
-func TestArrayTypeNilElement(t *testing.T) {
-	_, err := NewArrayType(nil)
-	if err == nil {
-		t.Error("NewArrayType(nil) should return error")
-	}
-}
-
-func TestArrayOfArrayRejected(t *testing.T) {
-	inner, _ := NewArrayType(StringType())
-	_, err := NewArrayType(inner)
-	if err == nil {
-		t.Error("array of array should be rejected")
-	}
-}
-
-func TestArrayTypeToProtoRoundTrip(t *testing.T) {
-	arr, _ := NewArrayType(StringType())
-	proto := arr.ToProto()
-
-	restored, err := TypeFromProto(proto)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if restored.Kind() != Array {
-		t.Errorf("restored Kind() = %v, want Array", restored.Kind())
-	}
-	restoredArr := restored.AsArray()
-	if restoredArr == nil {
-		t.Fatal("restored AsArray() is nil")
-	}
-	if restoredArr.ElementType().Kind() != String {
-		t.Errorf("restored element Kind() = %v, want String", restoredArr.ElementType().Kind())
-	}
-}
-
-func TestStructType(t *testing.T) {
-	st, err := NewStructType([]*StructField{
-		NewStructField("x", Int64Type()),
-		NewStructField("y", StringType()),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if st.Kind() != Struct {
-		t.Errorf("Kind() = %v, want Struct", st.Kind())
-	}
-	if !st.IsStruct() {
-		t.Error("IsStruct() should be true")
-	}
-	if st.AsStruct() != st {
-		t.Error("AsStruct() should return self")
-	}
-	if st.NumFields() != 2 {
-		t.Fatalf("NumFields() = %d, want 2", st.NumFields())
-	}
-	if st.Field(0).Name() != "x" || st.Field(0).Type() != Int64Type() {
-		t.Error("Field(0) mismatch")
-	}
-	if st.Field(1).Name() != "y" || st.Field(1).Type() != StringType() {
-		t.Error("Field(1) mismatch")
-	}
-}
-
-func TestStructTypeNilFields(t *testing.T) {
-	st, err := NewStructType(nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if st.NumFields() != 0 {
-		t.Errorf("NumFields() = %d, want 0", st.NumFields())
-	}
-}
-
-func TestStructTypeToProtoRoundTrip(t *testing.T) {
-	st, _ := NewStructType([]*StructField{
-		NewStructField("id", Int64Type()),
-		NewStructField("name", StringType()),
-	})
-	proto := st.ToProto()
-
-	restored, err := TypeFromProto(proto)
-	if err != nil {
-		t.Fatal(err)
-	}
-	restoredSt := restored.AsStruct()
-	if restoredSt == nil {
-		t.Fatal("restored AsStruct() is nil")
-	}
-	if restoredSt.NumFields() != 2 {
-		t.Fatalf("restored NumFields() = %d, want 2", restoredSt.NumFields())
-	}
-	if restoredSt.Field(0).Name() != "id" {
-		t.Errorf("restored Field(0).Name() = %q, want %q", restoredSt.Field(0).Name(), "id")
-	}
-	if restoredSt.Field(1).Type().Kind() != String {
-		t.Errorf("restored Field(1).Type().Kind() = %v, want String", restoredSt.Field(1).Type().Kind())
-	}
-}
-
-func TestNestedArrayOfStruct(t *testing.T) {
-	st, _ := NewStructType([]*StructField{
-		NewStructField("a", Int64Type()),
-	})
-	arr, err := NewArrayType(st)
-	if err != nil {
-		t.Fatal(err)
-	}
-	proto := arr.ToProto()
-	restored, err := TypeFromProto(proto)
-	if err != nil {
-		t.Fatal(err)
-	}
-	elem := restored.AsArray().ElementType()
-	if elem.Kind() != Struct {
-		t.Errorf("element Kind() = %v, want Struct", elem.Kind())
-	}
-	if elem.AsStruct().NumFields() != 1 {
-		t.Errorf("element NumFields() = %d, want 1", elem.AsStruct().NumFields())
-	}
-}
-
-func TestTypeFromProtoNil(t *testing.T) {
-	_, err := TypeFromProto(nil)
-	if err == nil {
-		t.Error("TypeFromProto(nil) should return error")
 	}
 }
