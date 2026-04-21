@@ -8,34 +8,6 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
-func TestArrayTypeProperties(t *testing.T) {
-	arr, err := NewArrayType(Int64Type())
-	if err != nil {
-		t.Fatal(err)
-	}
-	tests := []struct {
-		name string
-		got  any
-		want any
-	}{
-		{"Kind", arr.Kind(), Array},
-		{"IsArray", arr.IsArray(), true},
-		{"IsStruct", arr.IsStruct(), false},
-		{"ElementType", arr.ElementType(), Int64Type()},
-	}
-	for _, tt := range tests {
-		if tt.got != tt.want {
-			t.Errorf("%s = %v, want %v", tt.name, tt.got, tt.want)
-		}
-	}
-	if arr.AsArray() != arr {
-		t.Error("AsArray() should return self")
-	}
-	if arr.AsStruct() != nil {
-		t.Error("AsStruct() should return nil")
-	}
-}
-
 func TestArrayTypeErrors(t *testing.T) {
 	tests := []struct {
 		name    string

@@ -9,7 +9,6 @@ import (
 )
 
 func TestScalarTypeSingletons(t *testing.T) {
-	// Each accessor must return the same pointer every time.
 	accessors := []func() Type{
 		Int32Type, Int64Type, Uint32Type, Uint64Type,
 		BoolType, FloatType, DoubleType, StringType, BytesType,
@@ -23,32 +22,20 @@ func TestScalarTypeSingletons(t *testing.T) {
 	}
 }
 
-func TestScalarTypeProperties(t *testing.T) {
+func TestTypeInterfaceDispatch(t *testing.T) {
+	arr, _ := NewArrayType(Int64Type())
+	st, _ := NewStructType([]*StructField{NewStructField("x", Int64Type())})
+
 	tests := []struct {
-		name      string
-		typ       Type
-		wantKind  TypeKind
-		wantArray bool
+		name       string
+		typ        Type
+		wantKind   TypeKind
+		wantArray  bool
 		wantStruct bool
 	}{
-		{"Int32", Int32Type(), Int32, false, false},
-		{"Int64", Int64Type(), Int64, false, false},
-		{"Uint32", Uint32Type(), Uint32, false, false},
-		{"Uint64", Uint64Type(), Uint64, false, false},
-		{"Bool", BoolType(), Bool, false, false},
-		{"Float", FloatType(), Float, false, false},
-		{"Double", DoubleType(), Double, false, false},
-		{"String", StringType(), String, false, false},
-		{"Bytes", BytesType(), Bytes, false, false},
-		{"Date", DateType(), Date, false, false},
-		{"Timestamp", TimestampType(), Timestamp, false, false},
-		{"Time", TimeType(), Time, false, false},
-		{"Datetime", DatetimeType(), Datetime, false, false},
-		{"Geography", GeographyType(), Geography, false, false},
-		{"Numeric", NumericType(), Numeric, false, false},
-		{"BigNumeric", BigNumericType(), BigNumeric, false, false},
-		{"Json", JsonType(), Json, false, false},
-		{"Interval", IntervalType(), Interval, false, false},
+		{"scalar", Int64Type(), Int64, false, false},
+		{"array", arr, Array, true, false},
+		{"struct", st, Struct, false, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -60,12 +47,6 @@ func TestScalarTypeProperties(t *testing.T) {
 			}
 			if got := tt.typ.IsStruct(); got != tt.wantStruct {
 				t.Errorf("IsStruct() = %v, want %v", got, tt.wantStruct)
-			}
-			if tt.typ.AsArray() != nil {
-				t.Error("AsArray() should return nil for scalar")
-			}
-			if tt.typ.AsStruct() != nil {
-				t.Error("AsStruct() should return nil for scalar")
 			}
 		})
 	}

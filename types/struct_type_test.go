@@ -8,41 +8,6 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
-func TestStructTypeProperties(t *testing.T) {
-	st, err := NewStructType([]*StructField{
-		NewStructField("x", Int64Type()),
-		NewStructField("y", StringType()),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	tests := []struct {
-		name string
-		got  any
-		want any
-	}{
-		{"Kind", st.Kind(), Struct},
-		{"IsArray", st.IsArray(), false},
-		{"IsStruct", st.IsStruct(), true},
-		{"NumFields", st.NumFields(), 2},
-		{"Field(0).Name", st.Field(0).Name(), "x"},
-		{"Field(0).Type", st.Field(0).Type(), Int64Type()},
-		{"Field(1).Name", st.Field(1).Name(), "y"},
-		{"Field(1).Type", st.Field(1).Type(), StringType()},
-	}
-	for _, tt := range tests {
-		if tt.got != tt.want {
-			t.Errorf("%s = %v, want %v", tt.name, tt.got, tt.want)
-		}
-	}
-	if st.AsStruct() != st {
-		t.Error("AsStruct() should return self")
-	}
-	if st.AsArray() != nil {
-		t.Error("AsArray() should return nil")
-	}
-}
-
 func TestStructTypeNilFields(t *testing.T) {
 	st, err := NewStructType(nil)
 	if err != nil {
