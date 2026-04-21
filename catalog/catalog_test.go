@@ -4,12 +4,18 @@ import (
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/types"
+	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
-func TestSimpleCatalog(t *testing.T) {
-	cat := NewSimpleCatalog("test")
-	if cat.Name() != "test" {
-		t.Errorf("Name() = %q, want %q", cat.Name(), "test")
+func TestSimpleCatalogEmpty(t *testing.T) {
+	got := NewSimpleCatalog("test").ToProto()
+	want := &generated.SimpleCatalogProto{
+		Name: ptr("test"),
+	}
+	if diff := cmp.Diff(want, got, protocmp.Transform()); diff != "" {
+		t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
 	}
 }
 
@@ -18,25 +24,36 @@ func TestSimpleCatalogWithTablesAndBuiltins(t *testing.T) {
 	cat.AddTable(NewSimpleTable("users",
 		NewSimpleColumn("users", "id", types.Int64Type()),
 		NewSimpleColumn("users", "name", types.StringType()),
-		NewSimpleColumn("users", "active", types.BoolType()),
 	))
 	cat.AddZetaSQLBuiltinFunctions(nil)
 
-	p := cat.ToProto()
-	if p.GetName() != "main" {
-		t.Errorf("proto Name = %q, want %q", p.GetName(), "main")
+	got := cat.ToProto()
+	want := &generated.SimpleCatalogProto{
+		Name: ptr("main"),
+		Table: []*generated.SimpleTableProto{
+			{
+				Name:         ptr("users"),
+				IsValueTable: boolPtr(false),
+				Column: []*generated.SimpleColumnProto{
+					{
+						Name:             ptr("id"),
+						Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_INT64.Enum()},
+						IsPseudoColumn:   boolPtr(false),
+						IsWritableColumn: boolPtr(true),
+					},
+					{
+						Name:             ptr("name"),
+						Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_STRING.Enum()},
+						IsPseudoColumn:   boolPtr(false),
+						IsWritableColumn: boolPtr(true),
+					},
+				},
+			},
+		},
+		BuiltinFunctionOptions: &generated.ZetaSQLBuiltinFunctionOptionsProto{},
 	}
-	if len(p.GetTable()) != 1 {
-		t.Fatalf("proto Table count = %d, want 1", len(p.GetTable()))
-	}
-	if p.GetTable()[0].GetName() != "users" {
-		t.Errorf("proto Table[0].Name = %q, want %q", p.GetTable()[0].GetName(), "users")
-	}
-	if len(p.GetTable()[0].GetColumn()) != 3 {
-		t.Fatalf("proto Table[0] Column count = %d, want 3", len(p.GetTable()[0].GetColumn()))
-	}
-	if p.GetBuiltinFunctionOptions() == nil {
-		t.Error("proto BuiltinFunctionOptions should not be nil")
+	if diff := cmp.Diff(want, got, protocmp.Transform()); diff != "" {
+		t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
 	}
 }
 
@@ -48,23 +65,30 @@ func TestSimpleCatalogSubCatalogs(t *testing.T) {
 	))
 	root.AddSubCatalog(sub)
 
-	p := root.ToProto()
-	if len(p.GetCatalog()) != 1 {
-		t.Fatalf("proto Catalog count = %d, want 1", len(p.GetCatalog()))
+	got := root.ToProto()
+	want := &generated.SimpleCatalogProto{
+		Name: ptr("root"),
+		Catalog: []*generated.SimpleCatalogProto{
+			{
+				Name: ptr("schema1"),
+				Table: []*generated.SimpleTableProto{
+					{
+						Name:         ptr("t1"),
+						IsValueTable: boolPtr(false),
+						Column: []*generated.SimpleColumnProto{
+							{
+								Name:             ptr("col"),
+								Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_DOUBLE.Enum()},
+								IsPseudoColumn:   boolPtr(false),
+								IsWritableColumn: boolPtr(true),
+							},
+						},
+					},
+				},
+			},
+		},
 	}
-	subProto := p.GetCatalog()[0]
-	if subProto.GetName() != "schema1" {
-		t.Errorf("sub catalog name = %q, want %q", subProto.GetName(), "schema1")
-	}
-	if len(subProto.GetTable()) != 1 {
-		t.Fatalf("sub catalog table count = %d, want 1", len(subProto.GetTable()))
-	}
-}
-
-func TestSimpleCatalogNoBuiltins(t *testing.T) {
-	cat := NewSimpleCatalog("empty")
-	p := cat.ToProto()
-	if p.GetBuiltinFunctionOptions() != nil {
-		t.Error("proto BuiltinFunctionOptions should be nil when not set")
+	if diff := cmp.Diff(want, got, protocmp.Transform()); diff != "" {
+		t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
 	}
 }

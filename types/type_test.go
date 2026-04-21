@@ -4,52 +4,62 @@ import (
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 func TestScalarTypeSingletons(t *testing.T) {
-	if Int64Type() != Int64Type() {
-		t.Error("Int64Type() should return the same instance")
+	// Each accessor must return the same pointer every time.
+	accessors := []func() Type{
+		Int32Type, Int64Type, Uint32Type, Uint64Type,
+		BoolType, FloatType, DoubleType, StringType, BytesType,
+		DateType, TimestampType, TimeType, DatetimeType,
+		GeographyType, NumericType, BigNumericType, JsonType, IntervalType,
 	}
-	if StringType() != StringType() {
-		t.Error("StringType() should return the same instance")
+	for _, fn := range accessors {
+		if fn() != fn() {
+			t.Errorf("singleton identity broken for Kind=%v", fn().Kind())
+		}
 	}
 }
 
-func TestScalarTypeKind(t *testing.T) {
+func TestScalarTypeProperties(t *testing.T) {
 	tests := []struct {
-		name string
-		typ  Type
-		kind TypeKind
+		name      string
+		typ       Type
+		wantKind  TypeKind
+		wantArray bool
+		wantStruct bool
 	}{
-		{"Int32", Int32Type(), Int32},
-		{"Int64", Int64Type(), Int64},
-		{"Uint32", Uint32Type(), Uint32},
-		{"Uint64", Uint64Type(), Uint64},
-		{"Bool", BoolType(), Bool},
-		{"Float", FloatType(), Float},
-		{"Double", DoubleType(), Double},
-		{"String", StringType(), String},
-		{"Bytes", BytesType(), Bytes},
-		{"Date", DateType(), Date},
-		{"Timestamp", TimestampType(), Timestamp},
-		{"Time", TimeType(), Time},
-		{"Datetime", DatetimeType(), Datetime},
-		{"Geography", GeographyType(), Geography},
-		{"Numeric", NumericType(), Numeric},
-		{"BigNumeric", BigNumericType(), BigNumeric},
-		{"Json", JsonType(), Json},
-		{"Interval", IntervalType(), Interval},
+		{"Int32", Int32Type(), Int32, false, false},
+		{"Int64", Int64Type(), Int64, false, false},
+		{"Uint32", Uint32Type(), Uint32, false, false},
+		{"Uint64", Uint64Type(), Uint64, false, false},
+		{"Bool", BoolType(), Bool, false, false},
+		{"Float", FloatType(), Float, false, false},
+		{"Double", DoubleType(), Double, false, false},
+		{"String", StringType(), String, false, false},
+		{"Bytes", BytesType(), Bytes, false, false},
+		{"Date", DateType(), Date, false, false},
+		{"Timestamp", TimestampType(), Timestamp, false, false},
+		{"Time", TimeType(), Time, false, false},
+		{"Datetime", DatetimeType(), Datetime, false, false},
+		{"Geography", GeographyType(), Geography, false, false},
+		{"Numeric", NumericType(), Numeric, false, false},
+		{"BigNumeric", BigNumericType(), BigNumeric, false, false},
+		{"Json", JsonType(), Json, false, false},
+		{"Interval", IntervalType(), Interval, false, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.typ.Kind() != tt.kind {
-				t.Errorf("Kind() = %v, want %v", tt.typ.Kind(), tt.kind)
+			if got := tt.typ.Kind(); got != tt.wantKind {
+				t.Errorf("Kind() = %v, want %v", got, tt.wantKind)
 			}
-			if tt.typ.IsArray() {
-				t.Error("scalar type should not be array")
+			if got := tt.typ.IsArray(); got != tt.wantArray {
+				t.Errorf("IsArray() = %v, want %v", got, tt.wantArray)
 			}
-			if tt.typ.IsStruct() {
-				t.Error("scalar type should not be struct")
+			if got := tt.typ.IsStruct(); got != tt.wantStruct {
+				t.Errorf("IsStruct() = %v, want %v", got, tt.wantStruct)
 			}
 			if tt.typ.AsArray() != nil {
 				t.Error("AsArray() should return nil for scalar")
@@ -62,33 +72,37 @@ func TestScalarTypeKind(t *testing.T) {
 }
 
 func TestTypeFromKind(t *testing.T) {
-	typ, err := TypeFromKind(Int64)
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		kind    TypeKind
+		want    Type
+		wantErr bool
+	}{
+		{Int64, Int64Type(), false},
+		{String, StringType(), false},
+		{Bool, BoolType(), false},
+		{Array, nil, true},
+		{Struct, nil, true},
 	}
-	if typ != Int64Type() {
-		t.Error("TypeFromKind(Int64) should return Int64Type() singleton")
-	}
-}
-
-func TestTypeFromKindError(t *testing.T) {
-	_, err := TypeFromKind(Array)
-	if err == nil {
-		t.Error("TypeFromKind(Array) should return error")
-	}
-	_, err = TypeFromKind(Struct)
-	if err == nil {
-		t.Error("TypeFromKind(Struct) should return error")
+	for _, tt := range tests {
+		got, err := TypeFromKind(tt.kind)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("TypeFromKind(%v) error = %v, wantErr %v", tt.kind, err, tt.wantErr)
+			continue
+		}
+		if got != tt.want {
+			t.Errorf("TypeFromKind(%v) = %v, want %v", tt.kind, got, tt.want)
+		}
 	}
 }
 
 func TestScalarTypeToProtoRoundTrip(t *testing.T) {
 	for kind, typ := range scalarTypes {
-		proto := typ.ToProto()
-		if proto.GetTypeKind() != generated.TypeKind(kind) {
-			t.Errorf("ToProto().TypeKind = %v, want %v", proto.GetTypeKind(), kind)
+		got := typ.ToProto()
+		want := &generated.TypeProto{TypeKind: generated.TypeKind(kind).Enum()}
+		if diff := cmp.Diff(want, got, protocmp.Transform()); diff != "" {
+			t.Errorf("ToProto() mismatch for %v (-want +got):\n%s", kind, diff)
 		}
-		restored, err := TypeFromProto(proto)
+		restored, err := TypeFromProto(got)
 		if err != nil {
 			t.Fatalf("TypeFromProto failed for %v: %v", kind, err)
 		}

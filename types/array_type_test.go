@@ -1,57 +1,91 @@
 package types
 
-import "testing"
+import (
+	"testing"
 
-func TestArrayType(t *testing.T) {
+	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/testing/protocmp"
+)
+
+func TestArrayTypeProperties(t *testing.T) {
 	arr, err := NewArrayType(Int64Type())
 	if err != nil {
 		t.Fatal(err)
 	}
-	if arr.Kind() != Array {
-		t.Errorf("Kind() = %v, want Array", arr.Kind())
+	tests := []struct {
+		name string
+		got  any
+		want any
+	}{
+		{"Kind", arr.Kind(), Array},
+		{"IsArray", arr.IsArray(), true},
+		{"IsStruct", arr.IsStruct(), false},
+		{"ElementType", arr.ElementType(), Int64Type()},
 	}
-	if !arr.IsArray() {
-		t.Error("IsArray() should be true")
+	for _, tt := range tests {
+		if tt.got != tt.want {
+			t.Errorf("%s = %v, want %v", tt.name, tt.got, tt.want)
+		}
 	}
 	if arr.AsArray() != arr {
 		t.Error("AsArray() should return self")
 	}
-	if arr.ElementType() != Int64Type() {
-		t.Error("ElementType() should be Int64Type()")
+	if arr.AsStruct() != nil {
+		t.Error("AsStruct() should return nil")
 	}
 }
 
-func TestArrayTypeNilElement(t *testing.T) {
-	_, err := NewArrayType(nil)
-	if err == nil {
-		t.Error("NewArrayType(nil) should return error")
+func TestArrayTypeErrors(t *testing.T) {
+	tests := []struct {
+		name    string
+		elem    Type
+		wantErr bool
+	}{
+		{"nil element", nil, true},
+		{"array of array", must(NewArrayType(StringType())), true},
+		{"valid", Int64Type(), false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := NewArrayType(tt.elem)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewArrayType() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
 	}
 }
 
-func TestArrayOfArrayRejected(t *testing.T) {
-	inner, _ := NewArrayType(StringType())
-	_, err := NewArrayType(inner)
-	if err == nil {
-		t.Error("array of array should be rejected")
-	}
-}
-
-func TestArrayTypeToProtoRoundTrip(t *testing.T) {
+func TestArrayTypeToProto(t *testing.T) {
 	arr, _ := NewArrayType(StringType())
-	proto := arr.ToProto()
+	got := arr.ToProto()
+	want := &generated.TypeProto{
+		TypeKind: generated.TypeKind_TYPE_ARRAY.Enum(),
+		ArrayType: &generated.ArrayTypeProto{
+			ElementType: &generated.TypeProto{
+				TypeKind: generated.TypeKind_TYPE_STRING.Enum(),
+			},
+		},
+	}
+	if diff := cmp.Diff(want, got, protocmp.Transform()); diff != "" {
+		t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
+	}
+}
 
-	restored, err := TypeFromProto(proto)
+func TestArrayTypeRoundTrip(t *testing.T) {
+	original, _ := NewArrayType(StringType())
+	restored, err := TypeFromProto(original.ToProto())
 	if err != nil {
 		t.Fatal(err)
 	}
-	if restored.Kind() != Array {
-		t.Errorf("restored Kind() = %v, want Array", restored.Kind())
+	if diff := cmp.Diff(original.ToProto(), restored.ToProto(), protocmp.Transform()); diff != "" {
+		t.Errorf("round-trip mismatch (-want +got):\n%s", diff)
 	}
-	restoredArr := restored.AsArray()
-	if restoredArr == nil {
-		t.Fatal("restored AsArray() is nil")
+}
+
+func must[T any](v T, err error) T {
+	if err != nil {
+		panic(err)
 	}
-	if restoredArr.ElementType().Kind() != String {
-		t.Errorf("restored element Kind() = %v, want String", restoredArr.ElementType().Kind())
-	}
+	return v
 }

@@ -4,40 +4,44 @@ import (
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/types"
+	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
-func TestSimpleColumn(t *testing.T) {
+func TestSimpleColumnProperties(t *testing.T) {
 	col := NewSimpleColumn("users", "id", types.Int64Type())
-	if col.Name() != "id" {
-		t.Errorf("Name() = %q, want %q", col.Name(), "id")
+	tests := []struct {
+		name string
+		got  any
+		want any
+	}{
+		{"Name", col.Name(), "id"},
+		{"FullName", col.FullName(), "users.id"},
+		{"Type", col.Type(), types.Int64Type()},
+		{"IsPseudoColumn", col.IsPseudoColumn(), false},
+		{"IsWritable", col.IsWritable(), true},
 	}
-	if col.FullName() != "users.id" {
-		t.Errorf("FullName() = %q, want %q", col.FullName(), "users.id")
-	}
-	if col.Type() != types.Int64Type() {
-		t.Error("Type() should be Int64Type()")
-	}
-	if col.IsPseudoColumn() {
-		t.Error("IsPseudoColumn() should be false by default")
-	}
-	if !col.IsWritable() {
-		t.Error("IsWritable() should be true by default")
+	for _, tt := range tests {
+		if tt.got != tt.want {
+			t.Errorf("%s = %v, want %v", tt.name, tt.got, tt.want)
+		}
 	}
 }
 
 func TestSimpleColumnToProto(t *testing.T) {
 	col := NewSimpleColumn("t", "name", types.StringType())
-	p := col.ToProto()
-	if p.GetName() != "name" {
-		t.Errorf("proto Name = %q, want %q", p.GetName(), "name")
+	got := col.ToProto()
+	want := &generated.SimpleColumnProto{
+		Name:             ptr("name"),
+		Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_STRING.Enum()},
+		IsPseudoColumn:   boolPtr(false),
+		IsWritableColumn: boolPtr(true),
 	}
-	if p.GetType().GetTypeKind().String() != "TYPE_STRING" {
-		t.Errorf("proto TypeKind = %v, want TYPE_STRING", p.GetType().GetTypeKind())
-	}
-	if p.GetIsPseudoColumn() {
-		t.Error("proto IsPseudoColumn should be false")
-	}
-	if !p.GetIsWritableColumn() {
-		t.Error("proto IsWritableColumn should be true")
+	if diff := cmp.Diff(want, got, protocmp.Transform()); diff != "" {
+		t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func ptr(s string) *string { return &s }
+func boolPtr(b bool) *bool { return &b }

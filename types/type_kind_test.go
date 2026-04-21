@@ -3,13 +3,21 @@ package types
 import "testing"
 
 func TestTypeKindIsSimple(t *testing.T) {
-	if !Int64.IsSimple() {
-		t.Error("Int64 should be simple")
+	tests := []struct {
+		kind TypeKind
+		want bool
+	}{
+		{Int32, true},
+		{Int64, true},
+		{String, true},
+		{Bool, true},
+		{Double, true},
+		{Array, false},
+		{Struct, false},
 	}
-	if Array.IsSimple() {
-		t.Error("Array should not be simple")
-	}
-	if Struct.IsSimple() {
-		t.Error("Struct should not be simple")
+	for _, tt := range tests {
+		if got := tt.kind.IsSimple(); got != tt.want {
+			t.Errorf("%v.IsSimple() = %v, want %v", tt.kind, got, tt.want)
+		}
 	}
 }

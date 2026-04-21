@@ -1,8 +1,14 @@
 package types
 
-import "testing"
+import (
+	"testing"
 
-func TestStructType(t *testing.T) {
+	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/testing/protocmp"
+)
+
+func TestStructTypeProperties(t *testing.T) {
 	st, err := NewStructType([]*StructField{
 		NewStructField("x", Int64Type()),
 		NewStructField("y", StringType()),
@@ -10,23 +16,30 @@ func TestStructType(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if st.Kind() != Struct {
-		t.Errorf("Kind() = %v, want Struct", st.Kind())
+	tests := []struct {
+		name string
+		got  any
+		want any
+	}{
+		{"Kind", st.Kind(), Struct},
+		{"IsArray", st.IsArray(), false},
+		{"IsStruct", st.IsStruct(), true},
+		{"NumFields", st.NumFields(), 2},
+		{"Field(0).Name", st.Field(0).Name(), "x"},
+		{"Field(0).Type", st.Field(0).Type(), Int64Type()},
+		{"Field(1).Name", st.Field(1).Name(), "y"},
+		{"Field(1).Type", st.Field(1).Type(), StringType()},
 	}
-	if !st.IsStruct() {
-		t.Error("IsStruct() should be true")
+	for _, tt := range tests {
+		if tt.got != tt.want {
+			t.Errorf("%s = %v, want %v", tt.name, tt.got, tt.want)
+		}
 	}
 	if st.AsStruct() != st {
 		t.Error("AsStruct() should return self")
 	}
-	if st.NumFields() != 2 {
-		t.Fatalf("NumFields() = %d, want 2", st.NumFields())
-	}
-	if st.Field(0).Name() != "x" || st.Field(0).Type() != Int64Type() {
-		t.Error("Field(0) mismatch")
-	}
-	if st.Field(1).Name() != "y" || st.Field(1).Type() != StringType() {
-		t.Error("Field(1) mismatch")
+	if st.AsArray() != nil {
+		t.Error("AsArray() should return nil")
 	}
 }
 
@@ -35,33 +48,43 @@ func TestStructTypeNilFields(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if st.NumFields() != 0 {
-		t.Errorf("NumFields() = %d, want 0", st.NumFields())
+	if got := st.NumFields(); got != 0 {
+		t.Errorf("NumFields() = %d, want 0", got)
 	}
 }
 
-func TestStructTypeToProtoRoundTrip(t *testing.T) {
+func TestStructTypeToProto(t *testing.T) {
 	st, _ := NewStructType([]*StructField{
 		NewStructField("id", Int64Type()),
 		NewStructField("name", StringType()),
 	})
-	proto := st.ToProto()
+	got := st.ToProto()
+	want := &generated.TypeProto{
+		TypeKind: generated.TypeKind_TYPE_STRUCT.Enum(),
+		StructType: &generated.StructTypeProto{
+			Field: []*generated.StructFieldProto{
+				{FieldName: ptr("id"), FieldType: &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_INT64.Enum()}},
+				{FieldName: ptr("name"), FieldType: &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_STRING.Enum()}},
+			},
+		},
+	}
+	if diff := cmp.Diff(want, got, protocmp.Transform()); diff != "" {
+		t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
+	}
+}
 
-	restored, err := TypeFromProto(proto)
+func TestStructTypeRoundTrip(t *testing.T) {
+	original, _ := NewStructType([]*StructField{
+		NewStructField("id", Int64Type()),
+		NewStructField("name", StringType()),
+	})
+	restored, err := TypeFromProto(original.ToProto())
 	if err != nil {
 		t.Fatal(err)
 	}
-	restoredSt := restored.AsStruct()
-	if restoredSt == nil {
-		t.Fatal("restored AsStruct() is nil")
-	}
-	if restoredSt.NumFields() != 2 {
-		t.Fatalf("restored NumFields() = %d, want 2", restoredSt.NumFields())
-	}
-	if restoredSt.Field(0).Name() != "id" {
-		t.Errorf("restored Field(0).Name() = %q, want %q", restoredSt.Field(0).Name(), "id")
-	}
-	if restoredSt.Field(1).Type().Kind() != String {
-		t.Errorf("restored Field(1).Type().Kind() = %v, want String", restoredSt.Field(1).Type().Kind())
+	if diff := cmp.Diff(original.ToProto(), restored.ToProto(), protocmp.Transform()); diff != "" {
+		t.Errorf("round-trip mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func ptr(s string) *string { return &s }
