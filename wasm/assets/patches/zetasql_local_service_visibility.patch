@@ -1,0 +1,10 @@
+--- a/zetasql/local_service/BUILD
++++ b/zetasql/local_service/BUILD
+@@ -138,6 +138,7 @@
+
+ cc_proto_library(
+     name = "local_service_cc_proto",
++    visibility = ["//visibility:public"],
+     deps = [":local_service_proto"],
+ )
+

@@ -40,7 +40,10 @@ git_override(
         "//:patches/zetasql_public_functions_string.patch",
         "//:patches/zetasql_public_strings.patch",
         "//:patches/zetasql_resolved_ast_visibility.patch",
+        "//:patches/zetasql_proto_visibility.patch",
+        "//:patches/zetasql_local_service_visibility.patch",
         "//:patches/zetasql_parser_visibility.patch",
+        "//:patches/zetasql_analyzer_options_timezone.patch",
     ],
     patch_strip = 1,
 )

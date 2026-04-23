@@ -1,0 +1,11 @@
+--- a/zetasql/public/analyzer_options.cc
++++ b/zetasql/public/analyzer_options.cc
+@@ -325,7 +325,7 @@
+                .validate_resolved_ast =
+                    absl::GetFlag(FLAGS_zetasql_validate_resolved_ast),
+                .error_message_stability = GetDefaultErrorMessageStability()})) {
+-  ZETASQL_CHECK_OK(FindTimeZoneByName("America/Los_Angeles",  // Crash OK
++  ZETASQL_CHECK_OK(FindTimeZoneByName("UTC",  // Changed for WASM: no tzdata available
+                               &data_->default_timezone))
+       << "Did you need to install the tzdata package?";
+ }

@@ -27,7 +27,7 @@ func init() {
 	defer compiled.Close(ctx)
 
 	// Verify required functions are exported
-	requiredFuncs := []string{"malloc", "free", "parse_statement_proto", "free_proto_buffer"}
+	requiredFuncs := []string{"init_module", "malloc", "free", "parse_statement_proto", "analyze_statement_proto", "free_proto_buffer"}
 	exports := compiled.ExportedFunctions()
 	for _, funcName := range requiredFuncs {
 		if _, ok := exports[funcName]; !ok {

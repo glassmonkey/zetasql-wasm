@@ -10,21 +10,32 @@ cc_binary(
         "@zetasql//zetasql/public:analyzer",
         "@zetasql//zetasql/public:parse_resume_location",
         "@zetasql//zetasql/public:simple_catalog",
+        "@zetasql//zetasql/public:type",
+        "@zetasql//zetasql/public:type_cc_proto",
+        "@zetasql//zetasql/proto:simple_catalog_cc_proto",
+        "@zetasql//zetasql/public:builtin_function_options",
         "@zetasql//zetasql/resolved_ast",
+        "@zetasql//zetasql/resolved_ast:resolved_ast_cc_proto",
         "@zetasql//zetasql/resolved_ast:serialization_cc_proto",
         "@zetasql//zetasql/parser:parse_tree_serializer",
         "@zetasql//zetasql/parser:parse_tree_cc_proto",
+        "@zetasql//zetasql/proto:options_cc_proto",
+        "@zetasql//zetasql/local_service:local_service_cc_proto",
     ],
     linkopts = [
         # Export functions for WASI/standalone runtime
-        "-sEXPORTED_FUNCTIONS=_parse_statement,_parse_statement_proto,_analyze_statement,_free_string,_free_proto_buffer,_malloc,_free,_debug_test_basic,_debug_test_catalog,_debug_test_catalog_with_functions,_debug_test_analyzer_options,_debug_test_analyze",
+        "-sEXPORTED_FUNCTIONS=_init_module,_parse_statement,_parse_statement_proto,_analyze_statement,_analyze_statement_proto,_free_string,_free_proto_buffer,_malloc,_free,_debug_test_basic,_debug_test_catalog,_debug_test_catalog_with_functions,_debug_test_analyzer_options,_debug_test_analyze",
         "-sEXPORTED_RUNTIME_METHODS=ccall,cwrap",
 
         # Standalone WASM mode - compatible with WASI runtimes (wasmtime, wasmer)
         "-sSTANDALONE_WASM=1",
         "-sWASM_BIGINT=1",
 
-        # Reactor mode: no main function required (library mode)
+        # Reactor mode: no main function required (library mode).
+        # NOTE: --no-entry with explicit EXPORTED_FUNCTIONS prevents auto-export of _initialize,
+        # so C++ global ctors must be triggered manually via init_module. See bridge.cc.
+        # ref: https://emscripten.org/docs/compiling/Building-Projects.html
+        # ref: https://github.com/emscripten-core/emscripten/blob/main/system/lib/libc/crt1_reactor.c
         "-Wl,--no-entry",
 
         # Memory configuration - increased for ZetaSQL analyzer
