@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/glassmonkey/zetasql-wasm/catalog"
+	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
 	"github.com/glassmonkey/zetasql-wasm/wasm"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/tetratelabs/wazero"
@@ -26,12 +27,12 @@ func (e *AnalyzeError) Error() string {
 
 // AnalyzeOutput holds the result of a successful semantic analysis.
 type AnalyzeOutput struct {
-	response *generated.AnalyzeResponse
+	statement resolved_ast.StatementNode
 }
 
-// ResolvedStatement returns the resolved statement proto.
-func (o *AnalyzeOutput) ResolvedStatement() *generated.AnyResolvedStatementProto {
-	return o.response.GetResolvedStatement()
+// ResolvedStatement returns the type-safe resolved AST statement node.
+func (o *AnalyzeOutput) ResolvedStatement() resolved_ast.StatementNode {
+	return o.statement
 }
 
 // Analyzer represents a ZetaSQL analyzer instance backed by WASM.
@@ -178,7 +179,21 @@ func (a *Analyzer) AnalyzeStatement(
 		return nil, fmt.Errorf("failed to unmarshal AnalyzeResponse: %w", err)
 	}
 
-	return &AnalyzeOutput{response: response}, nil
+	// Convert proto to type-safe resolved AST node
+	stmtProto := response.GetResolvedStatement()
+	if stmtProto == nil {
+		return nil, fmt.Errorf("AnalyzeResponse contains no resolved statement")
+	}
+	stmtBytes, err := proto.Marshal(stmtProto)
+	if err != nil {
+		return nil, fmt.Errorf("failed to re-marshal resolved statement: %w", err)
+	}
+	stmt, err := resolved_ast.StatementFromBytes(stmtBytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert resolved statement: %w", err)
+	}
+
+	return &AnalyzeOutput{statement: stmt}, nil
 }
 
 // Close releases resources used by the analyzer.

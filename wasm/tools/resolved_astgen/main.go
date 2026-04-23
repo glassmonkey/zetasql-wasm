@@ -234,6 +234,7 @@ type fieldInfo struct {
 	IsSlice   bool
 	IsNode    bool
 	WrapCall  string
+	RawGetter string // raw getter expression for nil checks, e.g. "n.raw.GetParent().GetFoo()"
 }
 
 type wrapperInfo struct {
@@ -343,21 +344,10 @@ func (ctx *analysisContext) classifyNode(md protoreflect.MessageDescriptor) *nod
 		MarkerMethods: markerMethodsForCategory(category),
 	}
 
-	fields := md.Fields()
-	for i := range fields.Len() {
-		f := fields.Get(i)
-		fname := string(f.Name())
-
-		if fname == "parent" {
-			continue
-		}
-
-		fi := ctx.classifyField(f)
-		if reservedMethodNames[fi.GoName] {
-			fi.GoName = fi.GoName + "Value"
-		}
-		n.Fields = append(n.Fields, fi)
-		if fi.IsNode {
+	// Collect fields from this message and all parent messages (flattening inheritance)
+	n.Fields = ctx.collectFieldsRecursive(md, "n.raw")
+	for i := range n.Fields {
+		if n.Fields[i].IsNode {
 			n.HasChildNode = true
 		}
 	}
@@ -365,43 +355,79 @@ func (ctx *analysisContext) classifyNode(md protoreflect.MessageDescriptor) *nod
 	return n
 }
 
+// collectFieldsRecursive collects fields from the given message and recursively
+// from its parent chain, building the correct raw getter prefix for each level.
+func (ctx *analysisContext) collectFieldsRecursive(md protoreflect.MessageDescriptor, rawPrefix string) []fieldInfo {
+	var result []fieldInfo
+
+	fields := md.Fields()
+	for i := range fields.Len() {
+		f := fields.Get(i)
+		fname := string(f.Name())
+
+		if fname == "parent" {
+			// Recurse into parent message to flatten its fields
+			if f.Kind() == protoreflect.MessageKind {
+				parentPrefix := rawPrefix + ".GetParent()"
+				parentFields := ctx.collectFieldsRecursive(f.Message(), parentPrefix)
+				result = append(result, parentFields...)
+			}
+			continue
+		}
+
+		fi := ctx.classifyFieldWithPrefix(f, rawPrefix)
+		if reservedMethodNames[fi.GoName] {
+			fi.GoName = fi.GoName + "Value"
+		}
+		result = append(result, fi)
+	}
+
+	return result
+}
+
 func (ctx *analysisContext) classifyField(fd protoreflect.FieldDescriptor) fieldInfo {
+	return ctx.classifyFieldWithPrefix(fd, "n.raw")
+}
+
+func (ctx *analysisContext) classifyFieldWithPrefix(fd protoreflect.FieldDescriptor, rawPrefix string) fieldInfo {
 	fname := string(fd.Name())
 	goName := snakeToPascal(fname)
 	isSlice := fd.IsList()
+	rawGetter := fmt.Sprintf("%s.Get%s()", rawPrefix, goName)
 
 	fi := fieldInfo{
 		ProtoName: fname,
 		GoName:    goName,
 		IsSlice:   isSlice,
+		RawGetter: rawGetter,
 	}
 
 	switch fd.Kind() {
 	case protoreflect.BoolKind:
 		fi.GoType = "bool"
-		fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+		fi.WrapCall = rawGetter
 	case protoreflect.StringKind:
 		if isSlice {
 			fi.GoType = "[]string"
 		} else {
 			fi.GoType = "string"
 		}
-		fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+		fi.WrapCall = rawGetter
 	case protoreflect.Int32Kind:
 		if isSlice {
 			fi.GoType = "[]int32"
-			fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+			fi.WrapCall = rawGetter
 		} else {
 			fi.GoType = "int"
-			fi.WrapCall = fmt.Sprintf("int(n.raw.Get%s())", goName)
+			fi.WrapCall = fmt.Sprintf("int(%s)", rawGetter)
 		}
 	case protoreflect.Int64Kind:
 		if isSlice {
 			fi.GoType = "[]int64"
-			fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+			fi.WrapCall = rawGetter
 		} else {
 			fi.GoType = "int"
-			fi.WrapCall = fmt.Sprintf("int(n.raw.Get%s())", goName)
+			fi.WrapCall = fmt.Sprintf("int(%s)", rawGetter)
 		}
 	case protoreflect.EnumKind:
 		enumGoName := resolveEnumGoName(fd.Enum())
@@ -410,7 +436,7 @@ func (ctx *analysisContext) classifyField(fd protoreflect.FieldDescriptor) field
 		} else {
 			fi.GoType = "generated." + enumGoName
 		}
-		fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+		fi.WrapCall = rawGetter
 	case protoreflect.MessageKind:
 		msgName := string(fd.Message().Name())
 		if ctx.wrapperSet[msgName] {
@@ -420,23 +446,23 @@ func (ctx *analysisContext) classifyField(fd protoreflect.FieldDescriptor) field
 			fi.IsNode = true
 			if isSlice {
 				fi.GoType = "[]" + iface
-				fi.WrapCall = fmt.Sprintf("wrap%sSlice(n.raw.Get%s())", baseName, goName)
+				fi.WrapCall = fmt.Sprintf("wrap%sSlice(%s)", baseName, rawGetter)
 			} else {
 				fi.GoType = iface
-				fi.WrapCall = fmt.Sprintf("wrap%s(n.raw.Get%s())", baseName, goName)
+				fi.WrapCall = fmt.Sprintf("wrap%s(%s)", baseName, rawGetter)
 			}
 		} else if ctx.abstractSet[msgName] {
 			fi.GoType = "any"
-			fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+			fi.WrapCall = rawGetter
 		} else if ctx.concreteSet[msgName] {
 			nodeName := protoToNodeName(msgName)
 			fi.IsNode = true
 			if isSlice {
 				fi.GoType = "[]*" + nodeName
-				fi.WrapCall = fmt.Sprintf("new%sSlice(n.raw.Get%s())", nodeName, goName)
+				fi.WrapCall = fmt.Sprintf("new%sSlice(%s)", nodeName, rawGetter)
 			} else {
 				fi.GoType = "*" + nodeName
-				fi.WrapCall = fmt.Sprintf("new%s(n.raw.Get%s())", nodeName, goName)
+				fi.WrapCall = fmt.Sprintf("new%s(%s)", nodeName, rawGetter)
 			}
 		} else {
 			// External helper type (from serialization.proto, etc.)
@@ -445,14 +471,14 @@ func (ctx *analysisContext) classifyField(fd protoreflect.FieldDescriptor) field
 			} else {
 				fi.GoType = "*generated." + msgName
 			}
-			fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+			fi.WrapCall = rawGetter
 		}
 	case protoreflect.BytesKind:
 		fi.GoType = "[]byte"
-		fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+		fi.WrapCall = rawGetter
 	default:
 		fi.GoType = "any"
-		fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+		fi.WrapCall = rawGetter
 	}
 
 	return fi

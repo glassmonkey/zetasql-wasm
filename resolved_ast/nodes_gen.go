@@ -32,6 +32,14 @@ func newAbortBatchStmtNodeSlice(raws []*generated.ResolvedAbortBatchStmtProto) [
 func (n *AbortBatchStmtNode) Kind() Kind     { return KindAbortBatchStmt }
 func (n *AbortBatchStmtNode) statementNode() {}
 
+func (n *AbortBatchStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AbortBatchStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
 func (n *AbortBatchStmtNode) NumChildren() int {
 	count := 0
 	return count
@@ -66,6 +74,10 @@ func newAddColumnActionNodeSlice(raws []*generated.ResolvedAddColumnActionProto)
 
 func (n *AddColumnActionNode) Kind() Kind    { return KindAddColumnAction }
 func (n *AddColumnActionNode) argumentNode() {}
+
+func (n *AddColumnActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *AddColumnActionNode) IsIfNotExists() bool {
 	return n.raw.GetIsIfNotExists()
@@ -119,6 +131,10 @@ func newAddColumnIdentifierActionNodeSlice(raws []*generated.ResolvedAddColumnId
 
 func (n *AddColumnIdentifierActionNode) Kind() Kind    { return KindAddColumnIdentifierAction }
 func (n *AddColumnIdentifierActionNode) argumentNode() {}
+
+func (n *AddColumnIdentifierActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *AddColumnIdentifierActionNode) Name() string {
 	return n.raw.GetName()
@@ -176,6 +192,10 @@ func newAddConstraintActionNodeSlice(raws []*generated.ResolvedAddConstraintActi
 func (n *AddConstraintActionNode) Kind() Kind    { return KindAddConstraintAction }
 func (n *AddConstraintActionNode) argumentNode() {}
 
+func (n *AddConstraintActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *AddConstraintActionNode) IsIfNotExists() bool {
 	return n.raw.GetIsIfNotExists()
 }
@@ -232,6 +252,10 @@ func newAddSubEntityActionNodeSlice(raws []*generated.ResolvedAddSubEntityAction
 
 func (n *AddSubEntityActionNode) Kind() Kind    { return KindAddSubEntityAction }
 func (n *AddSubEntityActionNode) argumentNode() {}
+
+func (n *AddSubEntityActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *AddSubEntityActionNode) EntityType() string {
 	return n.raw.GetEntityType()
@@ -293,6 +317,10 @@ func newAddToRestricteeListActionNodeSlice(raws []*generated.ResolvedAddToRestri
 func (n *AddToRestricteeListActionNode) Kind() Kind    { return KindAddToRestricteeListAction }
 func (n *AddToRestricteeListActionNode) argumentNode() {}
 
+func (n *AddToRestricteeListActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *AddToRestricteeListActionNode) IsIfNotExists() bool {
 	return n.raw.GetIsIfNotExists()
 }
@@ -345,6 +373,58 @@ func newAggregateFunctionCallNodeSlice(raws []*generated.ResolvedAggregateFuncti
 func (n *AggregateFunctionCallNode) Kind() Kind { return KindAggregateFunctionCall }
 func (n *AggregateFunctionCallNode) exprNode()  {}
 
+func (n *AggregateFunctionCallNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AggregateFunctionCallNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetType()
+}
+
+func (n *AggregateFunctionCallNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetParent().GetParent().GetTypeAnnotationMap()
+}
+
+func (n *AggregateFunctionCallNode) Function() *generated.FunctionRefProto {
+	return n.raw.GetParent().GetParent().GetFunction()
+}
+
+func (n *AggregateFunctionCallNode) Signature() *generated.FunctionSignatureProto {
+	return n.raw.GetParent().GetParent().GetSignature()
+}
+
+func (n *AggregateFunctionCallNode) ArgumentList() []ExprNode {
+	return wrapExprSlice(n.raw.GetParent().GetParent().GetArgumentList())
+}
+
+func (n *AggregateFunctionCallNode) GenericArgumentList() []*generated.ResolvedFunctionArgumentProto {
+	return n.raw.GetParent().GetParent().GetGenericArgumentList()
+}
+
+func (n *AggregateFunctionCallNode) ErrorMode() generated.ResolvedFunctionCallBaseEnums_ErrorMode {
+	return n.raw.GetParent().GetParent().GetErrorMode()
+}
+
+func (n *AggregateFunctionCallNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetHintList()
+}
+
+func (n *AggregateFunctionCallNode) CollationList() []*generated.ResolvedCollationProto {
+	return n.raw.GetParent().GetParent().GetCollationList()
+}
+
+func (n *AggregateFunctionCallNode) Distinct() bool {
+	return n.raw.GetParent().GetDistinct()
+}
+
+func (n *AggregateFunctionCallNode) NullHandlingModifier() generated.ResolvedNonScalarFunctionCallBaseEnums_NullHandlingModifier {
+	return n.raw.GetParent().GetNullHandlingModifier()
+}
+
+func (n *AggregateFunctionCallNode) WhereExpr() ExprNode {
+	return wrapExpr(n.raw.GetParent().GetWhereExpr())
+}
+
 func (n *AggregateFunctionCallNode) HavingModifier() *generated.ResolvedAggregateHavingModifierProto {
 	return n.raw.GetHavingModifier()
 }
@@ -379,6 +459,10 @@ func (n *AggregateFunctionCallNode) HavingExpr() ExprNode {
 
 func (n *AggregateFunctionCallNode) NumChildren() int {
 	count := 0
+	count += len(n.ArgumentList())
+	if n.raw.GetParent().GetWhereExpr() != nil {
+		count++
+	}
 	if n.raw.GetLimit() != nil {
 		count++
 	}
@@ -391,6 +475,19 @@ func (n *AggregateFunctionCallNode) NumChildren() int {
 
 func (n *AggregateFunctionCallNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.ArgumentList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetWhereExpr() != nil {
+		if idx == i {
+			return n.WhereExpr()
+		}
+		idx++
+	}
 	if n.raw.GetLimit() != nil {
 		if idx == i {
 			return n.Limit()
@@ -438,6 +535,10 @@ func newAggregateHavingModifierNodeSlice(raws []*generated.ResolvedAggregateHavi
 
 func (n *AggregateHavingModifierNode) Kind() Kind    { return KindAggregateHavingModifier }
 func (n *AggregateHavingModifierNode) argumentNode() {}
+
+func (n *AggregateHavingModifierNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *AggregateHavingModifierNode) KindValue() generated.ResolvedAggregateHavingModifierEnums_HavingModifierKind {
 	return n.raw.GetKind()
@@ -492,12 +593,102 @@ func newAggregateScanNodeSlice(raws []*generated.ResolvedAggregateScanProto) []*
 func (n *AggregateScanNode) Kind() Kind { return KindAggregateScan }
 func (n *AggregateScanNode) scanNode()  {}
 
+func (n *AggregateScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AggregateScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetParent().GetColumnList()
+}
+
+func (n *AggregateScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetHintList()
+}
+
+func (n *AggregateScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetParent().GetIsOrdered()
+}
+
+func (n *AggregateScanNode) NodeSource() string {
+	return n.raw.GetParent().GetParent().GetNodeSource()
+}
+
+func (n *AggregateScanNode) InputScan() ScanNode {
+	return wrapScan(n.raw.GetParent().GetInputScan())
+}
+
+func (n *AggregateScanNode) GroupByList() []*generated.ResolvedComputedColumnProto {
+	return n.raw.GetParent().GetGroupByList()
+}
+
+func (n *AggregateScanNode) CollationList() []*generated.ResolvedCollationProto {
+	return n.raw.GetParent().GetCollationList()
+}
+
+func (n *AggregateScanNode) AggregateList() []ArgumentNode {
+	return wrapComputedColumnBaseSlice(n.raw.GetParent().GetAggregateList())
+}
+
+func (n *AggregateScanNode) GroupingSetList() []ArgumentNode {
+	return wrapGroupingSetBaseSlice(n.raw.GetParent().GetGroupingSetList())
+}
+
+func (n *AggregateScanNode) RollupColumnList() []*ColumnRefNode {
+	return newColumnRefNodeSlice(n.raw.GetParent().GetRollupColumnList())
+}
+
+func (n *AggregateScanNode) GroupingCallList() []*GroupingCallNode {
+	return newGroupingCallNodeSlice(n.raw.GetParent().GetGroupingCallList())
+}
+
 func (n *AggregateScanNode) NumChildren() int {
 	count := 0
+	if n.raw.GetParent().GetInputScan() != nil {
+		count++
+	}
+	count += len(n.AggregateList())
+	count += len(n.GroupingSetList())
+	count += len(n.RollupColumnList())
+	count += len(n.GroupingCallList())
 	return count
 }
 
 func (n *AggregateScanNode) Child(i int) Node {
+	idx := 0
+	if n.raw.GetParent().GetInputScan() != nil {
+		if idx == i {
+			return n.InputScan()
+		}
+		idx++
+	}
+	{
+		s := n.AggregateList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.GroupingSetList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.RollupColumnList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.GroupingCallList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -529,16 +720,106 @@ func (n *AggregationThresholdAggregateScanNode) Kind() Kind {
 }
 func (n *AggregationThresholdAggregateScanNode) scanNode() {}
 
+func (n *AggregationThresholdAggregateScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AggregationThresholdAggregateScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetParent().GetColumnList()
+}
+
+func (n *AggregationThresholdAggregateScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetHintList()
+}
+
+func (n *AggregationThresholdAggregateScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetParent().GetIsOrdered()
+}
+
+func (n *AggregationThresholdAggregateScanNode) NodeSource() string {
+	return n.raw.GetParent().GetParent().GetNodeSource()
+}
+
+func (n *AggregationThresholdAggregateScanNode) InputScan() ScanNode {
+	return wrapScan(n.raw.GetParent().GetInputScan())
+}
+
+func (n *AggregationThresholdAggregateScanNode) GroupByList() []*generated.ResolvedComputedColumnProto {
+	return n.raw.GetParent().GetGroupByList()
+}
+
+func (n *AggregationThresholdAggregateScanNode) CollationList() []*generated.ResolvedCollationProto {
+	return n.raw.GetParent().GetCollationList()
+}
+
+func (n *AggregationThresholdAggregateScanNode) AggregateList() []ArgumentNode {
+	return wrapComputedColumnBaseSlice(n.raw.GetParent().GetAggregateList())
+}
+
+func (n *AggregationThresholdAggregateScanNode) GroupingSetList() []ArgumentNode {
+	return wrapGroupingSetBaseSlice(n.raw.GetParent().GetGroupingSetList())
+}
+
+func (n *AggregationThresholdAggregateScanNode) RollupColumnList() []*ColumnRefNode {
+	return newColumnRefNodeSlice(n.raw.GetParent().GetRollupColumnList())
+}
+
+func (n *AggregationThresholdAggregateScanNode) GroupingCallList() []*GroupingCallNode {
+	return newGroupingCallNodeSlice(n.raw.GetParent().GetGroupingCallList())
+}
+
 func (n *AggregationThresholdAggregateScanNode) OptionList() []*generated.ResolvedOptionProto {
 	return n.raw.GetOptionList()
 }
 
 func (n *AggregationThresholdAggregateScanNode) NumChildren() int {
 	count := 0
+	if n.raw.GetParent().GetInputScan() != nil {
+		count++
+	}
+	count += len(n.AggregateList())
+	count += len(n.GroupingSetList())
+	count += len(n.RollupColumnList())
+	count += len(n.GroupingCallList())
 	return count
 }
 
 func (n *AggregationThresholdAggregateScanNode) Child(i int) Node {
+	idx := 0
+	if n.raw.GetParent().GetInputScan() != nil {
+		if idx == i {
+			return n.InputScan()
+		}
+		idx++
+	}
+	{
+		s := n.AggregateList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.GroupingSetList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.RollupColumnList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.GroupingCallList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -568,12 +849,34 @@ func newAlterAllRowAccessPoliciesStmtNodeSlice(raws []*generated.ResolvedAlterAl
 func (n *AlterAllRowAccessPoliciesStmtNode) Kind() Kind     { return KindAlterAllRowAccessPoliciesStmt }
 func (n *AlterAllRowAccessPoliciesStmtNode) statementNode() {}
 
+func (n *AlterAllRowAccessPoliciesStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterAllRowAccessPoliciesStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterAllRowAccessPoliciesStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterAllRowAccessPoliciesStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterAllRowAccessPoliciesStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterAllRowAccessPoliciesStmtNode) TableScan() *TableScanNode {
 	return newTableScanNode(n.raw.GetTableScan())
 }
 
 func (n *AlterAllRowAccessPoliciesStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	if n.raw.GetTableScan() != nil {
 		count++
 	}
@@ -582,6 +885,20 @@ func (n *AlterAllRowAccessPoliciesStmtNode) NumChildren() int {
 
 func (n *AlterAllRowAccessPoliciesStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetTableScan() != nil {
 		if idx == i {
 			return n.TableScan()
@@ -617,12 +934,49 @@ func newAlterApproxViewStmtNodeSlice(raws []*generated.ResolvedAlterApproxViewSt
 func (n *AlterApproxViewStmtNode) Kind() Kind     { return KindAlterApproxViewStmt }
 func (n *AlterApproxViewStmtNode) statementNode() {}
 
+func (n *AlterApproxViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterApproxViewStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterApproxViewStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterApproxViewStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterApproxViewStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterApproxViewStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	return count
 }
 
 func (n *AlterApproxViewStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -651,6 +1005,18 @@ func newAlterColumnDropDefaultActionNodeSlice(raws []*generated.ResolvedAlterCol
 
 func (n *AlterColumnDropDefaultActionNode) Kind() Kind    { return KindAlterColumnDropDefaultAction }
 func (n *AlterColumnDropDefaultActionNode) argumentNode() {}
+
+func (n *AlterColumnDropDefaultActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterColumnDropDefaultActionNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
+func (n *AlterColumnDropDefaultActionNode) Column() string {
+	return n.raw.GetParent().GetColumn()
+}
 
 func (n *AlterColumnDropDefaultActionNode) NumChildren() int {
 	count := 0
@@ -687,6 +1053,18 @@ func newAlterColumnDropGeneratedActionNodeSlice(raws []*generated.ResolvedAlterC
 func (n *AlterColumnDropGeneratedActionNode) Kind() Kind    { return KindAlterColumnDropGeneratedAction }
 func (n *AlterColumnDropGeneratedActionNode) argumentNode() {}
 
+func (n *AlterColumnDropGeneratedActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterColumnDropGeneratedActionNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
+func (n *AlterColumnDropGeneratedActionNode) Column() string {
+	return n.raw.GetParent().GetColumn()
+}
+
 func (n *AlterColumnDropGeneratedActionNode) NumChildren() int {
 	count := 0
 	return count
@@ -722,6 +1100,18 @@ func newAlterColumnDropNotNullActionNodeSlice(raws []*generated.ResolvedAlterCol
 func (n *AlterColumnDropNotNullActionNode) Kind() Kind    { return KindAlterColumnDropNotNullAction }
 func (n *AlterColumnDropNotNullActionNode) argumentNode() {}
 
+func (n *AlterColumnDropNotNullActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterColumnDropNotNullActionNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
+func (n *AlterColumnDropNotNullActionNode) Column() string {
+	return n.raw.GetParent().GetColumn()
+}
+
 func (n *AlterColumnDropNotNullActionNode) NumChildren() int {
 	count := 0
 	return count
@@ -756,6 +1146,18 @@ func newAlterColumnOptionsActionNodeSlice(raws []*generated.ResolvedAlterColumnO
 
 func (n *AlterColumnOptionsActionNode) Kind() Kind    { return KindAlterColumnOptionsAction }
 func (n *AlterColumnOptionsActionNode) argumentNode() {}
+
+func (n *AlterColumnOptionsActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterColumnOptionsActionNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
+func (n *AlterColumnOptionsActionNode) Column() string {
+	return n.raw.GetParent().GetColumn()
+}
 
 func (n *AlterColumnOptionsActionNode) OptionList() []*OptionNode {
 	return newOptionNodeSlice(n.raw.GetOptionList())
@@ -804,6 +1206,18 @@ func newAlterColumnSetDataTypeActionNodeSlice(raws []*generated.ResolvedAlterCol
 
 func (n *AlterColumnSetDataTypeActionNode) Kind() Kind    { return KindAlterColumnSetDataTypeAction }
 func (n *AlterColumnSetDataTypeActionNode) argumentNode() {}
+
+func (n *AlterColumnSetDataTypeActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterColumnSetDataTypeActionNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
+func (n *AlterColumnSetDataTypeActionNode) Column() string {
+	return n.raw.GetParent().GetColumn()
+}
 
 func (n *AlterColumnSetDataTypeActionNode) UpdatedType() *generated.TypeProto {
 	return n.raw.GetUpdatedType()
@@ -862,6 +1276,18 @@ func newAlterColumnSetDefaultActionNodeSlice(raws []*generated.ResolvedAlterColu
 func (n *AlterColumnSetDefaultActionNode) Kind() Kind    { return KindAlterColumnSetDefaultAction }
 func (n *AlterColumnSetDefaultActionNode) argumentNode() {}
 
+func (n *AlterColumnSetDefaultActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterColumnSetDefaultActionNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
+func (n *AlterColumnSetDefaultActionNode) Column() string {
+	return n.raw.GetParent().GetColumn()
+}
+
 func (n *AlterColumnSetDefaultActionNode) DefaultValue() *ColumnDefaultValueNode {
 	return newColumnDefaultValueNode(n.raw.GetDefaultValue())
 }
@@ -910,6 +1336,18 @@ func newAlterColumnSetGeneratedActionNodeSlice(raws []*generated.ResolvedAlterCo
 
 func (n *AlterColumnSetGeneratedActionNode) Kind() Kind    { return KindAlterColumnSetGeneratedAction }
 func (n *AlterColumnSetGeneratedActionNode) argumentNode() {}
+
+func (n *AlterColumnSetGeneratedActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterColumnSetGeneratedActionNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
+func (n *AlterColumnSetGeneratedActionNode) Column() string {
+	return n.raw.GetParent().GetColumn()
+}
 
 func (n *AlterColumnSetGeneratedActionNode) GeneratedColumnInfo() *GeneratedColumnInfoNode {
 	return newGeneratedColumnInfoNode(n.raw.GetGeneratedColumnInfo())
@@ -960,12 +1398,49 @@ func newAlterConnectionStmtNodeSlice(raws []*generated.ResolvedAlterConnectionSt
 func (n *AlterConnectionStmtNode) Kind() Kind     { return KindAlterConnectionStmt }
 func (n *AlterConnectionStmtNode) statementNode() {}
 
+func (n *AlterConnectionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterConnectionStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterConnectionStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterConnectionStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterConnectionStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterConnectionStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	return count
 }
 
 func (n *AlterConnectionStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -995,12 +1470,49 @@ func newAlterDatabaseStmtNodeSlice(raws []*generated.ResolvedAlterDatabaseStmtPr
 func (n *AlterDatabaseStmtNode) Kind() Kind     { return KindAlterDatabaseStmt }
 func (n *AlterDatabaseStmtNode) statementNode() {}
 
+func (n *AlterDatabaseStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterDatabaseStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterDatabaseStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterDatabaseStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterDatabaseStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterDatabaseStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	return count
 }
 
 func (n *AlterDatabaseStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -1030,16 +1542,53 @@ func newAlterEntityStmtNodeSlice(raws []*generated.ResolvedAlterEntityStmtProto)
 func (n *AlterEntityStmtNode) Kind() Kind     { return KindAlterEntityStmt }
 func (n *AlterEntityStmtNode) statementNode() {}
 
+func (n *AlterEntityStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterEntityStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterEntityStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterEntityStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterEntityStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterEntityStmtNode) EntityType() string {
 	return n.raw.GetEntityType()
 }
 
 func (n *AlterEntityStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	return count
 }
 
 func (n *AlterEntityStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -1069,12 +1618,49 @@ func newAlterExternalSchemaStmtNodeSlice(raws []*generated.ResolvedAlterExternal
 func (n *AlterExternalSchemaStmtNode) Kind() Kind     { return KindAlterExternalSchemaStmt }
 func (n *AlterExternalSchemaStmtNode) statementNode() {}
 
+func (n *AlterExternalSchemaStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterExternalSchemaStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterExternalSchemaStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterExternalSchemaStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterExternalSchemaStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterExternalSchemaStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	return count
 }
 
 func (n *AlterExternalSchemaStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -1104,6 +1690,26 @@ func newAlterIndexStmtNodeSlice(raws []*generated.ResolvedAlterIndexStmtProto) [
 func (n *AlterIndexStmtNode) Kind() Kind     { return KindAlterIndexStmt }
 func (n *AlterIndexStmtNode) statementNode() {}
 
+func (n *AlterIndexStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterIndexStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterIndexStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterIndexStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterIndexStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterIndexStmtNode) TableNamePath() []string {
 	return n.raw.GetTableNamePath()
 }
@@ -1118,6 +1724,8 @@ func (n *AlterIndexStmtNode) TableScan() *TableScanNode {
 
 func (n *AlterIndexStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	if n.raw.GetTableScan() != nil {
 		count++
 	}
@@ -1126,6 +1734,20 @@ func (n *AlterIndexStmtNode) NumChildren() int {
 
 func (n *AlterIndexStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetTableScan() != nil {
 		if idx == i {
 			return n.TableScan()
@@ -1161,12 +1783,49 @@ func newAlterMaterializedViewStmtNodeSlice(raws []*generated.ResolvedAlterMateri
 func (n *AlterMaterializedViewStmtNode) Kind() Kind     { return KindAlterMaterializedViewStmt }
 func (n *AlterMaterializedViewStmtNode) statementNode() {}
 
+func (n *AlterMaterializedViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterMaterializedViewStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterMaterializedViewStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterMaterializedViewStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterMaterializedViewStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterMaterializedViewStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	return count
 }
 
 func (n *AlterMaterializedViewStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -1196,12 +1855,49 @@ func newAlterModelStmtNodeSlice(raws []*generated.ResolvedAlterModelStmtProto) [
 func (n *AlterModelStmtNode) Kind() Kind     { return KindAlterModelStmt }
 func (n *AlterModelStmtNode) statementNode() {}
 
+func (n *AlterModelStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterModelStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterModelStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterModelStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterModelStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterModelStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	return count
 }
 
 func (n *AlterModelStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -1231,6 +1927,26 @@ func newAlterPrivilegeRestrictionStmtNodeSlice(raws []*generated.ResolvedAlterPr
 func (n *AlterPrivilegeRestrictionStmtNode) Kind() Kind     { return KindAlterPrivilegeRestrictionStmt }
 func (n *AlterPrivilegeRestrictionStmtNode) statementNode() {}
 
+func (n *AlterPrivilegeRestrictionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterPrivilegeRestrictionStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterPrivilegeRestrictionStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterPrivilegeRestrictionStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterPrivilegeRestrictionStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterPrivilegeRestrictionStmtNode) ColumnPrivilegeList() []*PrivilegeNode {
 	return newPrivilegeNodeSlice(n.raw.GetColumnPrivilegeList())
 }
@@ -1241,12 +1957,28 @@ func (n *AlterPrivilegeRestrictionStmtNode) ObjectType() string {
 
 func (n *AlterPrivilegeRestrictionStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	count += len(n.ColumnPrivilegeList())
 	return count
 }
 
 func (n *AlterPrivilegeRestrictionStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.ColumnPrivilegeList()
 		if i < idx+len(s) {
@@ -1283,6 +2015,26 @@ func newAlterRowAccessPolicyStmtNodeSlice(raws []*generated.ResolvedAlterRowAcce
 func (n *AlterRowAccessPolicyStmtNode) Kind() Kind     { return KindAlterRowAccessPolicyStmt }
 func (n *AlterRowAccessPolicyStmtNode) statementNode() {}
 
+func (n *AlterRowAccessPolicyStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterRowAccessPolicyStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterRowAccessPolicyStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterRowAccessPolicyStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterRowAccessPolicyStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterRowAccessPolicyStmtNode) Name() string {
 	return n.raw.GetName()
 }
@@ -1293,6 +2045,8 @@ func (n *AlterRowAccessPolicyStmtNode) TableScan() *TableScanNode {
 
 func (n *AlterRowAccessPolicyStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	if n.raw.GetTableScan() != nil {
 		count++
 	}
@@ -1301,6 +2055,20 @@ func (n *AlterRowAccessPolicyStmtNode) NumChildren() int {
 
 func (n *AlterRowAccessPolicyStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetTableScan() != nil {
 		if idx == i {
 			return n.TableScan()
@@ -1336,12 +2104,49 @@ func newAlterSchemaStmtNodeSlice(raws []*generated.ResolvedAlterSchemaStmtProto)
 func (n *AlterSchemaStmtNode) Kind() Kind     { return KindAlterSchemaStmt }
 func (n *AlterSchemaStmtNode) statementNode() {}
 
+func (n *AlterSchemaStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterSchemaStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterSchemaStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterSchemaStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterSchemaStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterSchemaStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	return count
 }
 
 func (n *AlterSchemaStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -1371,12 +2176,49 @@ func newAlterSequenceStmtNodeSlice(raws []*generated.ResolvedAlterSequenceStmtPr
 func (n *AlterSequenceStmtNode) Kind() Kind     { return KindAlterSequenceStmt }
 func (n *AlterSequenceStmtNode) statementNode() {}
 
+func (n *AlterSequenceStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterSequenceStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterSequenceStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterSequenceStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterSequenceStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterSequenceStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	return count
 }
 
 func (n *AlterSequenceStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -1405,6 +2247,10 @@ func newAlterSubEntityActionNodeSlice(raws []*generated.ResolvedAlterSubEntityAc
 
 func (n *AlterSubEntityActionNode) Kind() Kind    { return KindAlterSubEntityAction }
 func (n *AlterSubEntityActionNode) argumentNode() {}
+
+func (n *AlterSubEntityActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *AlterSubEntityActionNode) EntityType() string {
 	return n.raw.GetEntityType()
@@ -1467,6 +2313,14 @@ func newAlterTableSetOptionsStmtNodeSlice(raws []*generated.ResolvedAlterTableSe
 func (n *AlterTableSetOptionsStmtNode) Kind() Kind     { return KindAlterTableSetOptionsStmt }
 func (n *AlterTableSetOptionsStmtNode) statementNode() {}
 
+func (n *AlterTableSetOptionsStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterTableSetOptionsStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *AlterTableSetOptionsStmtNode) NamePath() []string {
 	return n.raw.GetNamePath()
 }
@@ -1481,12 +2335,20 @@ func (n *AlterTableSetOptionsStmtNode) IsIfExists() bool {
 
 func (n *AlterTableSetOptionsStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.OptionList())
 	return count
 }
 
 func (n *AlterTableSetOptionsStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.OptionList()
 		if i < idx+len(s) {
@@ -1523,12 +2385,49 @@ func newAlterTableStmtNodeSlice(raws []*generated.ResolvedAlterTableStmtProto) [
 func (n *AlterTableStmtNode) Kind() Kind     { return KindAlterTableStmt }
 func (n *AlterTableStmtNode) statementNode() {}
 
+func (n *AlterTableStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterTableStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterTableStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterTableStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterTableStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterTableStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	return count
 }
 
 func (n *AlterTableStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -1558,12 +2457,49 @@ func newAlterViewStmtNodeSlice(raws []*generated.ResolvedAlterViewStmtProto) []*
 func (n *AlterViewStmtNode) Kind() Kind     { return KindAlterViewStmt }
 func (n *AlterViewStmtNode) statementNode() {}
 
+func (n *AlterViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AlterViewStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *AlterViewStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *AlterViewStmtNode) AlterActionList() []ArgumentNode {
+	return wrapAlterActionSlice(n.raw.GetParent().GetAlterActionList())
+}
+
+func (n *AlterViewStmtNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterViewStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.AlterActionList())
 	return count
 }
 
 func (n *AlterViewStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.AlterActionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -1593,16 +2529,86 @@ func newAnalyticFunctionCallNodeSlice(raws []*generated.ResolvedAnalyticFunction
 func (n *AnalyticFunctionCallNode) Kind() Kind { return KindAnalyticFunctionCall }
 func (n *AnalyticFunctionCallNode) exprNode()  {}
 
+func (n *AnalyticFunctionCallNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AnalyticFunctionCallNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetType()
+}
+
+func (n *AnalyticFunctionCallNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetParent().GetParent().GetTypeAnnotationMap()
+}
+
+func (n *AnalyticFunctionCallNode) Function() *generated.FunctionRefProto {
+	return n.raw.GetParent().GetParent().GetFunction()
+}
+
+func (n *AnalyticFunctionCallNode) Signature() *generated.FunctionSignatureProto {
+	return n.raw.GetParent().GetParent().GetSignature()
+}
+
+func (n *AnalyticFunctionCallNode) ArgumentList() []ExprNode {
+	return wrapExprSlice(n.raw.GetParent().GetParent().GetArgumentList())
+}
+
+func (n *AnalyticFunctionCallNode) GenericArgumentList() []*generated.ResolvedFunctionArgumentProto {
+	return n.raw.GetParent().GetParent().GetGenericArgumentList()
+}
+
+func (n *AnalyticFunctionCallNode) ErrorMode() generated.ResolvedFunctionCallBaseEnums_ErrorMode {
+	return n.raw.GetParent().GetParent().GetErrorMode()
+}
+
+func (n *AnalyticFunctionCallNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetHintList()
+}
+
+func (n *AnalyticFunctionCallNode) CollationList() []*generated.ResolvedCollationProto {
+	return n.raw.GetParent().GetParent().GetCollationList()
+}
+
+func (n *AnalyticFunctionCallNode) Distinct() bool {
+	return n.raw.GetParent().GetDistinct()
+}
+
+func (n *AnalyticFunctionCallNode) NullHandlingModifier() generated.ResolvedNonScalarFunctionCallBaseEnums_NullHandlingModifier {
+	return n.raw.GetParent().GetNullHandlingModifier()
+}
+
+func (n *AnalyticFunctionCallNode) WhereExpr() ExprNode {
+	return wrapExpr(n.raw.GetParent().GetWhereExpr())
+}
+
 func (n *AnalyticFunctionCallNode) WindowFrame() *generated.ResolvedWindowFrameProto {
 	return n.raw.GetWindowFrame()
 }
 
 func (n *AnalyticFunctionCallNode) NumChildren() int {
 	count := 0
+	count += len(n.ArgumentList())
+	if n.raw.GetParent().GetWhereExpr() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *AnalyticFunctionCallNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.ArgumentList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetWhereExpr() != nil {
+		if idx == i {
+			return n.WhereExpr()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -1631,6 +2637,10 @@ func newAnalyticFunctionGroupNodeSlice(raws []*generated.ResolvedAnalyticFunctio
 
 func (n *AnalyticFunctionGroupNode) Kind() Kind    { return KindAnalyticFunctionGroup }
 func (n *AnalyticFunctionGroupNode) argumentNode() {}
+
+func (n *AnalyticFunctionGroupNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *AnalyticFunctionGroupNode) PartitionBy() *WindowPartitioningNode {
 	return newWindowPartitioningNode(n.raw.GetPartitionBy())
@@ -1706,6 +2716,26 @@ func newAnalyticScanNodeSlice(raws []*generated.ResolvedAnalyticScanProto) []*An
 func (n *AnalyticScanNode) Kind() Kind { return KindAnalyticScan }
 func (n *AnalyticScanNode) scanNode()  {}
 
+func (n *AnalyticScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AnalyticScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *AnalyticScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *AnalyticScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *AnalyticScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *AnalyticScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -1759,6 +2789,14 @@ func newAnalyzeStmtNodeSlice(raws []*generated.ResolvedAnalyzeStmtProto) []*Anal
 func (n *AnalyzeStmtNode) Kind() Kind     { return KindAnalyzeStmt }
 func (n *AnalyzeStmtNode) statementNode() {}
 
+func (n *AnalyzeStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AnalyzeStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *AnalyzeStmtNode) OptionList() []*OptionNode {
 	return newOptionNodeSlice(n.raw.GetOptionList())
 }
@@ -1769,6 +2807,7 @@ func (n *AnalyzeStmtNode) TableAndColumnIndexList() []*TableAndColumnInfoNode {
 
 func (n *AnalyzeStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.OptionList())
 	count += len(n.TableAndColumnIndexList())
 	return count
@@ -1776,6 +2815,13 @@ func (n *AnalyzeStmtNode) NumChildren() int {
 
 func (n *AnalyzeStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.OptionList()
 		if i < idx+len(s) {
@@ -1819,6 +2865,54 @@ func newAnonymizedAggregateScanNodeSlice(raws []*generated.ResolvedAnonymizedAgg
 func (n *AnonymizedAggregateScanNode) Kind() Kind { return KindAnonymizedAggregateScan }
 func (n *AnonymizedAggregateScanNode) scanNode()  {}
 
+func (n *AnonymizedAggregateScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AnonymizedAggregateScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetParent().GetColumnList()
+}
+
+func (n *AnonymizedAggregateScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetHintList()
+}
+
+func (n *AnonymizedAggregateScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetParent().GetIsOrdered()
+}
+
+func (n *AnonymizedAggregateScanNode) NodeSource() string {
+	return n.raw.GetParent().GetParent().GetNodeSource()
+}
+
+func (n *AnonymizedAggregateScanNode) InputScan() ScanNode {
+	return wrapScan(n.raw.GetParent().GetInputScan())
+}
+
+func (n *AnonymizedAggregateScanNode) GroupByList() []*generated.ResolvedComputedColumnProto {
+	return n.raw.GetParent().GetGroupByList()
+}
+
+func (n *AnonymizedAggregateScanNode) CollationList() []*generated.ResolvedCollationProto {
+	return n.raw.GetParent().GetCollationList()
+}
+
+func (n *AnonymizedAggregateScanNode) AggregateList() []ArgumentNode {
+	return wrapComputedColumnBaseSlice(n.raw.GetParent().GetAggregateList())
+}
+
+func (n *AnonymizedAggregateScanNode) GroupingSetList() []ArgumentNode {
+	return wrapGroupingSetBaseSlice(n.raw.GetParent().GetGroupingSetList())
+}
+
+func (n *AnonymizedAggregateScanNode) RollupColumnList() []*ColumnRefNode {
+	return newColumnRefNodeSlice(n.raw.GetParent().GetRollupColumnList())
+}
+
+func (n *AnonymizedAggregateScanNode) GroupingCallList() []*GroupingCallNode {
+	return newGroupingCallNodeSlice(n.raw.GetParent().GetGroupingCallList())
+}
+
 func (n *AnonymizedAggregateScanNode) KThresholdExpr() ExprNode {
 	return wrapExpr(n.raw.GetKThresholdExpr())
 }
@@ -1829,6 +2923,13 @@ func (n *AnonymizedAggregateScanNode) AnonymizationOptionList() []*generated.Res
 
 func (n *AnonymizedAggregateScanNode) NumChildren() int {
 	count := 0
+	if n.raw.GetParent().GetInputScan() != nil {
+		count++
+	}
+	count += len(n.AggregateList())
+	count += len(n.GroupingSetList())
+	count += len(n.RollupColumnList())
+	count += len(n.GroupingCallList())
 	if n.raw.GetKThresholdExpr() != nil {
 		count++
 	}
@@ -1837,6 +2938,40 @@ func (n *AnonymizedAggregateScanNode) NumChildren() int {
 
 func (n *AnonymizedAggregateScanNode) Child(i int) Node {
 	idx := 0
+	if n.raw.GetParent().GetInputScan() != nil {
+		if idx == i {
+			return n.InputScan()
+		}
+		idx++
+	}
+	{
+		s := n.AggregateList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.GroupingSetList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.RollupColumnList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.GroupingCallList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetKThresholdExpr() != nil {
 		if idx == i {
 			return n.KThresholdExpr()
@@ -1871,6 +3006,10 @@ func newArgumentDefNodeSlice(raws []*generated.ResolvedArgumentDefProto) []*Argu
 
 func (n *ArgumentDefNode) Kind() Kind    { return KindArgumentDef }
 func (n *ArgumentDefNode) argumentNode() {}
+
+func (n *ArgumentDefNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *ArgumentDefNode) Name() string {
 	return n.raw.GetName()
@@ -1918,6 +3057,10 @@ func newArgumentListNodeSlice(raws []*generated.ResolvedArgumentListProto) []*Ar
 
 func (n *ArgumentListNode) Kind() Kind    { return KindArgumentList }
 func (n *ArgumentListNode) argumentNode() {}
+
+func (n *ArgumentListNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *ArgumentListNode) ArgList() []*ArgumentDefNode {
 	return newArgumentDefNodeSlice(n.raw.GetArgList())
@@ -1967,6 +3110,18 @@ func newArgumentRefNodeSlice(raws []*generated.ResolvedArgumentRefProto) []*Argu
 func (n *ArgumentRefNode) Kind() Kind { return KindArgumentRef }
 func (n *ArgumentRefNode) exprNode()  {}
 
+func (n *ArgumentRefNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ArgumentRefNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *ArgumentRefNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *ArgumentRefNode) Name() string {
 	return n.raw.GetName()
 }
@@ -2009,6 +3164,18 @@ func newArrayAggregateNodeSlice(raws []*generated.ResolvedArrayAggregateProto) [
 
 func (n *ArrayAggregateNode) Kind() Kind { return KindArrayAggregate }
 func (n *ArrayAggregateNode) exprNode()  {}
+
+func (n *ArrayAggregateNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ArrayAggregateNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *ArrayAggregateNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *ArrayAggregateNode) Array() ExprNode {
 	return wrapExpr(n.raw.GetArray())
@@ -2087,6 +3254,26 @@ func newArrayScanNodeSlice(raws []*generated.ResolvedArrayScanProto) []*ArraySca
 
 func (n *ArrayScanNode) Kind() Kind { return KindArrayScan }
 func (n *ArrayScanNode) scanNode()  {}
+
+func (n *ArrayScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ArrayScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *ArrayScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *ArrayScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *ArrayScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
 
 func (n *ArrayScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
@@ -2187,6 +3374,10 @@ func newAssertRowsModifiedNodeSlice(raws []*generated.ResolvedAssertRowsModified
 func (n *AssertRowsModifiedNode) Kind() Kind    { return KindAssertRowsModified }
 func (n *AssertRowsModifiedNode) argumentNode() {}
 
+func (n *AssertRowsModifiedNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *AssertRowsModifiedNode) Rows() ExprNode {
 	return wrapExpr(n.raw.GetRows())
 }
@@ -2236,6 +3427,26 @@ func newAssertScanNodeSlice(raws []*generated.ResolvedAssertScanProto) []*Assert
 func (n *AssertScanNode) Kind() Kind { return KindAssertScan }
 func (n *AssertScanNode) scanNode()  {}
 
+func (n *AssertScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AssertScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *AssertScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *AssertScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *AssertScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *AssertScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -2250,6 +3461,7 @@ func (n *AssertScanNode) Message() ExprNode {
 
 func (n *AssertScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInputScan() != nil {
 		count++
 	}
@@ -2264,6 +3476,13 @@ func (n *AssertScanNode) NumChildren() int {
 
 func (n *AssertScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInputScan() != nil {
 		if idx == i {
 			return n.InputScan()
@@ -2311,6 +3530,14 @@ func newAssertStmtNodeSlice(raws []*generated.ResolvedAssertStmtProto) []*Assert
 func (n *AssertStmtNode) Kind() Kind     { return KindAssertStmt }
 func (n *AssertStmtNode) statementNode() {}
 
+func (n *AssertStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AssertStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *AssertStmtNode) Expression() ExprNode {
 	return wrapExpr(n.raw.GetExpression())
 }
@@ -2321,6 +3548,7 @@ func (n *AssertStmtNode) Description() string {
 
 func (n *AssertStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetExpression() != nil {
 		count++
 	}
@@ -2329,6 +3557,13 @@ func (n *AssertStmtNode) NumChildren() int {
 
 func (n *AssertStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetExpression() != nil {
 		if idx == i {
 			return n.Expression()
@@ -2364,6 +3599,14 @@ func newAssignmentStmtNodeSlice(raws []*generated.ResolvedAssignmentStmtProto) [
 func (n *AssignmentStmtNode) Kind() Kind     { return KindAssignmentStmt }
 func (n *AssignmentStmtNode) statementNode() {}
 
+func (n *AssignmentStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AssignmentStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *AssignmentStmtNode) Target() ExprNode {
 	return wrapExpr(n.raw.GetTarget())
 }
@@ -2374,6 +3617,7 @@ func (n *AssignmentStmtNode) Expr() ExprNode {
 
 func (n *AssignmentStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetTarget() != nil {
 		count++
 	}
@@ -2385,6 +3629,13 @@ func (n *AssignmentStmtNode) NumChildren() int {
 
 func (n *AssignmentStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetTarget() != nil {
 		if idx == i {
 			return n.Target()
@@ -2425,6 +3676,10 @@ func newAuxLoadDataPartitionFilterNodeSlice(raws []*generated.ResolvedAuxLoadDat
 
 func (n *AuxLoadDataPartitionFilterNode) Kind() Kind    { return KindAuxLoadDataPartitionFilter }
 func (n *AuxLoadDataPartitionFilterNode) argumentNode() {}
+
+func (n *AuxLoadDataPartitionFilterNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *AuxLoadDataPartitionFilterNode) Filter() ExprNode {
 	return wrapExpr(n.raw.GetFilter())
@@ -2478,6 +3733,14 @@ func newAuxLoadDataStmtNodeSlice(raws []*generated.ResolvedAuxLoadDataStmtProto)
 
 func (n *AuxLoadDataStmtNode) Kind() Kind     { return KindAuxLoadDataStmt }
 func (n *AuxLoadDataStmtNode) statementNode() {}
+
+func (n *AuxLoadDataStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *AuxLoadDataStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
 
 func (n *AuxLoadDataStmtNode) InsertionMode() generated.ResolvedAuxLoadDataStmtEnums_InsertionMode {
 	return n.raw.GetInsertionMode()
@@ -2545,6 +3808,7 @@ func (n *AuxLoadDataStmtNode) FromFilesOptionList() []*OptionNode {
 
 func (n *AuxLoadDataStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetPartitionFilter() != nil {
 		count++
 	}
@@ -2570,6 +3834,13 @@ func (n *AuxLoadDataStmtNode) NumChildren() int {
 
 func (n *AuxLoadDataStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetPartitionFilter() != nil {
 		if idx == i {
 			return n.PartitionFilter()
@@ -2679,12 +3950,33 @@ func newBarrierScanNodeSlice(raws []*generated.ResolvedBarrierScanProto) []*Barr
 func (n *BarrierScanNode) Kind() Kind { return KindBarrierScan }
 func (n *BarrierScanNode) scanNode()  {}
 
+func (n *BarrierScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *BarrierScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *BarrierScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *BarrierScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *BarrierScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *BarrierScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
 
 func (n *BarrierScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInputScan() != nil {
 		count++
 	}
@@ -2693,6 +3985,13 @@ func (n *BarrierScanNode) NumChildren() int {
 
 func (n *BarrierScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInputScan() != nil {
 		if idx == i {
 			return n.InputScan()
@@ -2727,6 +4026,14 @@ func newBeginStmtNodeSlice(raws []*generated.ResolvedBeginStmtProto) []*BeginStm
 
 func (n *BeginStmtNode) Kind() Kind     { return KindBeginStmt }
 func (n *BeginStmtNode) statementNode() {}
+
+func (n *BeginStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *BeginStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *BeginStmtNode) ReadWriteMode() generated.ResolvedBeginStmtEnums_ReadWriteMode {
 	return n.raw.GetReadWriteMode()
@@ -2771,6 +4078,14 @@ func newCallStmtNodeSlice(raws []*generated.ResolvedCallStmtProto) []*CallStmtNo
 func (n *CallStmtNode) Kind() Kind     { return KindCallStmt }
 func (n *CallStmtNode) statementNode() {}
 
+func (n *CallStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CallStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *CallStmtNode) Procedure() *generated.ProcedureRefProto {
 	return n.raw.GetProcedure()
 }
@@ -2785,12 +4100,20 @@ func (n *CallStmtNode) ArgumentList() []ExprNode {
 
 func (n *CallStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.ArgumentList())
 	return count
 }
 
 func (n *CallStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.ArgumentList()
 		if i < idx+len(s) {
@@ -2826,6 +4149,18 @@ func newCastNodeSlice(raws []*generated.ResolvedCastProto) []*CastNode {
 
 func (n *CastNode) Kind() Kind { return KindCast }
 func (n *CastNode) exprNode()  {}
+
+func (n *CastNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CastNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *CastNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *CastNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
@@ -2923,6 +4258,18 @@ func newCatalogColumnRefNodeSlice(raws []*generated.ResolvedCatalogColumnRefProt
 func (n *CatalogColumnRefNode) Kind() Kind { return KindCatalogColumnRef }
 func (n *CatalogColumnRefNode) exprNode()  {}
 
+func (n *CatalogColumnRefNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CatalogColumnRefNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *CatalogColumnRefNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *CatalogColumnRefNode) Column() *generated.ColumnRefProto {
 	return n.raw.GetColumn()
 }
@@ -2961,6 +4308,10 @@ func newCheckConstraintNodeSlice(raws []*generated.ResolvedCheckConstraintProto)
 
 func (n *CheckConstraintNode) Kind() Kind    { return KindCheckConstraint }
 func (n *CheckConstraintNode) argumentNode() {}
+
+func (n *CheckConstraintNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *CheckConstraintNode) ConstraintName() string {
 	return n.raw.GetConstraintName()
@@ -3023,6 +4374,14 @@ func newCloneDataStmtNodeSlice(raws []*generated.ResolvedCloneDataStmtProto) []*
 func (n *CloneDataStmtNode) Kind() Kind     { return KindCloneDataStmt }
 func (n *CloneDataStmtNode) statementNode() {}
 
+func (n *CloneDataStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CloneDataStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *CloneDataStmtNode) TargetTable() *TableScanNode {
 	return newTableScanNode(n.raw.GetTargetTable())
 }
@@ -3033,6 +4392,7 @@ func (n *CloneDataStmtNode) CloneFrom() ScanNode {
 
 func (n *CloneDataStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetTargetTable() != nil {
 		count++
 	}
@@ -3044,6 +4404,13 @@ func (n *CloneDataStmtNode) NumChildren() int {
 
 func (n *CloneDataStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetTargetTable() != nil {
 		if idx == i {
 			return n.TargetTable()
@@ -3084,6 +4451,10 @@ func newColumnAnnotationsNodeSlice(raws []*generated.ResolvedColumnAnnotationsPr
 
 func (n *ColumnAnnotationsNode) Kind() Kind    { return KindColumnAnnotations }
 func (n *ColumnAnnotationsNode) argumentNode() {}
+
+func (n *ColumnAnnotationsNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *ColumnAnnotationsNode) CollationName() ExprNode {
 	return wrapExpr(n.raw.GetCollationName())
@@ -3158,6 +4529,10 @@ func newColumnDefaultValueNodeSlice(raws []*generated.ResolvedColumnDefaultValue
 func (n *ColumnDefaultValueNode) Kind() Kind    { return KindColumnDefaultValue }
 func (n *ColumnDefaultValueNode) argumentNode() {}
 
+func (n *ColumnDefaultValueNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *ColumnDefaultValueNode) Expression() ExprNode {
 	return wrapExpr(n.raw.GetExpression())
 }
@@ -3210,6 +4585,10 @@ func newColumnDefinitionNodeSlice(raws []*generated.ResolvedColumnDefinitionProt
 
 func (n *ColumnDefinitionNode) Kind() Kind    { return KindColumnDefinition }
 func (n *ColumnDefinitionNode) argumentNode() {}
+
+func (n *ColumnDefinitionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *ColumnDefinitionNode) Name() string {
 	return n.raw.GetName()
@@ -3302,6 +4681,10 @@ func newColumnHolderNodeSlice(raws []*generated.ResolvedColumnHolderProto) []*Co
 func (n *ColumnHolderNode) Kind() Kind    { return KindColumnHolder }
 func (n *ColumnHolderNode) argumentNode() {}
 
+func (n *ColumnHolderNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *ColumnHolderNode) Column() *generated.ResolvedColumnProto {
 	return n.raw.GetColumn()
 }
@@ -3340,6 +4723,18 @@ func newColumnRefNodeSlice(raws []*generated.ResolvedColumnRefProto) []*ColumnRe
 
 func (n *ColumnRefNode) Kind() Kind { return KindColumnRef }
 func (n *ColumnRefNode) exprNode()  {}
+
+func (n *ColumnRefNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ColumnRefNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *ColumnRefNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *ColumnRefNode) Column() *generated.ResolvedColumnProto {
 	return n.raw.GetColumn()
@@ -3384,6 +4779,14 @@ func newCommitStmtNodeSlice(raws []*generated.ResolvedCommitStmtProto) []*Commit
 func (n *CommitStmtNode) Kind() Kind     { return KindCommitStmt }
 func (n *CommitStmtNode) statementNode() {}
 
+func (n *CommitStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CommitStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
 func (n *CommitStmtNode) NumChildren() int {
 	count := 0
 	return count
@@ -3418,6 +4821,10 @@ func newComputedColumnNodeSlice(raws []*generated.ResolvedComputedColumnProto) [
 
 func (n *ComputedColumnNode) Kind() Kind    { return KindComputedColumn }
 func (n *ComputedColumnNode) argumentNode() {}
+
+func (n *ComputedColumnNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *ComputedColumnNode) Column() *generated.ResolvedColumnProto {
 	return n.raw.GetColumn()
@@ -3472,6 +4879,10 @@ func newConnectionNodeSlice(raws []*generated.ResolvedConnectionProto) []*Connec
 func (n *ConnectionNode) Kind() Kind    { return KindConnection }
 func (n *ConnectionNode) argumentNode() {}
 
+func (n *ConnectionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *ConnectionNode) Connection() *generated.ConnectionRefProto {
 	return n.raw.GetConnection()
 }
@@ -3510,6 +4921,18 @@ func newConstantNodeSlice(raws []*generated.ResolvedConstantProto) []*ConstantNo
 
 func (n *ConstantNode) Kind() Kind { return KindConstant }
 func (n *ConstantNode) exprNode()  {}
+
+func (n *ConstantNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ConstantNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *ConstantNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *ConstantNode) Constant() *generated.ConstantRefProto {
 	return n.raw.GetConstant()
@@ -3550,12 +4973,110 @@ func newCreateApproxViewStmtNodeSlice(raws []*generated.ResolvedCreateApproxView
 func (n *CreateApproxViewStmtNode) Kind() Kind     { return KindCreateApproxViewStmt }
 func (n *CreateApproxViewStmtNode) statementNode() {}
 
+func (n *CreateApproxViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateApproxViewStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetParent().GetHintList())
+}
+
+func (n *CreateApproxViewStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetParent().GetNamePath()
+}
+
+func (n *CreateApproxViewStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetParent().GetCreateScope()
+}
+
+func (n *CreateApproxViewStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetParent().GetCreateMode()
+}
+
+func (n *CreateApproxViewStmtNode) OptionList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetOptionList())
+}
+
+func (n *CreateApproxViewStmtNode) OutputColumnList() []*OutputColumnNode {
+	return newOutputColumnNodeSlice(n.raw.GetParent().GetOutputColumnList())
+}
+
+func (n *CreateApproxViewStmtNode) HasExplicitColumns() bool {
+	return n.raw.GetParent().GetHasExplicitColumns()
+}
+
+func (n *CreateApproxViewStmtNode) Query() ScanNode {
+	return wrapScan(n.raw.GetParent().GetQuery())
+}
+
+func (n *CreateApproxViewStmtNode) Sql() string {
+	return n.raw.GetParent().GetSql()
+}
+
+func (n *CreateApproxViewStmtNode) SqlSecurity() generated.ResolvedCreateStatementEnums_SqlSecurity {
+	return n.raw.GetParent().GetSqlSecurity()
+}
+
+func (n *CreateApproxViewStmtNode) IsValueTable() bool {
+	return n.raw.GetParent().GetIsValueTable()
+}
+
+func (n *CreateApproxViewStmtNode) Recursive() bool {
+	return n.raw.GetParent().GetRecursive()
+}
+
+func (n *CreateApproxViewStmtNode) ColumnDefinitionList() []*ColumnDefinitionNode {
+	return newColumnDefinitionNodeSlice(n.raw.GetParent().GetColumnDefinitionList())
+}
+
 func (n *CreateApproxViewStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.OptionList())
+	count += len(n.OutputColumnList())
+	if n.raw.GetParent().GetQuery() != nil {
+		count++
+	}
+	count += len(n.ColumnDefinitionList())
 	return count
 }
 
 func (n *CreateApproxViewStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.OptionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.OutputColumnList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetQuery() != nil {
+		if idx == i {
+			return n.Query()
+		}
+		idx++
+	}
+	{
+		s := n.ColumnDefinitionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -3585,18 +5106,46 @@ func newCreateConnectionStmtNodeSlice(raws []*generated.ResolvedCreateConnection
 func (n *CreateConnectionStmtNode) Kind() Kind     { return KindCreateConnectionStmt }
 func (n *CreateConnectionStmtNode) statementNode() {}
 
+func (n *CreateConnectionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateConnectionStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *CreateConnectionStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *CreateConnectionStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetCreateScope()
+}
+
+func (n *CreateConnectionStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetCreateMode()
+}
+
 func (n *CreateConnectionStmtNode) OptionList() []*OptionNode {
 	return newOptionNodeSlice(n.raw.GetOptionList())
 }
 
 func (n *CreateConnectionStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.OptionList())
 	return count
 }
 
 func (n *CreateConnectionStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.OptionList()
 		if i < idx+len(s) {
@@ -3633,12 +5182,33 @@ func newCreateConstantStmtNodeSlice(raws []*generated.ResolvedCreateConstantStmt
 func (n *CreateConstantStmtNode) Kind() Kind     { return KindCreateConstantStmt }
 func (n *CreateConstantStmtNode) statementNode() {}
 
+func (n *CreateConstantStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateConstantStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *CreateConstantStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *CreateConstantStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetCreateScope()
+}
+
+func (n *CreateConstantStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetCreateMode()
+}
+
 func (n *CreateConstantStmtNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
 }
 
 func (n *CreateConstantStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetExpr() != nil {
 		count++
 	}
@@ -3647,6 +5217,13 @@ func (n *CreateConstantStmtNode) NumChildren() int {
 
 func (n *CreateConstantStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetExpr() != nil {
 		if idx == i {
 			return n.Expr()
@@ -3681,6 +5258,14 @@ func newCreateDatabaseStmtNodeSlice(raws []*generated.ResolvedCreateDatabaseStmt
 
 func (n *CreateDatabaseStmtNode) Kind() Kind     { return KindCreateDatabaseStmt }
 func (n *CreateDatabaseStmtNode) statementNode() {}
+
+func (n *CreateDatabaseStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateDatabaseStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *CreateDatabaseStmtNode) NamePath() []string {
 	return n.raw.GetNamePath()
@@ -3725,6 +5310,26 @@ func newCreateEntityStmtNodeSlice(raws []*generated.ResolvedCreateEntityStmtProt
 func (n *CreateEntityStmtNode) Kind() Kind     { return KindCreateEntityStmt }
 func (n *CreateEntityStmtNode) statementNode() {}
 
+func (n *CreateEntityStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateEntityStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *CreateEntityStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *CreateEntityStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetCreateScope()
+}
+
+func (n *CreateEntityStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetCreateMode()
+}
+
 func (n *CreateEntityStmtNode) EntityType() string {
 	return n.raw.GetEntityType()
 }
@@ -3743,12 +5348,20 @@ func (n *CreateEntityStmtNode) OptionList() []*OptionNode {
 
 func (n *CreateEntityStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.OptionList())
 	return count
 }
 
 func (n *CreateEntityStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.OptionList()
 		if i < idx+len(s) {
@@ -3784,6 +5397,30 @@ func newCreateExternalSchemaStmtNodeSlice(raws []*generated.ResolvedCreateExtern
 
 func (n *CreateExternalSchemaStmtNode) Kind() Kind     { return KindCreateExternalSchemaStmt }
 func (n *CreateExternalSchemaStmtNode) statementNode() {}
+
+func (n *CreateExternalSchemaStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateExternalSchemaStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetParent().GetHintList()
+}
+
+func (n *CreateExternalSchemaStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetParent().GetNamePath()
+}
+
+func (n *CreateExternalSchemaStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetParent().GetCreateScope()
+}
+
+func (n *CreateExternalSchemaStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetParent().GetCreateMode()
+}
+
+func (n *CreateExternalSchemaStmtNode) OptionList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetOptionList()
+}
 
 func (n *CreateExternalSchemaStmtNode) Connection() *ConnectionNode {
 	return newConnectionNode(n.raw.GetConnection())
@@ -3834,12 +5471,84 @@ func newCreateExternalTableStmtNodeSlice(raws []*generated.ResolvedCreateExterna
 func (n *CreateExternalTableStmtNode) Kind() Kind     { return KindCreateExternalTableStmt }
 func (n *CreateExternalTableStmtNode) statementNode() {}
 
+func (n *CreateExternalTableStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateExternalTableStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetParent().GetHintList()
+}
+
+func (n *CreateExternalTableStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetParent().GetNamePath()
+}
+
+func (n *CreateExternalTableStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetParent().GetCreateScope()
+}
+
+func (n *CreateExternalTableStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetParent().GetCreateMode()
+}
+
+func (n *CreateExternalTableStmtNode) OptionList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetOptionList()
+}
+
+func (n *CreateExternalTableStmtNode) ColumnDefinitionList() []*ColumnDefinitionNode {
+	return newColumnDefinitionNodeSlice(n.raw.GetParent().GetColumnDefinitionList())
+}
+
+func (n *CreateExternalTableStmtNode) PseudoColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetPseudoColumnList()
+}
+
+func (n *CreateExternalTableStmtNode) PrimaryKey() *PrimaryKeyNode {
+	return newPrimaryKeyNode(n.raw.GetParent().GetPrimaryKey())
+}
+
+func (n *CreateExternalTableStmtNode) ForeignKeyList() []*ForeignKeyNode {
+	return newForeignKeyNodeSlice(n.raw.GetParent().GetForeignKeyList())
+}
+
+func (n *CreateExternalTableStmtNode) CheckConstraintList() []*CheckConstraintNode {
+	return newCheckConstraintNodeSlice(n.raw.GetParent().GetCheckConstraintList())
+}
+
+func (n *CreateExternalTableStmtNode) IsValueTable() bool {
+	return n.raw.GetParent().GetIsValueTable()
+}
+
+func (n *CreateExternalTableStmtNode) LikeTable() *generated.TableRefProto {
+	return n.raw.GetParent().GetLikeTable()
+}
+
+func (n *CreateExternalTableStmtNode) CollationName() ExprNode {
+	return wrapExpr(n.raw.GetParent().GetCollationName())
+}
+
+func (n *CreateExternalTableStmtNode) Connection() *ConnectionNode {
+	return newConnectionNode(n.raw.GetParent().GetConnection())
+}
+
 func (n *CreateExternalTableStmtNode) WithPartitionColumns() *WithPartitionColumnsNode {
 	return newWithPartitionColumnsNode(n.raw.GetWithPartitionColumns())
 }
 
 func (n *CreateExternalTableStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.ColumnDefinitionList())
+	if n.raw.GetParent().GetPrimaryKey() != nil {
+		count++
+	}
+	count += len(n.ForeignKeyList())
+	count += len(n.CheckConstraintList())
+	if n.raw.GetParent().GetCollationName() != nil {
+		count++
+	}
+	if n.raw.GetParent().GetConnection() != nil {
+		count++
+	}
 	if n.raw.GetWithPartitionColumns() != nil {
 		count++
 	}
@@ -3848,6 +5557,45 @@ func (n *CreateExternalTableStmtNode) NumChildren() int {
 
 func (n *CreateExternalTableStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.ColumnDefinitionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetPrimaryKey() != nil {
+		if idx == i {
+			return n.PrimaryKey()
+		}
+		idx++
+	}
+	{
+		s := n.ForeignKeyList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.CheckConstraintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetCollationName() != nil {
+		if idx == i {
+			return n.CollationName()
+		}
+		idx++
+	}
+	if n.raw.GetParent().GetConnection() != nil {
+		if idx == i {
+			return n.Connection()
+		}
+		idx++
+	}
 	if n.raw.GetWithPartitionColumns() != nil {
 		if idx == i {
 			return n.WithPartitionColumns()
@@ -3882,6 +5630,26 @@ func newCreateFunctionStmtNodeSlice(raws []*generated.ResolvedCreateFunctionStmt
 
 func (n *CreateFunctionStmtNode) Kind() Kind     { return KindCreateFunctionStmt }
 func (n *CreateFunctionStmtNode) statementNode() {}
+
+func (n *CreateFunctionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateFunctionStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *CreateFunctionStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *CreateFunctionStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetCreateScope()
+}
+
+func (n *CreateFunctionStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetCreateMode()
+}
 
 func (n *CreateFunctionStmtNode) HasExplicitReturnType() bool {
 	return n.raw.GetHasExplicitReturnType()
@@ -3941,6 +5709,7 @@ func (n *CreateFunctionStmtNode) Connection() *ConnectionNode {
 
 func (n *CreateFunctionStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.AggregateExpressionList())
 	if n.raw.GetFunctionExpression() != nil {
 		count++
@@ -3954,6 +5723,13 @@ func (n *CreateFunctionStmtNode) NumChildren() int {
 
 func (n *CreateFunctionStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.AggregateExpressionList()
 		if i < idx+len(s) {
@@ -4008,6 +5784,26 @@ func newCreateIndexStmtNodeSlice(raws []*generated.ResolvedCreateIndexStmtProto)
 
 func (n *CreateIndexStmtNode) Kind() Kind     { return KindCreateIndexStmt }
 func (n *CreateIndexStmtNode) statementNode() {}
+
+func (n *CreateIndexStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateIndexStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetHintList()
+}
+
+func (n *CreateIndexStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *CreateIndexStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetCreateScope()
+}
+
+func (n *CreateIndexStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetCreateMode()
+}
 
 func (n *CreateIndexStmtNode) TableNamePath() []string {
 	return n.raw.GetTableNamePath()
@@ -4142,6 +5938,62 @@ func newCreateMaterializedViewStmtNodeSlice(raws []*generated.ResolvedCreateMate
 func (n *CreateMaterializedViewStmtNode) Kind() Kind     { return KindCreateMaterializedViewStmt }
 func (n *CreateMaterializedViewStmtNode) statementNode() {}
 
+func (n *CreateMaterializedViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateMaterializedViewStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetParent().GetHintList())
+}
+
+func (n *CreateMaterializedViewStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetParent().GetNamePath()
+}
+
+func (n *CreateMaterializedViewStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetParent().GetCreateScope()
+}
+
+func (n *CreateMaterializedViewStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetParent().GetCreateMode()
+}
+
+func (n *CreateMaterializedViewStmtNode) OptionList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetOptionList())
+}
+
+func (n *CreateMaterializedViewStmtNode) OutputColumnList() []*OutputColumnNode {
+	return newOutputColumnNodeSlice(n.raw.GetParent().GetOutputColumnList())
+}
+
+func (n *CreateMaterializedViewStmtNode) HasExplicitColumns() bool {
+	return n.raw.GetParent().GetHasExplicitColumns()
+}
+
+func (n *CreateMaterializedViewStmtNode) Query() ScanNode {
+	return wrapScan(n.raw.GetParent().GetQuery())
+}
+
+func (n *CreateMaterializedViewStmtNode) Sql() string {
+	return n.raw.GetParent().GetSql()
+}
+
+func (n *CreateMaterializedViewStmtNode) SqlSecurity() generated.ResolvedCreateStatementEnums_SqlSecurity {
+	return n.raw.GetParent().GetSqlSecurity()
+}
+
+func (n *CreateMaterializedViewStmtNode) IsValueTable() bool {
+	return n.raw.GetParent().GetIsValueTable()
+}
+
+func (n *CreateMaterializedViewStmtNode) Recursive() bool {
+	return n.raw.GetParent().GetRecursive()
+}
+
+func (n *CreateMaterializedViewStmtNode) ColumnDefinitionList() []*ColumnDefinitionNode {
+	return newColumnDefinitionNodeSlice(n.raw.GetParent().GetColumnDefinitionList())
+}
+
 func (n *CreateMaterializedViewStmtNode) PartitionByList() []ExprNode {
 	return wrapExprSlice(n.raw.GetPartitionByList())
 }
@@ -4156,6 +6008,13 @@ func (n *CreateMaterializedViewStmtNode) ReplicaSource() ScanNode {
 
 func (n *CreateMaterializedViewStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.OptionList())
+	count += len(n.OutputColumnList())
+	if n.raw.GetParent().GetQuery() != nil {
+		count++
+	}
+	count += len(n.ColumnDefinitionList())
 	count += len(n.PartitionByList())
 	count += len(n.ClusterByList())
 	if n.raw.GetReplicaSource() != nil {
@@ -4166,6 +6025,40 @@ func (n *CreateMaterializedViewStmtNode) NumChildren() int {
 
 func (n *CreateMaterializedViewStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.OptionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.OutputColumnList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetQuery() != nil {
+		if idx == i {
+			return n.Query()
+		}
+		idx++
+	}
+	{
+		s := n.ColumnDefinitionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.PartitionByList()
 		if i < idx+len(s) {
@@ -4214,6 +6107,10 @@ func newCreateModelAliasedQueryNodeSlice(raws []*generated.ResolvedCreateModelAl
 
 func (n *CreateModelAliasedQueryNode) Kind() Kind    { return KindCreateModelAliasedQuery }
 func (n *CreateModelAliasedQueryNode) argumentNode() {}
+
+func (n *CreateModelAliasedQueryNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *CreateModelAliasedQueryNode) Alias() string {
 	return n.raw.GetAlias()
@@ -4279,6 +6176,26 @@ func newCreateModelStmtNodeSlice(raws []*generated.ResolvedCreateModelStmtProto)
 
 func (n *CreateModelStmtNode) Kind() Kind     { return KindCreateModelStmt }
 func (n *CreateModelStmtNode) statementNode() {}
+
+func (n *CreateModelStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateModelStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetHintList()
+}
+
+func (n *CreateModelStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *CreateModelStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetCreateScope()
+}
+
+func (n *CreateModelStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetCreateMode()
+}
 
 func (n *CreateModelStmtNode) OptionList() []*generated.ResolvedOptionProto {
 	return n.raw.GetOptionList()
@@ -4438,6 +6355,26 @@ func newCreatePrivilegeRestrictionStmtNodeSlice(raws []*generated.ResolvedCreate
 func (n *CreatePrivilegeRestrictionStmtNode) Kind() Kind     { return KindCreatePrivilegeRestrictionStmt }
 func (n *CreatePrivilegeRestrictionStmtNode) statementNode() {}
 
+func (n *CreatePrivilegeRestrictionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreatePrivilegeRestrictionStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *CreatePrivilegeRestrictionStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *CreatePrivilegeRestrictionStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetCreateScope()
+}
+
+func (n *CreatePrivilegeRestrictionStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetCreateMode()
+}
+
 func (n *CreatePrivilegeRestrictionStmtNode) ColumnPrivilegeList() []*PrivilegeNode {
 	return newPrivilegeNodeSlice(n.raw.GetColumnPrivilegeList())
 }
@@ -4452,6 +6389,7 @@ func (n *CreatePrivilegeRestrictionStmtNode) RestricteeList() []ExprNode {
 
 func (n *CreatePrivilegeRestrictionStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.ColumnPrivilegeList())
 	count += len(n.RestricteeList())
 	return count
@@ -4459,6 +6397,13 @@ func (n *CreatePrivilegeRestrictionStmtNode) NumChildren() int {
 
 func (n *CreatePrivilegeRestrictionStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.ColumnPrivilegeList()
 		if i < idx+len(s) {
@@ -4502,6 +6447,26 @@ func newCreateProcedureStmtNodeSlice(raws []*generated.ResolvedCreateProcedureSt
 func (n *CreateProcedureStmtNode) Kind() Kind     { return KindCreateProcedureStmt }
 func (n *CreateProcedureStmtNode) statementNode() {}
 
+func (n *CreateProcedureStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateProcedureStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *CreateProcedureStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *CreateProcedureStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetCreateScope()
+}
+
+func (n *CreateProcedureStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetCreateMode()
+}
+
 func (n *CreateProcedureStmtNode) ArgumentNameList() []string {
 	return n.raw.GetArgumentNameList()
 }
@@ -4536,6 +6501,7 @@ func (n *CreateProcedureStmtNode) ExternalSecurity() generated.ResolvedCreateSta
 
 func (n *CreateProcedureStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.OptionList())
 	if n.raw.GetConnection() != nil {
 		count++
@@ -4545,6 +6511,13 @@ func (n *CreateProcedureStmtNode) NumChildren() int {
 
 func (n *CreateProcedureStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.OptionList()
 		if i < idx+len(s) {
@@ -4587,6 +6560,26 @@ func newCreatePropertyGraphStmtNodeSlice(raws []*generated.ResolvedCreatePropert
 func (n *CreatePropertyGraphStmtNode) Kind() Kind     { return KindCreatePropertyGraphStmt }
 func (n *CreatePropertyGraphStmtNode) statementNode() {}
 
+func (n *CreatePropertyGraphStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreatePropertyGraphStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *CreatePropertyGraphStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *CreatePropertyGraphStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetCreateScope()
+}
+
+func (n *CreatePropertyGraphStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetCreateMode()
+}
+
 func (n *CreatePropertyGraphStmtNode) NodeTableList() []*generated.ResolvedGraphElementTableProto {
 	return n.raw.GetNodeTableList()
 }
@@ -4609,12 +6602,20 @@ func (n *CreatePropertyGraphStmtNode) OptionList() []*OptionNode {
 
 func (n *CreatePropertyGraphStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.OptionList())
 	return count
 }
 
 func (n *CreatePropertyGraphStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.OptionList()
 		if i < idx+len(s) {
@@ -4651,6 +6652,14 @@ func newCreateRowAccessPolicyStmtNodeSlice(raws []*generated.ResolvedCreateRowAc
 func (n *CreateRowAccessPolicyStmtNode) Kind() Kind     { return KindCreateRowAccessPolicyStmt }
 func (n *CreateRowAccessPolicyStmtNode) statementNode() {}
 
+func (n *CreateRowAccessPolicyStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateRowAccessPolicyStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *CreateRowAccessPolicyStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
 	return n.raw.GetCreateMode()
 }
@@ -4685,6 +6694,7 @@ func (n *CreateRowAccessPolicyStmtNode) PredicateStr() string {
 
 func (n *CreateRowAccessPolicyStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.GranteeExprList())
 	if n.raw.GetTableScan() != nil {
 		count++
@@ -4697,6 +6707,13 @@ func (n *CreateRowAccessPolicyStmtNode) NumChildren() int {
 
 func (n *CreateRowAccessPolicyStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.GranteeExprList()
 		if i < idx+len(s) {
@@ -4744,6 +6761,30 @@ func newCreateSchemaStmtNodeSlice(raws []*generated.ResolvedCreateSchemaStmtProt
 
 func (n *CreateSchemaStmtNode) Kind() Kind     { return KindCreateSchemaStmt }
 func (n *CreateSchemaStmtNode) statementNode() {}
+
+func (n *CreateSchemaStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateSchemaStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetParent().GetHintList()
+}
+
+func (n *CreateSchemaStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetParent().GetNamePath()
+}
+
+func (n *CreateSchemaStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetParent().GetCreateScope()
+}
+
+func (n *CreateSchemaStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetParent().GetCreateMode()
+}
+
+func (n *CreateSchemaStmtNode) OptionList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetOptionList()
+}
 
 func (n *CreateSchemaStmtNode) CollationName() ExprNode {
 	return wrapExpr(n.raw.GetCollationName())
@@ -4794,18 +6835,46 @@ func newCreateSequenceStmtNodeSlice(raws []*generated.ResolvedCreateSequenceStmt
 func (n *CreateSequenceStmtNode) Kind() Kind     { return KindCreateSequenceStmt }
 func (n *CreateSequenceStmtNode) statementNode() {}
 
+func (n *CreateSequenceStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateSequenceStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *CreateSequenceStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *CreateSequenceStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetCreateScope()
+}
+
+func (n *CreateSequenceStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetCreateMode()
+}
+
 func (n *CreateSequenceStmtNode) OptionList() []*OptionNode {
 	return newOptionNodeSlice(n.raw.GetOptionList())
 }
 
 func (n *CreateSequenceStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.OptionList())
 	return count
 }
 
 func (n *CreateSequenceStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.OptionList()
 		if i < idx+len(s) {
@@ -4841,6 +6910,26 @@ func newCreateSnapshotTableStmtNodeSlice(raws []*generated.ResolvedCreateSnapsho
 
 func (n *CreateSnapshotTableStmtNode) Kind() Kind     { return KindCreateSnapshotTableStmt }
 func (n *CreateSnapshotTableStmtNode) statementNode() {}
+
+func (n *CreateSnapshotTableStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateSnapshotTableStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetHintList()
+}
+
+func (n *CreateSnapshotTableStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *CreateSnapshotTableStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetCreateScope()
+}
+
+func (n *CreateSnapshotTableStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetCreateMode()
+}
 
 func (n *CreateSnapshotTableStmtNode) CloneFrom() ScanNode {
 	return wrapScan(n.raw.GetCloneFrom())
@@ -4895,6 +6984,66 @@ func newCreateTableAsSelectStmtNodeSlice(raws []*generated.ResolvedCreateTableAs
 func (n *CreateTableAsSelectStmtNode) Kind() Kind     { return KindCreateTableAsSelectStmt }
 func (n *CreateTableAsSelectStmtNode) statementNode() {}
 
+func (n *CreateTableAsSelectStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateTableAsSelectStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetParent().GetHintList()
+}
+
+func (n *CreateTableAsSelectStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetParent().GetNamePath()
+}
+
+func (n *CreateTableAsSelectStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetParent().GetCreateScope()
+}
+
+func (n *CreateTableAsSelectStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetParent().GetCreateMode()
+}
+
+func (n *CreateTableAsSelectStmtNode) OptionList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetOptionList()
+}
+
+func (n *CreateTableAsSelectStmtNode) ColumnDefinitionList() []*ColumnDefinitionNode {
+	return newColumnDefinitionNodeSlice(n.raw.GetParent().GetColumnDefinitionList())
+}
+
+func (n *CreateTableAsSelectStmtNode) PseudoColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetPseudoColumnList()
+}
+
+func (n *CreateTableAsSelectStmtNode) PrimaryKey() *PrimaryKeyNode {
+	return newPrimaryKeyNode(n.raw.GetParent().GetPrimaryKey())
+}
+
+func (n *CreateTableAsSelectStmtNode) ForeignKeyList() []*ForeignKeyNode {
+	return newForeignKeyNodeSlice(n.raw.GetParent().GetForeignKeyList())
+}
+
+func (n *CreateTableAsSelectStmtNode) CheckConstraintList() []*CheckConstraintNode {
+	return newCheckConstraintNodeSlice(n.raw.GetParent().GetCheckConstraintList())
+}
+
+func (n *CreateTableAsSelectStmtNode) IsValueTable() bool {
+	return n.raw.GetParent().GetIsValueTable()
+}
+
+func (n *CreateTableAsSelectStmtNode) LikeTable() *generated.TableRefProto {
+	return n.raw.GetParent().GetLikeTable()
+}
+
+func (n *CreateTableAsSelectStmtNode) CollationName() ExprNode {
+	return wrapExpr(n.raw.GetParent().GetCollationName())
+}
+
+func (n *CreateTableAsSelectStmtNode) Connection() *ConnectionNode {
+	return newConnectionNode(n.raw.GetParent().GetConnection())
+}
+
 func (n *CreateTableAsSelectStmtNode) PartitionByList() []ExprNode {
 	return wrapExprSlice(n.raw.GetPartitionByList())
 }
@@ -4913,6 +7062,18 @@ func (n *CreateTableAsSelectStmtNode) Query() ScanNode {
 
 func (n *CreateTableAsSelectStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.ColumnDefinitionList())
+	if n.raw.GetParent().GetPrimaryKey() != nil {
+		count++
+	}
+	count += len(n.ForeignKeyList())
+	count += len(n.CheckConstraintList())
+	if n.raw.GetParent().GetCollationName() != nil {
+		count++
+	}
+	if n.raw.GetParent().GetConnection() != nil {
+		count++
+	}
 	count += len(n.PartitionByList())
 	count += len(n.ClusterByList())
 	count += len(n.OutputColumnList())
@@ -4924,6 +7085,45 @@ func (n *CreateTableAsSelectStmtNode) NumChildren() int {
 
 func (n *CreateTableAsSelectStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.ColumnDefinitionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetPrimaryKey() != nil {
+		if idx == i {
+			return n.PrimaryKey()
+		}
+		idx++
+	}
+	{
+		s := n.ForeignKeyList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.CheckConstraintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetCollationName() != nil {
+		if idx == i {
+			return n.CollationName()
+		}
+		idx++
+	}
+	if n.raw.GetParent().GetConnection() != nil {
+		if idx == i {
+			return n.Connection()
+		}
+		idx++
+	}
 	{
 		s := n.PartitionByList()
 		if i < idx+len(s) {
@@ -4980,6 +7180,26 @@ func newCreateTableFunctionStmtNodeSlice(raws []*generated.ResolvedCreateTableFu
 func (n *CreateTableFunctionStmtNode) Kind() Kind     { return KindCreateTableFunctionStmt }
 func (n *CreateTableFunctionStmtNode) statementNode() {}
 
+func (n *CreateTableFunctionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateTableFunctionStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *CreateTableFunctionStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *CreateTableFunctionStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetCreateScope()
+}
+
+func (n *CreateTableFunctionStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetCreateMode()
+}
+
 func (n *CreateTableFunctionStmtNode) ArgumentNameList() []string {
 	return n.raw.GetArgumentNameList()
 }
@@ -5022,6 +7242,7 @@ func (n *CreateTableFunctionStmtNode) SqlSecurity() generated.ResolvedCreateStat
 
 func (n *CreateTableFunctionStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.OptionList())
 	if n.raw.GetQuery() != nil {
 		count++
@@ -5032,6 +7253,13 @@ func (n *CreateTableFunctionStmtNode) NumChildren() int {
 
 func (n *CreateTableFunctionStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.OptionList()
 		if i < idx+len(s) {
@@ -5081,6 +7309,66 @@ func newCreateTableStmtNodeSlice(raws []*generated.ResolvedCreateTableStmtProto)
 func (n *CreateTableStmtNode) Kind() Kind     { return KindCreateTableStmt }
 func (n *CreateTableStmtNode) statementNode() {}
 
+func (n *CreateTableStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateTableStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetParent().GetHintList()
+}
+
+func (n *CreateTableStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetParent().GetNamePath()
+}
+
+func (n *CreateTableStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetParent().GetCreateScope()
+}
+
+func (n *CreateTableStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetParent().GetCreateMode()
+}
+
+func (n *CreateTableStmtNode) OptionList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetOptionList()
+}
+
+func (n *CreateTableStmtNode) ColumnDefinitionList() []*ColumnDefinitionNode {
+	return newColumnDefinitionNodeSlice(n.raw.GetParent().GetColumnDefinitionList())
+}
+
+func (n *CreateTableStmtNode) PseudoColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetPseudoColumnList()
+}
+
+func (n *CreateTableStmtNode) PrimaryKey() *PrimaryKeyNode {
+	return newPrimaryKeyNode(n.raw.GetParent().GetPrimaryKey())
+}
+
+func (n *CreateTableStmtNode) ForeignKeyList() []*ForeignKeyNode {
+	return newForeignKeyNodeSlice(n.raw.GetParent().GetForeignKeyList())
+}
+
+func (n *CreateTableStmtNode) CheckConstraintList() []*CheckConstraintNode {
+	return newCheckConstraintNodeSlice(n.raw.GetParent().GetCheckConstraintList())
+}
+
+func (n *CreateTableStmtNode) IsValueTable() bool {
+	return n.raw.GetParent().GetIsValueTable()
+}
+
+func (n *CreateTableStmtNode) LikeTable() *generated.TableRefProto {
+	return n.raw.GetParent().GetLikeTable()
+}
+
+func (n *CreateTableStmtNode) CollationName() ExprNode {
+	return wrapExpr(n.raw.GetParent().GetCollationName())
+}
+
+func (n *CreateTableStmtNode) Connection() *ConnectionNode {
+	return newConnectionNode(n.raw.GetParent().GetConnection())
+}
+
 func (n *CreateTableStmtNode) CloneFrom() ScanNode {
 	return wrapScan(n.raw.GetCloneFrom())
 }
@@ -5099,6 +7387,18 @@ func (n *CreateTableStmtNode) ClusterByList() []ExprNode {
 
 func (n *CreateTableStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.ColumnDefinitionList())
+	if n.raw.GetParent().GetPrimaryKey() != nil {
+		count++
+	}
+	count += len(n.ForeignKeyList())
+	count += len(n.CheckConstraintList())
+	if n.raw.GetParent().GetCollationName() != nil {
+		count++
+	}
+	if n.raw.GetParent().GetConnection() != nil {
+		count++
+	}
 	if n.raw.GetCloneFrom() != nil {
 		count++
 	}
@@ -5112,6 +7412,45 @@ func (n *CreateTableStmtNode) NumChildren() int {
 
 func (n *CreateTableStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.ColumnDefinitionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetPrimaryKey() != nil {
+		if idx == i {
+			return n.PrimaryKey()
+		}
+		idx++
+	}
+	{
+		s := n.ForeignKeyList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.CheckConstraintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetCollationName() != nil {
+		if idx == i {
+			return n.CollationName()
+		}
+		idx++
+	}
+	if n.raw.GetParent().GetConnection() != nil {
+		if idx == i {
+			return n.Connection()
+		}
+		idx++
+	}
 	if n.raw.GetCloneFrom() != nil {
 		if idx == i {
 			return n.CloneFrom()
@@ -5167,12 +7506,94 @@ func newCreateViewStmtNodeSlice(raws []*generated.ResolvedCreateViewStmtProto) [
 func (n *CreateViewStmtNode) Kind() Kind     { return KindCreateViewStmt }
 func (n *CreateViewStmtNode) statementNode() {}
 
+func (n *CreateViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateViewStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetParent().GetHintList()
+}
+
+func (n *CreateViewStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetParent().GetNamePath()
+}
+
+func (n *CreateViewStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
+	return n.raw.GetParent().GetParent().GetCreateScope()
+}
+
+func (n *CreateViewStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
+	return n.raw.GetParent().GetParent().GetCreateMode()
+}
+
+func (n *CreateViewStmtNode) OptionList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetOptionList()
+}
+
+func (n *CreateViewStmtNode) OutputColumnList() []*OutputColumnNode {
+	return newOutputColumnNodeSlice(n.raw.GetParent().GetOutputColumnList())
+}
+
+func (n *CreateViewStmtNode) HasExplicitColumns() bool {
+	return n.raw.GetParent().GetHasExplicitColumns()
+}
+
+func (n *CreateViewStmtNode) Query() ScanNode {
+	return wrapScan(n.raw.GetParent().GetQuery())
+}
+
+func (n *CreateViewStmtNode) Sql() string {
+	return n.raw.GetParent().GetSql()
+}
+
+func (n *CreateViewStmtNode) SqlSecurity() generated.ResolvedCreateStatementEnums_SqlSecurity {
+	return n.raw.GetParent().GetSqlSecurity()
+}
+
+func (n *CreateViewStmtNode) IsValueTable() bool {
+	return n.raw.GetParent().GetIsValueTable()
+}
+
+func (n *CreateViewStmtNode) Recursive() bool {
+	return n.raw.GetParent().GetRecursive()
+}
+
+func (n *CreateViewStmtNode) ColumnDefinitionList() []*ColumnDefinitionNode {
+	return newColumnDefinitionNodeSlice(n.raw.GetParent().GetColumnDefinitionList())
+}
+
 func (n *CreateViewStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.OutputColumnList())
+	if n.raw.GetParent().GetQuery() != nil {
+		count++
+	}
+	count += len(n.ColumnDefinitionList())
 	return count
 }
 
 func (n *CreateViewStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.OutputColumnList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetQuery() != nil {
+		if idx == i {
+			return n.Query()
+		}
+		idx++
+	}
+	{
+		s := n.ColumnDefinitionList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -5201,6 +7622,14 @@ func newCreateWithEntryStmtNodeSlice(raws []*generated.ResolvedCreateWithEntrySt
 
 func (n *CreateWithEntryStmtNode) Kind() Kind     { return KindCreateWithEntryStmt }
 func (n *CreateWithEntryStmtNode) statementNode() {}
+
+func (n *CreateWithEntryStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *CreateWithEntryStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *CreateWithEntryStmtNode) WithEntry() *generated.ResolvedWithEntryProto {
 	return n.raw.GetWithEntry()
@@ -5240,6 +7669,10 @@ func newCubeNodeSlice(raws []*generated.ResolvedCubeProto) []*CubeNode {
 
 func (n *CubeNode) Kind() Kind    { return KindCube }
 func (n *CubeNode) argumentNode() {}
+
+func (n *CubeNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *CubeNode) CubeColumnList() []*GroupingSetMultiColumnNode {
 	return newGroupingSetMultiColumnNodeSlice(n.raw.GetCubeColumnList())
@@ -5289,6 +7722,18 @@ func newDMLDefaultNodeSlice(raws []*generated.ResolvedDMLDefaultProto) []*DMLDef
 func (n *DMLDefaultNode) Kind() Kind { return KindDMLDefault }
 func (n *DMLDefaultNode) exprNode()  {}
 
+func (n *DMLDefaultNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DMLDefaultNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *DMLDefaultNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *DMLDefaultNode) NumChildren() int {
 	count := 0
 	return count
@@ -5323,6 +7768,10 @@ func newDMLValueNodeSlice(raws []*generated.ResolvedDMLValueProto) []*DMLValueNo
 
 func (n *DMLValueNode) Kind() Kind    { return KindDMLValue }
 func (n *DMLValueNode) argumentNode() {}
+
+func (n *DMLValueNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *DMLValueNode) Value() ExprNode {
 	return wrapExpr(n.raw.GetValue())
@@ -5372,6 +7821,10 @@ func newDeferredComputedColumnNodeSlice(raws []*generated.ResolvedDeferredComput
 
 func (n *DeferredComputedColumnNode) Kind() Kind    { return KindDeferredComputedColumn }
 func (n *DeferredComputedColumnNode) argumentNode() {}
+
+func (n *DeferredComputedColumnNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *DeferredComputedColumnNode) Column() *generated.ResolvedColumnProto {
 	return n.raw.GetColumn()
@@ -5430,6 +7883,14 @@ func newDefineTableStmtNodeSlice(raws []*generated.ResolvedDefineTableStmtProto)
 func (n *DefineTableStmtNode) Kind() Kind     { return KindDefineTableStmt }
 func (n *DefineTableStmtNode) statementNode() {}
 
+func (n *DefineTableStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DefineTableStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
 func (n *DefineTableStmtNode) NamePath() []string {
 	return n.raw.GetNamePath()
 }
@@ -5473,6 +7934,14 @@ func newDeleteStmtNodeSlice(raws []*generated.ResolvedDeleteStmtProto) []*Delete
 func (n *DeleteStmtNode) Kind() Kind     { return KindDeleteStmt }
 func (n *DeleteStmtNode) statementNode() {}
 
+func (n *DeleteStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DeleteStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *DeleteStmtNode) TableScan() *TableScanNode {
 	return newTableScanNode(n.raw.GetTableScan())
 }
@@ -5499,6 +7968,7 @@ func (n *DeleteStmtNode) WhereExpr() ExprNode {
 
 func (n *DeleteStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetTableScan() != nil {
 		count++
 	}
@@ -5516,6 +7986,13 @@ func (n *DeleteStmtNode) NumChildren() int {
 
 func (n *DeleteStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetTableScan() != nil {
 		if idx == i {
 			return n.TableScan()
@@ -5569,6 +8046,26 @@ func newDescribeScanNodeSlice(raws []*generated.ResolvedDescribeScanProto) []*De
 func (n *DescribeScanNode) Kind() Kind { return KindDescribeScan }
 func (n *DescribeScanNode) scanNode()  {}
 
+func (n *DescribeScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DescribeScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *DescribeScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *DescribeScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *DescribeScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *DescribeScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -5579,6 +8076,7 @@ func (n *DescribeScanNode) DescribeExpr() *ComputedColumnNode {
 
 func (n *DescribeScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInputScan() != nil {
 		count++
 	}
@@ -5590,6 +8088,13 @@ func (n *DescribeScanNode) NumChildren() int {
 
 func (n *DescribeScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInputScan() != nil {
 		if idx == i {
 			return n.InputScan()
@@ -5630,6 +8135,14 @@ func newDescribeStmtNodeSlice(raws []*generated.ResolvedDescribeStmtProto) []*De
 
 func (n *DescribeStmtNode) Kind() Kind     { return KindDescribeStmt }
 func (n *DescribeStmtNode) statementNode() {}
+
+func (n *DescribeStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DescribeStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *DescribeStmtNode) ObjectType() string {
 	return n.raw.GetObjectType()
@@ -5678,6 +8191,10 @@ func newDescriptorNodeSlice(raws []*generated.ResolvedDescriptorProto) []*Descri
 func (n *DescriptorNode) Kind() Kind    { return KindDescriptor }
 func (n *DescriptorNode) argumentNode() {}
 
+func (n *DescriptorNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *DescriptorNode) DescriptorColumnList() []*generated.ResolvedColumnProto {
 	return n.raw.GetDescriptorColumnList()
 }
@@ -5723,6 +8240,54 @@ func (n *DifferentialPrivacyAggregateScanNode) Kind() Kind {
 }
 func (n *DifferentialPrivacyAggregateScanNode) scanNode() {}
 
+func (n *DifferentialPrivacyAggregateScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DifferentialPrivacyAggregateScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetParent().GetColumnList()
+}
+
+func (n *DifferentialPrivacyAggregateScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetParent().GetHintList()
+}
+
+func (n *DifferentialPrivacyAggregateScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetParent().GetIsOrdered()
+}
+
+func (n *DifferentialPrivacyAggregateScanNode) NodeSource() string {
+	return n.raw.GetParent().GetParent().GetNodeSource()
+}
+
+func (n *DifferentialPrivacyAggregateScanNode) InputScan() ScanNode {
+	return wrapScan(n.raw.GetParent().GetInputScan())
+}
+
+func (n *DifferentialPrivacyAggregateScanNode) GroupByList() []*generated.ResolvedComputedColumnProto {
+	return n.raw.GetParent().GetGroupByList()
+}
+
+func (n *DifferentialPrivacyAggregateScanNode) CollationList() []*generated.ResolvedCollationProto {
+	return n.raw.GetParent().GetCollationList()
+}
+
+func (n *DifferentialPrivacyAggregateScanNode) AggregateList() []ArgumentNode {
+	return wrapComputedColumnBaseSlice(n.raw.GetParent().GetAggregateList())
+}
+
+func (n *DifferentialPrivacyAggregateScanNode) GroupingSetList() []ArgumentNode {
+	return wrapGroupingSetBaseSlice(n.raw.GetParent().GetGroupingSetList())
+}
+
+func (n *DifferentialPrivacyAggregateScanNode) RollupColumnList() []*ColumnRefNode {
+	return newColumnRefNodeSlice(n.raw.GetParent().GetRollupColumnList())
+}
+
+func (n *DifferentialPrivacyAggregateScanNode) GroupingCallList() []*GroupingCallNode {
+	return newGroupingCallNodeSlice(n.raw.GetParent().GetGroupingCallList())
+}
+
 func (n *DifferentialPrivacyAggregateScanNode) GroupSelectionThresholdExpr() ExprNode {
 	return wrapExpr(n.raw.GetGroupSelectionThresholdExpr())
 }
@@ -5733,6 +8298,13 @@ func (n *DifferentialPrivacyAggregateScanNode) OptionList() []*generated.Resolve
 
 func (n *DifferentialPrivacyAggregateScanNode) NumChildren() int {
 	count := 0
+	if n.raw.GetParent().GetInputScan() != nil {
+		count++
+	}
+	count += len(n.AggregateList())
+	count += len(n.GroupingSetList())
+	count += len(n.RollupColumnList())
+	count += len(n.GroupingCallList())
 	if n.raw.GetGroupSelectionThresholdExpr() != nil {
 		count++
 	}
@@ -5741,6 +8313,40 @@ func (n *DifferentialPrivacyAggregateScanNode) NumChildren() int {
 
 func (n *DifferentialPrivacyAggregateScanNode) Child(i int) Node {
 	idx := 0
+	if n.raw.GetParent().GetInputScan() != nil {
+		if idx == i {
+			return n.InputScan()
+		}
+		idx++
+	}
+	{
+		s := n.AggregateList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.GroupingSetList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.RollupColumnList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.GroupingCallList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetGroupSelectionThresholdExpr() != nil {
 		if idx == i {
 			return n.GroupSelectionThresholdExpr()
@@ -5775,6 +8381,10 @@ func newDropColumnActionNodeSlice(raws []*generated.ResolvedDropColumnActionProt
 
 func (n *DropColumnActionNode) Kind() Kind    { return KindDropColumnAction }
 func (n *DropColumnActionNode) argumentNode() {}
+
+func (n *DropColumnActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *DropColumnActionNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
@@ -5819,6 +8429,10 @@ func newDropConstraintActionNodeSlice(raws []*generated.ResolvedDropConstraintAc
 func (n *DropConstraintActionNode) Kind() Kind    { return KindDropConstraintAction }
 func (n *DropConstraintActionNode) argumentNode() {}
 
+func (n *DropConstraintActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *DropConstraintActionNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
 }
@@ -5862,6 +8476,14 @@ func newDropFunctionStmtNodeSlice(raws []*generated.ResolvedDropFunctionStmtProt
 func (n *DropFunctionStmtNode) Kind() Kind     { return KindDropFunctionStmt }
 func (n *DropFunctionStmtNode) statementNode() {}
 
+func (n *DropFunctionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DropFunctionStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *DropFunctionStmtNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
 }
@@ -5880,6 +8502,7 @@ func (n *DropFunctionStmtNode) Signature() *FunctionSignatureHolderNode {
 
 func (n *DropFunctionStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetArguments() != nil {
 		count++
 	}
@@ -5891,6 +8514,13 @@ func (n *DropFunctionStmtNode) NumChildren() int {
 
 func (n *DropFunctionStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetArguments() != nil {
 		if idx == i {
 			return n.Arguments()
@@ -5932,6 +8562,14 @@ func newDropIndexStmtNodeSlice(raws []*generated.ResolvedDropIndexStmtProto) []*
 func (n *DropIndexStmtNode) Kind() Kind     { return KindDropIndexStmt }
 func (n *DropIndexStmtNode) statementNode() {}
 
+func (n *DropIndexStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DropIndexStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *DropIndexStmtNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
 }
@@ -5950,10 +8588,19 @@ func (n *DropIndexStmtNode) IndexType() generated.ResolvedDropIndexStmtEnums_Ind
 
 func (n *DropIndexStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	return count
 }
 
 func (n *DropIndexStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -5982,6 +8629,14 @@ func newDropMaterializedViewStmtNodeSlice(raws []*generated.ResolvedDropMaterial
 
 func (n *DropMaterializedViewStmtNode) Kind() Kind     { return KindDropMaterializedViewStmt }
 func (n *DropMaterializedViewStmtNode) statementNode() {}
+
+func (n *DropMaterializedViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DropMaterializedViewStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *DropMaterializedViewStmtNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
@@ -6026,6 +8681,10 @@ func newDropPrimaryKeyActionNodeSlice(raws []*generated.ResolvedDropPrimaryKeyAc
 func (n *DropPrimaryKeyActionNode) Kind() Kind    { return KindDropPrimaryKeyAction }
 func (n *DropPrimaryKeyActionNode) argumentNode() {}
 
+func (n *DropPrimaryKeyActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *DropPrimaryKeyActionNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
 }
@@ -6065,6 +8724,14 @@ func newDropPrivilegeRestrictionStmtNodeSlice(raws []*generated.ResolvedDropPriv
 func (n *DropPrivilegeRestrictionStmtNode) Kind() Kind     { return KindDropPrivilegeRestrictionStmt }
 func (n *DropPrivilegeRestrictionStmtNode) statementNode() {}
 
+func (n *DropPrivilegeRestrictionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DropPrivilegeRestrictionStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *DropPrivilegeRestrictionStmtNode) ObjectType() string {
 	return n.raw.GetObjectType()
 }
@@ -6083,12 +8750,20 @@ func (n *DropPrivilegeRestrictionStmtNode) ColumnPrivilegeList() []*PrivilegeNod
 
 func (n *DropPrivilegeRestrictionStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.ColumnPrivilegeList())
 	return count
 }
 
 func (n *DropPrivilegeRestrictionStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.ColumnPrivilegeList()
 		if i < idx+len(s) {
@@ -6125,6 +8800,14 @@ func newDropRowAccessPolicyStmtNodeSlice(raws []*generated.ResolvedDropRowAccess
 func (n *DropRowAccessPolicyStmtNode) Kind() Kind     { return KindDropRowAccessPolicyStmt }
 func (n *DropRowAccessPolicyStmtNode) statementNode() {}
 
+func (n *DropRowAccessPolicyStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DropRowAccessPolicyStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *DropRowAccessPolicyStmtNode) IsDropAll() bool {
 	return n.raw.GetIsDropAll()
 }
@@ -6143,10 +8826,19 @@ func (n *DropRowAccessPolicyStmtNode) TargetNamePath() []string {
 
 func (n *DropRowAccessPolicyStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	return count
 }
 
 func (n *DropRowAccessPolicyStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -6175,6 +8867,14 @@ func newDropSnapshotTableStmtNodeSlice(raws []*generated.ResolvedDropSnapshotTab
 
 func (n *DropSnapshotTableStmtNode) Kind() Kind     { return KindDropSnapshotTableStmt }
 func (n *DropSnapshotTableStmtNode) statementNode() {}
+
+func (n *DropSnapshotTableStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DropSnapshotTableStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *DropSnapshotTableStmtNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
@@ -6218,6 +8918,14 @@ func newDropStmtNodeSlice(raws []*generated.ResolvedDropStmtProto) []*DropStmtNo
 
 func (n *DropStmtNode) Kind() Kind     { return KindDropStmt }
 func (n *DropStmtNode) statementNode() {}
+
+func (n *DropStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DropStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *DropStmtNode) ObjectType() string {
 	return n.raw.GetObjectType()
@@ -6270,6 +8978,10 @@ func newDropSubEntityActionNodeSlice(raws []*generated.ResolvedDropSubEntityActi
 func (n *DropSubEntityActionNode) Kind() Kind    { return KindDropSubEntityAction }
 func (n *DropSubEntityActionNode) argumentNode() {}
 
+func (n *DropSubEntityActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *DropSubEntityActionNode) EntityType() string {
 	return n.raw.GetEntityType()
 }
@@ -6317,6 +9029,14 @@ func newDropTableFunctionStmtNodeSlice(raws []*generated.ResolvedDropTableFuncti
 func (n *DropTableFunctionStmtNode) Kind() Kind     { return KindDropTableFunctionStmt }
 func (n *DropTableFunctionStmtNode) statementNode() {}
 
+func (n *DropTableFunctionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *DropTableFunctionStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *DropTableFunctionStmtNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
 }
@@ -6327,10 +9047,19 @@ func (n *DropTableFunctionStmtNode) NamePath() []string {
 
 func (n *DropTableFunctionStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	return count
 }
 
 func (n *DropTableFunctionStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -6359,6 +9088,26 @@ func newExecuteAsRoleScanNodeSlice(raws []*generated.ResolvedExecuteAsRoleScanPr
 
 func (n *ExecuteAsRoleScanNode) Kind() Kind { return KindExecuteAsRoleScan }
 func (n *ExecuteAsRoleScanNode) scanNode()  {}
+
+func (n *ExecuteAsRoleScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ExecuteAsRoleScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *ExecuteAsRoleScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *ExecuteAsRoleScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *ExecuteAsRoleScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
 
 func (n *ExecuteAsRoleScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
@@ -6417,6 +9166,10 @@ func newExecuteImmediateArgumentNodeSlice(raws []*generated.ResolvedExecuteImmed
 func (n *ExecuteImmediateArgumentNode) Kind() Kind    { return KindExecuteImmediateArgument }
 func (n *ExecuteImmediateArgumentNode) argumentNode() {}
 
+func (n *ExecuteImmediateArgumentNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *ExecuteImmediateArgumentNode) Name() string {
 	return n.raw.GetName()
 }
@@ -6470,6 +9223,14 @@ func newExecuteImmediateStmtNodeSlice(raws []*generated.ResolvedExecuteImmediate
 func (n *ExecuteImmediateStmtNode) Kind() Kind     { return KindExecuteImmediateStmt }
 func (n *ExecuteImmediateStmtNode) statementNode() {}
 
+func (n *ExecuteImmediateStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ExecuteImmediateStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *ExecuteImmediateStmtNode) Sql() ExprNode {
 	return wrapExpr(n.raw.GetSql())
 }
@@ -6484,6 +9245,7 @@ func (n *ExecuteImmediateStmtNode) UsingArgumentList() []*ExecuteImmediateArgume
 
 func (n *ExecuteImmediateStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetSql() != nil {
 		count++
 	}
@@ -6493,6 +9255,13 @@ func (n *ExecuteImmediateStmtNode) NumChildren() int {
 
 func (n *ExecuteImmediateStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetSql() != nil {
 		if idx == i {
 			return n.Sql()
@@ -6534,6 +9303,14 @@ func newExplainStmtNodeSlice(raws []*generated.ResolvedExplainStmtProto) []*Expl
 
 func (n *ExplainStmtNode) Kind() Kind     { return KindExplainStmt }
 func (n *ExplainStmtNode) statementNode() {}
+
+func (n *ExplainStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ExplainStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *ExplainStmtNode) Statement() StatementNode {
 	return wrapStatement(n.raw.GetStatement())
@@ -6583,6 +9360,14 @@ func newExportDataStmtNodeSlice(raws []*generated.ResolvedExportDataStmtProto) [
 
 func (n *ExportDataStmtNode) Kind() Kind     { return KindExportDataStmt }
 func (n *ExportDataStmtNode) statementNode() {}
+
+func (n *ExportDataStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ExportDataStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *ExportDataStmtNode) Connection() *ConnectionNode {
 	return newConnectionNode(n.raw.GetConnection())
@@ -6666,6 +9451,14 @@ func newExportMetadataStmtNodeSlice(raws []*generated.ResolvedExportMetadataStmt
 func (n *ExportMetadataStmtNode) Kind() Kind     { return KindExportMetadataStmt }
 func (n *ExportMetadataStmtNode) statementNode() {}
 
+func (n *ExportMetadataStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ExportMetadataStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
 func (n *ExportMetadataStmtNode) SchemaObjectKind() string {
 	return n.raw.GetSchemaObjectKind()
 }
@@ -6727,6 +9520,14 @@ func newExportModelStmtNodeSlice(raws []*generated.ResolvedExportModelStmtProto)
 func (n *ExportModelStmtNode) Kind() Kind     { return KindExportModelStmt }
 func (n *ExportModelStmtNode) statementNode() {}
 
+func (n *ExportModelStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ExportModelStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
 func (n *ExportModelStmtNode) ModelNamePath() []string {
 	return n.raw.GetModelNamePath()
 }
@@ -6784,6 +9585,18 @@ func newExpressionColumnNodeSlice(raws []*generated.ResolvedExpressionColumnProt
 func (n *ExpressionColumnNode) Kind() Kind { return KindExpressionColumn }
 func (n *ExpressionColumnNode) exprNode()  {}
 
+func (n *ExpressionColumnNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ExpressionColumnNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *ExpressionColumnNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *ExpressionColumnNode) Name() string {
 	return n.raw.GetName()
 }
@@ -6822,6 +9635,10 @@ func newExtendedCastElementNodeSlice(raws []*generated.ResolvedExtendedCastEleme
 
 func (n *ExtendedCastElementNode) Kind() Kind    { return KindExtendedCastElement }
 func (n *ExtendedCastElementNode) argumentNode() {}
+
+func (n *ExtendedCastElementNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *ExtendedCastElementNode) FromType() *generated.TypeProto {
 	return n.raw.GetFromType()
@@ -6869,6 +9686,10 @@ func newExtendedCastNodeSlice(raws []*generated.ResolvedExtendedCastProto) []*Ex
 
 func (n *ExtendedCastNode) Kind() Kind    { return KindExtendedCast }
 func (n *ExtendedCastNode) argumentNode() {}
+
+func (n *ExtendedCastNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *ExtendedCastNode) ElementList() []*ExtendedCastElementNode {
 	return newExtendedCastElementNodeSlice(n.raw.GetElementList())
@@ -6918,6 +9739,10 @@ func newFilterFieldArgNodeSlice(raws []*generated.ResolvedFilterFieldArgProto) [
 func (n *FilterFieldArgNode) Kind() Kind    { return KindFilterFieldArg }
 func (n *FilterFieldArgNode) argumentNode() {}
 
+func (n *FilterFieldArgNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *FilterFieldArgNode) Include() bool {
 	return n.raw.GetInclude()
 }
@@ -6960,6 +9785,18 @@ func newFilterFieldNodeSlice(raws []*generated.ResolvedFilterFieldProto) []*Filt
 
 func (n *FilterFieldNode) Kind() Kind { return KindFilterField }
 func (n *FilterFieldNode) exprNode()  {}
+
+func (n *FilterFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *FilterFieldNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *FilterFieldNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *FilterFieldNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
@@ -7026,6 +9863,26 @@ func newFilterScanNodeSlice(raws []*generated.ResolvedFilterScanProto) []*Filter
 func (n *FilterScanNode) Kind() Kind { return KindFilterScan }
 func (n *FilterScanNode) scanNode()  {}
 
+func (n *FilterScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *FilterScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *FilterScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *FilterScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *FilterScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *FilterScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -7088,6 +9945,10 @@ func newFilterUsingActionNodeSlice(raws []*generated.ResolvedFilterUsingActionPr
 func (n *FilterUsingActionNode) Kind() Kind    { return KindFilterUsingAction }
 func (n *FilterUsingActionNode) argumentNode() {}
 
+func (n *FilterUsingActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *FilterUsingActionNode) Predicate() ExprNode {
 	return wrapExpr(n.raw.GetPredicate())
 }
@@ -7140,6 +10001,18 @@ func newFlattenNodeSlice(raws []*generated.ResolvedFlattenProto) []*FlattenNode 
 
 func (n *FlattenNode) Kind() Kind { return KindFlatten }
 func (n *FlattenNode) exprNode()  {}
+
+func (n *FlattenNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *FlattenNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *FlattenNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *FlattenNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
@@ -7202,6 +10075,18 @@ func newFlattenedArgNodeSlice(raws []*generated.ResolvedFlattenedArgProto) []*Fl
 func (n *FlattenedArgNode) Kind() Kind { return KindFlattenedArg }
 func (n *FlattenedArgNode) exprNode()  {}
 
+func (n *FlattenedArgNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *FlattenedArgNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *FlattenedArgNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *FlattenedArgNode) NumChildren() int {
 	count := 0
 	return count
@@ -7236,6 +10121,10 @@ func newForeignKeyNodeSlice(raws []*generated.ResolvedForeignKeyProto) []*Foreig
 
 func (n *ForeignKeyNode) Kind() Kind    { return KindForeignKey }
 func (n *ForeignKeyNode) argumentNode() {}
+
+func (n *ForeignKeyNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *ForeignKeyNode) ConstraintName() string {
 	return n.raw.GetConstraintName()
@@ -7311,6 +10200,10 @@ func newFunctionArgumentNodeSlice(raws []*generated.ResolvedFunctionArgumentProt
 
 func (n *FunctionArgumentNode) Kind() Kind    { return KindFunctionArgument }
 func (n *FunctionArgumentNode) argumentNode() {}
+
+func (n *FunctionArgumentNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *FunctionArgumentNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
@@ -7451,16 +10344,65 @@ func newFunctionCallNodeSlice(raws []*generated.ResolvedFunctionCallProto) []*Fu
 func (n *FunctionCallNode) Kind() Kind { return KindFunctionCall }
 func (n *FunctionCallNode) exprNode()  {}
 
+func (n *FunctionCallNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *FunctionCallNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetParent().GetType()
+}
+
+func (n *FunctionCallNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetParent().GetTypeAnnotationMap()
+}
+
+func (n *FunctionCallNode) Function() *generated.FunctionRefProto {
+	return n.raw.GetParent().GetFunction()
+}
+
+func (n *FunctionCallNode) Signature() *generated.FunctionSignatureProto {
+	return n.raw.GetParent().GetSignature()
+}
+
+func (n *FunctionCallNode) ArgumentList() []ExprNode {
+	return wrapExprSlice(n.raw.GetParent().GetArgumentList())
+}
+
+func (n *FunctionCallNode) GenericArgumentList() []*generated.ResolvedFunctionArgumentProto {
+	return n.raw.GetParent().GetGenericArgumentList()
+}
+
+func (n *FunctionCallNode) ErrorMode() generated.ResolvedFunctionCallBaseEnums_ErrorMode {
+	return n.raw.GetParent().GetErrorMode()
+}
+
+func (n *FunctionCallNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *FunctionCallNode) CollationList() []*generated.ResolvedCollationProto {
+	return n.raw.GetParent().GetCollationList()
+}
+
 func (n *FunctionCallNode) FunctionCallInfo() *generated.ResolvedFunctionCallInfoProto {
 	return n.raw.GetFunctionCallInfo()
 }
 
 func (n *FunctionCallNode) NumChildren() int {
 	count := 0
+	count += len(n.ArgumentList())
 	return count
 }
 
 func (n *FunctionCallNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.ArgumentList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -7489,6 +10431,10 @@ func newFunctionSignatureHolderNodeSlice(raws []*generated.ResolvedFunctionSigna
 
 func (n *FunctionSignatureHolderNode) Kind() Kind    { return KindFunctionSignatureHolder }
 func (n *FunctionSignatureHolderNode) argumentNode() {}
+
+func (n *FunctionSignatureHolderNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *FunctionSignatureHolderNode) Signature() *generated.FunctionSignatureProto {
 	return n.raw.GetSignature()
@@ -7528,6 +10474,14 @@ func newGeneralizedQueryStmtNodeSlice(raws []*generated.ResolvedGeneralizedQuery
 
 func (n *GeneralizedQueryStmtNode) Kind() Kind     { return KindGeneralizedQueryStmt }
 func (n *GeneralizedQueryStmtNode) statementNode() {}
+
+func (n *GeneralizedQueryStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GeneralizedQueryStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *GeneralizedQueryStmtNode) OutputSchema() *OutputSchemaNode {
 	return newOutputSchemaNode(n.raw.GetOutputSchema())
@@ -7591,6 +10545,10 @@ func newGeneralizedQuerySubpipelineNodeSlice(raws []*generated.ResolvedGeneraliz
 func (n *GeneralizedQuerySubpipelineNode) Kind() Kind    { return KindGeneralizedQuerySubpipeline }
 func (n *GeneralizedQuerySubpipelineNode) argumentNode() {}
 
+func (n *GeneralizedQuerySubpipelineNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GeneralizedQuerySubpipelineNode) Subpipeline() *SubpipelineNode {
 	return newSubpipelineNode(n.raw.GetSubpipeline())
 }
@@ -7653,6 +10611,10 @@ func newGeneratedColumnInfoNodeSlice(raws []*generated.ResolvedGeneratedColumnIn
 func (n *GeneratedColumnInfoNode) Kind() Kind    { return KindGeneratedColumnInfo }
 func (n *GeneratedColumnInfoNode) argumentNode() {}
 
+func (n *GeneratedColumnInfoNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GeneratedColumnInfoNode) Expression() ExprNode {
 	return wrapExpr(n.raw.GetExpression())
 }
@@ -7714,6 +10676,18 @@ func newGetJsonFieldNodeSlice(raws []*generated.ResolvedGetJsonFieldProto) []*Ge
 func (n *GetJsonFieldNode) Kind() Kind { return KindGetJsonField }
 func (n *GetJsonFieldNode) exprNode()  {}
 
+func (n *GetJsonFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GetJsonFieldNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *GetJsonFieldNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *GetJsonFieldNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
 }
@@ -7766,6 +10740,18 @@ func newGetProtoFieldNodeSlice(raws []*generated.ResolvedGetProtoFieldProto) []*
 
 func (n *GetProtoFieldNode) Kind() Kind { return KindGetProtoField }
 func (n *GetProtoFieldNode) exprNode()  {}
+
+func (n *GetProtoFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GetProtoFieldNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *GetProtoFieldNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *GetProtoFieldNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
@@ -7836,6 +10822,18 @@ func newGetProtoOneofNodeSlice(raws []*generated.ResolvedGetProtoOneofProto) []*
 func (n *GetProtoOneofNode) Kind() Kind { return KindGetProtoOneof }
 func (n *GetProtoOneofNode) exprNode()  {}
 
+func (n *GetProtoOneofNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GetProtoOneofNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *GetProtoOneofNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *GetProtoOneofNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
 }
@@ -7889,6 +10887,18 @@ func newGetRowFieldNodeSlice(raws []*generated.ResolvedGetRowFieldProto) []*GetR
 func (n *GetRowFieldNode) Kind() Kind { return KindGetRowField }
 func (n *GetRowFieldNode) exprNode()  {}
 
+func (n *GetRowFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GetRowFieldNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *GetRowFieldNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *GetRowFieldNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
 }
@@ -7941,6 +10951,18 @@ func newGetStructFieldNodeSlice(raws []*generated.ResolvedGetStructFieldProto) [
 
 func (n *GetStructFieldNode) Kind() Kind { return KindGetStructField }
 func (n *GetStructFieldNode) exprNode()  {}
+
+func (n *GetStructFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GetStructFieldNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *GetStructFieldNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *GetStructFieldNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
@@ -7999,12 +11021,65 @@ func newGrantStmtNodeSlice(raws []*generated.ResolvedGrantStmtProto) []*GrantStm
 func (n *GrantStmtNode) Kind() Kind     { return KindGrantStmt }
 func (n *GrantStmtNode) statementNode() {}
 
+func (n *GrantStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GrantStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *GrantStmtNode) PrivilegeList() []*PrivilegeNode {
+	return newPrivilegeNodeSlice(n.raw.GetParent().GetPrivilegeList())
+}
+
+func (n *GrantStmtNode) ObjectTypeList() []string {
+	return n.raw.GetParent().GetObjectTypeList()
+}
+
+func (n *GrantStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *GrantStmtNode) GranteeList() []string {
+	return n.raw.GetParent().GetGranteeList()
+}
+
+func (n *GrantStmtNode) GranteeExprList() []ExprNode {
+	return wrapExprSlice(n.raw.GetParent().GetGranteeExprList())
+}
+
 func (n *GrantStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.PrivilegeList())
+	count += len(n.GranteeExprList())
 	return count
 }
 
 func (n *GrantStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.PrivilegeList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.GranteeExprList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -8033,6 +11108,10 @@ func newGrantToActionNodeSlice(raws []*generated.ResolvedGrantToActionProto) []*
 
 func (n *GrantToActionNode) Kind() Kind    { return KindGrantToAction }
 func (n *GrantToActionNode) argumentNode() {}
+
+func (n *GrantToActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *GrantToActionNode) GranteeExprList() []ExprNode {
 	return wrapExprSlice(n.raw.GetGranteeExprList())
@@ -8082,6 +11161,26 @@ func newGraphCallScanNodeSlice(raws []*generated.ResolvedGraphCallScanProto) []*
 func (n *GraphCallScanNode) Kind() Kind { return KindGraphCallScan }
 func (n *GraphCallScanNode) scanNode()  {}
 
+func (n *GraphCallScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GraphCallScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *GraphCallScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *GraphCallScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *GraphCallScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *GraphCallScanNode) Optional() bool {
 	return n.raw.GetOptional()
 }
@@ -8100,6 +11199,7 @@ func (n *GraphCallScanNode) ParameterList() []*ColumnRefNode {
 
 func (n *GraphCallScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetSubquery() != nil {
 		count++
 	}
@@ -8112,6 +11212,13 @@ func (n *GraphCallScanNode) NumChildren() int {
 
 func (n *GraphCallScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetSubquery() != nil {
 		if idx == i {
 			return n.Subquery()
@@ -8159,6 +11266,10 @@ func newGraphDynamicLabelSpecificationNodeSlice(raws []*generated.ResolvedGraphD
 
 func (n *GraphDynamicLabelSpecificationNode) Kind() Kind    { return KindGraphDynamicLabelSpecification }
 func (n *GraphDynamicLabelSpecificationNode) argumentNode() {}
+
+func (n *GraphDynamicLabelSpecificationNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *GraphDynamicLabelSpecificationNode) LabelExpr() ExprNode {
 	return wrapExpr(n.raw.GetLabelExpr())
@@ -8211,6 +11322,10 @@ func (n *GraphDynamicPropertiesSpecificationNode) Kind() Kind {
 }
 func (n *GraphDynamicPropertiesSpecificationNode) argumentNode() {}
 
+func (n *GraphDynamicPropertiesSpecificationNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GraphDynamicPropertiesSpecificationNode) PropertyExpr() ExprNode {
 	return wrapExpr(n.raw.GetPropertyExpr())
 }
@@ -8260,6 +11375,38 @@ func newGraphEdgeScanNodeSlice(raws []*generated.ResolvedGraphEdgeScanProto) []*
 func (n *GraphEdgeScanNode) Kind() Kind { return KindGraphEdgeScan }
 func (n *GraphEdgeScanNode) scanNode()  {}
 
+func (n *GraphEdgeScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GraphEdgeScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetParent().GetParent().GetColumnList()
+}
+
+func (n *GraphEdgeScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetParent().GetHintList())
+}
+
+func (n *GraphEdgeScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetParent().GetParent().GetIsOrdered()
+}
+
+func (n *GraphEdgeScanNode) NodeSource() string {
+	return n.raw.GetParent().GetParent().GetParent().GetNodeSource()
+}
+
+func (n *GraphEdgeScanNode) FilterExpr() ExprNode {
+	return wrapExpr(n.raw.GetParent().GetFilterExpr())
+}
+
+func (n *GraphEdgeScanNode) LabelExpr() ArgumentNode {
+	return wrapGraphLabelExpr(n.raw.GetParent().GetLabelExpr())
+}
+
+func (n *GraphEdgeScanNode) TargetElementTableList() []*generated.GraphElementTableRefProto {
+	return n.raw.GetParent().GetTargetElementTableList()
+}
+
 func (n *GraphEdgeScanNode) Orientation() generated.ResolvedGraphEdgeScanEnums_EdgeOrientation {
 	return n.raw.GetOrientation()
 }
@@ -8278,6 +11425,13 @@ func (n *GraphEdgeScanNode) CostExpr() ExprNode {
 
 func (n *GraphEdgeScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	if n.raw.GetParent().GetFilterExpr() != nil {
+		count++
+	}
+	if n.raw.GetParent().GetLabelExpr() != nil {
+		count++
+	}
 	count += len(n.LhsHintList())
 	count += len(n.RhsHintList())
 	if n.raw.GetCostExpr() != nil {
@@ -8288,6 +11442,25 @@ func (n *GraphEdgeScanNode) NumChildren() int {
 
 func (n *GraphEdgeScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetFilterExpr() != nil {
+		if idx == i {
+			return n.FilterExpr()
+		}
+		idx++
+	}
+	if n.raw.GetParent().GetLabelExpr() != nil {
+		if idx == i {
+			return n.LabelExpr()
+		}
+		idx++
+	}
 	{
 		s := n.LhsHintList()
 		if i < idx+len(s) {
@@ -8336,6 +11509,10 @@ func newGraphElementIdentifierNodeSlice(raws []*generated.ResolvedGraphElementId
 
 func (n *GraphElementIdentifierNode) Kind() Kind    { return KindGraphElementIdentifier }
 func (n *GraphElementIdentifierNode) argumentNode() {}
+
+func (n *GraphElementIdentifierNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *GraphElementIdentifierNode) ElementTable() *generated.GraphElementTableRefProto {
 	return n.raw.GetElementTable()
@@ -8415,6 +11592,10 @@ func newGraphElementLabelNodeSlice(raws []*generated.ResolvedGraphElementLabelPr
 func (n *GraphElementLabelNode) Kind() Kind    { return KindGraphElementLabel }
 func (n *GraphElementLabelNode) argumentNode() {}
 
+func (n *GraphElementLabelNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GraphElementLabelNode) Name() string {
 	return n.raw.GetName()
 }
@@ -8471,6 +11652,10 @@ func newGraphElementPropertyNodeSlice(raws []*generated.ResolvedGraphElementProp
 func (n *GraphElementPropertyNode) Kind() Kind    { return KindGraphElementProperty }
 func (n *GraphElementPropertyNode) argumentNode() {}
 
+func (n *GraphElementPropertyNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GraphElementPropertyNode) Declaration() *generated.GraphPropertyDeclarationRefProto {
 	return n.raw.GetDeclaration()
 }
@@ -8523,6 +11708,10 @@ func newGraphElementTableNodeSlice(raws []*generated.ResolvedGraphElementTablePr
 
 func (n *GraphElementTableNode) Kind() Kind    { return KindGraphElementTable }
 func (n *GraphElementTableNode) argumentNode() {}
+
+func (n *GraphElementTableNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *GraphElementTableNode) Alias() string {
 	return n.raw.GetAlias()
@@ -8613,6 +11802,18 @@ func newGraphGetElementPropertyNodeSlice(raws []*generated.ResolvedGraphGetEleme
 func (n *GraphGetElementPropertyNode) Kind() Kind { return KindGraphGetElementProperty }
 func (n *GraphGetElementPropertyNode) exprNode()  {}
 
+func (n *GraphGetElementPropertyNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GraphGetElementPropertyNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *GraphGetElementPropertyNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *GraphGetElementPropertyNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
 }
@@ -8678,6 +11879,18 @@ func newGraphIsLabeledPredicateNodeSlice(raws []*generated.ResolvedGraphIsLabele
 
 func (n *GraphIsLabeledPredicateNode) Kind() Kind { return KindGraphIsLabeledPredicate }
 func (n *GraphIsLabeledPredicateNode) exprNode()  {}
+
+func (n *GraphIsLabeledPredicateNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GraphIsLabeledPredicateNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *GraphIsLabeledPredicateNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *GraphIsLabeledPredicateNode) IsNot() bool {
 	return n.raw.GetIsNot()
@@ -8745,6 +11958,10 @@ func newGraphLabelNaryExprNodeSlice(raws []*generated.ResolvedGraphLabelNaryExpr
 func (n *GraphLabelNaryExprNode) Kind() Kind    { return KindGraphLabelNaryExpr }
 func (n *GraphLabelNaryExprNode) argumentNode() {}
 
+func (n *GraphLabelNaryExprNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GraphLabelNaryExprNode) Op() generated.ResolvedGraphLabelNaryExprEnums_GraphLogicalOpType {
 	return n.raw.GetOp()
 }
@@ -8796,6 +12013,10 @@ func newGraphLabelNodeSlice(raws []*generated.ResolvedGraphLabelProto) []*GraphL
 
 func (n *GraphLabelNode) Kind() Kind    { return KindGraphLabel }
 func (n *GraphLabelNode) argumentNode() {}
+
+func (n *GraphLabelNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *GraphLabelNode) Label() *generated.GraphElementLabelRefProto {
 	return n.raw.GetLabel()
@@ -8850,18 +12071,46 @@ func newGraphLinearScanNodeSlice(raws []*generated.ResolvedGraphLinearScanProto)
 func (n *GraphLinearScanNode) Kind() Kind { return KindGraphLinearScan }
 func (n *GraphLinearScanNode) scanNode()  {}
 
+func (n *GraphLinearScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GraphLinearScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetParent().GetColumnList()
+}
+
+func (n *GraphLinearScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *GraphLinearScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetParent().GetIsOrdered()
+}
+
+func (n *GraphLinearScanNode) NodeSource() string {
+	return n.raw.GetParent().GetParent().GetNodeSource()
+}
+
 func (n *GraphLinearScanNode) ScanList() []ScanNode {
 	return wrapScanSlice(n.raw.GetScanList())
 }
 
 func (n *GraphLinearScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.ScanList())
 	return count
 }
 
 func (n *GraphLinearScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.ScanList()
 		if i < idx+len(s) {
@@ -8897,6 +12146,10 @@ func newGraphMakeArrayVariableNodeSlice(raws []*generated.ResolvedGraphMakeArray
 
 func (n *GraphMakeArrayVariableNode) Kind() Kind    { return KindGraphMakeArrayVariable }
 func (n *GraphMakeArrayVariableNode) argumentNode() {}
+
+func (n *GraphMakeArrayVariableNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *GraphMakeArrayVariableNode) Element() *generated.ResolvedColumnProto {
 	return n.raw.GetElement()
@@ -8940,6 +12193,18 @@ func newGraphMakeElementNodeSlice(raws []*generated.ResolvedGraphMakeElementProt
 
 func (n *GraphMakeElementNode) Kind() Kind { return KindGraphMakeElement }
 func (n *GraphMakeElementNode) exprNode()  {}
+
+func (n *GraphMakeElementNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GraphMakeElementNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *GraphMakeElementNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *GraphMakeElementNode) Identifier() *GraphElementIdentifierNode {
 	return newGraphElementIdentifierNode(n.raw.GetIdentifier())
@@ -9032,12 +12297,71 @@ func newGraphNodeScanNodeSlice(raws []*generated.ResolvedGraphNodeScanProto) []*
 func (n *GraphNodeScanNode) Kind() Kind { return KindGraphNodeScan }
 func (n *GraphNodeScanNode) scanNode()  {}
 
+func (n *GraphNodeScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GraphNodeScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetParent().GetParent().GetColumnList()
+}
+
+func (n *GraphNodeScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetParent().GetHintList())
+}
+
+func (n *GraphNodeScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetParent().GetParent().GetIsOrdered()
+}
+
+func (n *GraphNodeScanNode) NodeSource() string {
+	return n.raw.GetParent().GetParent().GetParent().GetNodeSource()
+}
+
+func (n *GraphNodeScanNode) FilterExpr() ExprNode {
+	return wrapExpr(n.raw.GetParent().GetFilterExpr())
+}
+
+func (n *GraphNodeScanNode) LabelExpr() ArgumentNode {
+	return wrapGraphLabelExpr(n.raw.GetParent().GetLabelExpr())
+}
+
+func (n *GraphNodeScanNode) TargetElementTableList() []*generated.GraphElementTableRefProto {
+	return n.raw.GetParent().GetTargetElementTableList()
+}
+
 func (n *GraphNodeScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	if n.raw.GetParent().GetFilterExpr() != nil {
+		count++
+	}
+	if n.raw.GetParent().GetLabelExpr() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *GraphNodeScanNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.raw.GetParent().GetFilterExpr() != nil {
+		if idx == i {
+			return n.FilterExpr()
+		}
+		idx++
+	}
+	if n.raw.GetParent().GetLabelExpr() != nil {
+		if idx == i {
+			return n.LabelExpr()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -9066,6 +12390,10 @@ func newGraphNodeTableReferenceNodeSlice(raws []*generated.ResolvedGraphNodeTabl
 
 func (n *GraphNodeTableReferenceNode) Kind() Kind    { return KindGraphNodeTableReference }
 func (n *GraphNodeTableReferenceNode) argumentNode() {}
+
+func (n *GraphNodeTableReferenceNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *GraphNodeTableReferenceNode) NodeTableIdentifier() string {
 	return n.raw.GetNodeTableIdentifier()
@@ -9131,6 +12459,10 @@ func newGraphPathCostNodeSlice(raws []*generated.ResolvedGraphPathCostProto) []*
 func (n *GraphPathCostNode) Kind() Kind    { return KindGraphPathCost }
 func (n *GraphPathCostNode) argumentNode() {}
 
+func (n *GraphPathCostNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GraphPathCostNode) CostSupertype() *generated.TypeProto {
 	return n.raw.GetCostSupertype()
 }
@@ -9170,6 +12502,10 @@ func newGraphPathModeNodeSlice(raws []*generated.ResolvedGraphPathModeProto) []*
 func (n *GraphPathModeNode) Kind() Kind    { return KindGraphPathMode }
 func (n *GraphPathModeNode) argumentNode() {}
 
+func (n *GraphPathModeNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GraphPathModeNode) PathMode() generated.ResolvedGraphPathModeEnums_PathMode {
 	return n.raw.GetPathMode()
 }
@@ -9208,6 +12544,10 @@ func newGraphPathPatternQuantifierNodeSlice(raws []*generated.ResolvedGraphPathP
 
 func (n *GraphPathPatternQuantifierNode) Kind() Kind    { return KindGraphPathPatternQuantifier }
 func (n *GraphPathPatternQuantifierNode) argumentNode() {}
+
+func (n *GraphPathPatternQuantifierNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *GraphPathPatternQuantifierNode) LowerBound() ExprNode {
 	return wrapExpr(n.raw.GetLowerBound())
@@ -9271,6 +12611,26 @@ func newGraphPathScanNodeSlice(raws []*generated.ResolvedGraphPathScanProto) []*
 func (n *GraphPathScanNode) Kind() Kind { return KindGraphPathScan }
 func (n *GraphPathScanNode) scanNode()  {}
 
+func (n *GraphPathScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GraphPathScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetParent().GetColumnList()
+}
+
+func (n *GraphPathScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *GraphPathScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetParent().GetIsOrdered()
+}
+
+func (n *GraphPathScanNode) NodeSource() string {
+	return n.raw.GetParent().GetParent().GetNodeSource()
+}
+
 func (n *GraphPathScanNode) InputScanList() []ScanNode {
 	return wrapGraphPathScanBaseSlice(n.raw.GetInputScanList())
 }
@@ -9317,6 +12677,7 @@ func (n *GraphPathScanNode) PathCost() *GraphPathCostNode {
 
 func (n *GraphPathScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.InputScanList())
 	if n.raw.GetFilterExpr() != nil {
 		count++
@@ -9343,6 +12704,13 @@ func (n *GraphPathScanNode) NumChildren() int {
 
 func (n *GraphPathScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.InputScanList()
 		if i < idx+len(s) {
@@ -9429,6 +12797,10 @@ func newGraphPathSearchPrefixNodeSlice(raws []*generated.ResolvedGraphPathSearch
 func (n *GraphPathSearchPrefixNode) Kind() Kind    { return KindGraphPathSearchPrefix }
 func (n *GraphPathSearchPrefixNode) argumentNode() {}
 
+func (n *GraphPathSearchPrefixNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GraphPathSearchPrefixNode) Type() generated.ResolvedGraphPathSearchPrefixEnums_PathSearchPrefixType {
 	return n.raw.GetType()
 }
@@ -9482,6 +12854,10 @@ func newGraphPropertyDeclarationNodeSlice(raws []*generated.ResolvedGraphPropert
 func (n *GraphPropertyDeclarationNode) Kind() Kind    { return KindGraphPropertyDeclaration }
 func (n *GraphPropertyDeclarationNode) argumentNode() {}
 
+func (n *GraphPropertyDeclarationNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GraphPropertyDeclarationNode) Name() string {
 	return n.raw.GetName()
 }
@@ -9524,6 +12900,10 @@ func newGraphPropertyDefinitionNodeSlice(raws []*generated.ResolvedGraphProperty
 
 func (n *GraphPropertyDefinitionNode) Kind() Kind    { return KindGraphPropertyDefinition }
 func (n *GraphPropertyDefinitionNode) argumentNode() {}
+
+func (n *GraphPropertyDefinitionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *GraphPropertyDefinitionNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
@@ -9594,12 +12974,41 @@ func newGraphRefScanNodeSlice(raws []*generated.ResolvedGraphRefScanProto) []*Gr
 func (n *GraphRefScanNode) Kind() Kind { return KindGraphRefScan }
 func (n *GraphRefScanNode) scanNode()  {}
 
+func (n *GraphRefScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GraphRefScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *GraphRefScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *GraphRefScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *GraphRefScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *GraphRefScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	return count
 }
 
 func (n *GraphRefScanNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -9629,6 +13038,26 @@ func newGraphScanNodeSlice(raws []*generated.ResolvedGraphScanProto) []*GraphSca
 func (n *GraphScanNode) Kind() Kind { return KindGraphScan }
 func (n *GraphScanNode) scanNode()  {}
 
+func (n *GraphScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GraphScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetParent().GetColumnList()
+}
+
+func (n *GraphScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *GraphScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetParent().GetIsOrdered()
+}
+
+func (n *GraphScanNode) NodeSource() string {
+	return n.raw.GetParent().GetParent().GetNodeSource()
+}
+
 func (n *GraphScanNode) InputScanList() []*generated.ResolvedGraphPathScanProto {
 	return n.raw.GetInputScanList()
 }
@@ -9647,6 +13076,7 @@ func (n *GraphScanNode) Optional() bool {
 
 func (n *GraphScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetFilterExpr() != nil {
 		count++
 	}
@@ -9658,6 +13088,13 @@ func (n *GraphScanNode) NumChildren() int {
 
 func (n *GraphScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetFilterExpr() != nil {
 		if idx == i {
 			return n.FilterExpr()
@@ -9699,6 +13136,26 @@ func newGraphTableScanNodeSlice(raws []*generated.ResolvedGraphTableScanProto) [
 func (n *GraphTableScanNode) Kind() Kind { return KindGraphTableScan }
 func (n *GraphTableScanNode) scanNode()  {}
 
+func (n *GraphTableScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GraphTableScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *GraphTableScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *GraphTableScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *GraphTableScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *GraphTableScanNode) PropertyGraph() *generated.PropertyGraphRefProto {
 	return n.raw.GetPropertyGraph()
 }
@@ -9713,6 +13170,7 @@ func (n *GraphTableScanNode) ShapeExprList() []*ComputedColumnNode {
 
 func (n *GraphTableScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInputScan() != nil {
 		count++
 	}
@@ -9722,6 +13180,13 @@ func (n *GraphTableScanNode) NumChildren() int {
 
 func (n *GraphTableScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInputScan() != nil {
 		if idx == i {
 			return n.InputScan()
@@ -9764,6 +13229,10 @@ func newGraphWildCardLabelNodeSlice(raws []*generated.ResolvedGraphWildCardLabel
 func (n *GraphWildCardLabelNode) Kind() Kind    { return KindGraphWildCardLabel }
 func (n *GraphWildCardLabelNode) argumentNode() {}
 
+func (n *GraphWildCardLabelNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GraphWildCardLabelNode) NumChildren() int {
 	count := 0
 	return count
@@ -9798,6 +13267,26 @@ func newGroupRowsScanNodeSlice(raws []*generated.ResolvedGroupRowsScanProto) []*
 
 func (n *GroupRowsScanNode) Kind() Kind { return KindGroupRowsScan }
 func (n *GroupRowsScanNode) scanNode()  {}
+
+func (n *GroupRowsScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *GroupRowsScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *GroupRowsScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *GroupRowsScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *GroupRowsScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
 
 func (n *GroupRowsScanNode) InputColumnList() []*ComputedColumnNode {
 	return newComputedColumnNodeSlice(n.raw.GetInputColumnList())
@@ -9850,6 +13339,10 @@ func newGroupingCallNodeSlice(raws []*generated.ResolvedGroupingCallProto) []*Gr
 
 func (n *GroupingCallNode) Kind() Kind    { return KindGroupingCall }
 func (n *GroupingCallNode) argumentNode() {}
+
+func (n *GroupingCallNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *GroupingCallNode) GroupByColumn() *ColumnRefNode {
 	return newColumnRefNode(n.raw.GetGroupByColumn())
@@ -9904,6 +13397,10 @@ func newGroupingSetListNodeSlice(raws []*generated.ResolvedGroupingSetListProto)
 func (n *GroupingSetListNode) Kind() Kind    { return KindGroupingSetList }
 func (n *GroupingSetListNode) argumentNode() {}
 
+func (n *GroupingSetListNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GroupingSetListNode) ElemList() []ArgumentNode {
 	return wrapGroupingSetBaseSlice(n.raw.GetElemList())
 }
@@ -9951,6 +13448,10 @@ func newGroupingSetMultiColumnNodeSlice(raws []*generated.ResolvedGroupingSetMul
 
 func (n *GroupingSetMultiColumnNode) Kind() Kind    { return KindGroupingSetMultiColumn }
 func (n *GroupingSetMultiColumnNode) argumentNode() {}
+
+func (n *GroupingSetMultiColumnNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *GroupingSetMultiColumnNode) ColumnList() []*ColumnRefNode {
 	return newColumnRefNodeSlice(n.raw.GetColumnList())
@@ -10000,6 +13501,10 @@ func newGroupingSetNodeSlice(raws []*generated.ResolvedGroupingSetProto) []*Grou
 func (n *GroupingSetNode) Kind() Kind    { return KindGroupingSet }
 func (n *GroupingSetNode) argumentNode() {}
 
+func (n *GroupingSetNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GroupingSetNode) GroupByColumnList() []*ColumnRefNode {
 	return newColumnRefNodeSlice(n.raw.GetGroupByColumnList())
 }
@@ -10048,6 +13553,10 @@ func newGroupingSetProductNodeSlice(raws []*generated.ResolvedGroupingSetProduct
 func (n *GroupingSetProductNode) Kind() Kind    { return KindGroupingSetProduct }
 func (n *GroupingSetProductNode) argumentNode() {}
 
+func (n *GroupingSetProductNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *GroupingSetProductNode) InputList() []ArgumentNode {
 	return wrapGroupingSetBaseSlice(n.raw.GetInputList())
 }
@@ -10095,6 +13604,10 @@ func newIdentityColumnInfoNodeSlice(raws []*generated.ResolvedIdentityColumnInfo
 
 func (n *IdentityColumnInfoNode) Kind() Kind    { return KindIdentityColumnInfo }
 func (n *IdentityColumnInfoNode) argumentNode() {}
+
+func (n *IdentityColumnInfoNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *IdentityColumnInfoNode) StartWithValue() *generated.ValueWithTypeProto {
 	return n.raw.GetStartWithValue()
@@ -10151,6 +13664,14 @@ func newImportStmtNodeSlice(raws []*generated.ResolvedImportStmtProto) []*Import
 func (n *ImportStmtNode) Kind() Kind     { return KindImportStmt }
 func (n *ImportStmtNode) statementNode() {}
 
+func (n *ImportStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ImportStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *ImportStmtNode) ImportKind() generated.ResolvedImportStmtEnums_ImportKind {
 	return n.raw.GetImportKind()
 }
@@ -10177,12 +13698,20 @@ func (n *ImportStmtNode) OptionList() []*OptionNode {
 
 func (n *ImportStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.OptionList())
 	return count
 }
 
 func (n *ImportStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.OptionList()
 		if i < idx+len(s) {
@@ -10218,6 +13747,10 @@ func newIndexItemNodeSlice(raws []*generated.ResolvedIndexItemProto) []*IndexIte
 
 func (n *IndexItemNode) Kind() Kind    { return KindIndexItem }
 func (n *IndexItemNode) argumentNode() {}
+
+func (n *IndexItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *IndexItemNode) ColumnRef() *ColumnRefNode {
 	return newColumnRefNode(n.raw.GetColumnRef())
@@ -10275,6 +13808,10 @@ func newInlineLambdaNodeSlice(raws []*generated.ResolvedInlineLambdaProto) []*In
 
 func (n *InlineLambdaNode) Kind() Kind    { return KindInlineLambda }
 func (n *InlineLambdaNode) argumentNode() {}
+
+func (n *InlineLambdaNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *InlineLambdaNode) ArgumentList() []*generated.ResolvedColumnProto {
 	return n.raw.GetArgumentList()
@@ -10341,6 +13878,10 @@ func newInsertRowNodeSlice(raws []*generated.ResolvedInsertRowProto) []*InsertRo
 func (n *InsertRowNode) Kind() Kind    { return KindInsertRow }
 func (n *InsertRowNode) argumentNode() {}
 
+func (n *InsertRowNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *InsertRowNode) ValueList() []*DMLValueNode {
 	return newDMLValueNodeSlice(n.raw.GetValueList())
 }
@@ -10388,6 +13929,14 @@ func newInsertStmtNodeSlice(raws []*generated.ResolvedInsertStmtProto) []*Insert
 
 func (n *InsertStmtNode) Kind() Kind     { return KindInsertStmt }
 func (n *InsertStmtNode) statementNode() {}
+
+func (n *InsertStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *InsertStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
 
 func (n *InsertStmtNode) TableScan() *TableScanNode {
 	return newTableScanNode(n.raw.GetTableScan())
@@ -10443,6 +13992,7 @@ func (n *InsertStmtNode) GeneratedColumnExprList() []ExprNode {
 
 func (n *InsertStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetTableScan() != nil {
 		count++
 	}
@@ -10463,6 +14013,13 @@ func (n *InsertStmtNode) NumChildren() int {
 
 func (n *InsertStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetTableScan() != nil {
 		if idx == i {
 			return n.TableScan()
@@ -10536,6 +14093,26 @@ func newJoinScanNodeSlice(raws []*generated.ResolvedJoinScanProto) []*JoinScanNo
 
 func (n *JoinScanNode) Kind() Kind { return KindJoinScan }
 func (n *JoinScanNode) scanNode()  {}
+
+func (n *JoinScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *JoinScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *JoinScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *JoinScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *JoinScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
 
 func (n *JoinScanNode) JoinType() generated.ResolvedJoinScanEnums_JoinType {
 	return n.raw.GetJoinType()
@@ -10636,6 +14213,26 @@ func newLimitOffsetScanNodeSlice(raws []*generated.ResolvedLimitOffsetScanProto)
 func (n *LimitOffsetScanNode) Kind() Kind { return KindLimitOffsetScan }
 func (n *LimitOffsetScanNode) scanNode()  {}
 
+func (n *LimitOffsetScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *LimitOffsetScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *LimitOffsetScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *LimitOffsetScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *LimitOffsetScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *LimitOffsetScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -10711,6 +14308,18 @@ func newLiteralNodeSlice(raws []*generated.ResolvedLiteralProto) []*LiteralNode 
 func (n *LiteralNode) Kind() Kind { return KindLiteral }
 func (n *LiteralNode) exprNode()  {}
 
+func (n *LiteralNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *LiteralNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *LiteralNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *LiteralNode) Value() *generated.ValueWithTypeProto {
 	return n.raw.GetValue()
 }
@@ -10762,6 +14371,10 @@ func newLockModeNodeSlice(raws []*generated.ResolvedLockModeProto) []*LockModeNo
 func (n *LockModeNode) Kind() Kind    { return KindLockMode }
 func (n *LockModeNode) argumentNode() {}
 
+func (n *LockModeNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *LockModeNode) Strength() generated.ResolvedLockModeEnums_LockStrengthType {
 	return n.raw.GetStrength()
 }
@@ -10801,6 +14414,26 @@ func newLogScanNodeSlice(raws []*generated.ResolvedLogScanProto) []*LogScanNode 
 func (n *LogScanNode) Kind() Kind { return KindLogScan }
 func (n *LogScanNode) scanNode()  {}
 
+func (n *LogScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *LogScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *LogScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *LogScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *LogScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *LogScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -10815,6 +14448,7 @@ func (n *LogScanNode) OutputSchema() *OutputSchemaNode {
 
 func (n *LogScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInputScan() != nil {
 		count++
 	}
@@ -10826,6 +14460,13 @@ func (n *LogScanNode) NumChildren() int {
 
 func (n *LogScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInputScan() != nil {
 		if idx == i {
 			return n.InputScan()
@@ -10866,6 +14507,10 @@ func newMakeProtoFieldNodeSlice(raws []*generated.ResolvedMakeProtoFieldProto) [
 
 func (n *MakeProtoFieldNode) Kind() Kind    { return KindMakeProtoField }
 func (n *MakeProtoFieldNode) argumentNode() {}
+
+func (n *MakeProtoFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *MakeProtoFieldNode) FieldDescriptor() *generated.FieldDescriptorRefProto {
 	return n.raw.GetFieldDescriptor()
@@ -10924,6 +14569,18 @@ func newMakeProtoNodeSlice(raws []*generated.ResolvedMakeProtoProto) []*MakeProt
 func (n *MakeProtoNode) Kind() Kind { return KindMakeProto }
 func (n *MakeProtoNode) exprNode()  {}
 
+func (n *MakeProtoNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *MakeProtoNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *MakeProtoNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *MakeProtoNode) FieldList() []*generated.ResolvedMakeProtoFieldProto {
 	return n.raw.GetFieldList()
 }
@@ -10962,6 +14619,18 @@ func newMakeStructNodeSlice(raws []*generated.ResolvedMakeStructProto) []*MakeSt
 
 func (n *MakeStructNode) Kind() Kind { return KindMakeStruct }
 func (n *MakeStructNode) exprNode()  {}
+
+func (n *MakeStructNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *MakeStructNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *MakeStructNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *MakeStructNode) FieldList() []ExprNode {
 	return wrapExprSlice(n.raw.GetFieldList())
@@ -11011,6 +14680,10 @@ func newMatchRecognizePatternAnchorNodeSlice(raws []*generated.ResolvedMatchReco
 func (n *MatchRecognizePatternAnchorNode) Kind() Kind    { return KindMatchRecognizePatternAnchor }
 func (n *MatchRecognizePatternAnchorNode) argumentNode() {}
 
+func (n *MatchRecognizePatternAnchorNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *MatchRecognizePatternAnchorNode) Mode() generated.ResolvedMatchRecognizePatternAnchorEnums_Mode {
 	return n.raw.GetMode()
 }
@@ -11050,6 +14723,10 @@ func newMatchRecognizePatternEmptyNodeSlice(raws []*generated.ResolvedMatchRecog
 func (n *MatchRecognizePatternEmptyNode) Kind() Kind    { return KindMatchRecognizePatternEmpty }
 func (n *MatchRecognizePatternEmptyNode) argumentNode() {}
 
+func (n *MatchRecognizePatternEmptyNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *MatchRecognizePatternEmptyNode) NumChildren() int {
 	count := 0
 	return count
@@ -11084,6 +14761,10 @@ func newMatchRecognizePatternOperationNodeSlice(raws []*generated.ResolvedMatchR
 
 func (n *MatchRecognizePatternOperationNode) Kind() Kind    { return KindMatchRecognizePatternOperation }
 func (n *MatchRecognizePatternOperationNode) argumentNode() {}
+
+func (n *MatchRecognizePatternOperationNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *MatchRecognizePatternOperationNode) OpType() generated.ResolvedMatchRecognizePatternOperationEnums_MatchRecognizePatternOperationType {
 	return n.raw.GetOpType()
@@ -11138,6 +14819,10 @@ func (n *MatchRecognizePatternQuantificationNode) Kind() Kind {
 	return KindMatchRecognizePatternQuantification
 }
 func (n *MatchRecognizePatternQuantificationNode) argumentNode() {}
+
+func (n *MatchRecognizePatternQuantificationNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *MatchRecognizePatternQuantificationNode) Operand() ArgumentNode {
 	return wrapMatchRecognizePatternExpr(n.raw.GetOperand())
@@ -11220,6 +14905,10 @@ func (n *MatchRecognizePatternVariableRefNode) Kind() Kind {
 }
 func (n *MatchRecognizePatternVariableRefNode) argumentNode() {}
 
+func (n *MatchRecognizePatternVariableRefNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *MatchRecognizePatternVariableRefNode) Name() string {
 	return n.raw.GetName()
 }
@@ -11258,6 +14947,26 @@ func newMatchRecognizeScanNodeSlice(raws []*generated.ResolvedMatchRecognizeScan
 
 func (n *MatchRecognizeScanNode) Kind() Kind { return KindMatchRecognizeScan }
 func (n *MatchRecognizeScanNode) scanNode()  {}
+
+func (n *MatchRecognizeScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *MatchRecognizeScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *MatchRecognizeScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *MatchRecognizeScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *MatchRecognizeScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
 
 func (n *MatchRecognizeScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
@@ -11301,6 +15010,7 @@ func (n *MatchRecognizeScanNode) ClassifierColumn() *generated.ResolvedColumnPro
 
 func (n *MatchRecognizeScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInputScan() != nil {
 		count++
 	}
@@ -11314,6 +15024,13 @@ func (n *MatchRecognizeScanNode) NumChildren() int {
 
 func (n *MatchRecognizeScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInputScan() != nil {
 		if idx == i {
 			return n.InputScan()
@@ -11371,6 +15088,10 @@ func (n *MatchRecognizeVariableDefinitionNode) Kind() Kind {
 }
 func (n *MatchRecognizeVariableDefinitionNode) argumentNode() {}
 
+func (n *MatchRecognizeVariableDefinitionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *MatchRecognizeVariableDefinitionNode) Name() string {
 	return n.raw.GetName()
 }
@@ -11424,6 +15145,10 @@ func newMeasureGroupNodeSlice(raws []*generated.ResolvedMeasureGroupProto) []*Me
 func (n *MeasureGroupNode) Kind() Kind    { return KindMeasureGroup }
 func (n *MeasureGroupNode) argumentNode() {}
 
+func (n *MeasureGroupNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *MeasureGroupNode) PatternVariableRef() *generated.ResolvedMatchRecognizePatternVariableRefProto {
 	return n.raw.GetPatternVariableRef()
 }
@@ -11476,6 +15201,14 @@ func newMergeStmtNodeSlice(raws []*generated.ResolvedMergeStmtProto) []*MergeStm
 func (n *MergeStmtNode) Kind() Kind     { return KindMergeStmt }
 func (n *MergeStmtNode) statementNode() {}
 
+func (n *MergeStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *MergeStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *MergeStmtNode) TableScan() *TableScanNode {
 	return newTableScanNode(n.raw.GetTableScan())
 }
@@ -11498,6 +15231,7 @@ func (n *MergeStmtNode) WhenClauseList() []*MergeWhenNode {
 
 func (n *MergeStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetTableScan() != nil {
 		count++
 	}
@@ -11513,6 +15247,13 @@ func (n *MergeStmtNode) NumChildren() int {
 
 func (n *MergeStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetTableScan() != nil {
 		if idx == i {
 			return n.TableScan()
@@ -11566,6 +15307,10 @@ func newMergeWhenNodeSlice(raws []*generated.ResolvedMergeWhenProto) []*MergeWhe
 
 func (n *MergeWhenNode) Kind() Kind    { return KindMergeWhen }
 func (n *MergeWhenNode) argumentNode() {}
+
+func (n *MergeWhenNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *MergeWhenNode) MatchType() generated.ResolvedMergeWhenEnums_MatchType {
 	return n.raw.GetMatchType()
@@ -11653,6 +15398,10 @@ func newModelNodeSlice(raws []*generated.ResolvedModelProto) []*ModelNode {
 func (n *ModelNode) Kind() Kind    { return KindModel }
 func (n *ModelNode) argumentNode() {}
 
+func (n *ModelNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *ModelNode) Model() *generated.ModelRefProto {
 	return n.raw.GetModel()
 }
@@ -11692,6 +15441,14 @@ func newModuleStmtNodeSlice(raws []*generated.ResolvedModuleStmtProto) []*Module
 func (n *ModuleStmtNode) Kind() Kind     { return KindModuleStmt }
 func (n *ModuleStmtNode) statementNode() {}
 
+func (n *ModuleStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ModuleStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *ModuleStmtNode) NamePath() []string {
 	return n.raw.GetNamePath()
 }
@@ -11702,12 +15459,20 @@ func (n *ModuleStmtNode) OptionList() []*OptionNode {
 
 func (n *ModuleStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	count += len(n.OptionList())
 	return count
 }
 
 func (n *ModuleStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	{
 		s := n.OptionList()
 		if i < idx+len(s) {
@@ -11743,6 +15508,14 @@ func newMultiStmtNodeSlice(raws []*generated.ResolvedMultiStmtProto) []*MultiStm
 
 func (n *MultiStmtNode) Kind() Kind     { return KindMultiStmt }
 func (n *MultiStmtNode) statementNode() {}
+
+func (n *MultiStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *MultiStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *MultiStmtNode) StatementList() []StatementNode {
 	return wrapStatementSlice(n.raw.GetStatementList())
@@ -11792,6 +15565,10 @@ func newObjectUnitNodeSlice(raws []*generated.ResolvedObjectUnitProto) []*Object
 func (n *ObjectUnitNode) Kind() Kind    { return KindObjectUnit }
 func (n *ObjectUnitNode) argumentNode() {}
 
+func (n *ObjectUnitNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *ObjectUnitNode) NamePath() []string {
 	return n.raw.GetNamePath()
 }
@@ -11830,6 +15607,10 @@ func newOnConflictClauseNodeSlice(raws []*generated.ResolvedOnConflictClauseProt
 
 func (n *OnConflictClauseNode) Kind() Kind    { return KindOnConflictClause }
 func (n *OnConflictClauseNode) argumentNode() {}
+
+func (n *OnConflictClauseNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *OnConflictClauseNode) ConflictAction() generated.ResolvedOnConflictClauseEnums_ConflictAction {
 	return n.raw.GetConflictAction()
@@ -11909,6 +15690,10 @@ func newOptionNodeSlice(raws []*generated.ResolvedOptionProto) []*OptionNode {
 func (n *OptionNode) Kind() Kind    { return KindOption }
 func (n *OptionNode) argumentNode() {}
 
+func (n *OptionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *OptionNode) Qualifier() string {
 	return n.raw.GetQualifier()
 }
@@ -11969,6 +15754,10 @@ func newOrderByItemNodeSlice(raws []*generated.ResolvedOrderByItemProto) []*Orde
 
 func (n *OrderByItemNode) Kind() Kind    { return KindOrderByItem }
 func (n *OrderByItemNode) argumentNode() {}
+
+func (n *OrderByItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *OrderByItemNode) ColumnRef() *ColumnRefNode {
 	return newColumnRefNode(n.raw.GetColumnRef())
@@ -12044,6 +15833,26 @@ func newOrderByScanNodeSlice(raws []*generated.ResolvedOrderByScanProto) []*Orde
 func (n *OrderByScanNode) Kind() Kind { return KindOrderByScan }
 func (n *OrderByScanNode) scanNode()  {}
 
+func (n *OrderByScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *OrderByScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *OrderByScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *OrderByScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *OrderByScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *OrderByScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -12097,6 +15906,10 @@ func newOutputColumnNodeSlice(raws []*generated.ResolvedOutputColumnProto) []*Ou
 func (n *OutputColumnNode) Kind() Kind    { return KindOutputColumn }
 func (n *OutputColumnNode) argumentNode() {}
 
+func (n *OutputColumnNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *OutputColumnNode) Name() string {
 	return n.raw.GetName()
 }
@@ -12139,6 +15952,10 @@ func newOutputSchemaNodeSlice(raws []*generated.ResolvedOutputSchemaProto) []*Ou
 
 func (n *OutputSchemaNode) Kind() Kind    { return KindOutputSchema }
 func (n *OutputSchemaNode) argumentNode() {}
+
+func (n *OutputSchemaNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *OutputSchemaNode) OutputColumnList() []*OutputColumnNode {
 	return newOutputColumnNodeSlice(n.raw.GetOutputColumnList())
@@ -12192,6 +16009,18 @@ func newParameterNodeSlice(raws []*generated.ResolvedParameterProto) []*Paramete
 func (n *ParameterNode) Kind() Kind { return KindParameter }
 func (n *ParameterNode) exprNode()  {}
 
+func (n *ParameterNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ParameterNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *ParameterNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *ParameterNode) Name() string {
 	return n.raw.GetName()
 }
@@ -12239,12 +16068,33 @@ func newPipeCreateTableScanNodeSlice(raws []*generated.ResolvedPipeCreateTableSc
 func (n *PipeCreateTableScanNode) Kind() Kind { return KindPipeCreateTableScan }
 func (n *PipeCreateTableScanNode) scanNode()  {}
 
+func (n *PipeCreateTableScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *PipeCreateTableScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *PipeCreateTableScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *PipeCreateTableScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *PipeCreateTableScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *PipeCreateTableScanNode) CreateTableAsSelectStmt() *CreateTableAsSelectStmtNode {
 	return newCreateTableAsSelectStmtNode(n.raw.GetCreateTableAsSelectStmt())
 }
 
 func (n *PipeCreateTableScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetCreateTableAsSelectStmt() != nil {
 		count++
 	}
@@ -12253,6 +16103,13 @@ func (n *PipeCreateTableScanNode) NumChildren() int {
 
 func (n *PipeCreateTableScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetCreateTableAsSelectStmt() != nil {
 		if idx == i {
 			return n.CreateTableAsSelectStmt()
@@ -12288,12 +16145,33 @@ func newPipeExportDataScanNodeSlice(raws []*generated.ResolvedPipeExportDataScan
 func (n *PipeExportDataScanNode) Kind() Kind { return KindPipeExportDataScan }
 func (n *PipeExportDataScanNode) scanNode()  {}
 
+func (n *PipeExportDataScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *PipeExportDataScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *PipeExportDataScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *PipeExportDataScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *PipeExportDataScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *PipeExportDataScanNode) ExportDataStmt() *ExportDataStmtNode {
 	return newExportDataStmtNode(n.raw.GetExportDataStmt())
 }
 
 func (n *PipeExportDataScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetExportDataStmt() != nil {
 		count++
 	}
@@ -12302,6 +16180,13 @@ func (n *PipeExportDataScanNode) NumChildren() int {
 
 func (n *PipeExportDataScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetExportDataStmt() != nil {
 		if idx == i {
 			return n.ExportDataStmt()
@@ -12337,6 +16222,26 @@ func newPipeForkScanNodeSlice(raws []*generated.ResolvedPipeForkScanProto) []*Pi
 func (n *PipeForkScanNode) Kind() Kind { return KindPipeForkScan }
 func (n *PipeForkScanNode) scanNode()  {}
 
+func (n *PipeForkScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *PipeForkScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *PipeForkScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *PipeForkScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *PipeForkScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *PipeForkScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -12347,6 +16252,7 @@ func (n *PipeForkScanNode) SubpipelineList() []*generated.ResolvedGeneralizedQue
 
 func (n *PipeForkScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInputScan() != nil {
 		count++
 	}
@@ -12355,6 +16261,13 @@ func (n *PipeForkScanNode) NumChildren() int {
 
 func (n *PipeForkScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInputScan() != nil {
 		if idx == i {
 			return n.InputScan()
@@ -12389,6 +16302,10 @@ func newPipeIfCaseNodeSlice(raws []*generated.ResolvedPipeIfCaseProto) []*PipeIf
 
 func (n *PipeIfCaseNode) Kind() Kind    { return KindPipeIfCase }
 func (n *PipeIfCaseNode) argumentNode() {}
+
+func (n *PipeIfCaseNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *PipeIfCaseNode) Condition() ExprNode {
 	return wrapExpr(n.raw.GetCondition())
@@ -12447,6 +16364,26 @@ func newPipeIfScanNodeSlice(raws []*generated.ResolvedPipeIfScanProto) []*PipeIf
 func (n *PipeIfScanNode) Kind() Kind { return KindPipeIfScan }
 func (n *PipeIfScanNode) scanNode()  {}
 
+func (n *PipeIfScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *PipeIfScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *PipeIfScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *PipeIfScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *PipeIfScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *PipeIfScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -12461,6 +16398,7 @@ func (n *PipeIfScanNode) IfCaseList() []*generated.ResolvedPipeIfCaseProto {
 
 func (n *PipeIfScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInputScan() != nil {
 		count++
 	}
@@ -12469,6 +16407,13 @@ func (n *PipeIfScanNode) NumChildren() int {
 
 func (n *PipeIfScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInputScan() != nil {
 		if idx == i {
 			return n.InputScan()
@@ -12504,12 +16449,33 @@ func newPipeInsertScanNodeSlice(raws []*generated.ResolvedPipeInsertScanProto) [
 func (n *PipeInsertScanNode) Kind() Kind { return KindPipeInsertScan }
 func (n *PipeInsertScanNode) scanNode()  {}
 
+func (n *PipeInsertScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *PipeInsertScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *PipeInsertScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *PipeInsertScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *PipeInsertScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *PipeInsertScanNode) InsertStmt() *InsertStmtNode {
 	return newInsertStmtNode(n.raw.GetInsertStmt())
 }
 
 func (n *PipeInsertScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInsertStmt() != nil {
 		count++
 	}
@@ -12518,6 +16484,13 @@ func (n *PipeInsertScanNode) NumChildren() int {
 
 func (n *PipeInsertScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInsertStmt() != nil {
 		if idx == i {
 			return n.InsertStmt()
@@ -12553,6 +16526,26 @@ func newPipeTeeScanNodeSlice(raws []*generated.ResolvedPipeTeeScanProto) []*Pipe
 func (n *PipeTeeScanNode) Kind() Kind { return KindPipeTeeScan }
 func (n *PipeTeeScanNode) scanNode()  {}
 
+func (n *PipeTeeScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *PipeTeeScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *PipeTeeScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *PipeTeeScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *PipeTeeScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *PipeTeeScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -12563,6 +16556,7 @@ func (n *PipeTeeScanNode) SubpipelineList() []*generated.ResolvedGeneralizedQuer
 
 func (n *PipeTeeScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInputScan() != nil {
 		count++
 	}
@@ -12571,6 +16565,13 @@ func (n *PipeTeeScanNode) NumChildren() int {
 
 func (n *PipeTeeScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInputScan() != nil {
 		if idx == i {
 			return n.InputScan()
@@ -12605,6 +16606,10 @@ func newPivotColumnNodeSlice(raws []*generated.ResolvedPivotColumnProto) []*Pivo
 
 func (n *PivotColumnNode) Kind() Kind    { return KindPivotColumn }
 func (n *PivotColumnNode) argumentNode() {}
+
+func (n *PivotColumnNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *PivotColumnNode) Column() *generated.ResolvedColumnProto {
 	return n.raw.GetColumn()
@@ -12653,6 +16658,26 @@ func newPivotScanNodeSlice(raws []*generated.ResolvedPivotScanProto) []*PivotSca
 func (n *PivotScanNode) Kind() Kind { return KindPivotScan }
 func (n *PivotScanNode) scanNode()  {}
 
+func (n *PivotScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *PivotScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *PivotScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *PivotScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *PivotScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *PivotScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -12679,6 +16704,7 @@ func (n *PivotScanNode) PivotColumnList() []*PivotColumnNode {
 
 func (n *PivotScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInputScan() != nil {
 		count++
 	}
@@ -12694,6 +16720,13 @@ func (n *PivotScanNode) NumChildren() int {
 
 func (n *PivotScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInputScan() != nil {
 		if idx == i {
 			return n.InputScan()
@@ -12763,6 +16796,10 @@ func newPrimaryKeyNodeSlice(raws []*generated.ResolvedPrimaryKeyProto) []*Primar
 func (n *PrimaryKeyNode) Kind() Kind    { return KindPrimaryKey }
 func (n *PrimaryKeyNode) argumentNode() {}
 
+func (n *PrimaryKeyNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *PrimaryKeyNode) ColumnOffsetList() []int64 {
 	return n.raw.GetColumnOffsetList()
 }
@@ -12818,6 +16855,10 @@ func newPrivilegeNodeSlice(raws []*generated.ResolvedPrivilegeProto) []*Privileg
 func (n *PrivilegeNode) Kind() Kind    { return KindPrivilege }
 func (n *PrivilegeNode) argumentNode() {}
 
+func (n *PrivilegeNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *PrivilegeNode) ActionType() string {
 	return n.raw.GetActionType()
 }
@@ -12869,6 +16910,26 @@ func newProjectScanNodeSlice(raws []*generated.ResolvedProjectScanProto) []*Proj
 
 func (n *ProjectScanNode) Kind() Kind { return KindProjectScan }
 func (n *ProjectScanNode) scanNode()  {}
+
+func (n *ProjectScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ProjectScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *ProjectScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *ProjectScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *ProjectScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
 
 func (n *ProjectScanNode) ExprList() []*ComputedColumnNode {
 	return newComputedColumnNodeSlice(n.raw.GetExprList())
@@ -12930,6 +16991,14 @@ func newQueryStmtNodeSlice(raws []*generated.ResolvedQueryStmtProto) []*QueryStm
 
 func (n *QueryStmtNode) Kind() Kind     { return KindQueryStmt }
 func (n *QueryStmtNode) statementNode() {}
+
+func (n *QueryStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *QueryStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *QueryStmtNode) OutputColumnList() []*OutputColumnNode {
 	return newOutputColumnNodeSlice(n.raw.GetOutputColumnList())
@@ -12996,6 +17065,10 @@ func newRebuildActionNodeSlice(raws []*generated.ResolvedRebuildActionProto) []*
 func (n *RebuildActionNode) Kind() Kind    { return KindRebuildAction }
 func (n *RebuildActionNode) argumentNode() {}
 
+func (n *RebuildActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *RebuildActionNode) NumChildren() int {
 	count := 0
 	return count
@@ -13030,6 +17103,10 @@ func newRecursionDepthModifierNodeSlice(raws []*generated.ResolvedRecursionDepth
 
 func (n *RecursionDepthModifierNode) Kind() Kind    { return KindRecursionDepthModifier }
 func (n *RecursionDepthModifierNode) argumentNode() {}
+
+func (n *RecursionDepthModifierNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *RecursionDepthModifierNode) LowerBound() ExprNode {
 	return wrapExpr(n.raw.GetLowerBound())
@@ -13106,6 +17183,26 @@ func newRecursiveRefScanNodeSlice(raws []*generated.ResolvedRecursiveRefScanProt
 func (n *RecursiveRefScanNode) Kind() Kind { return KindRecursiveRefScan }
 func (n *RecursiveRefScanNode) scanNode()  {}
 
+func (n *RecursiveRefScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *RecursiveRefScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *RecursiveRefScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *RecursiveRefScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *RecursiveRefScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *RecursiveRefScanNode) NumChildren() int {
 	count := 0
 	return count
@@ -13140,6 +17237,26 @@ func newRecursiveScanNodeSlice(raws []*generated.ResolvedRecursiveScanProto) []*
 
 func (n *RecursiveScanNode) Kind() Kind { return KindRecursiveScan }
 func (n *RecursiveScanNode) scanNode()  {}
+
+func (n *RecursiveScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *RecursiveScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *RecursiveScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *RecursiveScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *RecursiveScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
 
 func (n *RecursiveScanNode) OpType() generated.ResolvedRecursiveScanEnums_RecursiveSetOperationType {
 	return n.raw.GetOpType()
@@ -13220,6 +17337,26 @@ func newRelationArgumentScanNodeSlice(raws []*generated.ResolvedRelationArgument
 func (n *RelationArgumentScanNode) Kind() Kind { return KindRelationArgumentScan }
 func (n *RelationArgumentScanNode) scanNode()  {}
 
+func (n *RelationArgumentScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *RelationArgumentScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *RelationArgumentScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *RelationArgumentScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *RelationArgumentScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *RelationArgumentScanNode) Name() string {
 	return n.raw.GetName()
 }
@@ -13230,10 +17367,19 @@ func (n *RelationArgumentScanNode) IsValueTable() bool {
 
 func (n *RelationArgumentScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	return count
 }
 
 func (n *RelationArgumentScanNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -13262,6 +17408,10 @@ func newRemoveFromRestricteeListActionNodeSlice(raws []*generated.ResolvedRemove
 
 func (n *RemoveFromRestricteeListActionNode) Kind() Kind    { return KindRemoveFromRestricteeListAction }
 func (n *RemoveFromRestricteeListActionNode) argumentNode() {}
+
+func (n *RemoveFromRestricteeListActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *RemoveFromRestricteeListActionNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
@@ -13315,6 +17465,10 @@ func newRenameColumnActionNodeSlice(raws []*generated.ResolvedRenameColumnAction
 func (n *RenameColumnActionNode) Kind() Kind    { return KindRenameColumnAction }
 func (n *RenameColumnActionNode) argumentNode() {}
 
+func (n *RenameColumnActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *RenameColumnActionNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
 }
@@ -13362,6 +17516,14 @@ func newRenameStmtNodeSlice(raws []*generated.ResolvedRenameStmtProto) []*Rename
 func (n *RenameStmtNode) Kind() Kind     { return KindRenameStmt }
 func (n *RenameStmtNode) statementNode() {}
 
+func (n *RenameStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *RenameStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *RenameStmtNode) ObjectType() string {
 	return n.raw.GetObjectType()
 }
@@ -13376,10 +17538,19 @@ func (n *RenameStmtNode) NewNamePath() []string {
 
 func (n *RenameStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	return count
 }
 
 func (n *RenameStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -13408,6 +17579,10 @@ func newRenameToActionNodeSlice(raws []*generated.ResolvedRenameToActionProto) [
 
 func (n *RenameToActionNode) Kind() Kind    { return KindRenameToAction }
 func (n *RenameToActionNode) argumentNode() {}
+
+func (n *RenameToActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *RenameToActionNode) NewPath() []string {
 	return n.raw.GetNewPath()
@@ -13447,6 +17622,10 @@ func newReplaceFieldItemNodeSlice(raws []*generated.ResolvedReplaceFieldItemProt
 
 func (n *ReplaceFieldItemNode) Kind() Kind    { return KindReplaceFieldItem }
 func (n *ReplaceFieldItemNode) argumentNode() {}
+
+func (n *ReplaceFieldItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *ReplaceFieldItemNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
@@ -13504,6 +17683,18 @@ func newReplaceFieldNodeSlice(raws []*generated.ResolvedReplaceFieldProto) []*Re
 
 func (n *ReplaceFieldNode) Kind() Kind { return KindReplaceField }
 func (n *ReplaceFieldNode) exprNode()  {}
+
+func (n *ReplaceFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ReplaceFieldNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *ReplaceFieldNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *ReplaceFieldNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
@@ -13566,6 +17757,10 @@ func newRestrictToActionNodeSlice(raws []*generated.ResolvedRestrictToActionProt
 func (n *RestrictToActionNode) Kind() Kind    { return KindRestrictToAction }
 func (n *RestrictToActionNode) argumentNode() {}
 
+func (n *RestrictToActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *RestrictToActionNode) RestricteeList() []ExprNode {
 	return wrapExprSlice(n.raw.GetRestricteeList())
 }
@@ -13613,6 +17808,10 @@ func newReturningClauseNodeSlice(raws []*generated.ResolvedReturningClauseProto)
 
 func (n *ReturningClauseNode) Kind() Kind    { return KindReturningClause }
 func (n *ReturningClauseNode) argumentNode() {}
+
+func (n *ReturningClauseNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *ReturningClauseNode) OutputColumnList() []*OutputColumnNode {
 	return newOutputColumnNodeSlice(n.raw.GetOutputColumnList())
@@ -13687,6 +17886,10 @@ func newRevokeFromActionNodeSlice(raws []*generated.ResolvedRevokeFromActionProt
 func (n *RevokeFromActionNode) Kind() Kind    { return KindRevokeFromAction }
 func (n *RevokeFromActionNode) argumentNode() {}
 
+func (n *RevokeFromActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *RevokeFromActionNode) RevokeeExprList() []ExprNode {
 	return wrapExprSlice(n.raw.GetRevokeeExprList())
 }
@@ -13739,12 +17942,65 @@ func newRevokeStmtNodeSlice(raws []*generated.ResolvedRevokeStmtProto) []*Revoke
 func (n *RevokeStmtNode) Kind() Kind     { return KindRevokeStmt }
 func (n *RevokeStmtNode) statementNode() {}
 
+func (n *RevokeStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *RevokeStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetParent().GetHintList())
+}
+
+func (n *RevokeStmtNode) PrivilegeList() []*PrivilegeNode {
+	return newPrivilegeNodeSlice(n.raw.GetParent().GetPrivilegeList())
+}
+
+func (n *RevokeStmtNode) ObjectTypeList() []string {
+	return n.raw.GetParent().GetObjectTypeList()
+}
+
+func (n *RevokeStmtNode) NamePath() []string {
+	return n.raw.GetParent().GetNamePath()
+}
+
+func (n *RevokeStmtNode) GranteeList() []string {
+	return n.raw.GetParent().GetGranteeList()
+}
+
+func (n *RevokeStmtNode) GranteeExprList() []ExprNode {
+	return wrapExprSlice(n.raw.GetParent().GetGranteeExprList())
+}
+
 func (n *RevokeStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
+	count += len(n.PrivilegeList())
+	count += len(n.GranteeExprList())
 	return count
 }
 
 func (n *RevokeStmtNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.PrivilegeList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	{
+		s := n.GranteeExprList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -13773,6 +18029,14 @@ func newRollbackStmtNodeSlice(raws []*generated.ResolvedRollbackStmtProto) []*Ro
 
 func (n *RollbackStmtNode) Kind() Kind     { return KindRollbackStmt }
 func (n *RollbackStmtNode) statementNode() {}
+
+func (n *RollbackStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *RollbackStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *RollbackStmtNode) NumChildren() int {
 	count := 0
@@ -13808,6 +18072,10 @@ func newRollupNodeSlice(raws []*generated.ResolvedRollupProto) []*RollupNode {
 
 func (n *RollupNode) Kind() Kind    { return KindRollup }
 func (n *RollupNode) argumentNode() {}
+
+func (n *RollupNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *RollupNode) RollupColumnList() []*GroupingSetMultiColumnNode {
 	return newGroupingSetMultiColumnNodeSlice(n.raw.GetRollupColumnList())
@@ -13857,6 +18125,14 @@ func newRunBatchStmtNodeSlice(raws []*generated.ResolvedRunBatchStmtProto) []*Ru
 func (n *RunBatchStmtNode) Kind() Kind     { return KindRunBatchStmt }
 func (n *RunBatchStmtNode) statementNode() {}
 
+func (n *RunBatchStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *RunBatchStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
 func (n *RunBatchStmtNode) NumChildren() int {
 	count := 0
 	return count
@@ -13891,6 +18167,26 @@ func newSampleScanNodeSlice(raws []*generated.ResolvedSampleScanProto) []*Sample
 
 func (n *SampleScanNode) Kind() Kind { return KindSampleScan }
 func (n *SampleScanNode) scanNode()  {}
+
+func (n *SampleScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *SampleScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *SampleScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *SampleScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *SampleScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
 
 func (n *SampleScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
@@ -14000,6 +18296,10 @@ func newSequenceNodeSlice(raws []*generated.ResolvedSequenceProto) []*SequenceNo
 func (n *SequenceNode) Kind() Kind    { return KindSequence }
 func (n *SequenceNode) argumentNode() {}
 
+func (n *SequenceNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *SequenceNode) Sequence() *generated.SequenceRefProto {
 	return n.raw.GetSequence()
 }
@@ -14038,6 +18338,10 @@ func newSetAsActionNodeSlice(raws []*generated.ResolvedSetAsActionProto) []*SetA
 
 func (n *SetAsActionNode) Kind() Kind    { return KindSetAsAction }
 func (n *SetAsActionNode) argumentNode() {}
+
+func (n *SetAsActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *SetAsActionNode) EntityBodyJson() string {
 	return n.raw.GetEntityBodyJson()
@@ -14081,6 +18385,10 @@ func newSetCollateClauseNodeSlice(raws []*generated.ResolvedSetCollateClauseProt
 
 func (n *SetCollateClauseNode) Kind() Kind    { return KindSetCollateClause }
 func (n *SetCollateClauseNode) argumentNode() {}
+
+func (n *SetCollateClauseNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *SetCollateClauseNode) CollationName() ExprNode {
 	return wrapExpr(n.raw.GetCollationName())
@@ -14130,6 +18438,10 @@ func newSetOperationItemNodeSlice(raws []*generated.ResolvedSetOperationItemProt
 
 func (n *SetOperationItemNode) Kind() Kind    { return KindSetOperationItem }
 func (n *SetOperationItemNode) argumentNode() {}
+
+func (n *SetOperationItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *SetOperationItemNode) Scan() ScanNode {
 	return wrapScan(n.raw.GetScan())
@@ -14183,6 +18495,26 @@ func newSetOperationScanNodeSlice(raws []*generated.ResolvedSetOperationScanProt
 
 func (n *SetOperationScanNode) Kind() Kind { return KindSetOperationScan }
 func (n *SetOperationScanNode) scanNode()  {}
+
+func (n *SetOperationScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *SetOperationScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *SetOperationScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *SetOperationScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *SetOperationScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
 
 func (n *SetOperationScanNode) OpType() generated.ResolvedSetOperationScanEnums_SetOperationType {
 	return n.raw.GetOpType()
@@ -14244,6 +18576,10 @@ func newSetOptionsActionNodeSlice(raws []*generated.ResolvedSetOptionsActionProt
 func (n *SetOptionsActionNode) Kind() Kind    { return KindSetOptionsAction }
 func (n *SetOptionsActionNode) argumentNode() {}
 
+func (n *SetOptionsActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *SetOptionsActionNode) OptionList() []*OptionNode {
 	return newOptionNodeSlice(n.raw.GetOptionList())
 }
@@ -14292,6 +18628,14 @@ func newSetTransactionStmtNodeSlice(raws []*generated.ResolvedSetTransactionStmt
 func (n *SetTransactionStmtNode) Kind() Kind     { return KindSetTransactionStmt }
 func (n *SetTransactionStmtNode) statementNode() {}
 
+func (n *SetTransactionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *SetTransactionStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
 func (n *SetTransactionStmtNode) ReadWriteMode() generated.ResolvedBeginStmtEnums_ReadWriteMode {
 	return n.raw.GetReadWriteMode()
 }
@@ -14334,6 +18678,14 @@ func newShowStmtNodeSlice(raws []*generated.ResolvedShowStmtProto) []*ShowStmtNo
 
 func (n *ShowStmtNode) Kind() Kind     { return KindShowStmt }
 func (n *ShowStmtNode) statementNode() {}
+
+func (n *ShowStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *ShowStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *ShowStmtNode) Identifier() string {
 	return n.raw.GetIdentifier()
@@ -14392,6 +18744,26 @@ func newSingleRowScanNodeSlice(raws []*generated.ResolvedSingleRowScanProto) []*
 func (n *SingleRowScanNode) Kind() Kind { return KindSingleRowScan }
 func (n *SingleRowScanNode) scanNode()  {}
 
+func (n *SingleRowScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *SingleRowScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *SingleRowScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *SingleRowScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *SingleRowScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *SingleRowScanNode) NumChildren() int {
 	count := 0
 	return count
@@ -14426,6 +18798,14 @@ func newStartBatchStmtNodeSlice(raws []*generated.ResolvedStartBatchStmtProto) [
 
 func (n *StartBatchStmtNode) Kind() Kind     { return KindStartBatchStmt }
 func (n *StartBatchStmtNode) statementNode() {}
+
+func (n *StartBatchStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *StartBatchStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *StartBatchStmtNode) BatchType() string {
 	return n.raw.GetBatchType()
@@ -14465,6 +18845,14 @@ func newStatementWithPipeOperatorsStmtNodeSlice(raws []*generated.ResolvedStatem
 
 func (n *StatementWithPipeOperatorsStmtNode) Kind() Kind     { return KindStatementWithPipeOperatorsStmt }
 func (n *StatementWithPipeOperatorsStmtNode) statementNode() {}
+
+func (n *StatementWithPipeOperatorsStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *StatementWithPipeOperatorsStmtNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
 
 func (n *StatementWithPipeOperatorsStmtNode) Statement() StatementNode {
 	return wrapStatement(n.raw.GetStatement())
@@ -14519,6 +18907,26 @@ func newStaticDescribeScanNodeSlice(raws []*generated.ResolvedStaticDescribeScan
 func (n *StaticDescribeScanNode) Kind() Kind { return KindStaticDescribeScan }
 func (n *StaticDescribeScanNode) scanNode()  {}
 
+func (n *StaticDescribeScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *StaticDescribeScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *StaticDescribeScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *StaticDescribeScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *StaticDescribeScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *StaticDescribeScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -14529,6 +18937,7 @@ func (n *StaticDescribeScanNode) DescribeText() string {
 
 func (n *StaticDescribeScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInputScan() != nil {
 		count++
 	}
@@ -14537,6 +18946,13 @@ func (n *StaticDescribeScanNode) NumChildren() int {
 
 func (n *StaticDescribeScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInputScan() != nil {
 		if idx == i {
 			return n.InputScan()
@@ -14572,12 +18988,41 @@ func newSubpipelineInputScanNodeSlice(raws []*generated.ResolvedSubpipelineInput
 func (n *SubpipelineInputScanNode) Kind() Kind { return KindSubpipelineInputScan }
 func (n *SubpipelineInputScanNode) scanNode()  {}
 
+func (n *SubpipelineInputScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *SubpipelineInputScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *SubpipelineInputScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *SubpipelineInputScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *SubpipelineInputScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *SubpipelineInputScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	return count
 }
 
 func (n *SubpipelineInputScanNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -14606,6 +19051,10 @@ func newSubpipelineNodeSlice(raws []*generated.ResolvedSubpipelineProto) []*Subp
 
 func (n *SubpipelineNode) Kind() Kind    { return KindSubpipeline }
 func (n *SubpipelineNode) argumentNode() {}
+
+func (n *SubpipelineNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *SubpipelineNode) Scan() ScanNode {
 	return wrapScan(n.raw.GetScan())
@@ -14656,6 +19105,14 @@ func newSubpipelineStmtNodeSlice(raws []*generated.ResolvedSubpipelineStmtProto)
 func (n *SubpipelineStmtNode) Kind() Kind     { return KindSubpipelineStmt }
 func (n *SubpipelineStmtNode) statementNode() {}
 
+func (n *SubpipelineStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *SubpipelineStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *SubpipelineStmtNode) TableScan() *TableScanNode {
 	return newTableScanNode(n.raw.GetTableScan())
 }
@@ -14670,6 +19127,7 @@ func (n *SubpipelineStmtNode) OutputSchema() *OutputSchemaNode {
 
 func (n *SubpipelineStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetTableScan() != nil {
 		count++
 	}
@@ -14684,6 +19142,13 @@ func (n *SubpipelineStmtNode) NumChildren() int {
 
 func (n *SubpipelineStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetTableScan() != nil {
 		if idx == i {
 			return n.TableScan()
@@ -14730,6 +19195,18 @@ func newSubqueryExprNodeSlice(raws []*generated.ResolvedSubqueryExprProto) []*Su
 
 func (n *SubqueryExprNode) Kind() Kind { return KindSubqueryExpr }
 func (n *SubqueryExprNode) exprNode()  {}
+
+func (n *SubqueryExprNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *SubqueryExprNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *SubqueryExprNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *SubqueryExprNode) SubqueryType() generated.ResolvedSubqueryExprEnums_SubqueryType {
 	return n.raw.GetSubqueryType()
@@ -14817,6 +19294,18 @@ func newSystemVariableNodeSlice(raws []*generated.ResolvedSystemVariableProto) [
 func (n *SystemVariableNode) Kind() Kind { return KindSystemVariable }
 func (n *SystemVariableNode) exprNode()  {}
 
+func (n *SystemVariableNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *SystemVariableNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *SystemVariableNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
+
 func (n *SystemVariableNode) NamePath() []string {
 	return n.raw.GetNamePath()
 }
@@ -14855,6 +19344,26 @@ func newTVFScanNodeSlice(raws []*generated.ResolvedTVFScanProto) []*TVFScanNode 
 
 func (n *TVFScanNode) Kind() Kind { return KindTVFScan }
 func (n *TVFScanNode) scanNode()  {}
+
+func (n *TVFScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *TVFScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *TVFScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *TVFScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *TVFScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
 
 func (n *TVFScanNode) Tvf() *generated.TableValuedFunctionRefProto {
 	return n.raw.GetTvf()
@@ -14915,6 +19424,10 @@ func newTableAndColumnInfoNodeSlice(raws []*generated.ResolvedTableAndColumnInfo
 func (n *TableAndColumnInfoNode) Kind() Kind    { return KindTableAndColumnInfo }
 func (n *TableAndColumnInfoNode) argumentNode() {}
 
+func (n *TableAndColumnInfoNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *TableAndColumnInfoNode) Table() *generated.TableRefProto {
 	return n.raw.GetTable()
 }
@@ -14957,6 +19470,26 @@ func newTableScanNodeSlice(raws []*generated.ResolvedTableScanProto) []*TableSca
 
 func (n *TableScanNode) Kind() Kind { return KindTableScan }
 func (n *TableScanNode) scanNode()  {}
+
+func (n *TableScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *TableScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *TableScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *TableScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *TableScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
 
 func (n *TableScanNode) Table() *generated.TableRefProto {
 	return n.raw.GetTable()
@@ -15031,6 +19564,14 @@ func newTruncateStmtNodeSlice(raws []*generated.ResolvedTruncateStmtProto) []*Tr
 func (n *TruncateStmtNode) Kind() Kind     { return KindTruncateStmt }
 func (n *TruncateStmtNode) statementNode() {}
 
+func (n *TruncateStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *TruncateStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *TruncateStmtNode) TableScan() *TableScanNode {
 	return newTableScanNode(n.raw.GetTableScan())
 }
@@ -15041,6 +19582,7 @@ func (n *TruncateStmtNode) WhereExpr() ExprNode {
 
 func (n *TruncateStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetTableScan() != nil {
 		count++
 	}
@@ -15052,6 +19594,13 @@ func (n *TruncateStmtNode) NumChildren() int {
 
 func (n *TruncateStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetTableScan() != nil {
 		if idx == i {
 			return n.TableScan()
@@ -15093,6 +19642,14 @@ func newUndropStmtNodeSlice(raws []*generated.ResolvedUndropStmtProto) []*Undrop
 func (n *UndropStmtNode) Kind() Kind     { return KindUndropStmt }
 func (n *UndropStmtNode) statementNode() {}
 
+func (n *UndropStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *UndropStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *UndropStmtNode) SchemaObjectKind() string {
 	return n.raw.GetSchemaObjectKind()
 }
@@ -15115,6 +19672,7 @@ func (n *UndropStmtNode) OptionList() []*OptionNode {
 
 func (n *UndropStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetForSystemTimeExpr() != nil {
 		count++
 	}
@@ -15124,6 +19682,13 @@ func (n *UndropStmtNode) NumChildren() int {
 
 func (n *UndropStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetForSystemTimeExpr() != nil {
 		if idx == i {
 			return n.ForSystemTimeExpr()
@@ -15165,6 +19730,10 @@ func newUnnestItemNodeSlice(raws []*generated.ResolvedUnnestItemProto) []*Unnest
 
 func (n *UnnestItemNode) Kind() Kind    { return KindUnnestItem }
 func (n *UnnestItemNode) argumentNode() {}
+
+func (n *UnnestItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *UnnestItemNode) ArrayExpr() ExprNode {
 	return wrapExpr(n.raw.GetArrayExpr())
@@ -15232,6 +19801,10 @@ func newUnpivotArgNodeSlice(raws []*generated.ResolvedUnpivotArgProto) []*Unpivo
 func (n *UnpivotArgNode) Kind() Kind    { return KindUnpivotArg }
 func (n *UnpivotArgNode) argumentNode() {}
 
+func (n *UnpivotArgNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *UnpivotArgNode) ColumnList() []*ColumnRefNode {
 	return newColumnRefNodeSlice(n.raw.GetColumnList())
 }
@@ -15280,6 +19853,26 @@ func newUnpivotScanNodeSlice(raws []*generated.ResolvedUnpivotScanProto) []*Unpi
 func (n *UnpivotScanNode) Kind() Kind { return KindUnpivotScan }
 func (n *UnpivotScanNode) scanNode()  {}
 
+func (n *UnpivotScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *UnpivotScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *UnpivotScanNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
+func (n *UnpivotScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *UnpivotScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *UnpivotScanNode) InputScan() ScanNode {
 	return wrapScan(n.raw.GetInputScan())
 }
@@ -15310,6 +19903,7 @@ func (n *UnpivotScanNode) IncludeNulls() bool {
 
 func (n *UnpivotScanNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetInputScan() != nil {
 		count++
 	}
@@ -15321,6 +19915,13 @@ func (n *UnpivotScanNode) NumChildren() int {
 
 func (n *UnpivotScanNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetInputScan() != nil {
 		if idx == i {
 			return n.InputScan()
@@ -15377,6 +19978,26 @@ func newUnsetArgumentScanNodeSlice(raws []*generated.ResolvedUnsetArgumentScanPr
 func (n *UnsetArgumentScanNode) Kind() Kind { return KindUnsetArgumentScan }
 func (n *UnsetArgumentScanNode) scanNode()  {}
 
+func (n *UnsetArgumentScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *UnsetArgumentScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *UnsetArgumentScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *UnsetArgumentScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *UnsetArgumentScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *UnsetArgumentScanNode) NumChildren() int {
 	count := 0
 	return count
@@ -15411,6 +20032,18 @@ func newUpdateConstructorNodeSlice(raws []*generated.ResolvedUpdateConstructorPr
 
 func (n *UpdateConstructorNode) Kind() Kind { return KindUpdateConstructor }
 func (n *UpdateConstructorNode) exprNode()  {}
+
+func (n *UpdateConstructorNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *UpdateConstructorNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *UpdateConstructorNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *UpdateConstructorNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
@@ -15477,6 +20110,10 @@ func newUpdateFieldItemNodeSlice(raws []*generated.ResolvedUpdateFieldItemProto)
 func (n *UpdateFieldItemNode) Kind() Kind    { return KindUpdateFieldItem }
 func (n *UpdateFieldItemNode) argumentNode() {}
 
+func (n *UpdateFieldItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *UpdateFieldItemNode) Expr() ExprNode {
 	return wrapExpr(n.raw.GetExpr())
 }
@@ -15533,6 +20170,10 @@ func newUpdateItemElementNodeSlice(raws []*generated.ResolvedUpdateItemElementPr
 
 func (n *UpdateItemElementNode) Kind() Kind    { return KindUpdateItemElement }
 func (n *UpdateItemElementNode) argumentNode() {}
+
+func (n *UpdateItemElementNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *UpdateItemElementNode) Subscript() ExprNode {
 	return wrapExpr(n.raw.GetSubscript())
@@ -15595,6 +20236,10 @@ func newUpdateItemNodeSlice(raws []*generated.ResolvedUpdateItemProto) []*Update
 
 func (n *UpdateItemNode) Kind() Kind    { return KindUpdateItem }
 func (n *UpdateItemNode) argumentNode() {}
+
+func (n *UpdateItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *UpdateItemNode) Target() ExprNode {
 	return wrapExpr(n.raw.GetTarget())
@@ -15703,6 +20348,14 @@ func newUpdateStmtNodeSlice(raws []*generated.ResolvedUpdateStmtProto) []*Update
 func (n *UpdateStmtNode) Kind() Kind     { return KindUpdateStmt }
 func (n *UpdateStmtNode) statementNode() {}
 
+func (n *UpdateStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *UpdateStmtNode) HintList() []*OptionNode {
+	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
+}
+
 func (n *UpdateStmtNode) TableScan() *TableScanNode {
 	return newTableScanNode(n.raw.GetTableScan())
 }
@@ -15745,6 +20398,7 @@ func (n *UpdateStmtNode) GeneratedColumnExprList() []ExprNode {
 
 func (n *UpdateStmtNode) NumChildren() int {
 	count := 0
+	count += len(n.HintList())
 	if n.raw.GetTableScan() != nil {
 		count++
 	}
@@ -15767,6 +20421,13 @@ func (n *UpdateStmtNode) NumChildren() int {
 
 func (n *UpdateStmtNode) Child(i int) Node {
 	idx := 0
+	{
+		s := n.HintList()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	if n.raw.GetTableScan() != nil {
 		if idx == i {
 			return n.TableScan()
@@ -15840,6 +20501,10 @@ func newWindowFrameExprNodeSlice(raws []*generated.ResolvedWindowFrameExprProto)
 func (n *WindowFrameExprNode) Kind() Kind    { return KindWindowFrameExpr }
 func (n *WindowFrameExprNode) argumentNode() {}
 
+func (n *WindowFrameExprNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *WindowFrameExprNode) BoundaryType() generated.ResolvedWindowFrameExprEnums_BoundaryType {
 	return n.raw.GetBoundaryType()
 }
@@ -15893,6 +20558,10 @@ func newWindowFrameNodeSlice(raws []*generated.ResolvedWindowFrameProto) []*Wind
 func (n *WindowFrameNode) Kind() Kind    { return KindWindowFrame }
 func (n *WindowFrameNode) argumentNode() {}
 
+func (n *WindowFrameNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *WindowFrameNode) FrameUnit() generated.ResolvedWindowFrameEnums_FrameUnit {
 	return n.raw.GetFrameUnit()
 }
@@ -15939,6 +20608,10 @@ func newWindowOrderingNodeSlice(raws []*generated.ResolvedWindowOrderingProto) [
 
 func (n *WindowOrderingNode) Kind() Kind    { return KindWindowOrdering }
 func (n *WindowOrderingNode) argumentNode() {}
+
+func (n *WindowOrderingNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *WindowOrderingNode) OrderByItemList() []*OrderByItemNode {
 	return newOrderByItemNodeSlice(n.raw.GetOrderByItemList())
@@ -15999,6 +20672,10 @@ func newWindowPartitioningNodeSlice(raws []*generated.ResolvedWindowPartitioning
 
 func (n *WindowPartitioningNode) Kind() Kind    { return KindWindowPartitioning }
 func (n *WindowPartitioningNode) argumentNode() {}
+
+func (n *WindowPartitioningNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
 
 func (n *WindowPartitioningNode) PartitionByList() []*ColumnRefNode {
 	return newColumnRefNodeSlice(n.raw.GetPartitionByList())
@@ -16064,6 +20741,10 @@ func newWithEntryNodeSlice(raws []*generated.ResolvedWithEntryProto) []*WithEntr
 func (n *WithEntryNode) Kind() Kind    { return KindWithEntry }
 func (n *WithEntryNode) argumentNode() {}
 
+func (n *WithEntryNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *WithEntryNode) WithQueryName() string {
 	return n.raw.GetWithQueryName()
 }
@@ -16116,6 +20797,18 @@ func newWithExprNodeSlice(raws []*generated.ResolvedWithExprProto) []*WithExprNo
 
 func (n *WithExprNode) Kind() Kind { return KindWithExpr }
 func (n *WithExprNode) exprNode()  {}
+
+func (n *WithExprNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *WithExprNode) Type() *generated.TypeProto {
+	return n.raw.GetParent().GetType()
+}
+
+func (n *WithExprNode) TypeAnnotationMap() *generated.AnnotationMapProto {
+	return n.raw.GetParent().GetTypeAnnotationMap()
+}
 
 func (n *WithExprNode) AssignmentList() []*generated.ResolvedComputedColumnProto {
 	return n.raw.GetAssignmentList()
@@ -16170,6 +20863,10 @@ func newWithPartitionColumnsNodeSlice(raws []*generated.ResolvedWithPartitionCol
 func (n *WithPartitionColumnsNode) Kind() Kind    { return KindWithPartitionColumns }
 func (n *WithPartitionColumnsNode) argumentNode() {}
 
+func (n *WithPartitionColumnsNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
 func (n *WithPartitionColumnsNode) ColumnDefinitionList() []*ColumnDefinitionNode {
 	return newColumnDefinitionNodeSlice(n.raw.GetColumnDefinitionList())
 }
@@ -16218,6 +20915,26 @@ func newWithRefScanNodeSlice(raws []*generated.ResolvedWithRefScanProto) []*With
 func (n *WithRefScanNode) Kind() Kind { return KindWithRefScan }
 func (n *WithRefScanNode) scanNode()  {}
 
+func (n *WithRefScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *WithRefScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *WithRefScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *WithRefScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *WithRefScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
+
 func (n *WithRefScanNode) WithQueryName() string {
 	return n.raw.GetWithQueryName()
 }
@@ -16256,6 +20973,26 @@ func newWithScanNodeSlice(raws []*generated.ResolvedWithScanProto) []*WithScanNo
 
 func (n *WithScanNode) Kind() Kind { return KindWithScan }
 func (n *WithScanNode) scanNode()  {}
+
+func (n *WithScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return n.raw.GetParent().GetParent().GetParseLocationRange()
+}
+
+func (n *WithScanNode) ColumnList() []*generated.ResolvedColumnProto {
+	return n.raw.GetParent().GetColumnList()
+}
+
+func (n *WithScanNode) HintList() []*generated.ResolvedOptionProto {
+	return n.raw.GetParent().GetHintList()
+}
+
+func (n *WithScanNode) IsOrdered() bool {
+	return n.raw.GetParent().GetIsOrdered()
+}
+
+func (n *WithScanNode) NodeSource() string {
+	return n.raw.GetParent().GetNodeSource()
+}
 
 func (n *WithScanNode) WithEntryList() []*generated.ResolvedWithEntryProto {
 	return n.raw.GetWithEntryList()
