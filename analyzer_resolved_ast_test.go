@@ -7,9 +7,9 @@ import (
 	"github.com/glassmonkey/zetasql-wasm/catalog"
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
 	"github.com/glassmonkey/zetasql-wasm/types"
+	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 )
 
-// newTestAnalyzer creates a shared analyzer for integration tests.
 func newTestAnalyzer(t *testing.T) *Analyzer {
 	t.Helper()
 	ctx := context.Background()
@@ -21,7 +21,6 @@ func newTestAnalyzer(t *testing.T) *Analyzer {
 	return a
 }
 
-// newUsersCatalog creates a catalog with a "users" table (id INT64, name STRING).
 func newUsersCatalog() *catalog.SimpleCatalog {
 	cat := catalog.NewSimpleCatalog("test")
 	cat.AddZetaSQLBuiltinFunctions(nil)
@@ -32,7 +31,6 @@ func newUsersCatalog() *catalog.SimpleCatalog {
 	return cat
 }
 
-// newUsersOrdersCatalog creates a catalog with "users" and "orders" tables.
 func newUsersOrdersCatalog() *catalog.SimpleCatalog {
 	cat := catalog.NewSimpleCatalog("test")
 	cat.AddZetaSQLBuiltinFunctions(nil)
@@ -59,359 +57,266 @@ func analyze(t *testing.T, a *Analyzer, sql string, cat *catalog.SimpleCatalog) 
 	return out
 }
 
+// findNode walks the tree and returns the first node matching the predicate.
+func findNode[T resolved_ast.Node](t *testing.T, root resolved_ast.Node) T {
+	t.Helper()
+	var result T
+	var found bool
+	resolved_ast.Walk(root, func(n resolved_ast.Node) error {
+		if v, ok := n.(T); ok && !found {
+			result = v
+			found = true
+		}
+		return nil
+	})
+	if !found {
+		t.Fatalf("node of type %T not found in resolved AST", result)
+	}
+	return result
+}
+
+// collectNodes walks the tree and returns all nodes matching the type.
+func collectNodes[T resolved_ast.Node](root resolved_ast.Node) []T {
+	var result []T
+	resolved_ast.Walk(root, func(n resolved_ast.Node) error {
+		if v, ok := n.(T); ok {
+			result = append(result, v)
+		}
+		return nil
+	})
+	return result
+}
+
 func TestResolvedAST_QueryStmt_SelectColumns(t *testing.T) {
 	a := newTestAnalyzer(t)
-	cat := newUsersCatalog()
-	out := analyze(t, a, "SELECT id, name FROM users", cat)
+	out := analyze(t, a, "SELECT id, name FROM users", newUsersCatalog())
+	stmt := out.ResolvedStatement().(*resolved_ast.QueryStmtNode)
 
-	stmt := out.ResolvedStatement()
-	queryStmt, ok := stmt.(*resolved_ast.QueryStmtNode)
-	if !ok {
-		t.Fatalf("expected *QueryStmtNode, got %T", stmt)
+	if got, want := stmt.Kind(), resolved_ast.KindQueryStmt; got != want {
+		t.Errorf("Kind() = %v, want %v", got, want)
+	}
+	if got, want := stmt.IsValueTable(), false; got != want {
+		t.Errorf("IsValueTable() = %v, want %v", got, want)
 	}
 
-	if queryStmt.IsValueTable() {
-		t.Error("IsValueTable() = true, want false")
+	cols := stmt.OutputColumnList()
+	if got, want := len(cols), 2; got != want {
+		t.Fatalf("len(OutputColumnList()) = %d, want %d", got, want)
 	}
 
-	cols := queryStmt.OutputColumnList()
-	if len(cols) != 2 {
-		t.Fatalf("OutputColumnList() len = %d, want 2", len(cols))
+	if got, want := cols[0].Name(), "id"; got != want {
+		t.Errorf("cols[0].Name() = %q, want %q", got, want)
+	}
+	if got, want := cols[0].Column().GetTableName(), "users"; got != want {
+		t.Errorf("cols[0].Column().TableName = %q, want %q", got, want)
+	}
+	if got, want := cols[0].Column().GetName(), "id"; got != want {
+		t.Errorf("cols[0].Column().Name = %q, want %q", got, want)
 	}
 
-	wantNames := []string{"id", "name"}
-	for i, col := range cols {
-		if got := col.Name(); got != wantNames[i] {
-			t.Errorf("OutputColumnList()[%d].Name() = %q, want %q", i, got, wantNames[i])
-		}
-		c := col.Column()
-		if c == nil {
-			t.Fatalf("OutputColumnList()[%d].Column() = nil", i)
-		}
-		if got := c.GetTableName(); got != "users" {
-			t.Errorf("OutputColumnList()[%d].Column().TableName = %q, want %q", i, got, "users")
-		}
+	if got, want := cols[1].Name(), "name"; got != want {
+		t.Errorf("cols[1].Name() = %q, want %q", got, want)
 	}
-
-	// Query should be a scan node
-	query := queryStmt.Query()
-	if query == nil {
-		t.Fatal("Query() = nil")
+	if got, want := cols[1].Column().GetTableName(), "users"; got != want {
+		t.Errorf("cols[1].Column().TableName = %q, want %q", got, want)
+	}
+	if got, want := cols[1].Column().GetName(), "name"; got != want {
+		t.Errorf("cols[1].Column().Name = %q, want %q", got, want)
 	}
 }
 
 func TestResolvedAST_TableScan(t *testing.T) {
 	a := newTestAnalyzer(t)
-	cat := newUsersCatalog()
-	out := analyze(t, a, "SELECT id FROM users", cat)
-
+	out := analyze(t, a, "SELECT id FROM users", newUsersCatalog())
 	stmt := out.ResolvedStatement().(*resolved_ast.QueryStmtNode)
 
-	// Walk the tree to find the TableScan
-	var tableScan *resolved_ast.TableScanNode
-	resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
-		if ts, ok := n.(*resolved_ast.TableScanNode); ok {
-			tableScan = ts
-		}
-		return nil
-	})
+	tableScan := findNode[*resolved_ast.TableScanNode](t, stmt)
 
-	if tableScan == nil {
-		t.Fatal("no TableScanNode found in resolved AST")
+	if got, want := tableScan.Kind(), resolved_ast.KindTableScan; got != want {
+		t.Errorf("Kind() = %v, want %v", got, want)
 	}
-
-	tableRef := tableScan.Table()
-	if tableRef == nil {
-		t.Fatal("TableScanNode.Table() = nil")
+	if got, want := tableScan.Table().GetName(), "users"; got != want {
+		t.Errorf("Table().Name = %q, want %q", got, want)
 	}
-	if got := tableRef.GetName(); got != "users" {
-		t.Errorf("Table().Name = %q, want %q", got, "users")
+	// SELECT id FROM users scans both columns (id, name) at the table level,
+	// even though only id is projected. ZetaSQL includes all referenced columns.
+	if got, want := len(tableScan.ColumnIndexList()), 2; got != want {
+		t.Errorf("len(ColumnIndexList()) = %d, want %d", got, want)
 	}
-
-	idxList := tableScan.ColumnIndexList()
-	if len(idxList) == 0 {
-		t.Error("ColumnIndexList() is empty, expected at least 1 column")
+	if got, want := tableScan.ColumnIndexList()[0], int64(0); got != want {
+		t.Errorf("ColumnIndexList()[0] = %d, want %d", got, want)
+	}
+	if got, want := tableScan.ColumnIndexList()[1], int64(1); got != want {
+		t.Errorf("ColumnIndexList()[1] = %d, want %d", got, want)
 	}
 }
 
 func TestResolvedAST_JoinScan(t *testing.T) {
 	a := newTestAnalyzer(t)
-	cat := newUsersOrdersCatalog()
-	out := analyze(t, a, "SELECT u.id, o.amount FROM users u JOIN orders o ON u.id = o.user_id", cat)
-
+	out := analyze(t, a, "SELECT u.id, o.amount FROM users u JOIN orders o ON u.id = o.user_id", newUsersOrdersCatalog())
 	stmt := out.ResolvedStatement().(*resolved_ast.QueryStmtNode)
 
-	var joinScan *resolved_ast.JoinScanNode
-	resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
-		if js, ok := n.(*resolved_ast.JoinScanNode); ok {
-			joinScan = js
-		}
-		return nil
-	})
+	joinScan := findNode[*resolved_ast.JoinScanNode](t, stmt)
 
-	if joinScan == nil {
-		t.Fatal("no JoinScanNode found in resolved AST")
+	if got, want := joinScan.Kind(), resolved_ast.KindJoinScan; got != want {
+		t.Errorf("Kind() = %v, want %v", got, want)
+	}
+	if got, want := joinScan.JoinType(), generated.ResolvedJoinScanEnums_INNER; got != want {
+		t.Errorf("JoinType() = %v, want %v (INNER)", got, want)
 	}
 
-	// INNER JOIN
-	if got := joinScan.JoinType(); got != 0 {
-		t.Errorf("JoinType() = %v, want INNER (0)", got)
+	leftTable := joinScan.LeftScan().(*resolved_ast.TableScanNode)
+	if got, want := leftTable.Table().GetName(), "users"; got != want {
+		t.Errorf("LeftScan().Table().Name = %q, want %q", got, want)
 	}
 
-	if joinScan.LeftScan() == nil {
-		t.Error("LeftScan() = nil")
-	}
-	if joinScan.RightScan() == nil {
-		t.Error("RightScan() = nil")
-	}
-	if joinScan.JoinExpr() == nil {
-		t.Error("JoinExpr() = nil, expected ON clause expression")
+	rightTable := joinScan.RightScan().(*resolved_ast.TableScanNode)
+	if got, want := rightTable.Table().GetName(), "orders"; got != want {
+		t.Errorf("RightScan().Table().Name = %q, want %q", got, want)
 	}
 
-	// Verify left and right are TableScans
-	leftTable, ok := joinScan.LeftScan().(*resolved_ast.TableScanNode)
-	if !ok {
-		t.Fatalf("LeftScan() type = %T, want *TableScanNode", joinScan.LeftScan())
+	// ON clause should be a FunctionCall ($equal)
+	joinExpr := joinScan.JoinExpr().(*resolved_ast.FunctionCallNode)
+	if got, want := joinExpr.Kind(), resolved_ast.KindFunctionCall; got != want {
+		t.Errorf("JoinExpr().Kind() = %v, want %v", got, want)
 	}
-	if got := leftTable.Table().GetName(); got != "users" {
-		t.Errorf("LeftScan().Table().Name = %q, want %q", got, "users")
+	if got, want := joinExpr.Function().GetName(), "ZetaSQL:$equal"; got != want {
+		t.Errorf("JoinExpr().Function().Name = %q, want %q", got, want)
 	}
-
-	rightTable, ok := joinScan.RightScan().(*resolved_ast.TableScanNode)
-	if !ok {
-		t.Fatalf("RightScan() type = %T, want *TableScanNode", joinScan.RightScan())
-	}
-	if got := rightTable.Table().GetName(); got != "orders" {
-		t.Errorf("RightScan().Table().Name = %q, want %q", got, "orders")
+	if got, want := len(joinExpr.ArgumentList()), 2; got != want {
+		t.Errorf("len(JoinExpr().ArgumentList()) = %d, want %d", got, want)
 	}
 }
 
 func TestResolvedAST_FilterScan(t *testing.T) {
 	a := newTestAnalyzer(t)
-	cat := newUsersCatalog()
-	out := analyze(t, a, "SELECT id FROM users WHERE id > 1", cat)
-
+	out := analyze(t, a, "SELECT id FROM users WHERE id > 1", newUsersCatalog())
 	stmt := out.ResolvedStatement().(*resolved_ast.QueryStmtNode)
 
-	var filterScan *resolved_ast.FilterScanNode
-	resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
-		if fs, ok := n.(*resolved_ast.FilterScanNode); ok {
-			filterScan = fs
-		}
-		return nil
-	})
+	filterScan := findNode[*resolved_ast.FilterScanNode](t, stmt)
 
-	if filterScan == nil {
-		t.Fatal("no FilterScanNode found in resolved AST")
+	if got, want := filterScan.Kind(), resolved_ast.KindFilterScan; got != want {
+		t.Errorf("Kind() = %v, want %v", got, want)
 	}
 
-	if filterScan.InputScan() == nil {
-		t.Error("FilterScan.InputScan() = nil")
+	// FilterExpr should be $greater_than function
+	filterFunc := filterScan.FilterExpr().(*resolved_ast.FunctionCallNode)
+	if got, want := filterFunc.Function().GetName(), "ZetaSQL:$greater"; got != want {
+		t.Errorf("FilterExpr().Function().Name = %q, want %q", got, want)
 	}
-	if filterScan.FilterExpr() == nil {
-		t.Error("FilterScan.FilterExpr() = nil")
-	}
-
-	// The filter expression should be a FunctionCallNode (for the > operator)
-	filterExpr := filterScan.FilterExpr()
-	if got := filterExpr.Kind(); got != resolved_ast.KindFunctionCall {
-		t.Errorf("FilterExpr().Kind() = %v, want KindFunctionCall", got)
+	if got, want := len(filterFunc.ArgumentList()), 2; got != want {
+		t.Errorf("len(FilterExpr().ArgumentList()) = %d, want %d", got, want)
 	}
 
-	// InputScan should contain a TableScan for "users"
-	var tableScan *resolved_ast.TableScanNode
-	resolved_ast.Walk(filterScan.InputScan(), func(n resolved_ast.Node) error {
-		if ts, ok := n.(*resolved_ast.TableScanNode); ok {
-			tableScan = ts
-		}
-		return nil
-	})
-	if tableScan == nil {
-		t.Fatal("no TableScanNode found under FilterScan.InputScan()")
-	}
-	if got := tableScan.Table().GetName(); got != "users" {
-		t.Errorf("InputScan TableScan.Table().Name = %q, want %q", got, "users")
+	// InputScan should be a TableScan for "users"
+	inputTableScan := filterScan.InputScan().(*resolved_ast.TableScanNode)
+	if got, want := inputTableScan.Table().GetName(), "users"; got != want {
+		t.Errorf("InputScan().Table().Name = %q, want %q", got, want)
 	}
 }
 
 func TestResolvedAST_ProjectScan(t *testing.T) {
 	a := newTestAnalyzer(t)
-	cat := newUsersCatalog()
-	out := analyze(t, a, "SELECT id + 1 AS inc FROM users", cat)
-
+	out := analyze(t, a, "SELECT id + 1 AS inc FROM users", newUsersCatalog())
 	stmt := out.ResolvedStatement().(*resolved_ast.QueryStmtNode)
 
-	var projectScan *resolved_ast.ProjectScanNode
-	resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
-		if ps, ok := n.(*resolved_ast.ProjectScanNode); ok {
-			projectScan = ps
-		}
-		return nil
-	})
+	projectScan := findNode[*resolved_ast.ProjectScanNode](t, stmt)
 
-	if projectScan == nil {
-		t.Fatal("no ProjectScanNode found in resolved AST")
+	if got, want := projectScan.Kind(), resolved_ast.KindProjectScan; got != want {
+		t.Errorf("Kind() = %v, want %v", got, want)
 	}
 
 	exprList := projectScan.ExprList()
-	if len(exprList) == 0 {
-		t.Fatal("ProjectScan.ExprList() is empty, expected computed columns")
+	if got, want := len(exprList), 1; got != want {
+		t.Fatalf("len(ExprList()) = %d, want %d", got, want)
 	}
 
-	// Each computed column should have a column and an expression
-	for i, cc := range exprList {
-		if cc.Column() == nil {
-			t.Errorf("ExprList()[%d].Column() = nil", i)
-		}
-		if cc.Expr() == nil {
-			t.Errorf("ExprList()[%d].Expr() = nil", i)
-		}
+	// The computed column's expression should be an $add function
+	addFunc := exprList[0].Expr().(*resolved_ast.FunctionCallNode)
+	if got, want := addFunc.Function().GetName(), "ZetaSQL:$add"; got != want {
+		t.Errorf("ExprList()[0].Expr().Function().Name = %q, want %q", got, want)
 	}
-
-	if projectScan.InputScan() == nil {
-		t.Error("ProjectScan.InputScan() = nil")
+	if got, want := len(addFunc.ArgumentList()), 2; got != want {
+		t.Errorf("len(ExprList()[0].Expr().ArgumentList()) = %d, want %d", got, want)
 	}
 }
 
-func TestResolvedAST_FunctionCall(t *testing.T) {
+func TestResolvedAST_FunctionCall_WithArguments(t *testing.T) {
 	a := newTestAnalyzer(t)
-	cat := newUsersCatalog()
-	out := analyze(t, a, "SELECT UPPER(name) FROM users", cat)
-
+	out := analyze(t, a, "SELECT UPPER(name) FROM users", newUsersCatalog())
 	stmt := out.ResolvedStatement().(*resolved_ast.QueryStmtNode)
 
-	var funcCall *resolved_ast.FunctionCallNode
-	resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
-		if fc, ok := n.(*resolved_ast.FunctionCallNode); ok {
-			funcCall = fc
-		}
-		return nil
-	})
+	funcCall := findNode[*resolved_ast.FunctionCallNode](t, stmt)
 
-	if funcCall == nil {
-		t.Fatal("no FunctionCallNode found in resolved AST")
+	if got, want := funcCall.Kind(), resolved_ast.KindFunctionCall; got != want {
+		t.Errorf("Kind() = %v, want %v", got, want)
 	}
-
-	if got := funcCall.Kind(); got != resolved_ast.KindFunctionCall {
-		t.Errorf("Kind() = %v, want KindFunctionCall", got)
-	}
-
-	// Verify flattened parent fields are accessible
-	fnRef := funcCall.Function()
-	if fnRef == nil {
-		t.Fatal("Function() = nil")
-	}
-	if got := fnRef.GetName(); got != "ZetaSQL:upper" {
-		t.Errorf("Function().Name = %q, want %q", got, "ZetaSQL:upper")
-	}
-
-	sig := funcCall.Signature()
-	if sig == nil {
-		t.Error("Signature() = nil")
+	if got, want := funcCall.Function().GetName(), "ZetaSQL:upper"; got != want {
+		t.Errorf("Function().Name = %q, want %q", got, want)
 	}
 
 	args := funcCall.ArgumentList()
-	if len(args) != 1 {
-		t.Fatalf("ArgumentList() len = %d, want 1", len(args))
+	if got, want := len(args), 1; got != want {
+		t.Fatalf("len(ArgumentList()) = %d, want %d", got, want)
 	}
 
-	// The argument should be a ColumnRef for "name"
-	colRef, ok := args[0].(*resolved_ast.ColumnRefNode)
-	if !ok {
-		t.Fatalf("ArgumentList()[0] type = %T, want *ColumnRefNode", args[0])
+	colRef := args[0].(*resolved_ast.ColumnRefNode)
+	if got, want := colRef.Column().GetName(), "name"; got != want {
+		t.Errorf("ArgumentList()[0].Column().Name = %q, want %q", got, want)
 	}
-	if got := colRef.Column().GetName(); got != "name" {
-		t.Errorf("ArgumentList()[0].Column().Name = %q, want %q", got, "name")
-	}
-}
-
-func TestResolvedAST_FunctionCall_Children_Walkable(t *testing.T) {
-	a := newTestAnalyzer(t)
-	cat := newUsersCatalog()
-	out := analyze(t, a, "SELECT UPPER(name) FROM users", cat)
-
-	stmt := out.ResolvedStatement()
-
-	// After parent flattening, Walk should find ColumnRefNode inside FunctionCall
-	var colRefs []*resolved_ast.ColumnRefNode
-	resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
-		if cr, ok := n.(*resolved_ast.ColumnRefNode); ok {
-			colRefs = append(colRefs, cr)
-		}
-		return nil
-	})
-
-	if len(colRefs) == 0 {
-		t.Fatal("no ColumnRefNode found via Walk — parent field flattening may not be working")
-	}
-
-	found := false
-	for _, cr := range colRefs {
-		if cr.Column().GetName() == "name" {
-			found = true
-			break
-		}
-	}
-	if !found {
-		t.Error("ColumnRefNode for column 'name' not found via Walk")
+	if got, want := colRef.Column().GetTableName(), "users"; got != want {
+		t.Errorf("ArgumentList()[0].Column().TableName = %q, want %q", got, want)
 	}
 }
 
-func TestResolvedAST_Walk_CollectsAllNodeKinds(t *testing.T) {
+func TestResolvedAST_Walk_NodeKinds(t *testing.T) {
 	a := newTestAnalyzer(t)
-	cat := newUsersCatalog()
-	out := analyze(t, a, "SELECT id, name FROM users WHERE id > 1", cat)
+	out := analyze(t, a, "SELECT id, name FROM users WHERE id > 1", newUsersCatalog())
 
-	stmt := out.ResolvedStatement()
-
-	kindSet := map[resolved_ast.Kind]bool{}
-	resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
-		kindSet[n.Kind()] = true
+	var kinds []resolved_ast.Kind
+	resolved_ast.Walk(out.ResolvedStatement(), func(n resolved_ast.Node) error {
+		kinds = append(kinds, n.Kind())
 		return nil
 	})
 
-	// This query should produce at minimum these node kinds
-	required := []resolved_ast.Kind{
+	wantKinds := []resolved_ast.Kind{
 		resolved_ast.KindQueryStmt,
 		resolved_ast.KindOutputColumn,
-		resolved_ast.KindTableScan,
+		resolved_ast.KindOutputColumn,
+		resolved_ast.KindProjectScan,
 		resolved_ast.KindFilterScan,
-		resolved_ast.KindFunctionCall, // WHERE id > 1
+		resolved_ast.KindTableScan,
+		resolved_ast.KindFunctionCall,
+		resolved_ast.KindColumnRef,
+		resolved_ast.KindLiteral,
 	}
-	for _, k := range required {
-		if !kindSet[k] {
-			t.Errorf("expected %v in Walk result, not found. Got kinds: %v", k, kindSet)
+	if got, want := len(kinds), len(wantKinds); got != want {
+		t.Fatalf("Walk visited %d nodes, want %d; got kinds: %v", got, want, kinds)
+	}
+	for i := range kinds {
+		if got, want := kinds[i], wantKinds[i]; got != want {
+			t.Errorf("kinds[%d] = %v, want %v", i, got, want)
 		}
 	}
 }
 
-func TestResolvedAST_ColumnRef_ViaComputedColumn(t *testing.T) {
+func TestResolvedAST_ColumnRef_WalkTraversal(t *testing.T) {
 	a := newTestAnalyzer(t)
-	cat := newUsersCatalog()
-	// SELECT id + 1 produces a ProjectScan with ComputedColumn whose Expr contains a ColumnRef.
-	// Note: FunctionCallNode currently does not expose parent-class children (ArgumentList),
-	// so we verify ColumnRef is reachable via ComputedColumn.Expr() → FunctionCall,
-	// and also verify direct ColumnRef for simple column projection.
-	out := analyze(t, a, "SELECT id FROM users", cat)
+	out := analyze(t, a, "SELECT UPPER(name) FROM users", newUsersCatalog())
 
-	stmt := out.ResolvedStatement().(*resolved_ast.QueryStmtNode)
+	colRefs := collectNodes[*resolved_ast.ColumnRefNode](out.ResolvedStatement())
 
-	// OutputColumn should reference a resolved column with correct metadata
-	cols := stmt.OutputColumnList()
-	if len(cols) != 1 {
-		t.Fatalf("OutputColumnList() len = %d, want 1", len(cols))
+	if got, want := len(colRefs), 1; got != want {
+		t.Fatalf("len(ColumnRefNodes) = %d, want %d", got, want)
 	}
-	col := cols[0].Column()
-	if col == nil {
-		t.Fatal("OutputColumn.Column() = nil")
+
+	if got, want := colRefs[0].Column().GetName(), "name"; got != want {
+		t.Errorf("ColumnRef.Column().Name = %q, want %q", got, want)
 	}
-	if got := col.GetName(); got != "id" {
-		t.Errorf("Column().Name = %q, want %q", got, "id")
+	if got, want := colRefs[0].Column().GetTableName(), "users"; got != want {
+		t.Errorf("ColumnRef.Column().TableName = %q, want %q", got, want)
 	}
-	if got := col.GetTableName(); got != "users" {
-		t.Errorf("Column().TableName = %q, want %q", got, "users")
-	}
-	if col.GetColumnId() == 0 {
-		t.Error("Column().ColumnId = 0, want nonzero")
+	if got, want := colRefs[0].IsCorrelated(), false; got != want {
+		t.Errorf("ColumnRef.IsCorrelated() = %v, want %v", got, want)
 	}
 }
