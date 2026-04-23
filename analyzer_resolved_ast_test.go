@@ -295,6 +295,66 @@ func TestResolvedAST_FunctionCall(t *testing.T) {
 	if got := funcCall.Kind(); got != resolved_ast.KindFunctionCall {
 		t.Errorf("Kind() = %v, want KindFunctionCall", got)
 	}
+
+	// Verify flattened parent fields are accessible
+	fnRef := funcCall.Function()
+	if fnRef == nil {
+		t.Fatal("Function() = nil")
+	}
+	if got := fnRef.GetName(); got != "ZetaSQL:upper" {
+		t.Errorf("Function().Name = %q, want %q", got, "ZetaSQL:upper")
+	}
+
+	sig := funcCall.Signature()
+	if sig == nil {
+		t.Error("Signature() = nil")
+	}
+
+	args := funcCall.ArgumentList()
+	if len(args) != 1 {
+		t.Fatalf("ArgumentList() len = %d, want 1", len(args))
+	}
+
+	// The argument should be a ColumnRef for "name"
+	colRef, ok := args[0].(*resolved_ast.ColumnRefNode)
+	if !ok {
+		t.Fatalf("ArgumentList()[0] type = %T, want *ColumnRefNode", args[0])
+	}
+	if got := colRef.Column().GetName(); got != "name" {
+		t.Errorf("ArgumentList()[0].Column().Name = %q, want %q", got, "name")
+	}
+}
+
+func TestResolvedAST_FunctionCall_Children_Walkable(t *testing.T) {
+	a := newTestAnalyzer(t)
+	cat := newUsersCatalog()
+	out := analyze(t, a, "SELECT UPPER(name) FROM users", cat)
+
+	stmt := out.ResolvedStatement()
+
+	// After parent flattening, Walk should find ColumnRefNode inside FunctionCall
+	var colRefs []*resolved_ast.ColumnRefNode
+	resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
+		if cr, ok := n.(*resolved_ast.ColumnRefNode); ok {
+			colRefs = append(colRefs, cr)
+		}
+		return nil
+	})
+
+	if len(colRefs) == 0 {
+		t.Fatal("no ColumnRefNode found via Walk — parent field flattening may not be working")
+	}
+
+	found := false
+	for _, cr := range colRefs {
+		if cr.Column().GetName() == "name" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("ColumnRefNode for column 'name' not found via Walk")
+	}
 }
 
 func TestResolvedAST_Walk_CollectsAllNodeKinds(t *testing.T) {
