@@ -1,0 +1,18 @@
+--- a/zetasql/resolved_ast/BUILD
++++ b/zetasql/resolved_ast/BUILD
+@@ -341,6 +341,7 @@
+
+ cc_proto_library(
+     name = "resolved_ast_cc_proto",
++    visibility = ["//visibility:public"],
+     deps = [":resolved_ast_proto"],
+ )
+
+@@ -362,6 +363,7 @@
+
+ cc_proto_library(
+     name = "serialization_cc_proto",
++    visibility = ["//visibility:public"],
+     deps = [":serialization_proto"],
+ )
+

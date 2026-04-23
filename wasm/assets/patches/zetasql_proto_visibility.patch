@@ -1,0 +1,18 @@
+--- a/zetasql/proto/BUILD
++++ b/zetasql/proto/BUILD
+@@ -37,6 +37,7 @@
+
+ cc_proto_library(
+     name = "options_cc_proto",
++    visibility = ["//visibility:public"],
+     deps = [":options_proto"],
+ )
+
+@@ -62,6 +63,7 @@
+
+ cc_proto_library(
+     name = "simple_catalog_cc_proto",
++    visibility = ["//visibility:public"],
+     deps = [":simple_catalog_proto"],
+ )
+
