@@ -10,6 +10,7 @@ cc_binary(
         "@zetasql//zetasql/public:analyzer",
         "@zetasql//zetasql/public:parse_resume_location",
         "@zetasql//zetasql/public:simple_catalog",
+        "@zetasql//zetasql/public:function",
         "@zetasql//zetasql/public:type",
         "@zetasql//zetasql/public:type_cc_proto",
         "@zetasql//zetasql/proto:simple_catalog_cc_proto",

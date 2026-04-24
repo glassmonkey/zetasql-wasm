@@ -10,6 +10,7 @@
 #include "zetasql/public/analyzer.h"
 #include "zetasql/public/simple_catalog.h"
 #include "zetasql/public/builtin_function_options.h"
+#include "zetasql/public/function.h"
 #include "zetasql/public/language_options.h"
 #include "zetasql/public/type.h"
 #include "zetasql/public/type.pb.h"
@@ -200,6 +201,25 @@ static void* pack_proto(const std::string& serialized) {
     return result;
 }
 
+// Helper: build FunctionArgumentType from proto
+static zetasql::FunctionArgumentType build_function_arg_type(
+    const zetasql::FunctionArgumentTypeProto& proto,
+    zetasql::TypeFactory* type_factory) {
+    auto kind = proto.kind();
+    if (kind == zetasql::ARG_TYPE_FIXED && proto.has_type()) {
+        const zetasql::Type* type = nullptr;
+        google::protobuf::DescriptorPool pool(
+            google::protobuf::DescriptorPool::generated_pool());
+        auto status = type_factory->DeserializeFromSelfContainedProto(
+            proto.type(), &pool, &type);
+        if (status.ok() && type != nullptr) {
+            return zetasql::FunctionArgumentType(type);
+        }
+    }
+    // Templated argument (ARG_TYPE_ANY_1, ARG_TYPE_ANY_2, etc.)
+    return zetasql::FunctionArgumentType(kind);
+}
+
 // Helper: build SimpleCatalog from proto
 static absl::Status build_catalog_from_proto(
     const zetasql::SimpleCatalogProto& catalog_proto,
@@ -248,6 +268,35 @@ static absl::Status build_catalog_from_proto(
         catalog->AddOwnedTable(table);
     }
 
+    // Add custom functions
+    for (const auto& fn_proto : catalog_proto.custom_function()) {
+        std::vector<std::string> name_path(
+            fn_proto.name_path().begin(), fn_proto.name_path().end());
+        std::string group = fn_proto.has_group() ? fn_proto.group() : "";
+        auto mode = static_cast<zetasql::Function::Mode>(fn_proto.mode());
+
+        std::vector<zetasql::FunctionSignature> signatures;
+        for (const auto& sig_proto : fn_proto.signature()) {
+            zetasql::FunctionArgumentType return_type =
+                build_function_arg_type(sig_proto.return_type(), type_factory);
+
+            zetasql::FunctionArgumentTypeList arguments;
+            for (const auto& arg_proto : sig_proto.argument()) {
+                arguments.push_back(
+                    build_function_arg_type(arg_proto, type_factory));
+            }
+
+            int64_t context_id = sig_proto.has_context_id()
+                ? sig_proto.context_id() : -1;
+            signatures.push_back(
+                zetasql::FunctionSignature(return_type, arguments, context_id));
+        }
+
+        auto* function = new zetasql::Function(
+            name_path, group, mode, signatures);
+        catalog->AddOwnedFunction(function);
+    }
+
     // Add sub-catalogs recursively
     for (const auto& sub_proto : catalog_proto.catalog()) {
         std::unique_ptr<zetasql::SimpleCatalog> sub_catalog;
@@ -272,12 +321,15 @@ void* analyze_statement_proto(const void* request_ptr, uint32_t request_size) {
         return pack_error("Failed to parse AnalyzeRequest proto");
     }
 
-    // Extract SQL statement
+    // Determine target type
+    bool is_next_statement = request.has_parse_resume_location();
     std::string sql;
     if (request.has_sql_statement()) {
         sql = request.sql_statement();
+    } else if (is_next_statement) {
+        sql = request.parse_resume_location().input();
     } else {
-        return pack_error("AnalyzeRequest must contain sql_statement");
+        return pack_error("AnalyzeRequest must contain sql_statement or parse_resume_location");
     }
 
     // Build TypeFactory (needed for catalog and analyzer)
@@ -310,9 +362,56 @@ void* analyze_statement_proto(const void* request_ptr, uint32_t request_size) {
         options.set_language(language_options);
     }
 
-    // Run AnalyzeStatement
+    // Set parse location record type if specified
+    if (request.has_options() && request.options().has_parse_location_record_type()) {
+        options.set_parse_location_record_type(
+            static_cast<zetasql::ParseLocationRecordType>(
+                request.options().parse_location_record_type()));
+    }
+
+    // Run analysis
     std::unique_ptr<const zetasql::AnalyzerOutput> output;
-    absl::Status status = zetasql::AnalyzeStatement(
+    absl::Status status;
+
+    if (is_next_statement) {
+        // Multi-statement: use AnalyzeNextStatement
+        zetasql::ParseResumeLocation resume_location =
+            zetasql::ParseResumeLocation::FromStringView(sql);
+        resume_location.set_byte_position(
+            request.parse_resume_location().byte_position());
+
+        bool at_end_of_input = false;
+        status = zetasql::AnalyzeNextStatement(
+            &resume_location, options, catalog.get(), &type_factory,
+            &output, &at_end_of_input);
+
+        if (!status.ok()) {
+            return pack_error(status.ToString());
+        }
+
+        // Serialize resolved AST to proto
+        zetasql::FileDescriptorSetMap file_descriptor_set_map;
+        zetasql::AnyResolvedStatementProto resolved_proto;
+        absl::Status save_status = output->resolved_statement()->SaveTo(
+            &file_descriptor_set_map, &resolved_proto);
+        if (!save_status.ok()) {
+            return pack_error("Failed to serialize resolved AST: " + save_status.ToString());
+        }
+
+        // Build AnalyzeResponse with resume position
+        zetasql::local_service::AnalyzeResponse response;
+        *response.mutable_resolved_statement() = resolved_proto;
+        response.set_resume_byte_position(resume_location.byte_position());
+
+        std::string serialized;
+        if (!response.SerializeToString(&serialized)) {
+            return pack_error("Failed to serialize AnalyzeResponse");
+        }
+        return pack_proto(serialized);
+    }
+
+    // Single statement: use AnalyzeStatement
+    status = zetasql::AnalyzeStatement(
         sql, options, catalog.get(), &type_factory, &output);
 
     if (!status.ok()) {
