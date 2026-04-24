@@ -1,11 +1,15 @@
 package catalog
 
-import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
+import (
+	"github.com/glassmonkey/zetasql-wasm/types"
+	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+)
 
 // SimpleCatalog represents a ZetaSQL catalog containing tables, functions, and sub-catalogs.
 type SimpleCatalog struct {
 	name           string
 	tables         []*SimpleTable
+	functions      []*types.Function
 	subCatalogs    []*SimpleCatalog
 	builtinOptions *generated.ZetaSQLBuiltinFunctionOptionsProto
 }
@@ -20,6 +24,11 @@ func (c *SimpleCatalog) Name() string { return c.name }
 // AddTable adds a table to this catalog.
 func (c *SimpleCatalog) AddTable(table *SimpleTable) {
 	c.tables = append(c.tables, table)
+}
+
+// AddFunction adds a custom function to this catalog.
+func (c *SimpleCatalog) AddFunction(fn *types.Function) {
+	c.functions = append(c.functions, fn)
 }
 
 // AddSubCatalog adds a nested catalog.
@@ -47,6 +56,9 @@ func (c *SimpleCatalog) ToProto() *generated.SimpleCatalogProto {
 	}
 	for _, sub := range c.subCatalogs {
 		p.Catalog = append(p.Catalog, sub.ToProto())
+	}
+	for _, fn := range c.functions {
+		p.CustomFunction = append(p.CustomFunction, fn.ToProto())
 	}
 	if c.builtinOptions != nil {
 		p.BuiltinFunctionOptions = c.builtinOptions
