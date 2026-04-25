@@ -30,8 +30,8 @@ func TestSimpleColumnToProto(t *testing.T) {
 			name: "pseudo column",
 			col: func() *SimpleColumn {
 				c := NewSimpleColumn("t", "_partition", types.Int64Type())
-				c.SetIsPseudoColumn(true)
-				c.SetIsWritable(false)
+				c.IsPseudoColumn = true
+				c.IsWritable = false
 				return c
 			}(),
 			want: &generated.SimpleColumnProto{

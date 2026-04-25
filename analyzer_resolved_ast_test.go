@@ -27,7 +27,7 @@ func newTestAnalyzer(t *testing.T) *Analyzer {
 func newUsersCatalog() *catalog.SimpleCatalog {
 	cat := catalog.NewSimpleCatalog("test")
 	cat.AddZetaSQLBuiltinFunctions(nil)
-	cat.AddTable(catalog.NewSimpleTable("users",
+	cat.Tables = append(cat.Tables, catalog.NewSimpleTable("users",
 		catalog.NewSimpleColumn("users", "id", types.Int64Type()),
 		catalog.NewSimpleColumn("users", "name", types.StringType()),
 	))
@@ -36,7 +36,7 @@ func newUsersCatalog() *catalog.SimpleCatalog {
 
 func newUsersOrdersCatalog() *catalog.SimpleCatalog {
 	cat := newUsersCatalog()
-	cat.AddTable(catalog.NewSimpleTable("orders",
+	cat.Tables = append(cat.Tables, catalog.NewSimpleTable("orders",
 		catalog.NewSimpleColumn("orders", "order_id", types.Int64Type()),
 		catalog.NewSimpleColumn("orders", "user_id", types.Int64Type()),
 		catalog.NewSimpleColumn("orders", "amount", types.Int64Type()),

@@ -216,7 +216,7 @@ func TestAnalyzer_AnalyzeStatement_CustomFunction(t *testing.T) {
 			for i := range argTypes {
 				argTypes[i] = types.NewFunctionArgumentType(types.Int64Type())
 			}
-			cat.AddFunction(types.NewFunction(
+			cat.Functions = append(cat.Functions, types.NewFunction(
 				[]string{tt.funcName},
 				tt.group,
 				types.ScalarMode,
@@ -290,7 +290,7 @@ func TestAnalyzer_AnalyzeStatement_TemplatedFunction(t *testing.T) {
 			// Arrange
 			cat := catalog.NewSimpleCatalog("test")
 			cat.AddZetaSQLBuiltinFunctions(nil)
-			cat.AddFunction(types.NewFunction(
+			cat.Functions = append(cat.Functions, types.NewFunction(
 				[]string{tt.funcName},
 				tt.group,
 				types.ScalarMode,

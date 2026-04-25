@@ -27,7 +27,7 @@ func TestSimpleCatalogToProto(t *testing.T) {
 			name: "catalog with table and builtins",
 			catalog: func() *SimpleCatalog {
 				cat := NewSimpleCatalog("main")
-				cat.AddTable(NewSimpleTable("users",
+				cat.Tables = append(cat.Tables, NewSimpleTable("users",
 					NewSimpleColumn("users", "id", types.Int64Type()),
 					NewSimpleColumn("users", "name", types.StringType()),
 				))
@@ -64,10 +64,10 @@ func TestSimpleCatalogToProto(t *testing.T) {
 			catalog: func() *SimpleCatalog {
 				root := NewSimpleCatalog("root")
 				sub := NewSimpleCatalog("schema1")
-				sub.AddTable(NewSimpleTable("t1",
+				sub.Tables = append(sub.Tables, NewSimpleTable("t1",
 					NewSimpleColumn("t1", "col", types.DoubleType()),
 				))
-				root.AddSubCatalog(sub)
+				root.SubCatalogs = append(root.SubCatalogs, sub)
 				return root
 			}(),
 			want: &generated.SimpleCatalogProto{

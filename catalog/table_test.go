@@ -108,9 +108,7 @@ func TestSimpleTableAddColumnToProto(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			table := NewSimpleTable("t")
-			for _, c := range tt.add {
-				table.AddColumn(c)
-			}
+			table.Columns = append(table.Columns, tt.add...)
 			assert.Empty(t, cmp.Diff(tt.want, table.ToProto(), protocmp.Transform()), "ToProto() mismatch")
 		})
 	}

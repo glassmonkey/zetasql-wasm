@@ -18,96 +18,96 @@ const (
 type SignatureArgumentKind = generated.SignatureArgumentKind
 
 // FunctionArgumentType represents a single function argument type.
+// Type is nil for templated arguments.
 type FunctionArgumentType struct {
-	kind generated.SignatureArgumentKind
-	typ  Type // nil for templated types
+	Kind generated.SignatureArgumentKind
+	Type Type
 }
 
 // NewFunctionArgumentType creates a fixed-type function argument.
 func NewFunctionArgumentType(typ Type) *FunctionArgumentType {
 	return &FunctionArgumentType{
-		kind: generated.SignatureArgumentKind_ARG_TYPE_FIXED,
-		typ:  typ,
+		Kind: generated.SignatureArgumentKind_ARG_TYPE_FIXED,
+		Type: typ,
 	}
 }
 
 // NewTemplatedFunctionArgumentType creates a templated function argument.
 func NewTemplatedFunctionArgumentType(kind generated.SignatureArgumentKind) *FunctionArgumentType {
-	return &FunctionArgumentType{kind: kind}
+	return &FunctionArgumentType{Kind: kind}
 }
 
 func (a *FunctionArgumentType) toProto() *generated.FunctionArgumentTypeProto {
+	kind := a.Kind
 	p := &generated.FunctionArgumentTypeProto{
-		Kind: &a.kind,
+		Kind: &kind,
 	}
-	if a.typ != nil {
-		p.Type = a.typ.ToProto()
+	if a.Type != nil {
+		p.Type = a.Type.ToProto()
 	}
 	return p
 }
 
 // FunctionSignature represents a function signature (return type + arguments).
 type FunctionSignature struct {
-	returnType *FunctionArgumentType
-	arguments  []*FunctionArgumentType
-	contextID  int64
+	ReturnType *FunctionArgumentType
+	Arguments  []*FunctionArgumentType
+	ContextID  int64
 }
 
 // NewFunctionSignature creates a new function signature.
 func NewFunctionSignature(ret *FunctionArgumentType, args []*FunctionArgumentType) *FunctionSignature {
 	return &FunctionSignature{
-		returnType: ret,
-		arguments:  args,
+		ReturnType: ret,
+		Arguments:  args,
 	}
-}
-
-// SetContextID sets the context ID for this signature.
-func (s *FunctionSignature) SetContextID(id int64) {
-	s.contextID = id
 }
 
 func (s *FunctionSignature) toProto() *generated.FunctionSignatureProto {
 	p := &generated.FunctionSignatureProto{}
-	if s.returnType != nil {
-		p.ReturnType = s.returnType.toProto()
+	if s.ReturnType != nil {
+		p.ReturnType = s.ReturnType.toProto()
 	}
-	for _, arg := range s.arguments {
+	for _, arg := range s.Arguments {
 		p.Argument = append(p.Argument, arg.toProto())
 	}
-	if s.contextID != 0 {
-		p.ContextId = &s.contextID
+	if s.ContextID != 0 {
+		ctxID := s.ContextID
+		p.ContextId = &ctxID
 	}
 	return p
 }
 
 // Function represents a ZetaSQL function with one or more signatures.
 type Function struct {
-	namePath   []string
-	group      string
-	mode       Mode
-	signatures []*FunctionSignature
+	NamePath   []string
+	Group      string
+	Mode       Mode
+	Signatures []*FunctionSignature
 }
 
 // NewFunction creates a new function.
 func NewFunction(namePath []string, group string, mode Mode, sigs []*FunctionSignature) *Function {
 	return &Function{
-		namePath:   namePath,
-		group:      group,
-		mode:       mode,
-		signatures: sigs,
+		NamePath:   namePath,
+		Group:      group,
+		Mode:       mode,
+		Signatures: sigs,
 	}
 }
 
 // ToProto converts the function to its protobuf representation.
 func (f *Function) ToProto() *generated.FunctionProto {
+	mode := f.Mode
 	p := &generated.FunctionProto{
-		NamePath: f.namePath,
-		Mode:     &f.mode,
+		NamePath: f.NamePath,
+		Mode:     &mode,
 	}
-	if f.group != "" {
-		p.Group = &f.group
+	if f.Group != "" {
+		group := f.Group
+		p.Group = &group
 	}
-	for _, sig := range f.signatures {
+	for _, sig := range f.Signatures {
 		p.Signature = append(p.Signature, sig.toProto())
 	}
 	return p
