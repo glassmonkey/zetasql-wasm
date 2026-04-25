@@ -15,9 +15,9 @@ func TestFunction_ToProto(t *testing.T) {
 		ScalarMode,
 		[]*FunctionSignature{
 			NewFunctionSignature(
-				NewFunctionArgumentType(Int64Type(), nil),
+				NewFunctionArgumentType(Int64Type()),
 				[]*FunctionArgumentType{
-					NewFunctionArgumentType(StringType(), nil),
+					NewFunctionArgumentType(StringType()),
 				},
 			),
 		},
@@ -48,9 +48,9 @@ func TestFunction_TemplatedArgument(t *testing.T) {
 		ScalarMode,
 		[]*FunctionSignature{
 			NewFunctionSignature(
-				NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1, nil),
+				NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1),
 				[]*FunctionArgumentType{
-					NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1, nil),
+					NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1),
 				},
 			),
 		},
@@ -70,12 +70,12 @@ func TestFunction_MultipleSignatures(t *testing.T) {
 		ScalarMode,
 		[]*FunctionSignature{
 			NewFunctionSignature(
-				NewFunctionArgumentType(Int64Type(), nil),
-				[]*FunctionArgumentType{NewFunctionArgumentType(Int64Type(), nil)},
+				NewFunctionArgumentType(Int64Type()),
+				[]*FunctionArgumentType{NewFunctionArgumentType(Int64Type())},
 			),
 			NewFunctionSignature(
-				NewFunctionArgumentType(StringType(), nil),
-				[]*FunctionArgumentType{NewFunctionArgumentType(StringType(), nil)},
+				NewFunctionArgumentType(StringType()),
+				[]*FunctionArgumentType{NewFunctionArgumentType(StringType())},
 			),
 		},
 	)
@@ -90,8 +90,8 @@ func TestFunction_AggregateMode(t *testing.T) {
 		AggregateMode,
 		[]*FunctionSignature{
 			NewFunctionSignature(
-				NewFunctionArgumentType(Int64Type(), nil),
-				[]*FunctionArgumentType{NewFunctionArgumentType(Int64Type(), nil)},
+				NewFunctionArgumentType(Int64Type()),
+				[]*FunctionArgumentType{NewFunctionArgumentType(Int64Type())},
 			),
 		},
 	)

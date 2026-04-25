@@ -214,7 +214,7 @@ func TestAnalyzer_AnalyzeStatement_CustomFunction(t *testing.T) {
 			cat.AddZetaSQLBuiltinFunctions(nil)
 			argTypes := make([]*types.FunctionArgumentType, tt.argCount)
 			for i := range argTypes {
-				argTypes[i] = types.NewFunctionArgumentType(types.Int64Type(), nil)
+				argTypes[i] = types.NewFunctionArgumentType(types.Int64Type())
 			}
 			cat.AddFunction(types.NewFunction(
 				[]string{tt.funcName},
@@ -222,7 +222,7 @@ func TestAnalyzer_AnalyzeStatement_CustomFunction(t *testing.T) {
 				types.ScalarMode,
 				[]*types.FunctionSignature{
 					types.NewFunctionSignature(
-						types.NewFunctionArgumentType(types.Int64Type(), nil),
+						types.NewFunctionArgumentType(types.Int64Type()),
 						argTypes,
 					),
 				},
@@ -296,9 +296,9 @@ func TestAnalyzer_AnalyzeStatement_TemplatedFunction(t *testing.T) {
 				types.ScalarMode,
 				[]*types.FunctionSignature{
 					types.NewFunctionSignature(
-						types.NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1, nil),
+						types.NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1),
 						[]*types.FunctionArgumentType{
-							types.NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1, nil),
+							types.NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1),
 						},
 					),
 				},

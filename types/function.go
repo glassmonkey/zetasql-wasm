@@ -17,47 +17,23 @@ const (
 // SignatureArgumentKind represents the kind of a function argument.
 type SignatureArgumentKind = generated.SignatureArgumentKind
 
-// FunctionArgumentTypeOptions configures optional properties of a function argument.
-type FunctionArgumentTypeOptions struct {
-	proto *generated.FunctionArgumentTypeOptionsProto
-}
-
-// NewFunctionArgumentTypeOptions creates default options.
-func NewFunctionArgumentTypeOptions() *FunctionArgumentTypeOptions {
-	return &FunctionArgumentTypeOptions{
-		proto: &generated.FunctionArgumentTypeOptionsProto{},
-	}
-}
-
-func (o *FunctionArgumentTypeOptions) toProto() *generated.FunctionArgumentTypeOptionsProto {
-	if o == nil {
-		return nil
-	}
-	return o.proto
-}
-
 // FunctionArgumentType represents a single function argument type.
 type FunctionArgumentType struct {
-	kind    generated.SignatureArgumentKind
-	typ     Type // nil for templated types
-	options *FunctionArgumentTypeOptions
+	kind generated.SignatureArgumentKind
+	typ  Type // nil for templated types
 }
 
 // NewFunctionArgumentType creates a fixed-type function argument.
-func NewFunctionArgumentType(typ Type, opts *FunctionArgumentTypeOptions) *FunctionArgumentType {
+func NewFunctionArgumentType(typ Type) *FunctionArgumentType {
 	return &FunctionArgumentType{
-		kind:    generated.SignatureArgumentKind_ARG_TYPE_FIXED,
-		typ:     typ,
-		options: opts,
+		kind: generated.SignatureArgumentKind_ARG_TYPE_FIXED,
+		typ:  typ,
 	}
 }
 
 // NewTemplatedFunctionArgumentType creates a templated function argument.
-func NewTemplatedFunctionArgumentType(kind generated.SignatureArgumentKind, opts *FunctionArgumentTypeOptions) *FunctionArgumentType {
-	return &FunctionArgumentType{
-		kind:    kind,
-		options: opts,
-	}
+func NewTemplatedFunctionArgumentType(kind generated.SignatureArgumentKind) *FunctionArgumentType {
+	return &FunctionArgumentType{kind: kind}
 }
 
 func (a *FunctionArgumentType) toProto() *generated.FunctionArgumentTypeProto {
@@ -66,9 +42,6 @@ func (a *FunctionArgumentType) toProto() *generated.FunctionArgumentTypeProto {
 	}
 	if a.typ != nil {
 		p.Type = a.typ.ToProto()
-	}
-	if a.options != nil {
-		p.Options = a.options.toProto()
 	}
 	return p
 }
