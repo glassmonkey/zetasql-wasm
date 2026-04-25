@@ -13,29 +13,6 @@ import (
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 )
 
-// init validates the WASM file structure
-func init() {
-	ctx := context.Background()
-	runtime := wazero.NewRuntime(ctx)
-	defer runtime.Close(ctx)
-
-	// Compile the WASM module to verify it's valid
-	compiled, err := runtime.CompileModule(ctx, wasm.ZetaSQLWasm)
-	if err != nil {
-		panic(fmt.Sprintf("failed to compile ZetaSQL WASM module: %v", err))
-	}
-	defer compiled.Close(ctx)
-
-	// Verify required functions are exported
-	requiredFuncs := []string{"init_module", "malloc", "free", "parse_statement_proto", "analyze_statement_proto", "free_proto_buffer"}
-	exports := compiled.ExportedFunctions()
-	for _, funcName := range requiredFuncs {
-		if _, ok := exports[funcName]; !ok {
-			panic(fmt.Sprintf("required WASM function '%s' not found in zetasql.wasm", funcName))
-		}
-	}
-}
-
 // Parser represents a ZetaSQL parser instance
 type Parser struct {
 	runtime wazero.Runtime
