@@ -3,9 +3,9 @@ package zetasql
 import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 
 // AnalyzerOptions configures the behavior of the ZetaSQL analyzer.
-// This is a minimal implementation for Phase 1; it will be extended in Phase 3.
 type AnalyzerOptions struct {
-	language *generated.LanguageOptionsProto
+	language                *LanguageOptions
+	parseLocationRecordType *generated.ParseLocationRecordType
 }
 
 // NewAnalyzerOptions creates AnalyzerOptions with default settings.
@@ -15,14 +15,22 @@ func NewAnalyzerOptions() *AnalyzerOptions {
 }
 
 // SetLanguageOptions sets the language options for analysis.
-func (o *AnalyzerOptions) SetLanguageOptions(lang *generated.LanguageOptionsProto) {
+func (o *AnalyzerOptions) SetLanguageOptions(lang *LanguageOptions) {
 	o.language = lang
+}
+
+// SetParseLocationRecordType sets how parse locations are recorded in the resolved AST.
+func (o *AnalyzerOptions) SetParseLocationRecordType(t generated.ParseLocationRecordType) {
+	o.parseLocationRecordType = &t
 }
 
 func (o *AnalyzerOptions) toProto() *generated.AnalyzerOptionsProto {
 	p := &generated.AnalyzerOptionsProto{}
 	if o.language != nil {
-		p.LanguageOptions = o.language
+		p.LanguageOptions = o.language.ToProto()
+	}
+	if o.parseLocationRecordType != nil {
+		p.ParseLocationRecordType = o.parseLocationRecordType
 	}
 	return p
 }

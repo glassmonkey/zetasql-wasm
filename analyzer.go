@@ -102,16 +102,68 @@ func (a *Analyzer) AnalyzeStatement(
 	cat *catalog.SimpleCatalog,
 	opts *AnalyzerOptions,
 ) (*AnalyzeOutput, error) {
-	if a.module == nil {
-		return nil, fmt.Errorf("analyzer is not initialized")
-	}
-
-	// Build AnalyzeRequest proto
 	request := &generated.AnalyzeRequest{
 		Target: &generated.AnalyzeRequest_SqlStatement{
 			SqlStatement: sql,
 		},
 	}
+	response, err := a.callAnalyze(ctx, request, cat, opts)
+	if err != nil {
+		return nil, err
+	}
+	return a.buildOutput(response)
+}
+
+// AnalyzeNextStatement analyzes the next statement from a multi-statement SQL string.
+// Returns the analysis output, whether more statements remain, and any error.
+// Call repeatedly with the same ParseResumeLocation until it returns false.
+func (a *Analyzer) AnalyzeNextStatement(
+	ctx context.Context,
+	loc *ParseResumeLocation,
+	cat *catalog.SimpleCatalog,
+	opts *AnalyzerOptions,
+) (*AnalyzeOutput, bool, error) {
+	allowResume := true
+	request := &generated.AnalyzeRequest{
+		Target: &generated.AnalyzeRequest_ParseResumeLocation{
+			ParseResumeLocation: &generated.ParseResumeLocationProto{
+				Input:        &loc.input,
+				BytePosition: &loc.bytePosition,
+				AllowResume:  &allowResume,
+			},
+		},
+	}
+	response, err := a.callAnalyze(ctx, request, cat, opts)
+	if err != nil {
+		return nil, false, err
+	}
+
+	// Update resume position
+	if response.ResumeBytePosition != nil {
+		loc.bytePosition = response.GetResumeBytePosition()
+	} else {
+		// No resume position means we consumed everything
+		loc.bytePosition = int32(len(loc.input))
+	}
+
+	output, err := a.buildOutput(response)
+	if err != nil {
+		return nil, false, err
+	}
+	return output, !loc.AtEnd(), nil
+}
+
+// callAnalyze sends an AnalyzeRequest to the WASM bridge and returns the response.
+func (a *Analyzer) callAnalyze(
+	ctx context.Context,
+	request *generated.AnalyzeRequest,
+	cat *catalog.SimpleCatalog,
+	opts *AnalyzerOptions,
+) (*generated.AnalyzeResponse, error) {
+	if a.module == nil {
+		return nil, fmt.Errorf("analyzer is not initialized")
+	}
+
 	if cat != nil {
 		request.SimpleCatalog = cat.ToProto()
 	}
@@ -119,19 +171,16 @@ func (a *Analyzer) AnalyzeStatement(
 		request.Options = opts.toProto()
 	}
 
-	// Serialize request to bytes
 	requestBytes, err := proto.Marshal(request)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal AnalyzeRequest: %w", err)
 	}
 
-	// Get exported WASM functions
 	mallocFn := a.module.ExportedFunction("malloc")
 	freeFn := a.module.ExportedFunction("free")
 	analyzeFn := a.module.ExportedFunction("analyze_statement_proto")
 	freeProtoBuffer := a.module.ExportedFunction("free_proto_buffer")
 
-	// Allocate WASM memory for request bytes
 	reqSize := uint64(len(requestBytes))
 	results, err := mallocFn.Call(ctx, reqSize)
 	if err != nil {
@@ -140,12 +189,10 @@ func (a *Analyzer) AnalyzeStatement(
 	reqPtr := results[0]
 	defer freeFn.Call(ctx, reqPtr)
 
-	// Write request bytes to WASM memory
 	if !a.module.Memory().Write(uint32(reqPtr), requestBytes) {
 		return nil, fmt.Errorf("failed to write request to WASM memory")
 	}
 
-	// Call analyze_statement_proto(request_ptr, request_size)
 	results, err = analyzeFn.Call(ctx, reqPtr, reqSize)
 	if err != nil {
 		return nil, fmt.Errorf("failed to call analyze function: %w", err)
@@ -153,9 +200,7 @@ func (a *Analyzer) AnalyzeStatement(
 	resultPtr := results[0]
 	defer freeProtoBuffer.Call(ctx, resultPtr)
 
-	// Read result: [uint32 size][data bytes]
 	mem := a.module.Memory()
-
 	sizeBytes, ok := mem.Read(uint32(resultPtr), 4)
 	if !ok {
 		return nil, fmt.Errorf("failed to read size from WASM memory")
@@ -167,19 +212,20 @@ func (a *Analyzer) AnalyzeStatement(
 		return nil, fmt.Errorf("failed to read data from WASM memory")
 	}
 
-	// Check if result is an error string
 	dataStr := string(dataBytes)
 	if len(dataStr) > 6 && dataStr[:6] == "Error:" {
 		return nil, &AnalyzeError{Message: dataStr[7:]}
 	}
 
-	// Deserialize AnalyzeResponse
 	response := &generated.AnalyzeResponse{}
 	if err := proto.Unmarshal(dataBytes, response); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal AnalyzeResponse: %w", err)
 	}
+	return response, nil
+}
 
-	// Convert proto to type-safe resolved AST node
+// buildOutput converts an AnalyzeResponse to a type-safe AnalyzeOutput.
+func (a *Analyzer) buildOutput(response *generated.AnalyzeResponse) (*AnalyzeOutput, error) {
 	stmtProto := response.GetResolvedStatement()
 	if stmtProto == nil {
 		return nil, fmt.Errorf("AnalyzeResponse contains no resolved statement")
@@ -192,7 +238,6 @@ func (a *Analyzer) AnalyzeStatement(
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert resolved statement: %w", err)
 	}
-
 	return &AnalyzeOutput{statement: stmt}, nil
 }
 
