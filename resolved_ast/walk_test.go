@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -45,20 +47,10 @@ func TestWalk_VisitsAllNodes(t *testing.T) {
 		kinds = append(kinds, n.Kind())
 		return nil
 	})
-	if err != nil {
-		t.Fatalf("Walk: %v", err)
-	}
+	require.NoError(t, err)
 
-	// QueryStmt -> OutputColumn, OutputColumn, SingleRowScan
 	want := []Kind{KindQueryStmt, KindOutputColumn, KindOutputColumn, KindSingleRowScan}
-	if len(kinds) != len(want) {
-		t.Fatalf("visited %d nodes, want %d: %v", len(kinds), len(want), kinds)
-	}
-	for i, k := range kinds {
-		if k != want[i] {
-			t.Errorf("kinds[%d] = %v, want %v", i, k, want[i])
-		}
-	}
+	assert.Equal(t, want, kinds)
 }
 
 func TestWalk_NilNode(t *testing.T) {
@@ -66,9 +58,7 @@ func TestWalk_NilNode(t *testing.T) {
 		t.Error("fn should not be called for nil node")
 		return nil
 	})
-	if err != nil {
-		t.Errorf("Walk(nil) = %v, want nil", err)
-	}
+	assert.NoError(t, err)
 }
 
 func TestWalk_EarlyStop(t *testing.T) {
@@ -83,43 +73,27 @@ func TestWalk_EarlyStop(t *testing.T) {
 		}
 		return nil
 	})
-	if !errors.Is(err, errStop) {
-		t.Errorf("Walk error = %v, want %v", err, errStop)
-	}
-	if count != 2 {
-		t.Errorf("visited %d nodes before stop, want 2", count)
-	}
+	assert.ErrorIs(t, err, errStop)
+	assert.Equal(t, 2, count)
 }
 
 func TestNumChildren_And_Child(t *testing.T) {
 	stmt := buildQueryStmt()
 
-	if got := stmt.NumChildren(); got != 3 {
-		t.Errorf("NumChildren() = %d, want 3", got)
-	}
+	assert.Equal(t, 3, stmt.NumChildren())
 
 	// First two children are OutputColumnNodes
 	for i := range 2 {
 		child := stmt.Child(i)
-		if child == nil {
-			t.Fatalf("Child(%d) = nil", i)
-		}
-		if _, ok := child.(*OutputColumnNode); !ok {
-			t.Errorf("Child(%d) type = %T, want *OutputColumnNode", i, child)
-		}
+		require.NotNil(t, child, "Child(%d)", i)
+		assert.IsType(t, &OutputColumnNode{}, child, "Child(%d)", i)
 	}
 
 	// Third child is the scan
 	scan := stmt.Child(2)
-	if scan == nil {
-		t.Fatal("Child(2) = nil")
-	}
-	if got := scan.Kind(); got != KindSingleRowScan {
-		t.Errorf("Child(2).Kind() = %v, want %v", got, KindSingleRowScan)
-	}
+	require.NotNil(t, scan)
+	assert.Equal(t, KindSingleRowScan, scan.Kind())
 
 	// Out of bounds
-	if got := stmt.Child(3); got != nil {
-		t.Errorf("Child(3) = %v, want nil", got)
-	}
+	assert.Nil(t, stmt.Child(3))
 }

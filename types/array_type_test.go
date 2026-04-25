@@ -5,6 +5,8 @@ import (
 
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
@@ -21,8 +23,10 @@ func TestArrayTypeErrors(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := NewArrayType(tt.elem)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("NewArrayType() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -58,9 +62,7 @@ func TestArrayTypeToProto(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			arr, _ := NewArrayType(tt.elem)
-			if diff := cmp.Diff(tt.want, arr.ToProto(), protocmp.Transform()); diff != "" {
-				t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
-			}
+			assert.Empty(t, cmp.Diff(tt.want, arr.ToProto(), protocmp.Transform()), "ToProto() mismatch")
 		})
 	}
 }
@@ -77,12 +79,8 @@ func TestArrayTypeRoundTrip(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			original, _ := NewArrayType(tt.elem)
 			restored, err := TypeFromProto(original.ToProto())
-			if err != nil {
-				t.Fatal(err)
-			}
-			if diff := cmp.Diff(original.ToProto(), restored.ToProto(), protocmp.Transform()); diff != "" {
-				t.Errorf("round-trip mismatch (-want +got):\n%s", diff)
-			}
+			require.NoError(t, err)
+			assert.Empty(t, cmp.Diff(original.ToProto(), restored.ToProto(), protocmp.Transform()), "round-trip mismatch")
 		})
 	}
 }
