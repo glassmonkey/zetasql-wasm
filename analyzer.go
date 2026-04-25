@@ -106,7 +106,7 @@ func (a *Analyzer) AnalyzeStatement(
 	if err != nil {
 		return nil, err
 	}
-	return a.buildOutput(response)
+	return buildOutput(response)
 }
 
 // AnalyzeNextStatement analyzes the next statement from a multi-statement SQL string.
@@ -141,7 +141,7 @@ func (a *Analyzer) AnalyzeNextStatement(
 		loc.BytePosition = int32(len(loc.Input))
 	}
 
-	output, err := a.buildOutput(response)
+	output, err := buildOutput(response)
 	if err != nil {
 		return nil, false, err
 	}
@@ -221,7 +221,7 @@ func (a *Analyzer) callAnalyze(
 }
 
 // buildOutput converts an AnalyzeResponse to a type-safe AnalyzeOutput.
-func (a *Analyzer) buildOutput(response *generated.AnalyzeResponse) (*AnalyzeOutput, error) {
+func buildOutput(response *generated.AnalyzeResponse) (*AnalyzeOutput, error) {
 	stmtProto := response.GetResolvedStatement()
 	if stmtProto == nil {
 		return nil, fmt.Errorf("AnalyzeResponse contains no resolved statement")
