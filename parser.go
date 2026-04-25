@@ -53,16 +53,8 @@ func (e *ParseError) Error() string {
 
 // Statement represents a successfully parsed SQL statement.
 type Statement struct {
-	sql  string
-	root ast.StatementNode
-}
-
-// SQL returns the original SQL string.
-func (s *Statement) SQL() string { return s.sql }
-
-// RootNode returns the root AST node of the parsed statement.
-func (s *Statement) RootNode() ast.StatementNode {
-	return s.root
+	SQL  string
+	Root ast.StatementNode
 }
 
 // NewParser creates a new ZetaSQL parser instance
@@ -187,8 +179,8 @@ func (p *Parser) ParseStatement(ctx context.Context, sql string) (*Statement, er
 	}
 
 	return &Statement{
-		sql:  sql,
-		root: root,
+		SQL:  sql,
+		Root: root,
 	}, nil
 }
 

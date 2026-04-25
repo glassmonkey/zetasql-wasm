@@ -1,30 +1,72 @@
 package zetasql
 
-import "testing"
+import (
+	"testing"
 
-func TestParseResumeLocation(t *testing.T) {
-	sql := "SELECT 1; SELECT 2"
-	loc := NewParseResumeLocation(sql)
+	"github.com/stretchr/testify/assert"
+)
 
-	if got, want := loc.Input(), sql; got != want {
-		t.Errorf("Input() = %q, want %q", got, want)
+func TestNewParseResumeLocation(t *testing.T) {
+	tests := []struct {
+		name string
+		sql  string
+		want *ParseResumeLocation
+	}{
+		{
+			name: "non-empty SQL",
+			sql:  "SELECT 1; SELECT 2",
+			want: &ParseResumeLocation{Input: "SELECT 1; SELECT 2", BytePosition: 0},
+		},
+		{
+			name: "single statement",
+			sql:  "SELECT 1",
+			want: &ParseResumeLocation{Input: "SELECT 1", BytePosition: 0},
+		},
 	}
-	if got, want := loc.BytePosition(), int32(0); got != want {
-		t.Errorf("BytePosition() = %d, want %d", got, want)
-	}
-	if got, want := loc.AtEnd(), false; got != want {
-		t.Errorf("AtEnd() = %v, want %v", got, want)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := NewParseResumeLocation
+
+			// Act
+			got := sut(tt.sql)
+
+			// Assert
+			assert.Equal(t, tt.want, got)
+		})
 	}
 }
 
-func TestParseResumeLocation_AtEnd(t *testing.T) {
-	sql := "SELECT 1"
-	loc := NewParseResumeLocation(sql)
+func TestParseResumeLocation_Reset(t *testing.T) {
+	tests := []struct {
+		name    string
+		initial *ParseResumeLocation
+		want    *ParseResumeLocation
+	}{
+		{
+			name:    "Reset from non-zero position",
+			initial: &ParseResumeLocation{Input: "SELECT 1; SELECT 2", BytePosition: 10},
+			want:    &ParseResumeLocation{Input: "SELECT 1; SELECT 2", BytePosition: 0},
+		},
+		{
+			name:    "Reset already at zero",
+			initial: &ParseResumeLocation{Input: "SELECT 1", BytePosition: 0},
+			want:    &ParseResumeLocation{Input: "SELECT 1", BytePosition: 0},
+		},
+	}
 
-	// Simulate consuming all input
-	loc.bytePosition = int32(len(sql))
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := tt.initial
 
-	if got, want := loc.AtEnd(), true; got != want {
-		t.Errorf("AtEnd() = %v, want %v", got, want)
+			// Act
+			sut.Reset()
+			got := sut
+
+			// Assert
+			assert.Equal(t, tt.want, got)
+		})
 	}
 }

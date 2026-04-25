@@ -27,12 +27,7 @@ func (e *AnalyzeError) Error() string {
 
 // AnalyzeOutput holds the result of a successful semantic analysis.
 type AnalyzeOutput struct {
-	statement resolved_ast.StatementNode
-}
-
-// ResolvedStatement returns the type-safe resolved AST statement node.
-func (o *AnalyzeOutput) ResolvedStatement() resolved_ast.StatementNode {
-	return o.statement
+	Statement resolved_ast.StatementNode
 }
 
 // Analyzer represents a ZetaSQL analyzer instance backed by WASM.
@@ -127,8 +122,8 @@ func (a *Analyzer) AnalyzeNextStatement(
 	request := &generated.AnalyzeRequest{
 		Target: &generated.AnalyzeRequest_ParseResumeLocation{
 			ParseResumeLocation: &generated.ParseResumeLocationProto{
-				Input:        &loc.input,
-				BytePosition: &loc.bytePosition,
+				Input:        &loc.Input,
+				BytePosition: &loc.BytePosition,
 				AllowResume:  &allowResume,
 			},
 		},
@@ -140,17 +135,18 @@ func (a *Analyzer) AnalyzeNextStatement(
 
 	// Update resume position
 	if response.ResumeBytePosition != nil {
-		loc.bytePosition = response.GetResumeBytePosition()
+		loc.BytePosition = response.GetResumeBytePosition()
 	} else {
 		// No resume position means we consumed everything
-		loc.bytePosition = int32(len(loc.input))
+		loc.BytePosition = int32(len(loc.Input))
 	}
 
 	output, err := a.buildOutput(response)
 	if err != nil {
 		return nil, false, err
 	}
-	return output, !loc.AtEnd(), nil
+	more := int(loc.BytePosition) < len(loc.Input)
+	return output, more, nil
 }
 
 // callAnalyze sends an AnalyzeRequest to the WASM bridge and returns the response.
@@ -238,7 +234,7 @@ func (a *Analyzer) buildOutput(response *generated.AnalyzeResponse) (*AnalyzeOut
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert resolved statement: %w", err)
 	}
-	return &AnalyzeOutput{statement: stmt}, nil
+	return &AnalyzeOutput{Statement: stmt}, nil
 }
 
 // Close releases resources used by the analyzer.
