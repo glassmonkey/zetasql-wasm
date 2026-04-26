@@ -24,7 +24,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
     KindSelect
       KindSelectList
         KindSelectColumn
-          KindIntLiteral
+          KindIntLiteral [1]
 `,
 		},
 		{
@@ -59,7 +59,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
         KindBinaryExpression
           KindPathExpression
             KindIdentifier [age]
-          KindIntLiteral
+          KindIntLiteral [20]
 `,
 		},
 		{
@@ -133,8 +133,8 @@ func TestParser_ParseStatement_AST(t *testing.T) {
             KindIdentifier [users]
     KindLimitOffset
       KindLimit
-        KindIntLiteral
-      KindIntLiteral
+        KindIntLiteral [10]
+      KindIntLiteral [5]
 `,
 		},
 		{
@@ -200,7 +200,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
             KindPathExpression
               KindIdentifier [COUNT]
             KindStar
-          KindIntLiteral
+          KindIntLiteral [1]
 `,
 		},
 		{
@@ -239,9 +239,9 @@ func TestParser_ParseStatement_AST(t *testing.T) {
           KindPathExpression
             KindIdentifier [id]
           KindInList
-            KindIntLiteral
-            KindIntLiteral
-            KindIntLiteral
+            KindIntLiteral [1]
+            KindIntLiteral [2]
+            KindIntLiteral [3]
           KindLocation
 `,
 		},
@@ -257,7 +257,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
             KindBinaryExpression
               KindPathExpression
                 KindIdentifier [id]
-              KindIntLiteral
+              KindIntLiteral [0]
             KindStringLiteral [a]
               KindStringLiteralComponent
             KindStringLiteral [b]
@@ -340,7 +340,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
         KindBinaryExpression
           KindPathExpression
             KindIdentifier [name]
-          KindNullLiteral
+          KindNullLiteral [NULL]
 `,
 		},
 		{
@@ -383,7 +383,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
             KindSelect
               KindSelectList
                 KindSelectColumn
-                  KindIntLiteral
+                  KindIntLiteral [1]
                   KindAlias
                     KindIdentifier [a]
     KindSelect
@@ -409,7 +409,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
             KindSelect
               KindSelectList
                 KindSelectColumn
-                  KindIntLiteral
+                  KindIntLiteral [1]
                   KindAlias
                     KindIdentifier [v]
       KindWithClauseEntry
@@ -422,7 +422,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
                   KindBinaryExpression
                     KindPathExpression
                       KindIdentifier [v]
-                    KindIntLiteral
+                    KindIntLiteral [2]
                   KindAlias
                     KindIdentifier [v]
               KindFromClause
@@ -448,9 +448,9 @@ func TestParser_ParseStatement_AST(t *testing.T) {
       KindSelectList
         KindSelectColumn
           KindArrayConstructor
-            KindIntLiteral
-            KindIntLiteral
-            KindIntLiteral
+            KindIntLiteral [1]
+            KindIntLiteral [2]
+            KindIntLiteral [3]
 `,
 		},
 		{
@@ -463,13 +463,13 @@ func TestParser_ParseStatement_AST(t *testing.T) {
         KindSelectColumn
           KindArrayElement
             KindArrayConstructor
-              KindIntLiteral
-              KindIntLiteral
-              KindIntLiteral
+              KindIntLiteral [10]
+              KindIntLiteral [20]
+              KindIntLiteral [30]
             KindFunctionCall
               KindPathExpression
                 KindIdentifier [OFFSET]
-              KindIntLiteral
+              KindIntLiteral [1]
             KindLocation
 `,
 		},
@@ -483,7 +483,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
         KindSelectColumn
           KindStructConstructorWithKeyword
             KindStructConstructorArg
-              KindIntLiteral
+              KindIntLiteral [1]
               KindAlias
                 KindIdentifier [a]
             KindStructConstructorArg
@@ -512,7 +512,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
                 KindSelectColumn
                   KindStructConstructorWithKeyword
                     KindStructConstructorArg
-                      KindIntLiteral
+                      KindIntLiteral [1]
                       KindAlias
                         KindIdentifier [a]
                   KindAlias
@@ -529,14 +529,14 @@ func TestParser_ParseStatement_AST(t *testing.T) {
     KindSelect
       KindSelectList
         KindSelectColumn
-          KindIntLiteral
+          KindIntLiteral [1]
       KindWhereClause
         KindExpressionSubquery
           KindQuery
             KindSelect
               KindSelectList
                 KindSelectColumn
-                  KindIntLiteral
+                  KindIntLiteral [1]
 `,
 		},
 		{
@@ -554,9 +554,9 @@ func TestParser_ParseStatement_AST(t *testing.T) {
           KindUnnestExpression
             KindExpressionWithOptAlias
               KindArrayConstructor
-                KindIntLiteral
-                KindIntLiteral
-                KindIntLiteral
+                KindIntLiteral [1]
+                KindIntLiteral [2]
+                KindIntLiteral [3]
           KindAlias
             KindIdentifier [v]
 `,
@@ -595,8 +595,8 @@ func TestParser_ParseStatement_AST(t *testing.T) {
           KindBetweenExpression
             KindPathExpression
               KindIdentifier [id]
-            KindIntLiteral
-            KindIntLiteral
+            KindIntLiteral [1]
+            KindIntLiteral [10]
             KindLocation
 `,
 		},

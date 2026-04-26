@@ -19,9 +19,32 @@ func TestNode_String(t *testing.T) {
 		want string
 	}{
 		{
-			name: "IntLiteral has no scalar suffix",
-			node: newIntLiteralNode(&generated.ASTIntLiteralProto{}),
-			want: "KindIntLiteral\n",
+			name: "IntLiteral emits [<image>]",
+			node: newIntLiteralNode(&generated.ASTIntLiteralProto{
+				Parent: &generated.ASTPrintableLeafProto{Image: ptr("42")},
+			}),
+			want: "KindIntLiteral [42]\n",
+		},
+		{
+			name: "FloatLiteral emits [<image>]",
+			node: newFloatLiteralNode(&generated.ASTFloatLiteralProto{
+				Parent: &generated.ASTPrintableLeafProto{Image: ptr("3.14")},
+			}),
+			want: "KindFloatLiteral [3.14]\n",
+		},
+		{
+			name: "BooleanLiteral emits [<image>]",
+			node: newBooleanLiteralNode(&generated.ASTBooleanLiteralProto{
+				Parent: &generated.ASTPrintableLeafProto{Image: ptr("true")},
+			}),
+			want: "KindBooleanLiteral [true]\n",
+		},
+		{
+			name: "NullLiteral emits [<image>]",
+			node: newNullLiteralNode(&generated.ASTNullLiteralProto{
+				Parent: &generated.ASTPrintableLeafProto{Image: ptr("NULL")},
+			}),
+			want: "KindNullLiteral [NULL]\n",
 		},
 		{
 			name: "Identifier emits [<id>]",
