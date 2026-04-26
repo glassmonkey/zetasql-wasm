@@ -1,7 +1,6 @@
 package zetasql
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,12 +11,6 @@ import (
 // String() representation defined in package ast. Triangulated across
 // multiple SQL shapes.
 func TestParser_ParseStatement_AST(t *testing.T) {
-	// Arrange (shared)
-	ctx := context.Background()
-	parser, err := NewParser(ctx)
-	require.NoError(t, err)
-	defer parser.Close(ctx)
-
 	tests := []struct {
 		name string
 		sql  string
@@ -93,7 +86,8 @@ func TestParser_ParseStatement_AST(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
-			sut := parser
+			ctx := t.Context()
+			sut := newTestParser(t)
 
 			// Act
 			parsed, err := sut.ParseStatement(ctx, tt.sql)
@@ -109,12 +103,6 @@ func TestParser_ParseStatement_AST(t *testing.T) {
 // TestParser_ParseStatement_Errors verifies that invalid SQL yields the
 // expected error type. wantErr is a type witness compared via assert.IsType.
 func TestParser_ParseStatement_Errors(t *testing.T) {
-	// Arrange (shared)
-	ctx := context.Background()
-	parser, err := NewParser(ctx)
-	require.NoError(t, err)
-	defer parser.Close(ctx)
-
 	tests := []struct {
 		name    string
 		sql     string
@@ -127,7 +115,8 @@ func TestParser_ParseStatement_Errors(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
-			sut := parser
+			ctx := t.Context()
+			sut := newTestParser(t)
 
 			// Act
 			_, got := sut.ParseStatement(ctx, tt.sql)
