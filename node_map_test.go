@@ -24,7 +24,6 @@ func analyzeWithLocations(t *testing.T, a *Analyzer, sql string) *AnalyzeOutput 
 // [start, end) byte range. The got is the node returned by NodeAt; want
 // is the same node found via tree walk (identity check via Same).
 func TestNodeMap_NodeAt(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name     string
 		sql      string
@@ -41,7 +40,6 @@ func TestNodeMap_NodeAt(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			// Arrange
 			a := newTestAnalyzer(t)
 			out := analyzeWithLocations(t, a, tt.sql)
@@ -62,7 +60,6 @@ func TestNodeMap_NodeAt(t *testing.T) {
 // only nodes fully contained in [start, end). The got is the sorted slice
 // of node Kinds returned; want is the expected list.
 func TestNodeMap_NodesInRange_Containment(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name  string
 		sql   string
@@ -86,7 +83,6 @@ func TestNodeMap_NodesInRange_Containment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			// Arrange
 			a := newTestAnalyzer(t)
 			out := analyzeWithLocations(t, a, tt.sql)
@@ -105,7 +101,6 @@ func TestNodeMap_NodesInRange_Containment(t *testing.T) {
 // TestNodeMap_RequiresParseLocationRecordType verifies that without
 // PARSE_LOCATION_RECORD_FULL_NODE_SCOPE, the NodeMap is empty.
 func TestNodeMap_RequiresParseLocationRecordType(t *testing.T) {
-	t.Parallel()
 	// Arrange
 	a := newTestAnalyzer(t)
 	opts := &AnalyzerOptions{} // deliberately omit ParseLocationRecordType
@@ -124,7 +119,6 @@ func TestNodeMap_RequiresParseLocationRecordType(t *testing.T) {
 // TestNodeMap_NonExistentPosition verifies that lookups outside any node's
 // range return nil for NodeAt and an empty slice for NodesInRange.
 func TestNodeMap_NonExistentPosition(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name  string
 		check func(*NodeMap) any
@@ -149,7 +143,6 @@ func TestNodeMap_NonExistentPosition(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			// Arrange
 			a := newTestAnalyzer(t)
 			out := analyzeWithLocations(t, a, "SELECT 1")

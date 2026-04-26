@@ -12,7 +12,6 @@ import (
 // across distinct error messages and across non-error buffers that should
 // not be interpreted as errors.
 func TestParseResultMessage(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name string
 		data []byte
@@ -51,7 +50,6 @@ func TestParseResultMessage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			// Arrange
 			sut := ParseResultMessage
 

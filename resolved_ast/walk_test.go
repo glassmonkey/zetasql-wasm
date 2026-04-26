@@ -40,7 +40,6 @@ func buildQueryStmt() *QueryStmtNode {
 }
 
 func TestWalk_VisitsAllNodes(t *testing.T) {
-	t.Parallel()
 	stmt := buildQueryStmt()
 
 	var kinds []Kind
@@ -55,7 +54,6 @@ func TestWalk_VisitsAllNodes(t *testing.T) {
 }
 
 func TestWalk_NilNode(t *testing.T) {
-	t.Parallel()
 	err := Walk(nil, func(n Node) error {
 		t.Error("fn should not be called for nil node")
 		return nil
@@ -64,7 +62,6 @@ func TestWalk_NilNode(t *testing.T) {
 }
 
 func TestWalk_EarlyStop(t *testing.T) {
-	t.Parallel()
 	stmt := buildQueryStmt()
 	errStop := errors.New("stop")
 
@@ -81,7 +78,6 @@ func TestWalk_EarlyStop(t *testing.T) {
 }
 
 func TestNumChildren_And_Child(t *testing.T) {
-	t.Parallel()
 	stmt := buildQueryStmt()
 
 	assert.Equal(t, 3, stmt.NumChildren())

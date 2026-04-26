@@ -11,7 +11,6 @@ import (
 )
 
 func TestFunction_ToProto(t *testing.T) {
-	t.Parallel()
 	fn := NewFunction(
 		[]string{"my_func"},
 		"custom",
@@ -45,7 +44,6 @@ func TestFunction_ToProto(t *testing.T) {
 }
 
 func TestFunction_TemplatedArgument(t *testing.T) {
-	t.Parallel()
 	fn := NewFunction(
 		[]string{"identity"},
 		"custom",
@@ -68,7 +66,6 @@ func TestFunction_TemplatedArgument(t *testing.T) {
 }
 
 func TestFunction_MultipleSignatures(t *testing.T) {
-	t.Parallel()
 	fn := NewFunction(
 		[]string{"overloaded"},
 		"custom",
@@ -143,7 +140,6 @@ func TestFunctionArgumentType_toProto_Options(t *testing.T) {
 }
 
 func TestFunction_AggregateMode(t *testing.T) {
-	t.Parallel()
 	fn := NewFunction(
 		[]string{"my_sum"},
 		"custom",
