@@ -5,7 +5,8 @@ description: >
   the project's test conventions: SUT/got/want pattern, testify as the
   assertion implementation, AAA structure, table-driven triangulation,
   payload structs defined on the production side, no getters in tests,
-  wantErr type witness, minimal helpers. Use this skill whenever the user
+  wantErr type witness, minimal helpers, behavior over internal state
+  (per xUnit Test Patterns). Use this skill whenever the user
   says "write a test", "add a test for X", "review my tests", "look at this
   test code", "do my tests follow the conventions?", "improve these tests",
   "refactor these tests", or opens a *_test.go file with intent to author
@@ -22,7 +23,7 @@ This skill covers two modes:
 - **Author mode**: writing a new test from scratch (typically called from the `tdd` cycle).
 - **Review mode**: reading an existing test against the rules and producing a structured report with concrete fixes.
 
-The same R1–R11 rule set governs both.
+The same R1–R12 rule set governs both.
 
 ## Underlying principle: testify is the test implementation
 
@@ -166,6 +167,39 @@ func formatNode(n resolved_ast.Node) string {
 
 **Why**: Production code shouldn't carry weight that only tests use. Consult `developer` if a real production-side change would clean things up instead.
 
+### R12: Test behavior, not internal state or construction
+
+A test must assert on something **observable from outside the SUT** that the SUT is contractually responsible for producing. Tests that only assert on internal state with no behavioral consequence — or on the result of a constructor that merely assigns fields — are not earning their keep.
+
+**Reference**: Meszaros, *xUnit Test Patterns*, specifically:
+- *State Verification* vs *Behavior Verification* — both are valid, but each requires the asserted property to be **observable** (a return value, an effect on a collaborator, a serialized output). Asserting on a private/public field that the SUT just stored verbatim is neither.
+- *Sensitive Equality* (smell) — an assertion that compares more detail than the test cares about. Includes "comparing the entire internal state of the SUT" when only a subset is part of the contract.
+- *Fragile Test* (smell, caused by *Overspecified Software*) — a test that breaks on harmless refactors because it locked in an implementation detail.
+- *Goals of Test Automation* — tests must reduce risk and survive refactors. A test that breaks on every internal rename without flagging a real regression has negative value.
+
+**What is *not* worth testing on its own**:
+
+| Pattern | Why it's not behavior |
+|---|---|
+| `TestNewX` that asserts `&X{Field: v}` was set up | tests Go's struct-literal assignment, not the SUT |
+| `TestSetX` / `TestEnableX` for a method whose body is `o.Field = v` (or `m[k] = true`) | tests Go's `=` / map insertion |
+| A test that the package's internal lookup table contains entry "foo" | the higher-level methods that *use* the entry already exercise it; missing entries make those tests fail |
+| `assert.Equal(sql, stmt.SQL)` when `ParseStatement` does `&Statement{SQL: sql, Root: root}` | pure passthrough — no transformation, no validation, no logic |
+
+**What *is* behavior worth testing** (each has a logic surface that can break independently of "Go assigned a value"):
+
+- A method whose result depends on input transformation, filtering, validation, or aggregation
+- An invariant maintained across multiple fields (e.g., `SetSupportsAllStatementKinds` must clear `StatementKinds`)
+- ToProto / FromProto serialization (boundary cases: nil, empty, deeply nested)
+- Validation that returns an error for malformed input
+- Method side effects on collaborators (analyzer + options + catalog → analysis result)
+
+**Heuristic** (the "given/when/then" test):
+
+Phrase the test as "given <input>, when <SUT call>, then <observable result>". If `<observable result>` reduces to "the field I just set has the value I set" or "the lookup table I built has the entry I added", the test is verifying Go itself — delete it. The behavior, if any, is exercised by the next-level test that *uses* the field/entry.
+
+**Why**: Without this filter, the test suite grows to mirror the implementation rather than the contract. Every refactor (renaming a field, swapping `Features` from `map` to `[]LanguageFeature`, dropping a redundant export check) breaks tests that aren't flagging real regressions, which conditions everyone to either skip the failing tests or skip the refactor. Both outcomes are worse than not having the test.
+
 ## Author mode (writing a new test)
 
 Use this when invoked from the `tdd` cycle (Step 2: red) or when the user asks "write a test for X".
@@ -281,10 +315,11 @@ If multiple files are reviewed, separate by file. If a file has no violations, s
 ### Step 5: Suggest priority
 
 When violations are numerous, indicate fix order:
-1. **R3 (one assert per got)**: design-level, fix first
-2. **R6 (test-side payload struct)**: structural
-3. **R2 (SUT/got/want)**: clarifies structure
-4. Format-level (R1, R4) last
+1. **R12 (behavior, not internal state)**: deletes whole tests that should not exist — fix first so subsequent rules apply to the right surface
+2. **R3 (one assert per got)**: design-level
+3. **R6 (test-side payload struct)**: structural
+4. **R2 (SUT/got/want)**: clarifies structure
+5. Format-level (R1, R4) last
 
 ### Review etiquette
 
@@ -339,6 +374,34 @@ func summary(n Node) string {
 assert.Equal(t, sql, stmt.SQL())
 ```
 → Violates R7. Use direct field access (`stmt.SQL`) and remove the getter (a `developer` concern).
+
+### AP5: Asserting on internal state with no behavioral consequence
+```go
+// bad — testing Go's map assignment
+sut := NewLanguageOptions()
+sut.EnableLanguageFeature(generated.LanguageFeature_FEATURE_TABLESAMPLE)
+assert.True(t, sut.Features[generated.LanguageFeature_FEATURE_TABLESAMPLE])
+
+// bad — testing that an export exists, when behavior tests already exercise it
+exports := compiledModule.ExportedFunctions()
+_, ok := exports["parse_statement_proto"]
+assert.True(t, ok)
+
+// bad — testing that &X{Field: v} assigned the field
+got := NewParseResumeLocation("SELECT 1")
+assert.Equal(t, &ParseResumeLocation{Input: "SELECT 1"}, got)
+```
+→ Violates R12. Each of these is *Sensitive Equality* + *Fragile Test* (Meszaros): the assertion locks in an implementation detail (storage layout, export-list shape, struct-literal mechanics) without verifying any contract that callers depend on. The behavior path — features take effect through the analyzer, exports are reachable through `Parser.ParseStatement`, the resume location is consumed by `AnalyzeNextStatement` — is what the test should target. Delete and rely on the integration/behavior test that exercises the same code path with an observable result.
+
+### AP6: Testing a constructor directly
+```go
+// bad
+func TestNewAnalyzerOptions(t *testing.T) {
+    got := NewAnalyzerOptions()
+    assert.Equal(t, &AnalyzerOptions{}, got)
+}
+```
+→ Violates R12. A constructor whose body is `return &X{...}` has no behavior beyond Go's struct literal. The constructor stays in production as ergonomic call-site sugar (`developer` AP2 distinguishes "useful constructor" from "noise constructor"), but the constructor itself is not the SUT — the SUT is whatever method consumes the constructed value. Test that method.
 
 ## How this skill interacts with others
 
