@@ -6,6 +6,7 @@ import (
 	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
@@ -29,8 +30,8 @@ func TestSimpleColumnToProto(t *testing.T) {
 			name: "pseudo column",
 			col: func() *SimpleColumn {
 				c := NewSimpleColumn("t", "_partition", types.Int64Type())
-				c.SetIsPseudoColumn(true)
-				c.SetIsWritable(false)
+				c.IsPseudoColumn = true
+				c.IsWritable = false
 				return c
 			}(),
 			want: &generated.SimpleColumnProto{
@@ -43,9 +44,7 @@ func TestSimpleColumnToProto(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if diff := cmp.Diff(tt.want, tt.col.ToProto(), protocmp.Transform()); diff != "" {
-				t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
-			}
+			assert.Empty(t, cmp.Diff(tt.want, tt.col.ToProto(), protocmp.Transform()), "ToProto() mismatch")
 		})
 	}
 }
@@ -59,9 +58,7 @@ func TestSimpleColumnFullName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		c := NewSimpleColumn(tt.table, tt.col, types.Int64Type())
-		if got := c.FullName(); got != tt.want {
-			t.Errorf("FullName() = %q, want %q", got, tt.want)
-		}
+		assert.Equal(t, tt.want, c.FullName())
 	}
 }
 

@@ -1,6 +1,10 @@
 package types
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestTypeKindIsSimple(t *testing.T) {
 	tests := []struct {
@@ -16,8 +20,6 @@ func TestTypeKindIsSimple(t *testing.T) {
 		{Struct, false},
 	}
 	for _, tt := range tests {
-		if got := tt.kind.IsSimple(); got != tt.want {
-			t.Errorf("%v.IsSimple() = %v, want %v", tt.kind, got, tt.want)
-		}
+		assert.Equal(t, tt.want, tt.kind.IsSimple(), "%v.IsSimple()", tt.kind)
 	}
 }

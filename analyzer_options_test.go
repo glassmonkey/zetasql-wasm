@@ -4,29 +4,135 @@ import (
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
-func TestAnalyzerOptions_SetParseLocationRecordType(t *testing.T) {
-	opts := NewAnalyzerOptions()
-	opts.SetParseLocationRecordType(generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE)
+func TestAnalyzerOptions_toProto(t *testing.T) {
+	fullScope := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE
+	codeSearch := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_CODE_SEARCH
 
-	proto := opts.toProto()
-	if proto.ParseLocationRecordType == nil {
-		t.Fatal("ParseLocationRecordType = nil")
+	tests := []struct {
+		name string
+		opts *AnalyzerOptions
+		want *generated.AnalyzerOptionsProto
+	}{
+		{
+			name: "default options yield empty proto",
+			opts: NewAnalyzerOptions(),
+			want: &generated.AnalyzerOptionsProto{},
+		},
+		{
+			name: "ParseLocationRecordType FULL_NODE_SCOPE is propagated",
+			opts: &AnalyzerOptions{ParseLocationRecordType: &fullScope},
+			want: &generated.AnalyzerOptionsProto{ParseLocationRecordType: &fullScope},
+		},
+		{
+			name: "ParseLocationRecordType CODE_SEARCH is propagated",
+			opts: &AnalyzerOptions{ParseLocationRecordType: &codeSearch},
+			want: &generated.AnalyzerOptionsProto{ParseLocationRecordType: &codeSearch},
+		},
 	}
-	if got, want := *proto.ParseLocationRecordType, generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE; got != want {
-		t.Errorf("ParseLocationRecordType = %v, want %v", got, want)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := tt.opts
+
+			// Act
+			got := sut.toProto()
+
+			// Assert
+			assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform()))
+		})
 	}
 }
 
-func TestAnalyzerOptions_DefaultNilFields(t *testing.T) {
-	opts := NewAnalyzerOptions()
-	proto := opts.toProto()
+// TestAnalyzerOptions_Clone verifies that Clone returns a deep copy whose
+// fields equal the original by value. Pointer-independence is checked in a
+// separate test so each behaviour has a single observable assertion.
+func TestAnalyzerOptions_Clone(t *testing.T) {
+	fullScope := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE
 
-	if proto.LanguageOptions != nil {
-		t.Errorf("LanguageOptions = %v, want nil", proto.LanguageOptions)
+	tests := []struct {
+		name string
+		opts *AnalyzerOptions
+		want *AnalyzerOptions
+	}{
+		{
+			name: "empty options clone equals empty options",
+			opts: &AnalyzerOptions{},
+			want: &AnalyzerOptions{},
+		},
+		{
+			name: "populated options clone equals original by value",
+			opts: &AnalyzerOptions{
+				Language: &LanguageOptions{
+					Features: map[generated.LanguageFeature]bool{
+						generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS: true,
+					},
+					StatementKinds: []generated.ResolvedNodeKind{generated.ResolvedNodeKind_RESOLVED_QUERY_STMT},
+					AllStatements:  false,
+					Keywords:       map[string]bool{"QUALIFY": true},
+				},
+				ParseLocationRecordType: &fullScope,
+			},
+			want: &AnalyzerOptions{
+				Language: &LanguageOptions{
+					Features: map[generated.LanguageFeature]bool{
+						generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS: true,
+					},
+					StatementKinds: []generated.ResolvedNodeKind{generated.ResolvedNodeKind_RESOLVED_QUERY_STMT},
+					AllStatements:  false,
+					Keywords:       map[string]bool{"QUALIFY": true},
+				},
+				ParseLocationRecordType: &fullScope,
+			},
+		},
 	}
-	if proto.ParseLocationRecordType != nil {
-		t.Errorf("ParseLocationRecordType = %v, want nil", proto.ParseLocationRecordType)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := tt.opts
+
+			// Act
+			got := sut.Clone()
+
+			// Assert
+			assert.Equal(t, tt.want, got)
+		})
 	}
+}
+
+// TestAnalyzerOptions_Clone_doesNotShareLanguagePointer verifies that the
+// Clone method produces an AnalyzerOptions whose Language field is a distinct
+// pointer from the original — mutating the clone's Language must not leak
+// into the original.
+func TestAnalyzerOptions_Clone_doesNotShareLanguagePointer(t *testing.T) {
+	// Arrange
+	sut := &AnalyzerOptions{
+		Language: &LanguageOptions{
+			Features: map[generated.LanguageFeature]bool{
+				generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS: true,
+			},
+			Keywords: map[string]bool{"QUALIFY": true},
+		},
+	}
+
+	// Act
+	clone := sut.Clone()
+	clone.Language.Features[generated.LanguageFeature_FEATURE_TABLESAMPLE] = true
+	clone.Language.Keywords["OFFSET"] = true
+	got := sut.Language
+
+	// Assert
+	want := &LanguageOptions{
+		Features: map[generated.LanguageFeature]bool{
+			generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS: true,
+		},
+		Keywords: map[string]bool{"QUALIFY": true},
+	}
+	assert.Equal(t, want, got)
 }

@@ -7,39 +7,36 @@ import (
 
 // SimpleColumn represents a column in a ZetaSQL table.
 type SimpleColumn struct {
-	tableName      string
-	name           string
-	typ            types.Type
-	isPseudoColumn bool
-	isWritable     bool
+	TableName      string
+	Name           string
+	Type           types.Type
+	IsPseudoColumn bool
+	IsWritable     bool
 }
 
-// NewSimpleColumn creates a SimpleColumn with the given table name, column name, and type.
+// NewSimpleColumn creates a SimpleColumn with the given table name, column
+// name, and type. IsWritable defaults to true to match ZetaSQL's expectation
+// that ordinary columns can be written.
 func NewSimpleColumn(tableName, name string, typ types.Type) *SimpleColumn {
 	return &SimpleColumn{
-		tableName:  tableName,
-		name:       name,
-		typ:        typ,
-		isWritable: true,
+		TableName:  tableName,
+		Name:       name,
+		Type:       typ,
+		IsWritable: true,
 	}
 }
 
-func (c *SimpleColumn) Name() string     { return c.name }
-func (c *SimpleColumn) FullName() string { return c.tableName + "." + c.name }
-func (c *SimpleColumn) Type() types.Type { return c.typ }
-func (c *SimpleColumn) IsPseudoColumn() bool     { return c.isPseudoColumn }
-func (c *SimpleColumn) SetIsPseudoColumn(v bool)  { c.isPseudoColumn = v }
-func (c *SimpleColumn) IsWritable() bool          { return c.isWritable }
-func (c *SimpleColumn) SetIsWritable(v bool)      { c.isWritable = v }
+// FullName returns "<TableName>.<Name>".
+func (c *SimpleColumn) FullName() string { return c.TableName + "." + c.Name }
 
 // ToProto serializes this column to a SimpleColumnProto.
 func (c *SimpleColumn) ToProto() *generated.SimpleColumnProto {
-	name := c.name
-	isPseudo := c.isPseudoColumn
-	isWritable := c.isWritable
+	name := c.Name
+	isPseudo := c.IsPseudoColumn
+	isWritable := c.IsWritable
 	return &generated.SimpleColumnProto{
 		Name:             &name,
-		Type:             c.typ.ToProto(),
+		Type:             c.Type.ToProto(),
 		IsPseudoColumn:   &isPseudo,
 		IsWritableColumn: &isWritable,
 	}

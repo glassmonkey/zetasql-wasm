@@ -4,33 +4,38 @@ import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 
 // AnalyzerOptions configures the behavior of the ZetaSQL analyzer.
 type AnalyzerOptions struct {
-	language                *LanguageOptions
-	parseLocationRecordType *generated.ParseLocationRecordType
+	Language                *LanguageOptions
+	ParseLocationRecordType *generated.ParseLocationRecordType
 }
 
 // NewAnalyzerOptions creates AnalyzerOptions with default settings.
-// By default, all statement kinds are supported.
 func NewAnalyzerOptions() *AnalyzerOptions {
 	return &AnalyzerOptions{}
 }
 
-// SetLanguageOptions sets the language options for analysis.
-func (o *AnalyzerOptions) SetLanguageOptions(lang *LanguageOptions) {
-	o.language = lang
-}
-
-// SetParseLocationRecordType sets how parse locations are recorded in the resolved AST.
-func (o *AnalyzerOptions) SetParseLocationRecordType(t generated.ParseLocationRecordType) {
-	o.parseLocationRecordType = &t
+// Clone returns a deep copy of the AnalyzerOptions. The returned value
+// shares no pointer state with the receiver: Language is deep-copied, and
+// ParseLocationRecordType is duplicated so that mutations of either side
+// do not leak across.
+func (o *AnalyzerOptions) Clone() *AnalyzerOptions {
+	clone := &AnalyzerOptions{}
+	if o.Language != nil {
+		clone.Language = o.Language.clone()
+	}
+	if o.ParseLocationRecordType != nil {
+		v := *o.ParseLocationRecordType
+		clone.ParseLocationRecordType = &v
+	}
+	return clone
 }
 
 func (o *AnalyzerOptions) toProto() *generated.AnalyzerOptionsProto {
 	p := &generated.AnalyzerOptionsProto{}
-	if o.language != nil {
-		p.LanguageOptions = o.language.ToProto()
+	if o.Language != nil {
+		p.LanguageOptions = o.Language.toProto()
 	}
-	if o.parseLocationRecordType != nil {
-		p.ParseLocationRecordType = o.parseLocationRecordType
+	if o.ParseLocationRecordType != nil {
+		p.ParseLocationRecordType = o.ParseLocationRecordType
 	}
 	return p
 }

@@ -13,29 +13,6 @@ import (
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 )
 
-// init validates the WASM file structure
-func init() {
-	ctx := context.Background()
-	runtime := wazero.NewRuntime(ctx)
-	defer runtime.Close(ctx)
-
-	// Compile the WASM module to verify it's valid
-	compiled, err := runtime.CompileModule(ctx, wasm.ZetaSQLWasm)
-	if err != nil {
-		panic(fmt.Sprintf("failed to compile ZetaSQL WASM module: %v", err))
-	}
-	defer compiled.Close(ctx)
-
-	// Verify required functions are exported
-	requiredFuncs := []string{"init_module", "malloc", "free", "parse_statement_proto", "analyze_statement_proto", "free_proto_buffer"}
-	exports := compiled.ExportedFunctions()
-	for _, funcName := range requiredFuncs {
-		if _, ok := exports[funcName]; !ok {
-			panic(fmt.Sprintf("required WASM function '%s' not found in zetasql.wasm", funcName))
-		}
-	}
-}
-
 // Parser represents a ZetaSQL parser instance
 type Parser struct {
 	runtime wazero.Runtime
@@ -53,16 +30,8 @@ func (e *ParseError) Error() string {
 
 // Statement represents a successfully parsed SQL statement.
 type Statement struct {
-	sql  string
-	root ast.StatementNode
-}
-
-// SQL returns the original SQL string.
-func (s *Statement) SQL() string { return s.sql }
-
-// RootNode returns the root AST node of the parsed statement.
-func (s *Statement) RootNode() ast.StatementNode {
-	return s.root
+	SQL  string
+	Root ast.StatementNode
 }
 
 // NewParser creates a new ZetaSQL parser instance
@@ -187,8 +156,8 @@ func (p *Parser) ParseStatement(ctx context.Context, sql string) (*Statement, er
 	}
 
 	return &Statement{
-		sql:  sql,
-		root: root,
+		SQL:  sql,
+		Root: root,
 	}, nil
 }
 

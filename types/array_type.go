@@ -8,7 +8,7 @@ import (
 
 // ArrayType represents a ZetaSQL ARRAY type.
 type ArrayType struct {
-	elementType Type
+	ElementType Type
 }
 
 // NewArrayType creates an ArrayType with the given element type.
@@ -20,22 +20,21 @@ func NewArrayType(elementType Type) (*ArrayType, error) {
 	if elementType.Kind() == Array {
 		return nil, fmt.Errorf("array of array is not supported in ZetaSQL")
 	}
-	return &ArrayType{elementType: elementType}, nil
+	return &ArrayType{ElementType: elementType}, nil
 }
 
-func (t *ArrayType) Kind() TypeKind       { return Array }
-func (t *ArrayType) IsArray() bool        { return true }
-func (t *ArrayType) IsStruct() bool       { return false }
+func (t *ArrayType) Kind() TypeKind        { return Array }
+func (t *ArrayType) IsArray() bool         { return true }
+func (t *ArrayType) IsStruct() bool        { return false }
 func (t *ArrayType) AsArray() *ArrayType   { return t }
 func (t *ArrayType) AsStruct() *StructType { return nil }
-func (t *ArrayType) ElementType() Type     { return t.elementType }
 
 func (t *ArrayType) ToProto() *generated.TypeProto {
 	k := Array.toProto()
 	return &generated.TypeProto{
 		TypeKind: &k,
 		ArrayType: &generated.ArrayTypeProto{
-			ElementType: t.elementType.ToProto(),
+			ElementType: t.ElementType.ToProto(),
 		},
 	}
 }

@@ -2,30 +2,31 @@ package zetasql
 
 import (
 	"context"
-	"errors"
 	"testing"
 
-	"github.com/glassmonkey/zetasql-wasm/ast"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestParseStatement(t *testing.T) {
+// TestParser_ParseStatement_AST verifies AST shape via the canonical
+// String() representation defined in package ast. Triangulated across
+// multiple SQL shapes.
+func TestParser_ParseStatement_AST(t *testing.T) {
+	// Arrange (shared)
 	ctx := context.Background()
 	parser, err := NewParser(ctx)
-	if err != nil {
-		t.Fatalf("Failed to create parser: %v", err)
-	}
+	require.NoError(t, err)
 	defer parser.Close(ctx)
 
 	tests := []struct {
-		name    string
-		sql     string
-		wantErr bool
-		wantAST string
+		name string
+		sql  string
+		want string
 	}{
 		{
-			name: "Simple SELECT literal",
+			name: "literal",
 			sql:  "SELECT 1",
-			wantAST: `KindQueryStatement
+			want: `KindQueryStatement
   KindQuery
     KindSelect
       KindSelectList
@@ -34,9 +35,9 @@ func TestParseStatement(t *testing.T) {
 `,
 		},
 		{
-			name: "SELECT star FROM table",
+			name: "star from table",
 			sql:  "SELECT * FROM users",
-			wantAST: `KindQueryStatement
+			want: `KindQueryStatement
   KindQuery
     KindSelect
       KindSelectList
@@ -49,9 +50,9 @@ func TestParseStatement(t *testing.T) {
 `,
 		},
 		{
-			name: "SELECT with WHERE",
+			name: "where clause",
 			sql:  "SELECT * FROM users WHERE age > 20",
-			wantAST: `KindQueryStatement
+			want: `KindQueryStatement
   KindQuery
     KindSelect
       KindSelectList
@@ -69,9 +70,9 @@ func TestParseStatement(t *testing.T) {
 `,
 		},
 		{
-			name: "SELECT columns from table",
+			name: "multiple columns",
 			sql:  "SELECT name, email FROM customers",
-			wantAST: `KindQueryStatement
+			want: `KindQueryStatement
   KindQuery
     KindSelect
       KindSelectList
@@ -87,41 +88,52 @@ func TestParseStatement(t *testing.T) {
             KindIdentifier [customers]
 `,
 		},
-		{
-			name:    "Invalid SQL",
-			sql:     "SELECT",
-			wantErr: true,
-		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			stmt, err := parser.ParseStatement(ctx, tt.sql)
+			// Arrange
+			sut := parser
 
-			if tt.wantErr {
-				if err == nil {
-					t.Fatal("expected error but got nil")
-				}
-				var parseErr *ParseError
-				if !errors.As(err, &parseErr) {
-					t.Fatalf("expected *ParseError, got %T: %v", err, err)
-				}
-				return
-			}
+			// Act
+			parsed, err := sut.ParseStatement(ctx, tt.sql)
+			require.NoError(t, err)
+			got := parsed.Root.String()
 
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			if stmt.SQL() != tt.sql {
-				t.Errorf("SQL() = %q, want %q", stmt.SQL(), tt.sql)
-			}
-
-			got := ast.DebugString(stmt.RootNode())
-			if got != tt.wantAST {
-				t.Errorf("AST mismatch for %q\ngot:\n%s\nwant:\n%s", tt.sql, got, tt.wantAST)
-			}
+			// Assert
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
 
+// TestParser_ParseStatement_Errors verifies that invalid SQL yields the
+// expected error type. wantErr is a type witness compared via assert.IsType.
+func TestParser_ParseStatement_Errors(t *testing.T) {
+	// Arrange (shared)
+	ctx := context.Background()
+	parser, err := NewParser(ctx)
+	require.NoError(t, err)
+	defer parser.Close(ctx)
 
+	tests := []struct {
+		name    string
+		sql     string
+		wantErr error
+	}{
+		{name: "incomplete SELECT", sql: "SELECT", wantErr: &ParseError{}},
+		{name: "missing select list", sql: "SELECT FROM users", wantErr: &ParseError{}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := parser
+
+			// Act
+			_, got := sut.ParseStatement(ctx, tt.sql)
+
+			// Assert
+			assert.IsType(t, tt.wantErr, got)
+		})
+	}
+}

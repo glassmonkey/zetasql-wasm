@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -32,71 +34,27 @@ func TestStatementFromBytes(t *testing.T) {
 	}
 
 	data, err := proto.Marshal(stmt)
-	if err != nil {
-		t.Fatalf("marshal: %v", err)
-	}
+	require.NoError(t, err)
 
 	node, err := StatementFromBytes(data)
-	if err != nil {
-		t.Fatalf("StatementFromBytes: %v", err)
-	}
+	require.NoError(t, err)
 
 	queryStmt, ok := node.(*QueryStmtNode)
-	if !ok {
-		t.Fatalf("expected *QueryStmtNode, got %T", node)
-	}
+	require.True(t, ok, "expected *QueryStmtNode, got %T", node)
 
-	if got := queryStmt.Kind(); got != KindQueryStmt {
-		t.Errorf("Kind() = %v, want %v", got, KindQueryStmt)
-	}
+	assert.Equal(t, KindQueryStmt, queryStmt.Kind())
 
 	cols := queryStmt.OutputColumnList()
-	if len(cols) != 1 {
-		t.Fatalf("OutputColumnList() len = %d, want 1", len(cols))
-	}
-	if got := cols[0].Name(); got != "col1" {
-		t.Errorf("OutputColumnList()[0].Name() = %q, want %q", got, "col1")
-	}
+	require.Len(t, cols, 1)
+	assert.Equal(t, "col1", cols[0].Name())
 
 	scan := queryStmt.Query()
-	if scan == nil {
-		t.Fatal("Query() returned nil")
-	}
-	if got := scan.Kind(); got != KindSingleRowScan {
-		t.Errorf("Query().Kind() = %v, want %v", got, KindSingleRowScan)
-	}
+	require.NotNil(t, scan)
+	assert.Equal(t, KindSingleRowScan, scan.Kind())
 }
 
 func TestStatementFromBytes_InvalidBytes(t *testing.T) {
 	_, err := StatementFromBytes([]byte{0xff, 0xff})
-	if err == nil {
-		t.Error("expected error for invalid bytes, got nil")
-	}
+	assert.Error(t, err)
 }
 
-func TestNodeFromBytes(t *testing.T) {
-	// Wrap a statement inside AnyResolvedNodeProto
-	nodeProto := &generated.AnyResolvedNodeProto{
-		Node: &generated.AnyResolvedNodeProto_ResolvedStatementNode{
-			ResolvedStatementNode: &generated.AnyResolvedStatementProto{
-				Node: &generated.AnyResolvedStatementProto_ResolvedQueryStmtNode{
-					ResolvedQueryStmtNode: &generated.ResolvedQueryStmtProto{},
-				},
-			},
-		},
-	}
-
-	data, err := proto.Marshal(nodeProto)
-	if err != nil {
-		t.Fatalf("marshal: %v", err)
-	}
-
-	node, err := NodeFromBytes(data)
-	if err != nil {
-		t.Fatalf("NodeFromBytes: %v", err)
-	}
-
-	if got := node.Kind(); got != KindQueryStmt {
-		t.Errorf("Kind() = %v, want %v", got, KindQueryStmt)
-	}
-}

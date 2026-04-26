@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFunction_ToProto(t *testing.T) {
@@ -13,9 +15,9 @@ func TestFunction_ToProto(t *testing.T) {
 		ScalarMode,
 		[]*FunctionSignature{
 			NewFunctionSignature(
-				NewFunctionArgumentType(Int64Type(), nil),
+				NewFunctionArgumentType(Int64Type()),
 				[]*FunctionArgumentType{
-					NewFunctionArgumentType(StringType(), nil),
+					NewFunctionArgumentType(StringType()),
 				},
 			),
 		},
@@ -23,36 +25,20 @@ func TestFunction_ToProto(t *testing.T) {
 
 	proto := fn.ToProto()
 
-	if got, want := len(proto.GetNamePath()), 1; got != want {
-		t.Fatalf("len(NamePath) = %d, want %d", got, want)
-	}
-	if got, want := proto.GetNamePath()[0], "my_func"; got != want {
-		t.Errorf("NamePath[0] = %q, want %q", got, want)
-	}
-	if got, want := proto.GetGroup(), "custom"; got != want {
-		t.Errorf("Group = %q, want %q", got, want)
-	}
-	if got, want := proto.GetMode(), generated.FunctionEnums_SCALAR; got != want {
-		t.Errorf("Mode = %v, want %v", got, want)
-	}
+	require.Len(t, proto.GetNamePath(), 1)
+	assert.Equal(t, "my_func", proto.GetNamePath()[0])
+	assert.Equal(t, "custom", proto.GetGroup())
+	assert.Equal(t, generated.FunctionEnums_SCALAR, proto.GetMode())
 
 	sigs := proto.GetSignature()
-	if got, want := len(sigs), 1; got != want {
-		t.Fatalf("len(Signature) = %d, want %d", got, want)
-	}
+	require.Len(t, sigs, 1)
 
 	ret := sigs[0].GetReturnType()
-	if got, want := ret.GetKind(), generated.SignatureArgumentKind_ARG_TYPE_FIXED; got != want {
-		t.Errorf("ReturnType.Kind = %v, want %v", got, want)
-	}
+	assert.Equal(t, generated.SignatureArgumentKind_ARG_TYPE_FIXED, ret.GetKind())
 
 	args := sigs[0].GetArgument()
-	if got, want := len(args), 1; got != want {
-		t.Fatalf("len(Argument) = %d, want %d", got, want)
-	}
-	if got, want := args[0].GetKind(), generated.SignatureArgumentKind_ARG_TYPE_FIXED; got != want {
-		t.Errorf("Argument[0].Kind = %v, want %v", got, want)
-	}
+	require.Len(t, args, 1)
+	assert.Equal(t, generated.SignatureArgumentKind_ARG_TYPE_FIXED, args[0].GetKind())
 }
 
 func TestFunction_TemplatedArgument(t *testing.T) {
@@ -62,9 +48,9 @@ func TestFunction_TemplatedArgument(t *testing.T) {
 		ScalarMode,
 		[]*FunctionSignature{
 			NewFunctionSignature(
-				NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1, nil),
+				NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1),
 				[]*FunctionArgumentType{
-					NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1, nil),
+					NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1),
 				},
 			),
 		},
@@ -73,12 +59,8 @@ func TestFunction_TemplatedArgument(t *testing.T) {
 	proto := fn.ToProto()
 	sig := proto.GetSignature()[0]
 
-	if got, want := sig.GetReturnType().GetKind(), generated.SignatureArgumentKind_ARG_TYPE_ANY_1; got != want {
-		t.Errorf("ReturnType.Kind = %v, want %v", got, want)
-	}
-	if got, want := sig.GetArgument()[0].GetKind(), generated.SignatureArgumentKind_ARG_TYPE_ANY_1; got != want {
-		t.Errorf("Argument[0].Kind = %v, want %v", got, want)
-	}
+	assert.Equal(t, generated.SignatureArgumentKind_ARG_TYPE_ANY_1, sig.GetReturnType().GetKind())
+	assert.Equal(t, generated.SignatureArgumentKind_ARG_TYPE_ANY_1, sig.GetArgument()[0].GetKind())
 }
 
 func TestFunction_MultipleSignatures(t *testing.T) {
@@ -88,20 +70,17 @@ func TestFunction_MultipleSignatures(t *testing.T) {
 		ScalarMode,
 		[]*FunctionSignature{
 			NewFunctionSignature(
-				NewFunctionArgumentType(Int64Type(), nil),
-				[]*FunctionArgumentType{NewFunctionArgumentType(Int64Type(), nil)},
+				NewFunctionArgumentType(Int64Type()),
+				[]*FunctionArgumentType{NewFunctionArgumentType(Int64Type())},
 			),
 			NewFunctionSignature(
-				NewFunctionArgumentType(StringType(), nil),
-				[]*FunctionArgumentType{NewFunctionArgumentType(StringType(), nil)},
+				NewFunctionArgumentType(StringType()),
+				[]*FunctionArgumentType{NewFunctionArgumentType(StringType())},
 			),
 		},
 	)
 
-	proto := fn.ToProto()
-	if got, want := len(proto.GetSignature()), 2; got != want {
-		t.Errorf("len(Signature) = %d, want %d", got, want)
-	}
+	assert.Len(t, fn.ToProto().GetSignature(), 2)
 }
 
 func TestFunction_AggregateMode(t *testing.T) {
@@ -111,13 +90,11 @@ func TestFunction_AggregateMode(t *testing.T) {
 		AggregateMode,
 		[]*FunctionSignature{
 			NewFunctionSignature(
-				NewFunctionArgumentType(Int64Type(), nil),
-				[]*FunctionArgumentType{NewFunctionArgumentType(Int64Type(), nil)},
+				NewFunctionArgumentType(Int64Type()),
+				[]*FunctionArgumentType{NewFunctionArgumentType(Int64Type())},
 			),
 		},
 	)
 
-	if got, want := fn.ToProto().GetMode(), generated.FunctionEnums_AGGREGATE; got != want {
-		t.Errorf("Mode = %v, want %v", got, want)
-	}
+	assert.Equal(t, generated.FunctionEnums_AGGREGATE, fn.ToProto().GetMode())
 }

@@ -14,6 +14,9 @@ type Node interface {
 	Kind() Kind
 	NumChildren() int
 	Child(i int) Node
+	// String returns the canonical multi-line string representation of the
+	// subtree rooted at this node (see formatNode for the exact shape).
+	String() string
 }
 
 // StatementFromBytes unmarshals serialized proto bytes into a StatementNode.
@@ -23,15 +26,6 @@ func StatementFromBytes(data []byte) (StatementNode, error) {
 		return nil, fmt.Errorf("failed to unmarshal proto: %w", err)
 	}
 	return wrapStatement(p), nil
-}
-
-// NodeFromBytes unmarshals serialized proto bytes into any Node.
-func NodeFromBytes(data []byte) (Node, error) {
-	p := &generated.AnyResolvedNodeProto{}
-	if err := proto.Unmarshal(data, p); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal proto: %w", err)
-	}
-	return wrapNode(p), nil
 }
 
 // StatementNode is the interface for resolved statement nodes.

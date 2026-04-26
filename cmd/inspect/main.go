@@ -47,6 +47,6 @@ func main() {
 	}
 
 	fmt.Println("\n=== ZetaSQL Parse Result ===")
-	fmt.Printf("SQL: %s\n", stmt.SQL())
+	fmt.Printf("SQL: %s\n", stmt.SQL)
 	fmt.Println("\nStatus: ✓ Successfully parsed")
 }

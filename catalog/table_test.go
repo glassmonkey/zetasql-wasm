@@ -6,6 +6,7 @@ import (
 	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
@@ -51,9 +52,7 @@ func TestSimpleTableToProto(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if diff := cmp.Diff(tt.want, tt.table.ToProto(), protocmp.Transform()); diff != "" {
-				t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
-			}
+			assert.Empty(t, cmp.Diff(tt.want, tt.table.ToProto(), protocmp.Transform()), "ToProto() mismatch")
 		})
 	}
 }
@@ -109,12 +108,8 @@ func TestSimpleTableAddColumnToProto(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			table := NewSimpleTable("t")
-			for _, c := range tt.add {
-				table.AddColumn(c)
-			}
-			if diff := cmp.Diff(tt.want, table.ToProto(), protocmp.Transform()); diff != "" {
-				t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
-			}
+			table.Columns = append(table.Columns, tt.add...)
+			assert.Empty(t, cmp.Diff(tt.want, table.ToProto(), protocmp.Transform()), "ToProto() mismatch")
 		})
 	}
 }

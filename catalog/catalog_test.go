@@ -6,6 +6,7 @@ import (
 	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
@@ -26,7 +27,7 @@ func TestSimpleCatalogToProto(t *testing.T) {
 			name: "catalog with table and builtins",
 			catalog: func() *SimpleCatalog {
 				cat := NewSimpleCatalog("main")
-				cat.AddTable(NewSimpleTable("users",
+				cat.Tables = append(cat.Tables, NewSimpleTable("users",
 					NewSimpleColumn("users", "id", types.Int64Type()),
 					NewSimpleColumn("users", "name", types.StringType()),
 				))
@@ -63,10 +64,10 @@ func TestSimpleCatalogToProto(t *testing.T) {
 			catalog: func() *SimpleCatalog {
 				root := NewSimpleCatalog("root")
 				sub := NewSimpleCatalog("schema1")
-				sub.AddTable(NewSimpleTable("t1",
+				sub.Tables = append(sub.Tables, NewSimpleTable("t1",
 					NewSimpleColumn("t1", "col", types.DoubleType()),
 				))
-				root.AddSubCatalog(sub)
+				root.SubCatalogs = append(root.SubCatalogs, sub)
 				return root
 			}(),
 			want: &generated.SimpleCatalogProto{
@@ -95,9 +96,7 @@ func TestSimpleCatalogToProto(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if diff := cmp.Diff(tt.want, tt.catalog.ToProto(), protocmp.Transform()); diff != "" {
-				t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
-			}
+			assert.Empty(t, cmp.Diff(tt.want, tt.catalog.ToProto(), protocmp.Transform()), "ToProto() mismatch")
 		})
 	}
 }

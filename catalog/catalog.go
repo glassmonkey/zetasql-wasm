@@ -7,61 +7,46 @@ import (
 
 // SimpleCatalog represents a ZetaSQL catalog containing tables, functions, and sub-catalogs.
 type SimpleCatalog struct {
-	name           string
-	tables         []*SimpleTable
-	functions      []*types.Function
-	subCatalogs    []*SimpleCatalog
-	builtinOptions *generated.ZetaSQLBuiltinFunctionOptionsProto
+	Name           string
+	Tables         []*SimpleTable
+	Functions      []*types.Function
+	SubCatalogs    []*SimpleCatalog
+	BuiltinOptions *generated.ZetaSQLBuiltinFunctionOptionsProto
 }
 
 // NewSimpleCatalog creates a SimpleCatalog with the given name.
 func NewSimpleCatalog(name string) *SimpleCatalog {
-	return &SimpleCatalog{name: name}
-}
-
-func (c *SimpleCatalog) Name() string { return c.name }
-
-// AddTable adds a table to this catalog.
-func (c *SimpleCatalog) AddTable(table *SimpleTable) {
-	c.tables = append(c.tables, table)
-}
-
-// AddFunction adds a custom function to this catalog.
-func (c *SimpleCatalog) AddFunction(fn *types.Function) {
-	c.functions = append(c.functions, fn)
-}
-
-// AddSubCatalog adds a nested catalog.
-func (c *SimpleCatalog) AddSubCatalog(sub *SimpleCatalog) {
-	c.subCatalogs = append(c.subCatalogs, sub)
+	return &SimpleCatalog{Name: name}
 }
 
 // AddZetaSQLBuiltinFunctions signals that built-in ZetaSQL functions should be
-// loaded on the WASM side. Pass nil for default behavior (load all builtins).
+// loaded on the WASM side. Pass nil for default behavior (load all builtins);
+// nil is normalized to an empty options proto so the C++ side can distinguish
+// "load builtins with defaults" from "do not load builtins" (BuiltinOptions == nil).
 func (c *SimpleCatalog) AddZetaSQLBuiltinFunctions(opts *generated.ZetaSQLBuiltinFunctionOptionsProto) {
 	if opts == nil {
 		opts = &generated.ZetaSQLBuiltinFunctionOptionsProto{}
 	}
-	c.builtinOptions = opts
+	c.BuiltinOptions = opts
 }
 
 // ToProto serializes this catalog to a SimpleCatalogProto.
 func (c *SimpleCatalog) ToProto() *generated.SimpleCatalogProto {
-	name := c.name
+	name := c.Name
 	p := &generated.SimpleCatalogProto{
 		Name: &name,
 	}
-	for _, t := range c.tables {
+	for _, t := range c.Tables {
 		p.Table = append(p.Table, t.ToProto())
 	}
-	for _, sub := range c.subCatalogs {
+	for _, sub := range c.SubCatalogs {
 		p.Catalog = append(p.Catalog, sub.ToProto())
 	}
-	for _, fn := range c.functions {
+	for _, fn := range c.Functions {
 		p.CustomFunction = append(p.CustomFunction, fn.ToProto())
 	}
-	if c.builtinOptions != nil {
-		p.BuiltinFunctionOptions = c.builtinOptions
+	if c.BuiltinOptions != nil {
+		p.BuiltinFunctionOptions = c.BuiltinOptions
 	}
 	return p
 }

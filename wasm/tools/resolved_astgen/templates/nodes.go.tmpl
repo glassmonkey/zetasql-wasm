@@ -32,6 +32,8 @@ func new{{$node.GoName}}Slice(raws []*generated.{{$node.ProtoName}}) []*{{$node.
 
 func (n *{{$node.GoName}}) Kind() Kind { return {{$node.KindName}} }
 
+func (n *{{$node.GoName}}) String() string { return formatNode(n) }
+
 {{- range $m := $node.MarkerMethods}}
 func (n *{{$node.GoName}}) {{$m}}() {}
 {{- end}}

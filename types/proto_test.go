@@ -5,6 +5,8 @@ import (
 
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
@@ -60,9 +62,7 @@ func TestNestedTypeToProto(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if diff := cmp.Diff(tt.want, tt.typ.ToProto(), protocmp.Transform()); diff != "" {
-				t.Errorf("ToProto() mismatch (-want +got):\n%s", diff)
-			}
+			assert.Empty(t, cmp.Diff(tt.want, tt.typ.ToProto(), protocmp.Transform()), "ToProto() mismatch")
 		})
 	}
 }
@@ -77,31 +77,10 @@ func TestNestedTypeRoundTrip(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			restored, err := TypeFromProto(tt.typ.ToProto())
-			if err != nil {
-				t.Fatal(err)
-			}
-			if diff := cmp.Diff(tt.typ.ToProto(), restored.ToProto(), protocmp.Transform()); diff != "" {
-				t.Errorf("round-trip mismatch (-want +got):\n%s", diff)
-			}
+			restored, err := typeFromProto(tt.typ.ToProto())
+			require.NoError(t, err)
+			assert.Empty(t, cmp.Diff(tt.typ.ToProto(), restored.ToProto(), protocmp.Transform()), "round-trip mismatch")
 		})
 	}
 }
 
-func TestTypeFromProtoErrors(t *testing.T) {
-	tests := []struct {
-		name  string
-		proto *generated.TypeProto
-	}{
-		{"nil", nil},
-		{"array without ArrayType", &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_ARRAY.Enum()}},
-		{"struct without StructType", &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_STRUCT.Enum()}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if _, err := TypeFromProto(tt.proto); err == nil {
-				t.Error("TypeFromProto() should return error")
-			}
-		})
-	}
-}

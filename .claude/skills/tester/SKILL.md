@@ -5,7 +5,8 @@ description: >
   the project's test conventions: SUT/got/want pattern, testify as the
   assertion implementation, AAA structure, table-driven triangulation,
   payload structs defined on the production side, no getters in tests,
-  wantErr type witness, minimal helpers. Use this skill whenever the user
+  wantErr type witness, minimal helpers, behavior over internal state
+  (per xUnit Test Patterns). Use this skill whenever the user
   says "write a test", "add a test for X", "review my tests", "look at this
   test code", "do my tests follow the conventions?", "improve these tests",
   "refactor these tests", or opens a *_test.go file with intent to author
@@ -22,7 +23,7 @@ This skill covers two modes:
 - **Author mode**: writing a new test from scratch (typically called from the `tdd` cycle).
 - **Review mode**: reading an existing test against the rules and producing a structured report with concrete fixes.
 
-The same R1–R11 rule set governs both.
+The same R1–R12 rule set governs both.
 
 ## Underlying principle: testify is the test implementation
 
@@ -34,7 +35,58 @@ A new test starts at `assert.Equal(t, want, got)` and works backward to define `
 
 The other principle behind these rules — **separation of behavior and data** (DTOs are data, no getters, public fields) — lives in the `developer` skill. Several rules below (R6, R7, R11) are the test-side reflection of that production-side principle.
 
-## Rules (R1–R11)
+## xUnit Test Patterns vocabulary (Meszaros)
+
+Most rules below are concrete instances of named patterns and smells from Gerard Meszaros, *xUnit Test Patterns: Refactoring Test Code* (2007). The mapping below is the shared vocabulary for diagnosing test problems on this project.
+
+| Rule | xUnit pattern / smell | What the term means |
+|---|---|---|
+| R1 (testify) | Custom Assertion | The assertion library *is* the assertion implementation; tests don't reinvent `if/t.Errorf`. |
+| R2 (SUT/got/want) | Tests as Documentation | Each test reads as a sentence; arrangement makes the contract obvious. |
+| R3 (one assert per case) | Assertion Roulette · Eager Test | Multiple unrelated assertions in one case make the failure ambiguous and slow to localize. |
+| R4 (AAA comments) | Four-Phase Test (Setup / Exercise / Verify / Teardown) | The four phases are the canonical structure; AAA is the conventional Go labelling of the first three. |
+| R5 (triangulation) | Hard-Coded Test Data | A single positive case can be passed by an implementation that hard-codes the magic value; multiple inputs force the real generalization. |
+| R6 (production-side payload) | Production Logic in Test | A test-only struct duplicates the production schema, then drifts; the test ends up describing what the test *thinks* the SUT does, not what it does. |
+| R7 (no getters) | Test Method Acne | Trivial accessor tests proliferate without adding signal — every getter brings its own one-line "assertion". |
+| R8 (typed wantErr) | Specific Assertion | Asserting on the error *type* (or value) verifies the failure mode, not just that "something failed." |
+| R9 (helpers stay trivially correct) | Test Logic in Test (Conditional Test Logic) · Untested Test Code | Logic inside helpers becomes second-tier production code — untested, and silent when it goes wrong. |
+| R10 (test independence) | Mystery Guest · Erratic Test (Test Run War, Resource Optimism, Resource Leakage) | A test that depends on hidden external state (file system, env, run order, leaked handles) flakes for reasons unrelated to the SUT. |
+| R11 (no test-only production APIs) | Test Logic in Production · Test Hook | Production code that exists only for testing carries weight no caller benefits from. |
+| R12 (behavior, not state) | Sensitive Equality · Fragile Test (Overspecified Software) · State vs Behavior Verification | Asserting on internal storage that the SUT holds verbatim, or on construction that has no logic, locks the test to the implementation rather than the contract. |
+
+**Test Doubles taxonomy** (Chapter 11): when this project introduces a test double, name it precisely — *Dummy* (passed but not used), *Stub* (canned answers), *Spy* (records calls), *Mock* (verifies expectations), *Fake* (working but not production-grade implementation). Most tests here run the real WASM module rather than a double, so the taxonomy rarely comes up — but when it does, the imprecise word "mock" should not stand in for any of the five.
+
+**Goals of Test Automation** (Chapter 3): a test must (a) help us understand the SUT, (b) reduce risk of defects, (c) survive refactoring, (d) be easy to write/maintain, (e) run fast enough to be run often. Every rule above serves one or more of these goals; if a proposed test or convention serves none, push back on it.
+
+**Other smells worth naming when reviewing**:
+
+- *Obscure Test* (Eager Test, General Fixture, Irrelevant Information, Hard-Coded Test Data) — a test the reader cannot follow at a glance. Counter with R2 + R5 + minimal `Arrange`.
+- *Slow Test* — a test slow enough that it discourages running the suite. The WASM-backed integration tests already toe this line; do not add more unless the behavior cannot be exercised any other way.
+- *Tested Behavior* vs *Tested Outcome* — what the SUT does vs the externally visible result. R12 enforces "tested outcome must be observable"; both verification styles are valid as long as that holds.
+
+When pointing out a problem in review, name the smell. "This is a *Sensitive Equality* on the internal map" gives the author a vocabulary to fix it; "this test feels off" does not.
+
+## Rules (R1–R12)
+
+### R0: Every test is `(SUT × behavior)`
+
+Every test in this repo follows the same canonical shape:
+
+```go
+sut := <test target>           // a value/function/instance to exercise
+got := sut.<Method>(<args>)    // invoke the behavior under test
+assert.Equal(t, want, got)
+```
+
+- **SUT** = a meaningful object, function, or value under test (a `*Parser`, an `*AnalyzerOptions`, the function `TypeFromKind`, etc.).
+- **Behavior** = the *invocation* on the SUT — `sut.SomeMethod(args)` for a method, `sut(args)` for a function-as-SUT. The invocation is the probe; the test asserts on what the probe returns.
+
+If a test does not have this shape, **something is off**. The two recurring degenerate forms are:
+
+1. **No method is invoked** — `got := someStruct.SomeField` after a constructor call. Without a behavior probe, the test asserts only that Go assigned a value (R12 / *Sensitive Equality*).
+2. **The "method" is a trivial accessor** — `got := sut.GetX()` where `GetX` returns a single field (R7 / *Test Method Acne*).
+
+Subsequent rules R1–R12 are constraints on this shape: how to write the assert (R1, R8), how to structure the four phases (R4), how to build `want` (R2, R6), how to triangulate (R5), how to keep helpers thin (R9), how to keep tests independent (R10), and what behaviors are worth probing in the first place (R7, R11, R12).
 
 ### R1: Use testify
 - Don't use bare `t.Errorf` / `t.Fatalf` for assertions
@@ -45,8 +97,8 @@ The other principle behind these rules — **separation of behavior and data** (
 **Why**: Unifies diff display on failure and continue-vs-abort behavior.
 
 ### R2: SUT / got / want pattern
-- **SUT** = the object/function under test
-- **got** = the direct return value of `sut.method(args)` (or a single field/single accessor on it)
+- **SUT** = the object/function under test (per R0)
+- **got** = the value returned by *invoking* the behavior on the SUT — `sut.Method(args)` or `sut(args)`. Field access on the return value (`sut.Method(args).Field`) is fine *as long as* the method itself has logic worth probing. Bare `sut.Field` (no method invocation) is not a test of the SUT.
 - **want** = the expected value
 - Building a fresh `payload` struct in the test by extracting multiple fields from the SUT's return is **NOT allowed**
 - `want` must be a complete struct so field add/remove surfaces in the diff
@@ -166,6 +218,39 @@ func formatNode(n resolved_ast.Node) string {
 
 **Why**: Production code shouldn't carry weight that only tests use. Consult `developer` if a real production-side change would clean things up instead.
 
+### R12: Test behavior, not internal state or construction
+
+A test must assert on something **observable from outside the SUT** that the SUT is contractually responsible for producing. Tests that only assert on internal state with no behavioral consequence — or on the result of a constructor that merely assigns fields — are not earning their keep.
+
+**Reference**: Meszaros, *xUnit Test Patterns*, specifically:
+- *State Verification* vs *Behavior Verification* — both are valid, but each requires the asserted property to be **observable** (a return value, an effect on a collaborator, a serialized output). Asserting on a private/public field that the SUT just stored verbatim is neither.
+- *Sensitive Equality* (smell) — an assertion that compares more detail than the test cares about. Includes "comparing the entire internal state of the SUT" when only a subset is part of the contract.
+- *Fragile Test* (smell, caused by *Overspecified Software*) — a test that breaks on harmless refactors because it locked in an implementation detail.
+- *Goals of Test Automation* — tests must reduce risk and survive refactors. A test that breaks on every internal rename without flagging a real regression has negative value.
+
+**What is *not* worth testing on its own**:
+
+| Pattern | Why it's not behavior |
+|---|---|
+| `TestNewX` that asserts `&X{Field: v}` was set up | tests Go's struct-literal assignment, not the SUT |
+| `TestSetX` / `TestEnableX` for a method whose body is `o.Field = v` (or `m[k] = true`) | tests Go's `=` / map insertion |
+| A test that the package's internal lookup table contains entry "foo" | the higher-level methods that *use* the entry already exercise it; missing entries make those tests fail |
+| `assert.Equal(sql, stmt.SQL)` when `ParseStatement` does `&Statement{SQL: sql, Root: root}` | pure passthrough — no transformation, no validation, no logic |
+
+**What *is* behavior worth testing** (each has a logic surface that can break independently of "Go assigned a value"):
+
+- A method whose result depends on input transformation, filtering, validation, or aggregation
+- An invariant maintained across multiple fields (e.g., `SetSupportsAllStatementKinds` must clear `StatementKinds`)
+- ToProto / FromProto serialization (boundary cases: nil, empty, deeply nested)
+- Validation that returns an error for malformed input
+- Method side effects on collaborators (analyzer + options + catalog → analysis result)
+
+**Heuristic** (the "given/when/then" test):
+
+Phrase the test as "given <input>, when <SUT call>, then <observable result>". If `<observable result>` reduces to "the field I just set has the value I set" or "the lookup table I built has the entry I added", the test is verifying Go itself — delete it. The behavior, if any, is exercised by the next-level test that *uses* the field/entry.
+
+**Why**: Without this filter, the test suite grows to mirror the implementation rather than the contract. Every refactor (renaming a field, swapping `Features` from `map` to `[]LanguageFeature`, dropping a redundant export check) breaks tests that aren't flagging real regressions, which conditions everyone to either skip the failing tests or skip the refactor. Both outcomes are worse than not having the test.
+
 ## Author mode (writing a new test)
 
 Use this when invoked from the `tdd` cycle (Step 2: red) or when the user asks "write a test for X".
@@ -281,10 +366,11 @@ If multiple files are reviewed, separate by file. If a file has no violations, s
 ### Step 5: Suggest priority
 
 When violations are numerous, indicate fix order:
-1. **R3 (one assert per got)**: design-level, fix first
-2. **R6 (test-side payload struct)**: structural
-3. **R2 (SUT/got/want)**: clarifies structure
-4. Format-level (R1, R4) last
+1. **R12 (behavior, not internal state)**: deletes whole tests that should not exist — fix first so subsequent rules apply to the right surface
+2. **R3 (one assert per got)**: design-level
+3. **R6 (test-side payload struct)**: structural
+4. **R2 (SUT/got/want)**: clarifies structure
+5. Format-level (R1, R4) last
 
 ### Review etiquette
 
@@ -339,6 +425,34 @@ func summary(n Node) string {
 assert.Equal(t, sql, stmt.SQL())
 ```
 → Violates R7. Use direct field access (`stmt.SQL`) and remove the getter (a `developer` concern).
+
+### AP5: Asserting on internal state with no behavioral consequence
+```go
+// bad — testing Go's map assignment
+sut := NewLanguageOptions()
+sut.EnableLanguageFeature(generated.LanguageFeature_FEATURE_TABLESAMPLE)
+assert.True(t, sut.Features[generated.LanguageFeature_FEATURE_TABLESAMPLE])
+
+// bad — testing that an export exists, when behavior tests already exercise it
+exports := compiledModule.ExportedFunctions()
+_, ok := exports["parse_statement_proto"]
+assert.True(t, ok)
+
+// bad — testing that &X{Field: v} assigned the field
+got := NewParseResumeLocation("SELECT 1")
+assert.Equal(t, &ParseResumeLocation{Input: "SELECT 1"}, got)
+```
+→ Violates R12. Each of these is *Sensitive Equality* + *Fragile Test* (Meszaros): the assertion locks in an implementation detail (storage layout, export-list shape, struct-literal mechanics) without verifying any contract that callers depend on. The behavior path — features take effect through the analyzer, exports are reachable through `Parser.ParseStatement`, the resume location is consumed by `AnalyzeNextStatement` — is what the test should target. Delete and rely on the integration/behavior test that exercises the same code path with an observable result.
+
+### AP6: Testing a constructor directly
+```go
+// bad
+func TestNewAnalyzerOptions(t *testing.T) {
+    got := NewAnalyzerOptions()
+    assert.Equal(t, &AnalyzerOptions{}, got)
+}
+```
+→ Violates R12. A constructor whose body is `return &X{...}` has no behavior beyond Go's struct literal. The constructor stays in production as ergonomic call-site sugar (`developer` AP2 distinguishes "useful constructor" from "noise constructor"), but the constructor itself is not the SUT — the SUT is whatever method consumes the constructed value. Test that method.
 
 ## How this skill interacts with others
 
