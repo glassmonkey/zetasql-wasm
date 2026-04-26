@@ -15,9 +15,6 @@ Use this when invoked from the `tdd` cycle (Step 2: red) or when the user asks "
 
 ```go
 func TestSUT_Behavior(t *testing.T) {
-    // Arrange (shared)
-    // ... shared setup, if any ...
-
     tests := []struct {
         name    string
         // input fields
@@ -33,11 +30,12 @@ func TestSUT_Behavior(t *testing.T) {
 
     for _, tt := range tests {
         t.Run(tt.name, func(t *testing.T) {
-            // Arrange
-            sut := ... // subject under test
+            // Arrange — per case; no Arrange at function scope.
+            ctx := t.Context()
+            sut := ... // construct via Setup function (e.g., newTestAnalyzer(t))
 
             // Act
-            got, err := sut.Method(tt.input)
+            got, err := sut.Method(ctx, tt.input)
 
             // Assert
             if tt.wantErr != nil {
@@ -50,6 +48,8 @@ func TestSUT_Behavior(t *testing.T) {
     }
 }
 ```
+
+The parameter table sits at function scope because it is read-only data, not Arrange. Anything mutable (the SUT, contexts, options, catalogs) goes inside the case. See `fixture-management.md` for the full rule and rationale.
 
 ### A3: `want` is a complete struct
 For struct returns, build a fully populated `want` so any field add/remove appears in the diff. For scalar returns, the scalar type alone is fine.

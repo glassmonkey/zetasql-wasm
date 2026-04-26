@@ -41,9 +41,9 @@ assert.Equal(t, want, got)
 
 ## R4: Explicit AAA comments
 - Each test case carries `// Arrange`, `// Act`, `// Assert` markers
-- Shared setup outside the loop is labeled `// Arrange (shared)`
+- The whole Arrange happens inside each `t.Run` body; the test function scope is for the parameter table only (see `fixture-management.md`)
 
-**Why**: Makes the structural intent obvious. Reinforces TDD habits.
+**Why**: Makes the structural intent obvious. Reinforces TDD habits. Keeping Arrange per case (rather than at function scope) preserves test independence (R10).
 
 ## R5: Triangulation (table-driven)
 - At least two positive cases per behavior
@@ -126,6 +126,7 @@ func formatNode(n resolved_ast.Node) string {
 ## R10: Test independence
 - Tests don't depend on execution order
 - No shared global state (use `t.Cleanup` for reliable teardown)
+- No mutable fixtures shared across `t.Run` cases — each case constructs its own (see `fixture-management.md`). `// Arrange (shared)` is forbidden.
 - Must be safe to run in parallel
 
 ## R11: No test-only production APIs

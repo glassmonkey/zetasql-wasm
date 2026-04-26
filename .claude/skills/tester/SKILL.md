@@ -28,7 +28,7 @@ This skill covers two modes:
 - **Author mode**: writing a new test from scratch (typically called from the `tdd` cycle). Skeleton in this file; full procedure in [`references/modes.md`](references/modes.md).
 - **Review mode**: reading an existing test against the rules and producing a structured report with concrete fixes. Skeleton in this file; full procedure in [`references/modes.md`](references/modes.md).
 
-The same R0–R12 rule set governs both. R0 is inline below (it sets the canonical shape that every other rule constrains). R1–R12 details are in [`references/rules.md`](references/rules.md). When a review names an anti-pattern (AP1–AP6), the code examples and rationale live in [`references/anti-patterns.md`](references/anti-patterns.md). The xUnit Test Patterns vocabulary (Smell / Pattern / Refactoring catalog from Meszaros) lives in [`references/xunit-patterns.md`](references/xunit-patterns.md) — open it when you need a definition or want to verify you're using a smell name precisely.
+The same R0–R12 rule set governs both. R0 is inline below (it sets the canonical shape that every other rule constrains). R1–R12 details are in [`references/rules.md`](references/rules.md). Fixture construction policy (per-case Arrange, banned shared state) is in [`references/fixture-management.md`](references/fixture-management.md). When a review names an anti-pattern (AP1–AP6), the code examples and rationale live in [`references/anti-patterns.md`](references/anti-patterns.md). The xUnit Test Patterns vocabulary (Smell / Pattern / Refactoring catalog from Meszaros) lives in [`references/xunit-patterns.md`](references/xunit-patterns.md) — open it when you need a definition or want to verify you're using a smell name precisely.
 
 ## Underlying principle: testify is the test implementation
 
@@ -134,8 +134,38 @@ The point is to catch issues on the first read, before any human pushback. Scan 
 | Test depends on file paths, env vars, current time, or test execution order | R10 / Mystery Guest / Context Sensitivity | Inline the data, stub the dependency, or use a Virtual Clock. |
 | Test verifies a function that has zero production callers (only tests use it) | R11 | The function is dead code held alive by its test. Delete both unless it's about to gain a real caller. |
 | `t.Run(tt.name, func(t *testing.T) { ... })` body has 2+ unrelated `assert.*` calls | R3 / Assertion Roulette | Split into separate cases or build a complete `want` struct. |
+| Mutable fixture (`*Analyzer`, `*FilterOptions`, etc.) constructed at the test function scope and reused across `t.Run` cases — often labeled `// Arrange (shared)` | R10 / Fixture management / Erratic Test | Move the construction inside each `t.Run` body. Use `t.Context()` instead of a shared `context.Background()`. |
 
 When in doubt about the smell name, look it up in `references/xunit-patterns.md`. Naming the smell precisely makes the fix obvious.
+
+## Fixture management
+
+**Each `t.Run` body owns its entire Arrange.** No mutable state lives at the test function scope.
+
+```go
+for _, tt := range tests {
+    t.Run(tt.name, func(t *testing.T) {
+        // Arrange — per case
+        ctx := t.Context()
+        a := newTestAnalyzer(t)
+        cat := newUsersCatalog()
+
+        // Act
+        got, err := a.AnalyzeStatement(ctx, tt.sql, cat, &AnalyzerOptions{})
+        // ...
+    })
+}
+```
+
+- `ctx := t.Context()` (Go 1.24+) — never `context.Background()` at function scope. `t.Context()` is canceled when the case ends and propagates to goroutines correctly.
+- Fixture instances (`*Analyzer`, `*Parser`, options structs, catalogs) are constructed inside each case via Setup functions like `newTestAnalyzer(t)`. The Setup function returns a fresh instance per call — never a cached singleton.
+- The test parameter table (`tests := []struct{...}{...}`) stays at function scope because it is read-only data, not Arrange.
+
+**`// Arrange (shared)` is forbidden.** Sharing a mutable fixture instance across `t.Run` cases violates R10 (test independence) — even when the instance "looks read-only", helper methods can mutate hidden state, which is the *Erratic Test* failure mode (Resource Leakage / Test Run War / Interacting Tests). The cost of constructing the fixture N times is the price of independence; it is not negotiable at the test level.
+
+If WASM construction wall-clock becomes a real problem, we revisit at the bridge level (e.g., a `sync.Pool` of pre-warmed instances with documented invariants), not by relaxing this rule.
+
+When to extract a Setup function: same construction sequence appears in 3+ cases or 2+ test files. Below that, inline construction is fine. See [`references/fixture-management.md`](references/fixture-management.md) for the full forbidden-vs-required examples and a migration recipe for legacy tests.
 
 ## Pre-completion sniff scan (mandatory)
 
@@ -160,7 +190,7 @@ The bar: by the time you say "done", a reviewer reading the resulting test file 
 Use this when invoked from the `tdd` cycle (Step 2: red) or when the user asks "write a test for X". Full text in [`references/modes.md`](references/modes.md#author-mode-writing-a-new-test).
 
 1. **A1 — Pick the SUT**: function / method receiver / constructor.
-2. **A2 — Write a table-driven skeleton**: `tests := []struct{name, input, want, wantErr}{...}` with an inner `t.Run` that follows the R0 shape and labels the AAA phases.
+2. **A2 — Write a table-driven skeleton**: `tests := []struct{name, input, want, wantErr}{...}` at function scope (read-only data); each `t.Run` body owns its own Arrange (`ctx := t.Context()`, Setup-function calls), follows the R0 shape, and labels the AAA phases. No `// Arrange (shared)` block.
 3. **A3 — `want` is a complete struct**: full population so field add/remove surfaces in the diff.
 4. **A4 — Tree comparison uses the minimal helper**: per R9 — single-accessor cases, no branches.
 5. **A5 — Reuse, don't reinvent**: `newTestAnalyzer`, `newUsersCatalog`, `findNode` already exist.
