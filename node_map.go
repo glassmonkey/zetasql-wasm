@@ -29,7 +29,7 @@ func NewNodeMap(stmt resolved_ast.StatementNode) *NodeMap {
 	m := &NodeMap{
 		nodes: make(map[parseLocationKey][]resolved_ast.Node),
 	}
-	resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
+	_ = resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
 		if loc, ok := n.(locatable); ok {
 			r := loc.ParseLocationRange()
 			if r != nil && r.Start != nil && r.End != nil {

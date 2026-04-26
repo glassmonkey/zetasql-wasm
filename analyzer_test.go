@@ -18,7 +18,7 @@ func newTestAnalyzer(t *testing.T) *Analyzer {
 	ctx := t.Context()
 	a, err := NewAnalyzer(ctx)
 	require.NoError(t, err)
-	t.Cleanup(func() { a.Close(ctx) })
+	t.Cleanup(func() { _ = a.Close(ctx) })
 	return a
 }
 
@@ -27,7 +27,7 @@ func newTestParser(t *testing.T) *Parser {
 	ctx := t.Context()
 	p, err := NewParser(ctx)
 	require.NoError(t, err)
-	t.Cleanup(func() { p.Close(ctx) })
+	t.Cleanup(func() { _ = p.Close(ctx) })
 	return p
 }
 
@@ -73,7 +73,7 @@ func findNode[T resolved_ast.Node](t *testing.T, root resolved_ast.Node) T {
 	t.Helper()
 	var result T
 	var found bool
-	resolved_ast.Walk(root, func(n resolved_ast.Node) error {
+	_ = resolved_ast.Walk(root, func(n resolved_ast.Node) error {
 		if v, ok := n.(T); ok && !found {
 			result = v
 			found = true

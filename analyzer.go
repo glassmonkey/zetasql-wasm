@@ -41,13 +41,13 @@ func NewAnalyzer(ctx context.Context) (*Analyzer, error) {
 	runtime := wazero.NewRuntime(ctx)
 
 	if _, err := wasi_snapshot_preview1.Instantiate(ctx, runtime); err != nil {
-		runtime.Close(ctx)
+		_ = runtime.Close(ctx)
 		return nil, fmt.Errorf("failed to instantiate WASI: %w", err)
 	}
 
 	compiledModule, err := runtime.CompileModule(ctx, wasm.ZetaSQLWasm)
 	if err != nil {
-		runtime.Close(ctx)
+		_ = runtime.Close(ctx)
 		return nil, fmt.Errorf("failed to compile WASM module: %w", err)
 	}
 
@@ -55,7 +55,7 @@ func NewAnalyzer(ctx context.Context) (*Analyzer, error) {
 
 	emscriptenExporter, err := emscripten.NewFunctionExporterForModule(compiledModule)
 	if err != nil {
-		runtime.Close(ctx)
+		_ = runtime.Close(ctx)
 		return nil, fmt.Errorf("failed to create Emscripten exporter: %w", err)
 	}
 	emscriptenExporter.ExportFunctions(builder)
@@ -64,14 +64,14 @@ func NewAnalyzer(ctx context.Context) (*Analyzer, error) {
 	builder.NewFunctionBuilder().WithFunc(func() int32 { return 0 }).Export("HaveOffsetConverter")
 
 	if _, err := builder.Instantiate(ctx); err != nil {
-		runtime.Close(ctx)
+		_ = runtime.Close(ctx)
 		return nil, fmt.Errorf("failed to instantiate env module: %w", err)
 	}
 
 	moduleConfig := wazero.NewModuleConfig()
 	module, err := runtime.InstantiateModule(ctx, compiledModule, moduleConfig)
 	if err != nil {
-		runtime.Close(ctx)
+		_ = runtime.Close(ctx)
 		return nil, fmt.Errorf("failed to instantiate WASM module: %w", err)
 	}
 
@@ -79,7 +79,7 @@ func NewAnalyzer(ctx context.Context) (*Analyzer, error) {
 	// Required before using AnalyzerOptions or any code that depends on abseil global state.
 	initFn := module.ExportedFunction("init_module")
 	if _, err := initFn.Call(ctx); err != nil {
-		runtime.Close(ctx)
+		_ = runtime.Close(ctx)
 		return nil, fmt.Errorf("failed to initialize WASM module: %w", err)
 	}
 
@@ -183,7 +183,7 @@ func (a *Analyzer) callAnalyze(
 		return nil, fmt.Errorf("failed to allocate memory: %w", err)
 	}
 	reqPtr := results[0]
-	defer freeFn.Call(ctx, reqPtr)
+	defer func() { _, _ = freeFn.Call(ctx, reqPtr) }()
 
 	if !a.module.Memory().Write(uint32(reqPtr), requestBytes) {
 		return nil, fmt.Errorf("failed to write request to WASM memory")
@@ -194,7 +194,7 @@ func (a *Analyzer) callAnalyze(
 		return nil, fmt.Errorf("failed to call analyze function: %w", err)
 	}
 	resultPtr := results[0]
-	defer freeProtoBuffer.Call(ctx, resultPtr)
+	defer func() { _, _ = freeProtoBuffer.Call(ctx, resultPtr) }()
 
 	mem := a.module.Memory()
 	sizeBytes, ok := mem.Read(uint32(resultPtr), 4)
