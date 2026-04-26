@@ -64,6 +64,42 @@ func TestNode_String(t *testing.T) {
 			want: "KindQueryStatement\n" +
 				"  KindQuery\n",
 		},
+		{
+			name: "Select without DISTINCT emits no marker",
+			node: newSelectNode(&generated.ASTSelectProto{}),
+			want: "KindSelect\n",
+		},
+		{
+			name: "Select with DISTINCT emits [DISTINCT]",
+			node: newSelectNode(&generated.ASTSelectProto{Distinct: ptr(true)}),
+			want: "KindSelect [DISTINCT]\n",
+		},
+		{
+			name: "OrderingExpression unspecified emits [NOT_SET]",
+			node: newOrderingExpressionNode(&generated.ASTOrderingExpressionProto{}),
+			want: "KindOrderingExpression [NOT_SET]\n",
+		},
+		{
+			name: "OrderingExpression DESC emits [DESC]",
+			node: newOrderingExpressionNode(&generated.ASTOrderingExpressionProto{
+				OrderingSpec: ptr(generated.ASTOrderingExpressionEnums_DESC),
+			}),
+			want: "KindOrderingExpression [DESC]\n",
+		},
+		{
+			name: "SetOperationAllOrDistinct ALL emits [ALL]",
+			node: newSetOperationAllOrDistinctNode(&generated.ASTSetOperationAllOrDistinctProto{
+				Value: ptr(generated.ASTSetOperationEnums_ALL),
+			}),
+			want: "KindSetOperationAllOrDistinct [ALL]\n",
+		},
+		{
+			name: "SetOperationType UNION emits [UNION]",
+			node: newSetOperationTypeNode(&generated.ASTSetOperationTypeProto{
+				Value: ptr(generated.ASTSetOperationEnums_UNION),
+			}),
+			want: "KindSetOperationType [UNION]\n",
+		},
 	}
 
 	for _, tt := range tests {

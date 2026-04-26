@@ -113,7 +113,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
           KindPathExpression
             KindIdentifier [users]
     KindOrderBy
-      KindOrderingExpression
+      KindOrderingExpression [DESC]
         KindPathExpression
           KindIdentifier [id]
 `,
@@ -301,8 +301,8 @@ func TestParser_ParseStatement_AST(t *testing.T) {
     KindSetOperation
       KindSetOperationMetadataList
         KindSetOperationMetadata
-          KindSetOperationType
-          KindSetOperationAllOrDistinct
+          KindSetOperationType [UNION]
+          KindSetOperationAllOrDistinct [ALL]
       KindSelect
         KindSelectList
           KindSelectColumn
@@ -348,7 +348,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
 			sql:  "SELECT DISTINCT name FROM users",
 			want: `KindQueryStatement
   KindQuery
-    KindSelect
+    KindSelect [DISTINCT]
       KindSelectList
         KindSelectColumn
           KindPathExpression
@@ -614,7 +614,7 @@ func TestParser_ParseStatement_AST(t *testing.T) {
                 KindIdentifier [ROW_NUMBER]
             KindWindowSpecification
               KindOrderBy
-                KindOrderingExpression
+                KindOrderingExpression [UNSPECIFIED]
                   KindPathExpression
                     KindIdentifier [id]
       KindFromClause
