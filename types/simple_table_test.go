@@ -1,9 +1,8 @@
-package catalog
+package types
 
 import (
 	"testing"
 
-	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
@@ -19,8 +18,8 @@ func TestSimpleTableToProto(t *testing.T) {
 		{
 			name: "multi-column table",
 			table: NewSimpleTable("orders",
-				NewSimpleColumn("orders", "id", types.Int64Type()),
-				NewSimpleColumn("orders", "total", types.DoubleType()),
+				NewSimpleColumn("orders", "id", Int64Type()),
+				NewSimpleColumn("orders", "total", DoubleType()),
 			),
 			want: &generated.SimpleTableProto{
 				Name:         ptr("orders"),
@@ -65,7 +64,7 @@ func TestSimpleTableAddColumnToProto(t *testing.T) {
 	}{
 		{
 			name: "add one column",
-			add:  []*SimpleColumn{NewSimpleColumn("t", "x", types.BoolType())},
+			add:  []*SimpleColumn{NewSimpleColumn("t", "x", BoolType())},
 			want: &generated.SimpleTableProto{
 				Name:         ptr("t"),
 				IsValueTable: boolPtr(false),
@@ -82,8 +81,8 @@ func TestSimpleTableAddColumnToProto(t *testing.T) {
 		{
 			name: "add two columns",
 			add: []*SimpleColumn{
-				NewSimpleColumn("t", "a", types.StringType()),
-				NewSimpleColumn("t", "b", types.TimestampType()),
+				NewSimpleColumn("t", "a", StringType()),
+				NewSimpleColumn("t", "b", TimestampType()),
 			},
 			want: &generated.SimpleTableProto{
 				Name:         ptr("t"),

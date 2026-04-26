@@ -1,9 +1,8 @@
-package catalog
+package types
 
 import (
 	"testing"
 
-	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +17,7 @@ func TestSimpleColumnToProto(t *testing.T) {
 	}{
 		{
 			name: "writable string column",
-			col:  NewSimpleColumn("t", "name", types.StringType()),
+			col:  NewSimpleColumn("t", "name", StringType()),
 			want: &generated.SimpleColumnProto{
 				Name:             ptr("name"),
 				Type:             &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_STRING.Enum()},
@@ -29,7 +28,7 @@ func TestSimpleColumnToProto(t *testing.T) {
 		{
 			name: "pseudo column",
 			col: func() *SimpleColumn {
-				c := NewSimpleColumn("t", "_partition", types.Int64Type())
+				c := NewSimpleColumn("t", "_partition", Int64Type())
 				c.IsPseudoColumn = true
 				c.IsWritable = false
 				return c
@@ -57,10 +56,9 @@ func TestSimpleColumnFullName(t *testing.T) {
 		{"orders", "total", "orders.total"},
 	}
 	for _, tt := range tests {
-		c := NewSimpleColumn(tt.table, tt.col, types.Int64Type())
+		c := NewSimpleColumn(tt.table, tt.col, Int64Type())
 		assert.Equal(t, tt.want, c.FullName())
 	}
 }
 
-func ptr(s string) *string { return &s }
 func boolPtr(b bool) *bool { return &b }

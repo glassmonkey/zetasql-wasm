@@ -1,15 +1,12 @@
-package catalog
+package types
 
-import (
-	"github.com/glassmonkey/zetasql-wasm/types"
-	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
-)
+import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 
 // SimpleColumn represents a column in a ZetaSQL table.
 type SimpleColumn struct {
 	TableName      string
 	Name           string
-	Type           types.Type
+	Type           Type
 	IsPseudoColumn bool
 	IsWritable     bool
 }
@@ -17,7 +14,7 @@ type SimpleColumn struct {
 // NewSimpleColumn creates a SimpleColumn with the given table name, column
 // name, and type. IsWritable defaults to true to match ZetaSQL's expectation
 // that ordinary columns can be written.
-func NewSimpleColumn(tableName, name string, typ types.Type) *SimpleColumn {
+func NewSimpleColumn(tableName, name string, typ Type) *SimpleColumn {
 	return &SimpleColumn{
 		TableName:  tableName,
 		Name:       name,
