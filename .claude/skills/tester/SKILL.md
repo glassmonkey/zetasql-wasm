@@ -68,6 +68,26 @@ When pointing out a problem in review, name the smell. "This is a *Sensitive Equ
 
 ## Rules (R1–R12)
 
+### R0: Every test is `(SUT × behavior)`
+
+Every test in this repo follows the same canonical shape:
+
+```go
+sut := <test target>           // a value/function/instance to exercise
+got := sut.<Method>(<args>)    // invoke the behavior under test
+assert.Equal(t, want, got)
+```
+
+- **SUT** = a meaningful object, function, or value under test (a `*Parser`, an `*AnalyzerOptions`, the function `TypeFromKind`, etc.).
+- **Behavior** = the *invocation* on the SUT — `sut.SomeMethod(args)` for a method, `sut(args)` for a function-as-SUT. The invocation is the probe; the test asserts on what the probe returns.
+
+If a test does not have this shape, **something is off**. The two recurring degenerate forms are:
+
+1. **No method is invoked** — `got := someStruct.SomeField` after a constructor call. Without a behavior probe, the test asserts only that Go assigned a value (R12 / *Sensitive Equality*).
+2. **The "method" is a trivial accessor** — `got := sut.GetX()` where `GetX` returns a single field (R7 / *Test Method Acne*).
+
+Subsequent rules R1–R12 are constraints on this shape: how to write the assert (R1, R8), how to structure the four phases (R4), how to build `want` (R2, R6), how to triangulate (R5), how to keep helpers thin (R9), how to keep tests independent (R10), and what behaviors are worth probing in the first place (R7, R11, R12).
+
 ### R1: Use testify
 - Don't use bare `t.Errorf` / `t.Fatalf` for assertions
 - Use `assert.Equal` for equality
@@ -77,8 +97,8 @@ When pointing out a problem in review, name the smell. "This is a *Sensitive Equ
 **Why**: Unifies diff display on failure and continue-vs-abort behavior.
 
 ### R2: SUT / got / want pattern
-- **SUT** = the object/function under test
-- **got** = the direct return value of `sut.method(args)` (or a single field/single accessor on it)
+- **SUT** = the object/function under test (per R0)
+- **got** = the value returned by *invoking* the behavior on the SUT — `sut.Method(args)` or `sut(args)`. Field access on the return value (`sut.Method(args).Field`) is fine *as long as* the method itself has logic worth probing. Bare `sut.Field` (no method invocation) is not a test of the SUT.
 - **want** = the expected value
 - Building a fresh `payload` struct in the test by extracting multiple fields from the SUT's return is **NOT allowed**
 - `want` must be a complete struct so field add/remove surfaces in the diff
