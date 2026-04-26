@@ -37,10 +37,6 @@ func (c *SimpleCatalog) AddZetaSQLBuiltinFunctions(opts *generated.ZetaSQLBuilti
 	c.BuiltinOptions = opts
 }
 
-// FullName returns the catalog's local name. SimpleCatalog has no parent
-// pointer, so the returned string is the leaf name regardless of nesting.
-func (c *SimpleCatalog) FullName() string { return c.Name }
-
 // FindTable looks up a table by name path, descending through sub-catalogs
 // for multi-segment paths. The last segment matches against Tables, earlier
 // segments match against SubCatalogs. Comparisons are case-insensitive

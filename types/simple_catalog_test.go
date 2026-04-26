@@ -101,28 +101,6 @@ func TestSimpleCatalogToProto(t *testing.T) {
 	}
 }
 
-func TestSimpleCatalog_FullName(t *testing.T) {
-	tests := []struct {
-		name string
-		want string
-	}{
-		{name: "main", want: "main"},
-		{name: "analytics_db", want: "analytics_db"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			sut := NewSimpleCatalog(tt.name)
-
-			// Act
-			got := sut.FullName()
-
-			// Assert
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
 // newFindTestCatalog builds a fixed two-level catalog used by both FindTable
 // and FindFunction tests:
 //
