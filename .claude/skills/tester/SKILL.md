@@ -1,22 +1,31 @@
 ---
 name: tester
 description: >
-  Authors and reviews Go test code in the zetasql-wasm repository against
-  the project's test conventions: SUT/got/want pattern, testify as the
-  assertion implementation, AAA structure, table-driven triangulation,
-  payload structs defined on the production side, no getters in tests,
-  wantErr type witness, minimal helpers, behavior over internal state
-  (per xUnit Test Patterns). Includes a code-level red-flag table and a
-  mandatory pre-completion sniff scan so test smells (Mystery Guest,
-  Buggy Tests, Sensitive Equality, etc.) get caught proactively on the
-  first pass instead of after user pushback. Use this skill whenever
-  the user says "write a test", "add a test for X", "review my tests",
-  "look at this test code", "do my tests follow the conventions?",
-  "improve these tests", "refactor these tests", or opens a *_test.go
-  file with intent to author or improve it — and apply the sniff scan
-  to your own test work even if no review was requested. Production-code
-  design concerns belong to the `developer` skill; the TDD cycle belongs
-  to the `tdd` skill.
+  Authors and reviews Go test code in zetasql-wasm: SUT/got/want,
+  testify, AAA, table-driven triangulation, full `want` structs,
+  `wantErr error` type witness, per-case fixture with `t.Context()`
+  (no `// Arrange (shared)`), trivial helpers, behavior over internal
+  state. Has a red-flag table and mandatory pre-completion sniff scan
+  so test smells (Mystery Guest, Buggy Tests, Sensitive Equality,
+  Assertion Roulette, Fragile Test) get caught on the first pass.
+
+  Fire whenever the user reasons about a Go test — writing one,
+  reviewing one, questioning whether a test is verifying anything
+  meaningful, debugging a flake, picking a fixture or `wantErr`
+  shape, judging a test helper, or decoding a reviewer comment about
+  a test — even when "test" is not said but the topic is clearly
+  `*_test.go` content. Examples include questions about whether a
+  constructor test or setter test is meaningful, what shape `wantErr`
+  should take, whether a setup helper at function scope is safe,
+  whether an `if`/`switch` inside a test helper is a problem, or
+  what a reviewer means by "tests target internal state".
+
+  Do NOT fire for production refactors that mention a test file
+  (→ `developer`), TDD orchestration (→ `tdd`, which delegates the
+  actual test shape back to this skill — so when invoked from a TDD
+  context, fire normally), build/CI failures, WASM debugging,
+  production API design even when "getter" appears, git/PR
+  mechanics, or general Go language questions.
 ---
 
 # Tester
