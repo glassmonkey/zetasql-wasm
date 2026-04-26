@@ -29,7 +29,9 @@ func newAbortBatchStatementNodeSlice(raws []*generated.ASTAbortBatchStatementPro
 	return nodes
 }
 
-func (n *AbortBatchStatementNode) Kind() Kind     { return KindAbortBatchStatement }
+func (n *AbortBatchStatementNode) Kind() Kind { return KindAbortBatchStatement }
+
+func (n *AbortBatchStatementNode) String() string { return formatNode(n) }
 func (n *AbortBatchStatementNode) statementNode() {}
 
 func (n *AbortBatchStatementNode) NumChildren() int {
@@ -65,6 +67,8 @@ func newAddColumnActionNodeSlice(raws []*generated.ASTAddColumnActionProto) []*A
 }
 
 func (n *AddColumnActionNode) Kind() Kind { return KindAddColumnAction }
+
+func (n *AddColumnActionNode) String() string { return formatNode(n) }
 
 func (n *AddColumnActionNode) ColumnDefinition() *ColumnDefinitionNode {
 	return newColumnDefinitionNode(n.raw.GetColumnDefinition())
@@ -144,6 +148,8 @@ func newAddColumnIdentifierActionNodeSlice(raws []*generated.ASTAddColumnIdentif
 
 func (n *AddColumnIdentifierActionNode) Kind() Kind { return KindAddColumnIdentifierAction }
 
+func (n *AddColumnIdentifierActionNode) String() string { return formatNode(n) }
+
 func (n *AddColumnIdentifierActionNode) ColumnName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetColumnName())
 }
@@ -209,6 +215,8 @@ func newAddConstraintActionNodeSlice(raws []*generated.ASTAddConstraintActionPro
 
 func (n *AddConstraintActionNode) Kind() Kind { return KindAddConstraintAction }
 
+func (n *AddConstraintActionNode) String() string { return formatNode(n) }
+
 func (n *AddConstraintActionNode) Constraint() Node {
 	return wrapTableConstraint(n.raw.GetConstraint())
 }
@@ -260,6 +268,8 @@ func newAddSubEntityActionNodeSlice(raws []*generated.ASTAddSubEntityActionProto
 }
 
 func (n *AddSubEntityActionNode) Kind() Kind { return KindAddSubEntityAction }
+
+func (n *AddSubEntityActionNode) String() string { return formatNode(n) }
 
 func (n *AddSubEntityActionNode) Type() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetType())
@@ -339,6 +349,8 @@ func newAddToRestricteeListClauseNodeSlice(raws []*generated.ASTAddToRestricteeL
 
 func (n *AddToRestricteeListClauseNode) Kind() Kind { return KindAddToRestricteeListClause }
 
+func (n *AddToRestricteeListClauseNode) String() string { return formatNode(n) }
+
 func (n *AddToRestricteeListClauseNode) IsIfNotExists() bool {
 	return n.raw.GetIsIfNotExists()
 }
@@ -390,6 +402,8 @@ func newAddTtlActionNodeSlice(raws []*generated.ASTAddTtlActionProto) []*AddTtlA
 }
 
 func (n *AddTtlActionNode) Kind() Kind { return KindAddTtlAction }
+
+func (n *AddTtlActionNode) String() string { return formatNode(n) }
 
 func (n *AddTtlActionNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -443,6 +457,8 @@ func newAfterMatchSkipClauseNodeSlice(raws []*generated.ASTAfterMatchSkipClauseP
 
 func (n *AfterMatchSkipClauseNode) Kind() Kind { return KindAfterMatchSkipClause }
 
+func (n *AfterMatchSkipClauseNode) String() string { return formatNode(n) }
+
 func (n *AfterMatchSkipClauseNode) TargetType() generated.ASTAfterMatchSkipClauseEnums_AfterMatchSkipTargetType {
 	return n.raw.GetTargetType()
 }
@@ -480,6 +496,8 @@ func newAliasNodeSlice(raws []*generated.ASTAliasProto) []*AliasNode {
 }
 
 func (n *AliasNode) Kind() Kind { return KindAlias }
+
+func (n *AliasNode) String() string { return formatNode(n) }
 
 func (n *AliasNode) Identifier() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetIdentifier())
@@ -529,6 +547,8 @@ func newAliasedGroupRowsNodeSlice(raws []*generated.ASTAliasedGroupRowsProto) []
 
 func (n *AliasedGroupRowsNode) Kind() Kind { return KindAliasedGroupRows }
 
+func (n *AliasedGroupRowsNode) String() string { return formatNode(n) }
+
 func (n *AliasedGroupRowsNode) Alias() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetAlias())
 }
@@ -575,7 +595,9 @@ func newAliasedQueryExpressionNodeSlice(raws []*generated.ASTAliasedQueryExpress
 	return nodes
 }
 
-func (n *AliasedQueryExpressionNode) Kind() Kind           { return KindAliasedQueryExpression }
+func (n *AliasedQueryExpressionNode) Kind() Kind { return KindAliasedQueryExpression }
+
+func (n *AliasedQueryExpressionNode) String() string       { return formatNode(n) }
 func (n *AliasedQueryExpressionNode) queryExpressionNode() {}
 
 func (n *AliasedQueryExpressionNode) Query() *QueryNode {
@@ -639,6 +661,8 @@ func newAliasedQueryListNodeSlice(raws []*generated.ASTAliasedQueryListProto) []
 
 func (n *AliasedQueryListNode) Kind() Kind { return KindAliasedQueryList }
 
+func (n *AliasedQueryListNode) String() string { return formatNode(n) }
+
 func (n *AliasedQueryListNode) AliasedQueryList() []*AliasedQueryNode {
 	return newAliasedQueryNodeSlice(n.raw.GetAliasedQueryList())
 }
@@ -685,6 +709,8 @@ func newAliasedQueryModifiersNodeSlice(raws []*generated.ASTAliasedQueryModifier
 }
 
 func (n *AliasedQueryModifiersNode) Kind() Kind { return KindAliasedQueryModifiers }
+
+func (n *AliasedQueryModifiersNode) String() string { return formatNode(n) }
 
 func (n *AliasedQueryModifiersNode) RecursionDepthModifier() *RecursionDepthModifierNode {
 	return newRecursionDepthModifierNode(n.raw.GetRecursionDepthModifier())
@@ -733,6 +759,8 @@ func newAliasedQueryNodeSlice(raws []*generated.ASTAliasedQueryProto) []*Aliased
 }
 
 func (n *AliasedQueryNode) Kind() Kind { return KindAliasedQuery }
+
+func (n *AliasedQueryNode) String() string { return formatNode(n) }
 
 func (n *AliasedQueryNode) Alias() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetAlias())
@@ -808,6 +836,8 @@ func newAlterActionListNodeSlice(raws []*generated.ASTAlterActionListProto) []*A
 
 func (n *AlterActionListNode) Kind() Kind { return KindAlterActionList }
 
+func (n *AlterActionListNode) String() string { return formatNode(n) }
+
 func (n *AlterActionListNode) Actions() []Node {
 	return wrapAlterActionSlice(n.raw.GetActions())
 }
@@ -856,6 +886,8 @@ func newAlterAllRowAccessPoliciesStatementNodeSlice(raws []*generated.ASTAlterAl
 func (n *AlterAllRowAccessPoliciesStatementNode) Kind() Kind {
 	return KindAlterAllRowAccessPoliciesStatement
 }
+
+func (n *AlterAllRowAccessPoliciesStatementNode) String() string { return formatNode(n) }
 func (n *AlterAllRowAccessPoliciesStatementNode) statementNode() {}
 
 func (n *AlterAllRowAccessPoliciesStatementNode) TableNamePath() *PathExpressionNode {
@@ -917,7 +949,9 @@ func newAlterApproxViewStatementNodeSlice(raws []*generated.ASTAlterApproxViewSt
 	return nodes
 }
 
-func (n *AlterApproxViewStatementNode) Kind() Kind     { return KindAlterApproxViewStatement }
+func (n *AlterApproxViewStatementNode) Kind() Kind { return KindAlterApproxViewStatement }
+
+func (n *AlterApproxViewStatementNode) String() string { return formatNode(n) }
 func (n *AlterApproxViewStatementNode) statementNode() {}
 
 func (n *AlterApproxViewStatementNode) NumChildren() int {
@@ -953,6 +987,8 @@ func newAlterColumnDropDefaultActionNodeSlice(raws []*generated.ASTAlterColumnDr
 }
 
 func (n *AlterColumnDropDefaultActionNode) Kind() Kind { return KindAlterColumnDropDefaultAction }
+
+func (n *AlterColumnDropDefaultActionNode) String() string { return formatNode(n) }
 
 func (n *AlterColumnDropDefaultActionNode) ColumnName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetColumnName())
@@ -1006,6 +1042,8 @@ func newAlterColumnDropGeneratedActionNodeSlice(raws []*generated.ASTAlterColumn
 
 func (n *AlterColumnDropGeneratedActionNode) Kind() Kind { return KindAlterColumnDropGeneratedAction }
 
+func (n *AlterColumnDropGeneratedActionNode) String() string { return formatNode(n) }
+
 func (n *AlterColumnDropGeneratedActionNode) ColumnName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetColumnName())
 }
@@ -1058,6 +1096,8 @@ func newAlterColumnDropNotNullActionNodeSlice(raws []*generated.ASTAlterColumnDr
 
 func (n *AlterColumnDropNotNullActionNode) Kind() Kind { return KindAlterColumnDropNotNullAction }
 
+func (n *AlterColumnDropNotNullActionNode) String() string { return formatNode(n) }
+
 func (n *AlterColumnDropNotNullActionNode) ColumnName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetColumnName())
 }
@@ -1109,6 +1149,8 @@ func newAlterColumnOptionsActionNodeSlice(raws []*generated.ASTAlterColumnOption
 }
 
 func (n *AlterColumnOptionsActionNode) Kind() Kind { return KindAlterColumnOptionsAction }
+
+func (n *AlterColumnOptionsActionNode) String() string { return formatNode(n) }
 
 func (n *AlterColumnOptionsActionNode) ColumnName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetColumnName())
@@ -1175,6 +1217,8 @@ func newAlterColumnSetDefaultActionNodeSlice(raws []*generated.ASTAlterColumnSet
 
 func (n *AlterColumnSetDefaultActionNode) Kind() Kind { return KindAlterColumnSetDefaultAction }
 
+func (n *AlterColumnSetDefaultActionNode) String() string { return formatNode(n) }
+
 func (n *AlterColumnSetDefaultActionNode) ColumnName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetColumnName())
 }
@@ -1240,6 +1284,8 @@ func newAlterColumnSetGeneratedActionNodeSlice(raws []*generated.ASTAlterColumnS
 
 func (n *AlterColumnSetGeneratedActionNode) Kind() Kind { return KindAlterColumnSetGeneratedAction }
 
+func (n *AlterColumnSetGeneratedActionNode) String() string { return formatNode(n) }
+
 func (n *AlterColumnSetGeneratedActionNode) ColumnName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetColumnName())
 }
@@ -1304,6 +1350,8 @@ func newAlterColumnTypeActionNodeSlice(raws []*generated.ASTAlterColumnTypeActio
 }
 
 func (n *AlterColumnTypeActionNode) Kind() Kind { return KindAlterColumnTypeAction }
+
+func (n *AlterColumnTypeActionNode) String() string { return formatNode(n) }
 
 func (n *AlterColumnTypeActionNode) ColumnName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetColumnName())
@@ -1381,7 +1429,9 @@ func newAlterConnectionStatementNodeSlice(raws []*generated.ASTAlterConnectionSt
 	return nodes
 }
 
-func (n *AlterConnectionStatementNode) Kind() Kind     { return KindAlterConnectionStatement }
+func (n *AlterConnectionStatementNode) Kind() Kind { return KindAlterConnectionStatement }
+
+func (n *AlterConnectionStatementNode) String() string { return formatNode(n) }
 func (n *AlterConnectionStatementNode) statementNode() {}
 
 func (n *AlterConnectionStatementNode) NumChildren() int {
@@ -1419,6 +1469,8 @@ func newAlterConstraintEnforcementActionNodeSlice(raws []*generated.ASTAlterCons
 func (n *AlterConstraintEnforcementActionNode) Kind() Kind {
 	return KindAlterConstraintEnforcementAction
 }
+
+func (n *AlterConstraintEnforcementActionNode) String() string { return formatNode(n) }
 
 func (n *AlterConstraintEnforcementActionNode) ConstraintName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetConstraintName())
@@ -1475,6 +1527,8 @@ func newAlterConstraintSetOptionsActionNodeSlice(raws []*generated.ASTAlterConst
 }
 
 func (n *AlterConstraintSetOptionsActionNode) Kind() Kind { return KindAlterConstraintSetOptionsAction }
+
+func (n *AlterConstraintSetOptionsActionNode) String() string { return formatNode(n) }
 
 func (n *AlterConstraintSetOptionsActionNode) ConstraintName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetConstraintName())
@@ -1539,7 +1593,9 @@ func newAlterDatabaseStatementNodeSlice(raws []*generated.ASTAlterDatabaseStatem
 	return nodes
 }
 
-func (n *AlterDatabaseStatementNode) Kind() Kind     { return KindAlterDatabaseStatement }
+func (n *AlterDatabaseStatementNode) Kind() Kind { return KindAlterDatabaseStatement }
+
+func (n *AlterDatabaseStatementNode) String() string { return formatNode(n) }
 func (n *AlterDatabaseStatementNode) statementNode() {}
 
 func (n *AlterDatabaseStatementNode) NumChildren() int {
@@ -1574,7 +1630,9 @@ func newAlterEntityStatementNodeSlice(raws []*generated.ASTAlterEntityStatementP
 	return nodes
 }
 
-func (n *AlterEntityStatementNode) Kind() Kind     { return KindAlterEntityStatement }
+func (n *AlterEntityStatementNode) Kind() Kind { return KindAlterEntityStatement }
+
+func (n *AlterEntityStatementNode) String() string { return formatNode(n) }
 func (n *AlterEntityStatementNode) statementNode() {}
 
 func (n *AlterEntityStatementNode) Type() *IdentifierNode {
@@ -1623,7 +1681,9 @@ func newAlterExternalSchemaStatementNodeSlice(raws []*generated.ASTAlterExternal
 	return nodes
 }
 
-func (n *AlterExternalSchemaStatementNode) Kind() Kind     { return KindAlterExternalSchemaStatement }
+func (n *AlterExternalSchemaStatementNode) Kind() Kind { return KindAlterExternalSchemaStatement }
+
+func (n *AlterExternalSchemaStatementNode) String() string { return formatNode(n) }
 func (n *AlterExternalSchemaStatementNode) statementNode() {}
 
 func (n *AlterExternalSchemaStatementNode) NumChildren() int {
@@ -1658,7 +1718,9 @@ func newAlterIndexStatementNodeSlice(raws []*generated.ASTAlterIndexStatementPro
 	return nodes
 }
 
-func (n *AlterIndexStatementNode) Kind() Kind     { return KindAlterIndexStatement }
+func (n *AlterIndexStatementNode) Kind() Kind { return KindAlterIndexStatement }
+
+func (n *AlterIndexStatementNode) String() string { return formatNode(n) }
 func (n *AlterIndexStatementNode) statementNode() {}
 
 func (n *AlterIndexStatementNode) TableName() *PathExpressionNode {
@@ -1711,7 +1773,9 @@ func newAlterMaterializedViewStatementNodeSlice(raws []*generated.ASTAlterMateri
 	return nodes
 }
 
-func (n *AlterMaterializedViewStatementNode) Kind() Kind     { return KindAlterMaterializedViewStatement }
+func (n *AlterMaterializedViewStatementNode) Kind() Kind { return KindAlterMaterializedViewStatement }
+
+func (n *AlterMaterializedViewStatementNode) String() string { return formatNode(n) }
 func (n *AlterMaterializedViewStatementNode) statementNode() {}
 
 func (n *AlterMaterializedViewStatementNode) NumChildren() int {
@@ -1746,7 +1810,9 @@ func newAlterModelStatementNodeSlice(raws []*generated.ASTAlterModelStatementPro
 	return nodes
 }
 
-func (n *AlterModelStatementNode) Kind() Kind     { return KindAlterModelStatement }
+func (n *AlterModelStatementNode) Kind() Kind { return KindAlterModelStatement }
+
+func (n *AlterModelStatementNode) String() string { return formatNode(n) }
 func (n *AlterModelStatementNode) statementNode() {}
 
 func (n *AlterModelStatementNode) NumChildren() int {
@@ -1784,6 +1850,8 @@ func newAlterPrivilegeRestrictionStatementNodeSlice(raws []*generated.ASTAlterPr
 func (n *AlterPrivilegeRestrictionStatementNode) Kind() Kind {
 	return KindAlterPrivilegeRestrictionStatement
 }
+
+func (n *AlterPrivilegeRestrictionStatementNode) String() string { return formatNode(n) }
 func (n *AlterPrivilegeRestrictionStatementNode) statementNode() {}
 
 func (n *AlterPrivilegeRestrictionStatementNode) Privileges() *PrivilegesNode {
@@ -1845,7 +1913,9 @@ func newAlterRowAccessPolicyStatementNodeSlice(raws []*generated.ASTAlterRowAcce
 	return nodes
 }
 
-func (n *AlterRowAccessPolicyStatementNode) Kind() Kind     { return KindAlterRowAccessPolicyStatement }
+func (n *AlterRowAccessPolicyStatementNode) Kind() Kind { return KindAlterRowAccessPolicyStatement }
+
+func (n *AlterRowAccessPolicyStatementNode) String() string { return formatNode(n) }
 func (n *AlterRowAccessPolicyStatementNode) statementNode() {}
 
 func (n *AlterRowAccessPolicyStatementNode) Name() *IdentifierNode {
@@ -1894,7 +1964,9 @@ func newAlterSchemaStatementNodeSlice(raws []*generated.ASTAlterSchemaStatementP
 	return nodes
 }
 
-func (n *AlterSchemaStatementNode) Kind() Kind     { return KindAlterSchemaStatement }
+func (n *AlterSchemaStatementNode) Kind() Kind { return KindAlterSchemaStatement }
+
+func (n *AlterSchemaStatementNode) String() string { return formatNode(n) }
 func (n *AlterSchemaStatementNode) statementNode() {}
 
 func (n *AlterSchemaStatementNode) NumChildren() int {
@@ -1929,7 +2001,9 @@ func newAlterSequenceStatementNodeSlice(raws []*generated.ASTAlterSequenceStatem
 	return nodes
 }
 
-func (n *AlterSequenceStatementNode) Kind() Kind     { return KindAlterSequenceStatement }
+func (n *AlterSequenceStatementNode) Kind() Kind { return KindAlterSequenceStatement }
+
+func (n *AlterSequenceStatementNode) String() string { return formatNode(n) }
 func (n *AlterSequenceStatementNode) statementNode() {}
 
 func (n *AlterSequenceStatementNode) NumChildren() int {
@@ -1965,6 +2039,8 @@ func newAlterSubEntityActionNodeSlice(raws []*generated.ASTAlterSubEntityActionP
 }
 
 func (n *AlterSubEntityActionNode) Kind() Kind { return KindAlterSubEntityAction }
+
+func (n *AlterSubEntityActionNode) String() string { return formatNode(n) }
 
 func (n *AlterSubEntityActionNode) Type() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetType())
@@ -2042,7 +2118,9 @@ func newAlterTableStatementNodeSlice(raws []*generated.ASTAlterTableStatementPro
 	return nodes
 }
 
-func (n *AlterTableStatementNode) Kind() Kind     { return KindAlterTableStatement }
+func (n *AlterTableStatementNode) Kind() Kind { return KindAlterTableStatement }
+
+func (n *AlterTableStatementNode) String() string { return formatNode(n) }
 func (n *AlterTableStatementNode) statementNode() {}
 
 func (n *AlterTableStatementNode) NumChildren() int {
@@ -2077,7 +2155,9 @@ func newAlterViewStatementNodeSlice(raws []*generated.ASTAlterViewStatementProto
 	return nodes
 }
 
-func (n *AlterViewStatementNode) Kind() Kind     { return KindAlterViewStatement }
+func (n *AlterViewStatementNode) Kind() Kind { return KindAlterViewStatement }
+
+func (n *AlterViewStatementNode) String() string { return formatNode(n) }
 func (n *AlterViewStatementNode) statementNode() {}
 
 func (n *AlterViewStatementNode) NumChildren() int {
@@ -2112,7 +2192,9 @@ func newAnalyticFunctionCallNodeSlice(raws []*generated.ASTAnalyticFunctionCallP
 	return nodes
 }
 
-func (n *AnalyticFunctionCallNode) Kind() Kind      { return KindAnalyticFunctionCall }
+func (n *AnalyticFunctionCallNode) Kind() Kind { return KindAnalyticFunctionCall }
+
+func (n *AnalyticFunctionCallNode) String() string  { return formatNode(n) }
 func (n *AnalyticFunctionCallNode) expressionNode() {}
 
 func (n *AnalyticFunctionCallNode) Function() *FunctionCallNode {
@@ -2174,7 +2256,9 @@ func newAnalyzeStatementNodeSlice(raws []*generated.ASTAnalyzeStatementProto) []
 	return nodes
 }
 
-func (n *AnalyzeStatementNode) Kind() Kind     { return KindAnalyzeStatement }
+func (n *AnalyzeStatementNode) Kind() Kind { return KindAnalyzeStatement }
+
+func (n *AnalyzeStatementNode) String() string { return formatNode(n) }
 func (n *AnalyzeStatementNode) statementNode() {}
 
 func (n *AnalyzeStatementNode) OptionsList() *OptionsListNode {
@@ -2236,7 +2320,9 @@ func newAndExprNodeSlice(raws []*generated.ASTAndExprProto) []*AndExprNode {
 	return nodes
 }
 
-func (n *AndExprNode) Kind() Kind      { return KindAndExpr }
+func (n *AndExprNode) Kind() Kind { return KindAndExpr }
+
+func (n *AndExprNode) String() string  { return formatNode(n) }
 func (n *AndExprNode) expressionNode() {}
 
 func (n *AndExprNode) Conjuncts() []ExpressionNode {
@@ -2286,6 +2372,8 @@ func newAnySomeAllOpNodeSlice(raws []*generated.ASTAnySomeAllOpProto) []*AnySome
 
 func (n *AnySomeAllOpNode) Kind() Kind { return KindAnySomeAllOp }
 
+func (n *AnySomeAllOpNode) String() string { return formatNode(n) }
+
 func (n *AnySomeAllOpNode) Op() generated.ASTAnySomeAllOpEnums_Op {
 	return n.raw.GetOp()
 }
@@ -2324,6 +2412,8 @@ func newArrayColumnSchemaNodeSlice(raws []*generated.ASTArrayColumnSchemaProto) 
 
 func (n *ArrayColumnSchemaNode) Kind() Kind { return KindArrayColumnSchema }
 
+func (n *ArrayColumnSchemaNode) String() string { return formatNode(n) }
+
 func (n *ArrayColumnSchemaNode) NumChildren() int {
 	count := 0
 	return count
@@ -2356,7 +2446,9 @@ func newArrayConstructorNodeSlice(raws []*generated.ASTArrayConstructorProto) []
 	return nodes
 }
 
-func (n *ArrayConstructorNode) Kind() Kind      { return KindArrayConstructor }
+func (n *ArrayConstructorNode) Kind() Kind { return KindArrayConstructor }
+
+func (n *ArrayConstructorNode) String() string  { return formatNode(n) }
 func (n *ArrayConstructorNode) expressionNode() {}
 
 func (n *ArrayConstructorNode) Type() *ArrayTypeNode {
@@ -2417,7 +2509,9 @@ func newArrayElementNodeSlice(raws []*generated.ASTArrayElementProto) []*ArrayEl
 	return nodes
 }
 
-func (n *ArrayElementNode) Kind() Kind      { return KindArrayElement }
+func (n *ArrayElementNode) Kind() Kind { return KindArrayElement }
+
+func (n *ArrayElementNode) String() string  { return formatNode(n) }
 func (n *ArrayElementNode) expressionNode() {}
 
 func (n *ArrayElementNode) Array() ExpressionNode {
@@ -2494,6 +2588,8 @@ func newArrayTypeNodeSlice(raws []*generated.ASTArrayTypeProto) []*ArrayTypeNode
 
 func (n *ArrayTypeNode) Kind() Kind { return KindArrayType }
 
+func (n *ArrayTypeNode) String() string { return formatNode(n) }
+
 func (n *ArrayTypeNode) ElementType() Node {
 	return wrapType(n.raw.GetElementType())
 }
@@ -2568,6 +2664,8 @@ func newAssertRowsModifiedNodeSlice(raws []*generated.ASTAssertRowsModifiedProto
 
 func (n *AssertRowsModifiedNode) Kind() Kind { return KindAssertRowsModified }
 
+func (n *AssertRowsModifiedNode) String() string { return formatNode(n) }
+
 func (n *AssertRowsModifiedNode) NumRows() ExpressionNode {
 	return wrapExpression(n.raw.GetNumRows())
 }
@@ -2614,7 +2712,9 @@ func newAssertStatementNodeSlice(raws []*generated.ASTAssertStatementProto) []*A
 	return nodes
 }
 
-func (n *AssertStatementNode) Kind() Kind     { return KindAssertStatement }
+func (n *AssertStatementNode) Kind() Kind { return KindAssertStatement }
+
+func (n *AssertStatementNode) String() string { return formatNode(n) }
 func (n *AssertStatementNode) statementNode() {}
 
 func (n *AssertStatementNode) Expr() ExpressionNode {
@@ -2676,7 +2776,9 @@ func newAssignmentFromStructNodeSlice(raws []*generated.ASTAssignmentFromStructP
 	return nodes
 }
 
-func (n *AssignmentFromStructNode) Kind() Kind     { return KindAssignmentFromStruct }
+func (n *AssignmentFromStructNode) Kind() Kind { return KindAssignmentFromStruct }
+
+func (n *AssignmentFromStructNode) String() string { return formatNode(n) }
 func (n *AssignmentFromStructNode) statementNode() {}
 
 func (n *AssignmentFromStructNode) Variables() *IdentifierListNode {
@@ -2740,6 +2842,8 @@ func newAuxLoadDataFromFilesOptionsListNodeSlice(raws []*generated.ASTAuxLoadDat
 
 func (n *AuxLoadDataFromFilesOptionsListNode) Kind() Kind { return KindAuxLoadDataFromFilesOptionsList }
 
+func (n *AuxLoadDataFromFilesOptionsListNode) String() string { return formatNode(n) }
+
 func (n *AuxLoadDataFromFilesOptionsListNode) OptionsList() *OptionsListNode {
 	return newOptionsListNode(n.raw.GetOptionsList())
 }
@@ -2787,6 +2891,8 @@ func newAuxLoadDataPartitionsClauseNodeSlice(raws []*generated.ASTAuxLoadDataPar
 }
 
 func (n *AuxLoadDataPartitionsClauseNode) Kind() Kind { return KindAuxLoadDataPartitionsClause }
+
+func (n *AuxLoadDataPartitionsClauseNode) String() string { return formatNode(n) }
 
 func (n *AuxLoadDataPartitionsClauseNode) PartitionFilter() ExpressionNode {
 	return wrapExpression(n.raw.GetPartitionFilter())
@@ -2838,7 +2944,9 @@ func newAuxLoadDataStatementNodeSlice(raws []*generated.ASTAuxLoadDataStatementP
 	return nodes
 }
 
-func (n *AuxLoadDataStatementNode) Kind() Kind     { return KindAuxLoadDataStatement }
+func (n *AuxLoadDataStatementNode) Kind() Kind { return KindAuxLoadDataStatement }
+
+func (n *AuxLoadDataStatementNode) String() string { return formatNode(n) }
 func (n *AuxLoadDataStatementNode) statementNode() {}
 
 func (n *AuxLoadDataStatementNode) InsertionMode() generated.ASTAuxLoadDataStatementEnums_InsertionMode {
@@ -2947,7 +3055,9 @@ func newBeginEndBlockNodeSlice(raws []*generated.ASTBeginEndBlockProto) []*Begin
 	return nodes
 }
 
-func (n *BeginEndBlockNode) Kind() Kind     { return KindBeginEndBlock }
+func (n *BeginEndBlockNode) Kind() Kind { return KindBeginEndBlock }
+
+func (n *BeginEndBlockNode) String() string { return formatNode(n) }
 func (n *BeginEndBlockNode) statementNode() {}
 
 func (n *BeginEndBlockNode) Label() *LabelNode {
@@ -3022,7 +3132,9 @@ func newBeginStatementNodeSlice(raws []*generated.ASTBeginStatementProto) []*Beg
 	return nodes
 }
 
-func (n *BeginStatementNode) Kind() Kind     { return KindBeginStatement }
+func (n *BeginStatementNode) Kind() Kind { return KindBeginStatement }
+
+func (n *BeginStatementNode) String() string { return formatNode(n) }
 func (n *BeginStatementNode) statementNode() {}
 
 func (n *BeginStatementNode) ModeList() *TransactionModeListNode {
@@ -3071,7 +3183,9 @@ func newBetweenExpressionNodeSlice(raws []*generated.ASTBetweenExpressionProto) 
 	return nodes
 }
 
-func (n *BetweenExpressionNode) Kind() Kind      { return KindBetweenExpression }
+func (n *BetweenExpressionNode) Kind() Kind { return KindBetweenExpression }
+
+func (n *BetweenExpressionNode) String() string  { return formatNode(n) }
 func (n *BetweenExpressionNode) expressionNode() {}
 
 func (n *BetweenExpressionNode) Lhs() ExpressionNode {
@@ -3163,7 +3277,9 @@ func newBigNumericLiteralNodeSlice(raws []*generated.ASTBigNumericLiteralProto) 
 	return nodes
 }
 
-func (n *BigNumericLiteralNode) Kind() Kind      { return KindBigNumericLiteral }
+func (n *BigNumericLiteralNode) Kind() Kind { return KindBigNumericLiteral }
+
+func (n *BigNumericLiteralNode) String() string  { return formatNode(n) }
 func (n *BigNumericLiteralNode) expressionNode() {}
 func (n *BigNumericLiteralNode) leafNode()       {}
 
@@ -3213,7 +3329,9 @@ func newBinaryExpressionNodeSlice(raws []*generated.ASTBinaryExpressionProto) []
 	return nodes
 }
 
-func (n *BinaryExpressionNode) Kind() Kind      { return KindBinaryExpression }
+func (n *BinaryExpressionNode) Kind() Kind { return KindBinaryExpression }
+
+func (n *BinaryExpressionNode) String() string  { return formatNode(n) }
 func (n *BinaryExpressionNode) expressionNode() {}
 
 func (n *BinaryExpressionNode) Op() generated.ASTBinaryExpressionEnums_Op {
@@ -3283,7 +3401,9 @@ func newBitwiseShiftExpressionNodeSlice(raws []*generated.ASTBitwiseShiftExpress
 	return nodes
 }
 
-func (n *BitwiseShiftExpressionNode) Kind() Kind      { return KindBitwiseShiftExpression }
+func (n *BitwiseShiftExpressionNode) Kind() Kind { return KindBitwiseShiftExpression }
+
+func (n *BitwiseShiftExpressionNode) String() string  { return formatNode(n) }
 func (n *BitwiseShiftExpressionNode) expressionNode() {}
 
 func (n *BitwiseShiftExpressionNode) Lhs() ExpressionNode {
@@ -3362,7 +3482,9 @@ func newBooleanLiteralNodeSlice(raws []*generated.ASTBooleanLiteralProto) []*Boo
 	return nodes
 }
 
-func (n *BooleanLiteralNode) Kind() Kind      { return KindBooleanLiteral }
+func (n *BooleanLiteralNode) Kind() Kind { return KindBooleanLiteral }
+
+func (n *BooleanLiteralNode) String() string  { return formatNode(n) }
 func (n *BooleanLiteralNode) expressionNode() {}
 func (n *BooleanLiteralNode) leafNode()       {}
 
@@ -3403,6 +3525,8 @@ func newBoundedQuantifierNodeSlice(raws []*generated.ASTBoundedQuantifierProto) 
 }
 
 func (n *BoundedQuantifierNode) Kind() Kind { return KindBoundedQuantifier }
+
+func (n *BoundedQuantifierNode) String() string { return formatNode(n) }
 
 func (n *BoundedQuantifierNode) LowerBound() *QuantifierBoundNode {
 	return newQuantifierBoundNode(n.raw.GetLowerBound())
@@ -3464,6 +3588,8 @@ func newBracedConstructorFieldNodeSlice(raws []*generated.ASTBracedConstructorFi
 }
 
 func (n *BracedConstructorFieldNode) Kind() Kind { return KindBracedConstructorField }
+
+func (n *BracedConstructorFieldNode) String() string { return formatNode(n) }
 
 func (n *BracedConstructorFieldNode) Value() *BracedConstructorFieldValueNode {
 	return newBracedConstructorFieldValueNode(n.raw.GetValue())
@@ -3530,6 +3656,8 @@ func newBracedConstructorFieldValueNodeSlice(raws []*generated.ASTBracedConstruc
 
 func (n *BracedConstructorFieldValueNode) Kind() Kind { return KindBracedConstructorFieldValue }
 
+func (n *BracedConstructorFieldValueNode) String() string { return formatNode(n) }
+
 func (n *BracedConstructorFieldValueNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
 }
@@ -3580,7 +3708,9 @@ func newBracedConstructorLhsNodeSlice(raws []*generated.ASTBracedConstructorLhsP
 	return nodes
 }
 
-func (n *BracedConstructorLhsNode) Kind() Kind      { return KindBracedConstructorLhs }
+func (n *BracedConstructorLhsNode) Kind() Kind { return KindBracedConstructorLhs }
+
+func (n *BracedConstructorLhsNode) String() string  { return formatNode(n) }
 func (n *BracedConstructorLhsNode) expressionNode() {}
 
 func (n *BracedConstructorLhsNode) ExtendedPathExpr() ExpressionNode {
@@ -3633,7 +3763,9 @@ func newBracedConstructorNodeSlice(raws []*generated.ASTBracedConstructorProto) 
 	return nodes
 }
 
-func (n *BracedConstructorNode) Kind() Kind      { return KindBracedConstructor }
+func (n *BracedConstructorNode) Kind() Kind { return KindBracedConstructor }
+
+func (n *BracedConstructorNode) String() string  { return formatNode(n) }
 func (n *BracedConstructorNode) expressionNode() {}
 
 func (n *BracedConstructorNode) Fields() []*BracedConstructorFieldNode {
@@ -3681,7 +3813,9 @@ func newBracedNewConstructorNodeSlice(raws []*generated.ASTBracedNewConstructorP
 	return nodes
 }
 
-func (n *BracedNewConstructorNode) Kind() Kind      { return KindBracedNewConstructor }
+func (n *BracedNewConstructorNode) Kind() Kind { return KindBracedNewConstructor }
+
+func (n *BracedNewConstructorNode) String() string  { return formatNode(n) }
 func (n *BracedNewConstructorNode) expressionNode() {}
 
 func (n *BracedNewConstructorNode) TypeName() *SimpleTypeNode {
@@ -3743,7 +3877,9 @@ func newBreakStatementNodeSlice(raws []*generated.ASTBreakStatementProto) []*Bre
 	return nodes
 }
 
-func (n *BreakStatementNode) Kind() Kind     { return KindBreakStatement }
+func (n *BreakStatementNode) Kind() Kind { return KindBreakStatement }
+
+func (n *BreakStatementNode) String() string { return formatNode(n) }
 func (n *BreakStatementNode) statementNode() {}
 
 func (n *BreakStatementNode) Keyword() generated.ASTBreakContinueStatementEnums_BreakContinueKeyword {
@@ -3782,7 +3918,9 @@ func newBytesLiteralComponentNodeSlice(raws []*generated.ASTBytesLiteralComponen
 	return nodes
 }
 
-func (n *BytesLiteralComponentNode) Kind() Kind      { return KindBytesLiteralComponent }
+func (n *BytesLiteralComponentNode) Kind() Kind { return KindBytesLiteralComponent }
+
+func (n *BytesLiteralComponentNode) String() string  { return formatNode(n) }
 func (n *BytesLiteralComponentNode) expressionNode() {}
 func (n *BytesLiteralComponentNode) leafNode()       {}
 
@@ -3818,7 +3956,9 @@ func newBytesLiteralNodeSlice(raws []*generated.ASTBytesLiteralProto) []*BytesLi
 	return nodes
 }
 
-func (n *BytesLiteralNode) Kind() Kind      { return KindBytesLiteral }
+func (n *BytesLiteralNode) Kind() Kind { return KindBytesLiteral }
+
+func (n *BytesLiteralNode) String() string  { return formatNode(n) }
 func (n *BytesLiteralNode) expressionNode() {}
 func (n *BytesLiteralNode) leafNode()       {}
 
@@ -3871,7 +4011,9 @@ func newCallStatementNodeSlice(raws []*generated.ASTCallStatementProto) []*CallS
 	return nodes
 }
 
-func (n *CallStatementNode) Kind() Kind     { return KindCallStatement }
+func (n *CallStatementNode) Kind() Kind { return KindCallStatement }
+
+func (n *CallStatementNode) String() string { return formatNode(n) }
 func (n *CallStatementNode) statementNode() {}
 
 func (n *CallStatementNode) ProcedureName() *PathExpressionNode {
@@ -3932,7 +4074,9 @@ func newCaseNoValueExpressionNodeSlice(raws []*generated.ASTCaseNoValueExpressio
 	return nodes
 }
 
-func (n *CaseNoValueExpressionNode) Kind() Kind      { return KindCaseNoValueExpression }
+func (n *CaseNoValueExpressionNode) Kind() Kind { return KindCaseNoValueExpression }
+
+func (n *CaseNoValueExpressionNode) String() string  { return formatNode(n) }
 func (n *CaseNoValueExpressionNode) expressionNode() {}
 
 func (n *CaseNoValueExpressionNode) Arguments() []ExpressionNode {
@@ -3980,7 +4124,9 @@ func newCaseStatementNodeSlice(raws []*generated.ASTCaseStatementProto) []*CaseS
 	return nodes
 }
 
-func (n *CaseStatementNode) Kind() Kind     { return KindCaseStatement }
+func (n *CaseStatementNode) Kind() Kind { return KindCaseStatement }
+
+func (n *CaseStatementNode) String() string { return formatNode(n) }
 func (n *CaseStatementNode) statementNode() {}
 
 func (n *CaseStatementNode) Expression() ExpressionNode {
@@ -4055,7 +4201,9 @@ func newCaseValueExpressionNodeSlice(raws []*generated.ASTCaseValueExpressionPro
 	return nodes
 }
 
-func (n *CaseValueExpressionNode) Kind() Kind      { return KindCaseValueExpression }
+func (n *CaseValueExpressionNode) Kind() Kind { return KindCaseValueExpression }
+
+func (n *CaseValueExpressionNode) String() string  { return formatNode(n) }
 func (n *CaseValueExpressionNode) expressionNode() {}
 
 func (n *CaseValueExpressionNode) Arguments() []ExpressionNode {
@@ -4103,7 +4251,9 @@ func newCastExpressionNodeSlice(raws []*generated.ASTCastExpressionProto) []*Cas
 	return nodes
 }
 
-func (n *CastExpressionNode) Kind() Kind      { return KindCastExpression }
+func (n *CastExpressionNode) Kind() Kind { return KindCastExpression }
+
+func (n *CastExpressionNode) String() string  { return formatNode(n) }
 func (n *CastExpressionNode) expressionNode() {}
 
 func (n *CastExpressionNode) Expr() ExpressionNode {
@@ -4184,6 +4334,8 @@ func newChainedBaseExprNodeSlice(raws []*generated.ASTChainedBaseExprProto) []*C
 
 func (n *ChainedBaseExprNode) Kind() Kind { return KindChainedBaseExpr }
 
+func (n *ChainedBaseExprNode) String() string { return formatNode(n) }
+
 func (n *ChainedBaseExprNode) Expr() ExpressionNode {
 	return wrapExpression(n.raw.GetExpr())
 }
@@ -4231,6 +4383,8 @@ func newCheckConstraintNodeSlice(raws []*generated.ASTCheckConstraintProto) []*C
 }
 
 func (n *CheckConstraintNode) Kind() Kind { return KindCheckConstraint }
+
+func (n *CheckConstraintNode) String() string { return formatNode(n) }
 
 func (n *CheckConstraintNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -4310,6 +4464,8 @@ func newClampedBetweenModifierNodeSlice(raws []*generated.ASTClampedBetweenModif
 
 func (n *ClampedBetweenModifierNode) Kind() Kind { return KindClampedBetweenModifier }
 
+func (n *ClampedBetweenModifierNode) String() string { return formatNode(n) }
+
 func (n *ClampedBetweenModifierNode) Low() ExpressionNode {
 	return wrapExpression(n.raw.GetLow())
 }
@@ -4371,6 +4527,8 @@ func newCloneDataSourceListNodeSlice(raws []*generated.ASTCloneDataSourceListPro
 
 func (n *CloneDataSourceListNode) Kind() Kind { return KindCloneDataSourceList }
 
+func (n *CloneDataSourceListNode) String() string { return formatNode(n) }
+
 func (n *CloneDataSourceListNode) DataSources() []*CloneDataSourceNode {
 	return newCloneDataSourceNodeSlice(n.raw.GetDataSources())
 }
@@ -4416,7 +4574,9 @@ func newCloneDataSourceNodeSlice(raws []*generated.ASTCloneDataSourceProto) []*C
 	return nodes
 }
 
-func (n *CloneDataSourceNode) Kind() Kind           { return KindCloneDataSource }
+func (n *CloneDataSourceNode) Kind() Kind { return KindCloneDataSource }
+
+func (n *CloneDataSourceNode) String() string       { return formatNode(n) }
 func (n *CloneDataSourceNode) tableExpressionNode() {}
 
 func (n *CloneDataSourceNode) NumChildren() int {
@@ -4451,7 +4611,9 @@ func newCloneDataStatementNodeSlice(raws []*generated.ASTCloneDataStatementProto
 	return nodes
 }
 
-func (n *CloneDataStatementNode) Kind() Kind     { return KindCloneDataStatement }
+func (n *CloneDataStatementNode) Kind() Kind { return KindCloneDataStatement }
+
+func (n *CloneDataStatementNode) String() string { return formatNode(n) }
 func (n *CloneDataStatementNode) statementNode() {}
 
 func (n *CloneDataStatementNode) TargetPath() *PathExpressionNode {
@@ -4515,6 +4677,8 @@ func newClusterByNodeSlice(raws []*generated.ASTClusterByProto) []*ClusterByNode
 
 func (n *ClusterByNode) Kind() Kind { return KindClusterBy }
 
+func (n *ClusterByNode) String() string { return formatNode(n) }
+
 func (n *ClusterByNode) ClusteringExpressions() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetClusteringExpressions())
 }
@@ -4561,6 +4725,8 @@ func newCollateNodeSlice(raws []*generated.ASTCollateProto) []*CollateNode {
 }
 
 func (n *CollateNode) Kind() Kind { return KindCollate }
+
+func (n *CollateNode) String() string { return formatNode(n) }
 
 func (n *CollateNode) CollationName() ExpressionNode {
 	return wrapExpression(n.raw.GetCollationName())
@@ -4610,6 +4776,8 @@ func newColumnAttributeListNodeSlice(raws []*generated.ASTColumnAttributeListPro
 
 func (n *ColumnAttributeListNode) Kind() Kind { return KindColumnAttributeList }
 
+func (n *ColumnAttributeListNode) String() string { return formatNode(n) }
+
 func (n *ColumnAttributeListNode) Values() []Node {
 	return wrapColumnAttributeSlice(n.raw.GetValues())
 }
@@ -4656,6 +4824,8 @@ func newColumnDefinitionNodeSlice(raws []*generated.ASTColumnDefinitionProto) []
 }
 
 func (n *ColumnDefinitionNode) Kind() Kind { return KindColumnDefinition }
+
+func (n *ColumnDefinitionNode) String() string { return formatNode(n) }
 
 func (n *ColumnDefinitionNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
@@ -4718,6 +4888,8 @@ func newColumnListNodeSlice(raws []*generated.ASTColumnListProto) []*ColumnListN
 
 func (n *ColumnListNode) Kind() Kind { return KindColumnList }
 
+func (n *ColumnListNode) String() string { return formatNode(n) }
+
 func (n *ColumnListNode) Identifiers() []*IdentifierNode {
 	return newIdentifierNodeSlice(n.raw.GetIdentifiers())
 }
@@ -4764,6 +4936,8 @@ func newColumnPositionNodeSlice(raws []*generated.ASTColumnPositionProto) []*Col
 }
 
 func (n *ColumnPositionNode) Kind() Kind { return KindColumnPosition }
+
+func (n *ColumnPositionNode) String() string { return formatNode(n) }
 
 func (n *ColumnPositionNode) Identifier() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetIdentifier())
@@ -4817,6 +4991,8 @@ func newColumnWithOptionsListNodeSlice(raws []*generated.ASTColumnWithOptionsLis
 
 func (n *ColumnWithOptionsListNode) Kind() Kind { return KindColumnWithOptionsList }
 
+func (n *ColumnWithOptionsListNode) String() string { return formatNode(n) }
+
 func (n *ColumnWithOptionsListNode) ColumnWithOptions() []*ColumnWithOptionsNode {
 	return newColumnWithOptionsNodeSlice(n.raw.GetColumnWithOptions())
 }
@@ -4863,6 +5039,8 @@ func newColumnWithOptionsNodeSlice(raws []*generated.ASTColumnWithOptionsProto) 
 }
 
 func (n *ColumnWithOptionsNode) Kind() Kind { return KindColumnWithOptions }
+
+func (n *ColumnWithOptionsNode) String() string { return formatNode(n) }
 
 func (n *ColumnWithOptionsNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
@@ -4923,7 +5101,9 @@ func newCommitStatementNodeSlice(raws []*generated.ASTCommitStatementProto) []*C
 	return nodes
 }
 
-func (n *CommitStatementNode) Kind() Kind     { return KindCommitStatement }
+func (n *CommitStatementNode) Kind() Kind { return KindCommitStatement }
+
+func (n *CommitStatementNode) String() string { return formatNode(n) }
 func (n *CommitStatementNode) statementNode() {}
 
 func (n *CommitStatementNode) NumChildren() int {
@@ -4958,7 +5138,9 @@ func newConcatExprNodeSlice(raws []*generated.ASTConcatExprProto) []*ConcatExprN
 	return nodes
 }
 
-func (n *ConcatExprNode) Kind() Kind      { return KindConcatExpr }
+func (n *ConcatExprNode) Kind() Kind { return KindConcatExpr }
+
+func (n *ConcatExprNode) String() string  { return formatNode(n) }
 func (n *ConcatExprNode) expressionNode() {}
 
 func (n *ConcatExprNode) Operands() []ExpressionNode {
@@ -5008,6 +5190,8 @@ func newConnectionClauseNodeSlice(raws []*generated.ASTConnectionClauseProto) []
 
 func (n *ConnectionClauseNode) Kind() Kind { return KindConnectionClause }
 
+func (n *ConnectionClauseNode) String() string { return formatNode(n) }
+
 func (n *ConnectionClauseNode) ConnectionPath() ExpressionNode {
 	return wrapExpression(n.raw.GetConnectionPath())
 }
@@ -5054,7 +5238,9 @@ func newContinueStatementNodeSlice(raws []*generated.ASTContinueStatementProto) 
 	return nodes
 }
 
-func (n *ContinueStatementNode) Kind() Kind     { return KindContinueStatement }
+func (n *ContinueStatementNode) Kind() Kind { return KindContinueStatement }
+
+func (n *ContinueStatementNode) String() string { return formatNode(n) }
 func (n *ContinueStatementNode) statementNode() {}
 
 func (n *ContinueStatementNode) Keyword() generated.ASTBreakContinueStatementEnums_BreakContinueKeyword {
@@ -5093,7 +5279,9 @@ func newCopyDataSourceNodeSlice(raws []*generated.ASTCopyDataSourceProto) []*Cop
 	return nodes
 }
 
-func (n *CopyDataSourceNode) Kind() Kind           { return KindCopyDataSource }
+func (n *CopyDataSourceNode) Kind() Kind { return KindCopyDataSource }
+
+func (n *CopyDataSourceNode) String() string       { return formatNode(n) }
 func (n *CopyDataSourceNode) tableExpressionNode() {}
 
 func (n *CopyDataSourceNode) NumChildren() int {
@@ -5128,7 +5316,9 @@ func newCreateApproxViewStatementNodeSlice(raws []*generated.ASTCreateApproxView
 	return nodes
 }
 
-func (n *CreateApproxViewStatementNode) Kind() Kind     { return KindCreateApproxViewStatement }
+func (n *CreateApproxViewStatementNode) Kind() Kind { return KindCreateApproxViewStatement }
+
+func (n *CreateApproxViewStatementNode) String() string { return formatNode(n) }
 func (n *CreateApproxViewStatementNode) statementNode() {}
 
 func (n *CreateApproxViewStatementNode) NumChildren() int {
@@ -5163,7 +5353,9 @@ func newCreateConnectionStatementNodeSlice(raws []*generated.ASTCreateConnection
 	return nodes
 }
 
-func (n *CreateConnectionStatementNode) Kind() Kind     { return KindCreateConnectionStatement }
+func (n *CreateConnectionStatementNode) Kind() Kind { return KindCreateConnectionStatement }
+
+func (n *CreateConnectionStatementNode) String() string { return formatNode(n) }
 func (n *CreateConnectionStatementNode) statementNode() {}
 
 func (n *CreateConnectionStatementNode) Name() *PathExpressionNode {
@@ -5225,7 +5417,9 @@ func newCreateConstantStatementNodeSlice(raws []*generated.ASTCreateConstantStat
 	return nodes
 }
 
-func (n *CreateConstantStatementNode) Kind() Kind     { return KindCreateConstantStatement }
+func (n *CreateConstantStatementNode) Kind() Kind { return KindCreateConstantStatement }
+
+func (n *CreateConstantStatementNode) String() string { return formatNode(n) }
 func (n *CreateConstantStatementNode) statementNode() {}
 
 func (n *CreateConstantStatementNode) Name() *PathExpressionNode {
@@ -5287,7 +5481,9 @@ func newCreateDatabaseStatementNodeSlice(raws []*generated.ASTCreateDatabaseStat
 	return nodes
 }
 
-func (n *CreateDatabaseStatementNode) Kind() Kind     { return KindCreateDatabaseStatement }
+func (n *CreateDatabaseStatementNode) Kind() Kind { return KindCreateDatabaseStatement }
+
+func (n *CreateDatabaseStatementNode) String() string { return formatNode(n) }
 func (n *CreateDatabaseStatementNode) statementNode() {}
 
 func (n *CreateDatabaseStatementNode) Name() *PathExpressionNode {
@@ -5349,7 +5545,9 @@ func newCreateEntityStatementNodeSlice(raws []*generated.ASTCreateEntityStatemen
 	return nodes
 }
 
-func (n *CreateEntityStatementNode) Kind() Kind     { return KindCreateEntityStatement }
+func (n *CreateEntityStatementNode) Kind() Kind { return KindCreateEntityStatement }
+
+func (n *CreateEntityStatementNode) String() string { return formatNode(n) }
 func (n *CreateEntityStatementNode) statementNode() {}
 
 func (n *CreateEntityStatementNode) Type() *IdentifierNode {
@@ -5450,7 +5648,9 @@ func newCreateExternalSchemaStatementNodeSlice(raws []*generated.ASTCreateExtern
 	return nodes
 }
 
-func (n *CreateExternalSchemaStatementNode) Kind() Kind     { return KindCreateExternalSchemaStatement }
+func (n *CreateExternalSchemaStatementNode) Kind() Kind { return KindCreateExternalSchemaStatement }
+
+func (n *CreateExternalSchemaStatementNode) String() string { return formatNode(n) }
 func (n *CreateExternalSchemaStatementNode) statementNode() {}
 
 func (n *CreateExternalSchemaStatementNode) WithConnectionClause() *WithConnectionClauseNode {
@@ -5499,7 +5699,9 @@ func newCreateExternalTableStatementNodeSlice(raws []*generated.ASTCreateExterna
 	return nodes
 }
 
-func (n *CreateExternalTableStatementNode) Kind() Kind     { return KindCreateExternalTableStatement }
+func (n *CreateExternalTableStatementNode) Kind() Kind { return KindCreateExternalTableStatement }
+
+func (n *CreateExternalTableStatementNode) String() string { return formatNode(n) }
 func (n *CreateExternalTableStatementNode) statementNode() {}
 
 func (n *CreateExternalTableStatementNode) WithPartitionColumnsClause() *WithPartitionColumnsClauseNode {
@@ -5548,7 +5750,9 @@ func newCreateFunctionStatementNodeSlice(raws []*generated.ASTCreateFunctionStat
 	return nodes
 }
 
-func (n *CreateFunctionStatementNode) Kind() Kind     { return KindCreateFunctionStatement }
+func (n *CreateFunctionStatementNode) Kind() Kind { return KindCreateFunctionStatement }
+
+func (n *CreateFunctionStatementNode) String() string { return formatNode(n) }
 func (n *CreateFunctionStatementNode) statementNode() {}
 
 func (n *CreateFunctionStatementNode) ReturnType() Node {
@@ -5631,7 +5835,9 @@ func newCreateIndexStatementNodeSlice(raws []*generated.ASTCreateIndexStatementP
 	return nodes
 }
 
-func (n *CreateIndexStatementNode) Kind() Kind     { return KindCreateIndexStatement }
+func (n *CreateIndexStatementNode) Kind() Kind { return KindCreateIndexStatement }
+
+func (n *CreateIndexStatementNode) String() string { return formatNode(n) }
 func (n *CreateIndexStatementNode) statementNode() {}
 
 func (n *CreateIndexStatementNode) Name() *PathExpressionNode {
@@ -5800,7 +6006,9 @@ func newCreateLocalityGroupStatementNodeSlice(raws []*generated.ASTCreateLocalit
 	return nodes
 }
 
-func (n *CreateLocalityGroupStatementNode) Kind() Kind     { return KindCreateLocalityGroupStatement }
+func (n *CreateLocalityGroupStatementNode) Kind() Kind { return KindCreateLocalityGroupStatement }
+
+func (n *CreateLocalityGroupStatementNode) String() string { return formatNode(n) }
 func (n *CreateLocalityGroupStatementNode) statementNode() {}
 
 func (n *CreateLocalityGroupStatementNode) Name() *PathExpressionNode {
@@ -5862,7 +6070,9 @@ func newCreateMaterializedViewStatementNodeSlice(raws []*generated.ASTCreateMate
 	return nodes
 }
 
-func (n *CreateMaterializedViewStatementNode) Kind() Kind     { return KindCreateMaterializedViewStatement }
+func (n *CreateMaterializedViewStatementNode) Kind() Kind { return KindCreateMaterializedViewStatement }
+
+func (n *CreateMaterializedViewStatementNode) String() string { return formatNode(n) }
 func (n *CreateMaterializedViewStatementNode) statementNode() {}
 
 func (n *CreateMaterializedViewStatementNode) PartitionBy() *PartitionByNode {
@@ -5937,7 +6147,9 @@ func newCreateModelStatementNodeSlice(raws []*generated.ASTCreateModelStatementP
 	return nodes
 }
 
-func (n *CreateModelStatementNode) Kind() Kind     { return KindCreateModelStatement }
+func (n *CreateModelStatementNode) Kind() Kind { return KindCreateModelStatement }
+
+func (n *CreateModelStatementNode) String() string { return formatNode(n) }
 func (n *CreateModelStatementNode) statementNode() {}
 
 func (n *CreateModelStatementNode) Name() *PathExpressionNode {
@@ -6071,6 +6283,8 @@ func newCreatePrivilegeRestrictionStatementNodeSlice(raws []*generated.ASTCreate
 func (n *CreatePrivilegeRestrictionStatementNode) Kind() Kind {
 	return KindCreatePrivilegeRestrictionStatement
 }
+
+func (n *CreatePrivilegeRestrictionStatementNode) String() string { return formatNode(n) }
 func (n *CreatePrivilegeRestrictionStatementNode) statementNode() {}
 
 func (n *CreatePrivilegeRestrictionStatementNode) Privileges() *PrivilegesNode {
@@ -6158,7 +6372,9 @@ func newCreateProcedureStatementNodeSlice(raws []*generated.ASTCreateProcedureSt
 	return nodes
 }
 
-func (n *CreateProcedureStatementNode) Kind() Kind     { return KindCreateProcedureStatement }
+func (n *CreateProcedureStatementNode) Kind() Kind { return KindCreateProcedureStatement }
+
+func (n *CreateProcedureStatementNode) String() string { return formatNode(n) }
 func (n *CreateProcedureStatementNode) statementNode() {}
 
 func (n *CreateProcedureStatementNode) Name() *PathExpressionNode {
@@ -6289,7 +6505,9 @@ func newCreatePropertyGraphStatementNodeSlice(raws []*generated.ASTCreatePropert
 	return nodes
 }
 
-func (n *CreatePropertyGraphStatementNode) Kind() Kind     { return KindCreatePropertyGraphStatement }
+func (n *CreatePropertyGraphStatementNode) Kind() Kind { return KindCreatePropertyGraphStatement }
+
+func (n *CreatePropertyGraphStatementNode) String() string { return formatNode(n) }
 func (n *CreatePropertyGraphStatementNode) statementNode() {}
 
 func (n *CreatePropertyGraphStatementNode) Name() *PathExpressionNode {
@@ -6377,7 +6595,9 @@ func newCreateRowAccessPolicyStatementNodeSlice(raws []*generated.ASTCreateRowAc
 	return nodes
 }
 
-func (n *CreateRowAccessPolicyStatementNode) Kind() Kind     { return KindCreateRowAccessPolicyStatement }
+func (n *CreateRowAccessPolicyStatementNode) Kind() Kind { return KindCreateRowAccessPolicyStatement }
+
+func (n *CreateRowAccessPolicyStatementNode) String() string { return formatNode(n) }
 func (n *CreateRowAccessPolicyStatementNode) statementNode() {}
 
 func (n *CreateRowAccessPolicyStatementNode) TargetPath() *PathExpressionNode {
@@ -6469,7 +6689,9 @@ func newCreateSchemaStatementNodeSlice(raws []*generated.ASTCreateSchemaStatemen
 	return nodes
 }
 
-func (n *CreateSchemaStatementNode) Kind() Kind     { return KindCreateSchemaStatement }
+func (n *CreateSchemaStatementNode) Kind() Kind { return KindCreateSchemaStatement }
+
+func (n *CreateSchemaStatementNode) String() string { return formatNode(n) }
 func (n *CreateSchemaStatementNode) statementNode() {}
 
 func (n *CreateSchemaStatementNode) Collate() *CollateNode {
@@ -6518,7 +6740,9 @@ func newCreateSequenceStatementNodeSlice(raws []*generated.ASTCreateSequenceStat
 	return nodes
 }
 
-func (n *CreateSequenceStatementNode) Kind() Kind     { return KindCreateSequenceStatement }
+func (n *CreateSequenceStatementNode) Kind() Kind { return KindCreateSequenceStatement }
+
+func (n *CreateSequenceStatementNode) String() string { return formatNode(n) }
 func (n *CreateSequenceStatementNode) statementNode() {}
 
 func (n *CreateSequenceStatementNode) Name() *PathExpressionNode {
@@ -6580,7 +6804,9 @@ func newCreateSnapshotStatementNodeSlice(raws []*generated.ASTCreateSnapshotStat
 	return nodes
 }
 
-func (n *CreateSnapshotStatementNode) Kind() Kind     { return KindCreateSnapshotStatement }
+func (n *CreateSnapshotStatementNode) Kind() Kind { return KindCreateSnapshotStatement }
+
+func (n *CreateSnapshotStatementNode) String() string { return formatNode(n) }
 func (n *CreateSnapshotStatementNode) statementNode() {}
 
 func (n *CreateSnapshotStatementNode) SchemaObjectKind() generated.SchemaObjectKind {
@@ -6659,7 +6885,9 @@ func newCreateSnapshotTableStatementNodeSlice(raws []*generated.ASTCreateSnapsho
 	return nodes
 }
 
-func (n *CreateSnapshotTableStatementNode) Kind() Kind     { return KindCreateSnapshotTableStatement }
+func (n *CreateSnapshotTableStatementNode) Kind() Kind { return KindCreateSnapshotTableStatement }
+
+func (n *CreateSnapshotTableStatementNode) String() string { return formatNode(n) }
 func (n *CreateSnapshotTableStatementNode) statementNode() {}
 
 func (n *CreateSnapshotTableStatementNode) Name() *PathExpressionNode {
@@ -6734,7 +6962,9 @@ func newCreateTableFunctionStatementNodeSlice(raws []*generated.ASTCreateTableFu
 	return nodes
 }
 
-func (n *CreateTableFunctionStatementNode) Kind() Kind     { return KindCreateTableFunctionStatement }
+func (n *CreateTableFunctionStatementNode) Kind() Kind { return KindCreateTableFunctionStatement }
+
+func (n *CreateTableFunctionStatementNode) String() string { return formatNode(n) }
 func (n *CreateTableFunctionStatementNode) statementNode() {}
 
 func (n *CreateTableFunctionStatementNode) ReturnTvfSchema() *TVFSchemaNode {
@@ -6796,7 +7026,9 @@ func newCreateTableStatementNodeSlice(raws []*generated.ASTCreateTableStatementP
 	return nodes
 }
 
-func (n *CreateTableStatementNode) Kind() Kind     { return KindCreateTableStatement }
+func (n *CreateTableStatementNode) Kind() Kind { return KindCreateTableStatement }
+
+func (n *CreateTableStatementNode) String() string { return formatNode(n) }
 func (n *CreateTableStatementNode) statementNode() {}
 
 func (n *CreateTableStatementNode) CloneDataSource() *CloneDataSourceNode {
@@ -6923,7 +7155,9 @@ func newCreateViewStatementNodeSlice(raws []*generated.ASTCreateViewStatementPro
 	return nodes
 }
 
-func (n *CreateViewStatementNode) Kind() Kind     { return KindCreateViewStatement }
+func (n *CreateViewStatementNode) Kind() Kind { return KindCreateViewStatement }
+
+func (n *CreateViewStatementNode) String() string { return formatNode(n) }
 func (n *CreateViewStatementNode) statementNode() {}
 
 func (n *CreateViewStatementNode) NumChildren() int {
@@ -6959,6 +7193,8 @@ func newCubeNodeSlice(raws []*generated.ASTCubeProto) []*CubeNode {
 }
 
 func (n *CubeNode) Kind() Kind { return KindCube }
+
+func (n *CubeNode) String() string { return formatNode(n) }
 
 func (n *CubeNode) Expressions() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetExpressions())
@@ -7005,7 +7241,9 @@ func newDateOrTimeLiteralNodeSlice(raws []*generated.ASTDateOrTimeLiteralProto) 
 	return nodes
 }
 
-func (n *DateOrTimeLiteralNode) Kind() Kind      { return KindDateOrTimeLiteral }
+func (n *DateOrTimeLiteralNode) Kind() Kind { return KindDateOrTimeLiteral }
+
+func (n *DateOrTimeLiteralNode) String() string  { return formatNode(n) }
 func (n *DateOrTimeLiteralNode) expressionNode() {}
 
 func (n *DateOrTimeLiteralNode) StringLiteral() *StringLiteralNode {
@@ -7058,7 +7296,9 @@ func newDefaultLiteralNodeSlice(raws []*generated.ASTDefaultLiteralProto) []*Def
 	return nodes
 }
 
-func (n *DefaultLiteralNode) Kind() Kind      { return KindDefaultLiteral }
+func (n *DefaultLiteralNode) Kind() Kind { return KindDefaultLiteral }
+
+func (n *DefaultLiteralNode) String() string  { return formatNode(n) }
 func (n *DefaultLiteralNode) expressionNode() {}
 
 func (n *DefaultLiteralNode) NumChildren() int {
@@ -7093,7 +7333,9 @@ func newDefineMacroStatementNodeSlice(raws []*generated.ASTDefineMacroStatementP
 	return nodes
 }
 
-func (n *DefineMacroStatementNode) Kind() Kind     { return KindDefineMacroStatement }
+func (n *DefineMacroStatementNode) Kind() Kind { return KindDefineMacroStatement }
+
+func (n *DefineMacroStatementNode) String() string { return formatNode(n) }
 func (n *DefineMacroStatementNode) statementNode() {}
 
 func (n *DefineMacroStatementNode) Name() *IdentifierNode {
@@ -7155,7 +7397,9 @@ func newDefineTableStatementNodeSlice(raws []*generated.ASTDefineTableStatementP
 	return nodes
 }
 
-func (n *DefineTableStatementNode) Kind() Kind     { return KindDefineTableStatement }
+func (n *DefineTableStatementNode) Kind() Kind { return KindDefineTableStatement }
+
+func (n *DefineTableStatementNode) String() string { return formatNode(n) }
 func (n *DefineTableStatementNode) statementNode() {}
 
 func (n *DefineTableStatementNode) Name() *PathExpressionNode {
@@ -7217,7 +7461,9 @@ func newDeleteStatementNodeSlice(raws []*generated.ASTDeleteStatementProto) []*D
 	return nodes
 }
 
-func (n *DeleteStatementNode) Kind() Kind     { return KindDeleteStatement }
+func (n *DeleteStatementNode) Kind() Kind { return KindDeleteStatement }
+
+func (n *DeleteStatementNode) String() string { return formatNode(n) }
 func (n *DeleteStatementNode) statementNode() {}
 
 func (n *DeleteStatementNode) TargetPath() ExpressionNode {
@@ -7344,7 +7590,9 @@ func newDescribeStatementNodeSlice(raws []*generated.ASTDescribeStatementProto) 
 	return nodes
 }
 
-func (n *DescribeStatementNode) Kind() Kind     { return KindDescribeStatement }
+func (n *DescribeStatementNode) Kind() Kind { return KindDescribeStatement }
+
+func (n *DescribeStatementNode) String() string { return formatNode(n) }
 func (n *DescribeStatementNode) statementNode() {}
 
 func (n *DescribeStatementNode) OptionalIdentifier() *IdentifierNode {
@@ -7421,6 +7669,8 @@ func newDescriptorColumnListNodeSlice(raws []*generated.ASTDescriptorColumnListP
 
 func (n *DescriptorColumnListNode) Kind() Kind { return KindDescriptorColumnList }
 
+func (n *DescriptorColumnListNode) String() string { return formatNode(n) }
+
 func (n *DescriptorColumnListNode) DescriptorColumnList() []*DescriptorColumnNode {
 	return newDescriptorColumnNodeSlice(n.raw.GetDescriptorColumnList())
 }
@@ -7467,6 +7717,8 @@ func newDescriptorColumnNodeSlice(raws []*generated.ASTDescriptorColumnProto) []
 }
 
 func (n *DescriptorColumnNode) Kind() Kind { return KindDescriptorColumn }
+
+func (n *DescriptorColumnNode) String() string { return formatNode(n) }
 
 func (n *DescriptorColumnNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
@@ -7516,6 +7768,8 @@ func newDescriptorNodeSlice(raws []*generated.ASTDescriptorProto) []*DescriptorN
 
 func (n *DescriptorNode) Kind() Kind { return KindDescriptor }
 
+func (n *DescriptorNode) String() string { return formatNode(n) }
+
 func (n *DescriptorNode) Columns() *DescriptorColumnListNode {
 	return newDescriptorColumnListNode(n.raw.GetColumns())
 }
@@ -7562,7 +7816,9 @@ func newDotGeneralizedFieldNodeSlice(raws []*generated.ASTDotGeneralizedFieldPro
 	return nodes
 }
 
-func (n *DotGeneralizedFieldNode) Kind() Kind      { return KindDotGeneralizedField }
+func (n *DotGeneralizedFieldNode) Kind() Kind { return KindDotGeneralizedField }
+
+func (n *DotGeneralizedFieldNode) String() string  { return formatNode(n) }
 func (n *DotGeneralizedFieldNode) expressionNode() {}
 
 func (n *DotGeneralizedFieldNode) Expr() ExpressionNode {
@@ -7624,7 +7880,9 @@ func newDotIdentifierNodeSlice(raws []*generated.ASTDotIdentifierProto) []*DotId
 	return nodes
 }
 
-func (n *DotIdentifierNode) Kind() Kind      { return KindDotIdentifier }
+func (n *DotIdentifierNode) Kind() Kind { return KindDotIdentifier }
+
+func (n *DotIdentifierNode) String() string  { return formatNode(n) }
 func (n *DotIdentifierNode) expressionNode() {}
 
 func (n *DotIdentifierNode) Expr() ExpressionNode {
@@ -7686,7 +7944,9 @@ func newDotStarNodeSlice(raws []*generated.ASTDotStarProto) []*DotStarNode {
 	return nodes
 }
 
-func (n *DotStarNode) Kind() Kind      { return KindDotStar }
+func (n *DotStarNode) Kind() Kind { return KindDotStar }
+
+func (n *DotStarNode) String() string  { return formatNode(n) }
 func (n *DotStarNode) expressionNode() {}
 
 func (n *DotStarNode) Expr() ExpressionNode {
@@ -7735,7 +7995,9 @@ func newDotStarWithModifiersNodeSlice(raws []*generated.ASTDotStarWithModifiersP
 	return nodes
 }
 
-func (n *DotStarWithModifiersNode) Kind() Kind      { return KindDotStarWithModifiers }
+func (n *DotStarWithModifiersNode) Kind() Kind { return KindDotStarWithModifiers }
+
+func (n *DotStarWithModifiersNode) String() string  { return formatNode(n) }
 func (n *DotStarWithModifiersNode) expressionNode() {}
 
 func (n *DotStarWithModifiersNode) Expr() ExpressionNode {
@@ -7800,6 +8062,8 @@ func newDropAllRowAccessPoliciesStatementNodeSlice(raws []*generated.ASTDropAllR
 func (n *DropAllRowAccessPoliciesStatementNode) Kind() Kind {
 	return KindDropAllRowAccessPoliciesStatement
 }
+
+func (n *DropAllRowAccessPoliciesStatementNode) String() string { return formatNode(n) }
 func (n *DropAllRowAccessPoliciesStatementNode) statementNode() {}
 
 func (n *DropAllRowAccessPoliciesStatementNode) TableName() *PathExpressionNode {
@@ -7854,6 +8118,8 @@ func newDropColumnActionNodeSlice(raws []*generated.ASTDropColumnActionProto) []
 
 func (n *DropColumnActionNode) Kind() Kind { return KindDropColumnAction }
 
+func (n *DropColumnActionNode) String() string { return formatNode(n) }
+
 func (n *DropColumnActionNode) ColumnName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetColumnName())
 }
@@ -7906,6 +8172,8 @@ func newDropConstraintActionNodeSlice(raws []*generated.ASTDropConstraintActionP
 
 func (n *DropConstraintActionNode) Kind() Kind { return KindDropConstraintAction }
 
+func (n *DropConstraintActionNode) String() string { return formatNode(n) }
+
 func (n *DropConstraintActionNode) ConstraintName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetConstraintName())
 }
@@ -7956,7 +8224,9 @@ func newDropEntityStatementNodeSlice(raws []*generated.ASTDropEntityStatementPro
 	return nodes
 }
 
-func (n *DropEntityStatementNode) Kind() Kind     { return KindDropEntityStatement }
+func (n *DropEntityStatementNode) Kind() Kind { return KindDropEntityStatement }
+
+func (n *DropEntityStatementNode) String() string { return formatNode(n) }
 func (n *DropEntityStatementNode) statementNode() {}
 
 func (n *DropEntityStatementNode) EntityType() *IdentifierNode {
@@ -8022,7 +8292,9 @@ func newDropFunctionStatementNodeSlice(raws []*generated.ASTDropFunctionStatemen
 	return nodes
 }
 
-func (n *DropFunctionStatementNode) Kind() Kind     { return KindDropFunctionStatement }
+func (n *DropFunctionStatementNode) Kind() Kind { return KindDropFunctionStatement }
+
+func (n *DropFunctionStatementNode) String() string { return formatNode(n) }
 func (n *DropFunctionStatementNode) statementNode() {}
 
 func (n *DropFunctionStatementNode) Name() *PathExpressionNode {
@@ -8088,7 +8360,9 @@ func newDropMaterializedViewStatementNodeSlice(raws []*generated.ASTDropMaterial
 	return nodes
 }
 
-func (n *DropMaterializedViewStatementNode) Kind() Kind     { return KindDropMaterializedViewStatement }
+func (n *DropMaterializedViewStatementNode) Kind() Kind { return KindDropMaterializedViewStatement }
+
+func (n *DropMaterializedViewStatementNode) String() string { return formatNode(n) }
 func (n *DropMaterializedViewStatementNode) statementNode() {}
 
 func (n *DropMaterializedViewStatementNode) Name() *PathExpressionNode {
@@ -8143,6 +8417,8 @@ func newDropPrimaryKeyActionNodeSlice(raws []*generated.ASTDropPrimaryKeyActionP
 
 func (n *DropPrimaryKeyActionNode) Kind() Kind { return KindDropPrimaryKeyAction }
 
+func (n *DropPrimaryKeyActionNode) String() string { return formatNode(n) }
+
 func (n *DropPrimaryKeyActionNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
 }
@@ -8182,6 +8458,8 @@ func newDropPrivilegeRestrictionStatementNodeSlice(raws []*generated.ASTDropPriv
 func (n *DropPrivilegeRestrictionStatementNode) Kind() Kind {
 	return KindDropPrivilegeRestrictionStatement
 }
+
+func (n *DropPrivilegeRestrictionStatementNode) String() string { return formatNode(n) }
 func (n *DropPrivilegeRestrictionStatementNode) statementNode() {}
 
 func (n *DropPrivilegeRestrictionStatementNode) IsIfExists() bool {
@@ -8260,7 +8538,9 @@ func newDropRowAccessPolicyStatementNodeSlice(raws []*generated.ASTDropRowAccess
 	return nodes
 }
 
-func (n *DropRowAccessPolicyStatementNode) Kind() Kind     { return KindDropRowAccessPolicyStatement }
+func (n *DropRowAccessPolicyStatementNode) Kind() Kind { return KindDropRowAccessPolicyStatement }
+
+func (n *DropRowAccessPolicyStatementNode) String() string { return formatNode(n) }
 func (n *DropRowAccessPolicyStatementNode) statementNode() {}
 
 func (n *DropRowAccessPolicyStatementNode) Name() *PathExpressionNode {
@@ -8326,7 +8606,9 @@ func newDropSearchIndexStatementNodeSlice(raws []*generated.ASTDropSearchIndexSt
 	return nodes
 }
 
-func (n *DropSearchIndexStatementNode) Kind() Kind     { return KindDropSearchIndexStatement }
+func (n *DropSearchIndexStatementNode) Kind() Kind { return KindDropSearchIndexStatement }
+
+func (n *DropSearchIndexStatementNode) String() string { return formatNode(n) }
 func (n *DropSearchIndexStatementNode) statementNode() {}
 
 func (n *DropSearchIndexStatementNode) NumChildren() int {
@@ -8361,7 +8643,9 @@ func newDropSnapshotTableStatementNodeSlice(raws []*generated.ASTDropSnapshotTab
 	return nodes
 }
 
-func (n *DropSnapshotTableStatementNode) Kind() Kind     { return KindDropSnapshotTableStatement }
+func (n *DropSnapshotTableStatementNode) Kind() Kind { return KindDropSnapshotTableStatement }
+
+func (n *DropSnapshotTableStatementNode) String() string { return formatNode(n) }
 func (n *DropSnapshotTableStatementNode) statementNode() {}
 
 func (n *DropSnapshotTableStatementNode) Name() *PathExpressionNode {
@@ -8414,7 +8698,9 @@ func newDropStatementNodeSlice(raws []*generated.ASTDropStatementProto) []*DropS
 	return nodes
 }
 
-func (n *DropStatementNode) Kind() Kind     { return KindDropStatement }
+func (n *DropStatementNode) Kind() Kind { return KindDropStatement }
+
+func (n *DropStatementNode) String() string { return formatNode(n) }
 func (n *DropStatementNode) statementNode() {}
 
 func (n *DropStatementNode) Name() *PathExpressionNode {
@@ -8476,6 +8762,8 @@ func newDropSubEntityActionNodeSlice(raws []*generated.ASTDropSubEntityActionPro
 }
 
 func (n *DropSubEntityActionNode) Kind() Kind { return KindDropSubEntityAction }
+
+func (n *DropSubEntityActionNode) String() string { return formatNode(n) }
 
 func (n *DropSubEntityActionNode) Type() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetType())
@@ -8540,7 +8828,9 @@ func newDropTableFunctionStatementNodeSlice(raws []*generated.ASTDropTableFuncti
 	return nodes
 }
 
-func (n *DropTableFunctionStatementNode) Kind() Kind     { return KindDropTableFunctionStatement }
+func (n *DropTableFunctionStatementNode) Kind() Kind { return KindDropTableFunctionStatement }
+
+func (n *DropTableFunctionStatementNode) String() string { return formatNode(n) }
 func (n *DropTableFunctionStatementNode) statementNode() {}
 
 func (n *DropTableFunctionStatementNode) Name() *PathExpressionNode {
@@ -8595,6 +8885,8 @@ func newDropTtlActionNodeSlice(raws []*generated.ASTDropTtlActionProto) []*DropT
 
 func (n *DropTtlActionNode) Kind() Kind { return KindDropTtlAction }
 
+func (n *DropTtlActionNode) String() string { return formatNode(n) }
+
 func (n *DropTtlActionNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
 }
@@ -8631,7 +8923,9 @@ func newDropVectorIndexStatementNodeSlice(raws []*generated.ASTDropVectorIndexSt
 	return nodes
 }
 
-func (n *DropVectorIndexStatementNode) Kind() Kind     { return KindDropVectorIndexStatement }
+func (n *DropVectorIndexStatementNode) Kind() Kind { return KindDropVectorIndexStatement }
+
+func (n *DropVectorIndexStatementNode) String() string { return formatNode(n) }
 func (n *DropVectorIndexStatementNode) statementNode() {}
 
 func (n *DropVectorIndexStatementNode) NumChildren() int {
@@ -8667,6 +8961,8 @@ func newElseifClauseListNodeSlice(raws []*generated.ASTElseifClauseListProto) []
 }
 
 func (n *ElseifClauseListNode) Kind() Kind { return KindElseifClauseList }
+
+func (n *ElseifClauseListNode) String() string { return formatNode(n) }
 
 func (n *ElseifClauseListNode) ElseifClauses() []*ElseifClauseNode {
 	return newElseifClauseNodeSlice(n.raw.GetElseifClauses())
@@ -8714,6 +9010,8 @@ func newElseifClauseNodeSlice(raws []*generated.ASTElseifClauseProto) []*ElseifC
 }
 
 func (n *ElseifClauseNode) Kind() Kind { return KindElseifClause }
+
+func (n *ElseifClauseNode) String() string { return formatNode(n) }
 
 func (n *ElseifClauseNode) Condition() ExpressionNode {
 	return wrapExpression(n.raw.GetCondition())
@@ -8776,6 +9074,8 @@ func newEmptyRowPatternNodeSlice(raws []*generated.ASTEmptyRowPatternProto) []*E
 
 func (n *EmptyRowPatternNode) Kind() Kind { return KindEmptyRowPattern }
 
+func (n *EmptyRowPatternNode) String() string { return formatNode(n) }
+
 func (n *EmptyRowPatternNode) NumChildren() int {
 	count := 0
 	return count
@@ -8809,6 +9109,8 @@ func newExceptionHandlerListNodeSlice(raws []*generated.ASTExceptionHandlerListP
 }
 
 func (n *ExceptionHandlerListNode) Kind() Kind { return KindExceptionHandlerList }
+
+func (n *ExceptionHandlerListNode) String() string { return formatNode(n) }
 
 func (n *ExceptionHandlerListNode) ExceptionHandlerList() []*ExceptionHandlerNode {
 	return newExceptionHandlerNodeSlice(n.raw.GetExceptionHandlerList())
@@ -8857,6 +9159,8 @@ func newExceptionHandlerNodeSlice(raws []*generated.ASTExceptionHandlerProto) []
 
 func (n *ExceptionHandlerNode) Kind() Kind { return KindExceptionHandler }
 
+func (n *ExceptionHandlerNode) String() string { return formatNode(n) }
+
 func (n *ExceptionHandlerNode) StatementList() *StatementListNode {
 	return newStatementListNode(n.raw.GetStatementList())
 }
@@ -8903,7 +9207,9 @@ func newExecuteImmediateStatementNodeSlice(raws []*generated.ASTExecuteImmediate
 	return nodes
 }
 
-func (n *ExecuteImmediateStatementNode) Kind() Kind     { return KindExecuteImmediateStatement }
+func (n *ExecuteImmediateStatementNode) Kind() Kind { return KindExecuteImmediateStatement }
+
+func (n *ExecuteImmediateStatementNode) String() string { return formatNode(n) }
 func (n *ExecuteImmediateStatementNode) statementNode() {}
 
 func (n *ExecuteImmediateStatementNode) Sql() ExpressionNode {
@@ -8980,6 +9286,8 @@ func newExecuteIntoClauseNodeSlice(raws []*generated.ASTExecuteIntoClauseProto) 
 
 func (n *ExecuteIntoClauseNode) Kind() Kind { return KindExecuteIntoClause }
 
+func (n *ExecuteIntoClauseNode) String() string { return formatNode(n) }
+
 func (n *ExecuteIntoClauseNode) Identifiers() *IdentifierListNode {
 	return newIdentifierListNode(n.raw.GetIdentifiers())
 }
@@ -9027,6 +9335,8 @@ func newExecuteUsingArgumentNodeSlice(raws []*generated.ASTExecuteUsingArgumentP
 }
 
 func (n *ExecuteUsingArgumentNode) Kind() Kind { return KindExecuteUsingArgument }
+
+func (n *ExecuteUsingArgumentNode) String() string { return formatNode(n) }
 
 func (n *ExecuteUsingArgumentNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -9089,6 +9399,8 @@ func newExecuteUsingClauseNodeSlice(raws []*generated.ASTExecuteUsingClauseProto
 
 func (n *ExecuteUsingClauseNode) Kind() Kind { return KindExecuteUsingClause }
 
+func (n *ExecuteUsingClauseNode) String() string { return formatNode(n) }
+
 func (n *ExecuteUsingClauseNode) Arguments() []*ExecuteUsingArgumentNode {
 	return newExecuteUsingArgumentNodeSlice(n.raw.GetArguments())
 }
@@ -9134,7 +9446,9 @@ func newExplainStatementNodeSlice(raws []*generated.ASTExplainStatementProto) []
 	return nodes
 }
 
-func (n *ExplainStatementNode) Kind() Kind     { return KindExplainStatement }
+func (n *ExplainStatementNode) Kind() Kind { return KindExplainStatement }
+
+func (n *ExplainStatementNode) String() string { return formatNode(n) }
 func (n *ExplainStatementNode) statementNode() {}
 
 func (n *ExplainStatementNode) Statement() StatementNode {
@@ -9183,7 +9497,9 @@ func newExportDataStatementNodeSlice(raws []*generated.ASTExportDataStatementPro
 	return nodes
 }
 
-func (n *ExportDataStatementNode) Kind() Kind     { return KindExportDataStatement }
+func (n *ExportDataStatementNode) Kind() Kind { return KindExportDataStatement }
+
+func (n *ExportDataStatementNode) String() string { return formatNode(n) }
 func (n *ExportDataStatementNode) statementNode() {}
 
 func (n *ExportDataStatementNode) WithConnectionClause() *WithConnectionClauseNode {
@@ -9258,7 +9574,9 @@ func newExportMetadataStatementNodeSlice(raws []*generated.ASTExportMetadataStat
 	return nodes
 }
 
-func (n *ExportMetadataStatementNode) Kind() Kind     { return KindExportMetadataStatement }
+func (n *ExportMetadataStatementNode) Kind() Kind { return KindExportMetadataStatement }
+
+func (n *ExportMetadataStatementNode) String() string { return formatNode(n) }
 func (n *ExportMetadataStatementNode) statementNode() {}
 
 func (n *ExportMetadataStatementNode) SchemaObjectKind() generated.SchemaObjectKind {
@@ -9337,7 +9655,9 @@ func newExportModelStatementNodeSlice(raws []*generated.ASTExportModelStatementP
 	return nodes
 }
 
-func (n *ExportModelStatementNode) Kind() Kind     { return KindExportModelStatement }
+func (n *ExportModelStatementNode) Kind() Kind { return KindExportModelStatement }
+
+func (n *ExportModelStatementNode) String() string { return formatNode(n) }
 func (n *ExportModelStatementNode) statementNode() {}
 
 func (n *ExportModelStatementNode) ModelNamePath() *PathExpressionNode {
@@ -9412,7 +9732,9 @@ func newExpressionSubqueryNodeSlice(raws []*generated.ASTExpressionSubqueryProto
 	return nodes
 }
 
-func (n *ExpressionSubqueryNode) Kind() Kind      { return KindExpressionSubquery }
+func (n *ExpressionSubqueryNode) Kind() Kind { return KindExpressionSubquery }
+
+func (n *ExpressionSubqueryNode) String() string  { return formatNode(n) }
 func (n *ExpressionSubqueryNode) expressionNode() {}
 
 func (n *ExpressionSubqueryNode) Hint() *HintNode {
@@ -9478,7 +9800,9 @@ func newExpressionWithAliasNodeSlice(raws []*generated.ASTExpressionWithAliasPro
 	return nodes
 }
 
-func (n *ExpressionWithAliasNode) Kind() Kind      { return KindExpressionWithAlias }
+func (n *ExpressionWithAliasNode) Kind() Kind { return KindExpressionWithAlias }
+
+func (n *ExpressionWithAliasNode) String() string  { return formatNode(n) }
 func (n *ExpressionWithAliasNode) expressionNode() {}
 
 func (n *ExpressionWithAliasNode) Expression() ExpressionNode {
@@ -9542,6 +9866,8 @@ func newExpressionWithOptAliasNodeSlice(raws []*generated.ASTExpressionWithOptAl
 
 func (n *ExpressionWithOptAliasNode) Kind() Kind { return KindExpressionWithOptAlias }
 
+func (n *ExpressionWithOptAliasNode) String() string { return formatNode(n) }
+
 func (n *ExpressionWithOptAliasNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
 }
@@ -9601,7 +9927,9 @@ func newExtendedPathExpressionNodeSlice(raws []*generated.ASTExtendedPathExpress
 	return nodes
 }
 
-func (n *ExtendedPathExpressionNode) Kind() Kind      { return KindExtendedPathExpression }
+func (n *ExtendedPathExpressionNode) Kind() Kind { return KindExtendedPathExpression }
+
+func (n *ExtendedPathExpressionNode) String() string  { return formatNode(n) }
 func (n *ExtendedPathExpressionNode) expressionNode() {}
 
 func (n *ExtendedPathExpressionNode) ParenthesizedPath() ExpressionNode {
@@ -9663,7 +9991,9 @@ func newExtractExpressionNodeSlice(raws []*generated.ASTExtractExpressionProto) 
 	return nodes
 }
 
-func (n *ExtractExpressionNode) Kind() Kind      { return KindExtractExpression }
+func (n *ExtractExpressionNode) Kind() Kind { return KindExtractExpression }
+
+func (n *ExtractExpressionNode) String() string  { return formatNode(n) }
 func (n *ExtractExpressionNode) expressionNode() {}
 
 func (n *ExtractExpressionNode) LhsExpr() ExpressionNode {
@@ -9740,6 +10070,8 @@ func newFilterFieldsArgNodeSlice(raws []*generated.ASTFilterFieldsArgProto) []*F
 
 func (n *FilterFieldsArgNode) Kind() Kind { return KindFilterFieldsArg }
 
+func (n *FilterFieldsArgNode) String() string { return formatNode(n) }
+
 func (n *FilterFieldsArgNode) PathExpression() ExpressionNode {
 	return wrapGeneralizedPathExpression(n.raw.GetPathExpression())
 }
@@ -9791,6 +10123,8 @@ func newFilterUsingClauseNodeSlice(raws []*generated.ASTFilterUsingClauseProto) 
 }
 
 func (n *FilterUsingClauseNode) Kind() Kind { return KindFilterUsingClause }
+
+func (n *FilterUsingClauseNode) String() string { return formatNode(n) }
 
 func (n *FilterUsingClauseNode) Predicate() ExpressionNode {
 	return wrapExpression(n.raw.GetPredicate())
@@ -9844,6 +10178,8 @@ func newFixedQuantifierNodeSlice(raws []*generated.ASTFixedQuantifierProto) []*F
 
 func (n *FixedQuantifierNode) Kind() Kind { return KindFixedQuantifier }
 
+func (n *FixedQuantifierNode) String() string { return formatNode(n) }
+
 func (n *FixedQuantifierNode) Bound() ExpressionNode {
 	return wrapExpression(n.raw.GetBound())
 }
@@ -9890,7 +10226,9 @@ func newFloatLiteralNodeSlice(raws []*generated.ASTFloatLiteralProto) []*FloatLi
 	return nodes
 }
 
-func (n *FloatLiteralNode) Kind() Kind      { return KindFloatLiteral }
+func (n *FloatLiteralNode) Kind() Kind { return KindFloatLiteral }
+
+func (n *FloatLiteralNode) String() string  { return formatNode(n) }
 func (n *FloatLiteralNode) expressionNode() {}
 func (n *FloatLiteralNode) leafNode()       {}
 
@@ -9926,7 +10264,9 @@ func newForInStatementNodeSlice(raws []*generated.ASTForInStatementProto) []*For
 	return nodes
 }
 
-func (n *ForInStatementNode) Kind() Kind     { return KindForInStatement }
+func (n *ForInStatementNode) Kind() Kind { return KindForInStatement }
+
+func (n *ForInStatementNode) String() string { return formatNode(n) }
 func (n *ForInStatementNode) statementNode() {}
 
 func (n *ForInStatementNode) Variable() *IdentifierNode {
@@ -9990,6 +10330,8 @@ func newForSystemTimeNodeSlice(raws []*generated.ASTForSystemTimeProto) []*ForSy
 
 func (n *ForSystemTimeNode) Kind() Kind { return KindForSystemTime }
 
+func (n *ForSystemTimeNode) String() string { return formatNode(n) }
+
 func (n *ForSystemTimeNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
 }
@@ -10038,6 +10380,8 @@ func newForeignKeyActionsNodeSlice(raws []*generated.ASTForeignKeyActionsProto) 
 
 func (n *ForeignKeyActionsNode) Kind() Kind { return KindForeignKeyActions }
 
+func (n *ForeignKeyActionsNode) String() string { return formatNode(n) }
+
 func (n *ForeignKeyActionsNode) UpdateAction() generated.ASTForeignKeyActionsEnums_Action {
 	return n.raw.GetUpdateAction()
 }
@@ -10079,6 +10423,8 @@ func newForeignKeyColumnAttributeNodeSlice(raws []*generated.ASTForeignKeyColumn
 }
 
 func (n *ForeignKeyColumnAttributeNode) Kind() Kind { return KindForeignKeyColumnAttribute }
+
+func (n *ForeignKeyColumnAttributeNode) String() string { return formatNode(n) }
 
 func (n *ForeignKeyColumnAttributeNode) ConstraintName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetConstraintName())
@@ -10140,6 +10486,8 @@ func newForeignKeyNodeSlice(raws []*generated.ASTForeignKeyProto) []*ForeignKeyN
 }
 
 func (n *ForeignKeyNode) Kind() Kind { return KindForeignKey }
+
+func (n *ForeignKeyNode) String() string { return formatNode(n) }
 
 func (n *ForeignKeyNode) ColumnList() *ColumnListNode {
 	return newColumnListNode(n.raw.GetColumnList())
@@ -10228,6 +10576,8 @@ func newForeignKeyReferenceNodeSlice(raws []*generated.ASTForeignKeyReferencePro
 
 func (n *ForeignKeyReferenceNode) Kind() Kind { return KindForeignKeyReference }
 
+func (n *ForeignKeyReferenceNode) String() string { return formatNode(n) }
+
 func (n *ForeignKeyReferenceNode) TableName() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetTableName())
 }
@@ -10310,6 +10660,8 @@ func newFormatClauseNodeSlice(raws []*generated.ASTFormatClauseProto) []*FormatC
 
 func (n *FormatClauseNode) Kind() Kind { return KindFormatClause }
 
+func (n *FormatClauseNode) String() string { return formatNode(n) }
+
 func (n *FormatClauseNode) Format() ExpressionNode {
 	return wrapExpression(n.raw.GetFormat())
 }
@@ -10371,6 +10723,8 @@ func newFromClauseNodeSlice(raws []*generated.ASTFromClauseProto) []*FromClauseN
 
 func (n *FromClauseNode) Kind() Kind { return KindFromClause }
 
+func (n *FromClauseNode) String() string { return formatNode(n) }
+
 func (n *FromClauseNode) TableExpression() TableExpressionNode {
 	return wrapTableExpression(n.raw.GetTableExpression())
 }
@@ -10417,7 +10771,9 @@ func newFromQueryNodeSlice(raws []*generated.ASTFromQueryProto) []*FromQueryNode
 	return nodes
 }
 
-func (n *FromQueryNode) Kind() Kind           { return KindFromQuery }
+func (n *FromQueryNode) Kind() Kind { return KindFromQuery }
+
+func (n *FromQueryNode) String() string       { return formatNode(n) }
 func (n *FromQueryNode) queryExpressionNode() {}
 
 func (n *FromQueryNode) FromClause() *FromClauseNode {
@@ -10466,7 +10822,9 @@ func newFunctionCallNodeSlice(raws []*generated.ASTFunctionCallProto) []*Functio
 	return nodes
 }
 
-func (n *FunctionCallNode) Kind() Kind      { return KindFunctionCall }
+func (n *FunctionCallNode) Kind() Kind { return KindFunctionCall }
+
+func (n *FunctionCallNode) String() string  { return formatNode(n) }
 func (n *FunctionCallNode) expressionNode() {}
 
 func (n *FunctionCallNode) Function() *PathExpressionNode {
@@ -10662,6 +11020,8 @@ func newFunctionDeclarationNodeSlice(raws []*generated.ASTFunctionDeclarationPro
 
 func (n *FunctionDeclarationNode) Kind() Kind { return KindFunctionDeclaration }
 
+func (n *FunctionDeclarationNode) String() string { return formatNode(n) }
+
 func (n *FunctionDeclarationNode) Name() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetName())
 }
@@ -10722,6 +11082,8 @@ func newFunctionParameterNodeSlice(raws []*generated.ASTFunctionParameterProto) 
 }
 
 func (n *FunctionParameterNode) Kind() Kind { return KindFunctionParameter }
+
+func (n *FunctionParameterNode) String() string { return formatNode(n) }
 
 func (n *FunctionParameterNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
@@ -10844,6 +11206,8 @@ func newFunctionParametersNodeSlice(raws []*generated.ASTFunctionParametersProto
 
 func (n *FunctionParametersNode) Kind() Kind { return KindFunctionParameters }
 
+func (n *FunctionParametersNode) String() string { return formatNode(n) }
+
 func (n *FunctionParametersNode) ParameterEntries() []*FunctionParameterNode {
 	return newFunctionParameterNodeSlice(n.raw.GetParameterEntries())
 }
@@ -10891,6 +11255,8 @@ func newFunctionTypeArgListNodeSlice(raws []*generated.ASTFunctionTypeArgListPro
 
 func (n *FunctionTypeArgListNode) Kind() Kind { return KindFunctionTypeArgList }
 
+func (n *FunctionTypeArgListNode) String() string { return formatNode(n) }
+
 func (n *FunctionTypeArgListNode) Args() []Node {
 	return wrapTypeSlice(n.raw.GetArgs())
 }
@@ -10937,6 +11303,8 @@ func newFunctionTypeNodeSlice(raws []*generated.ASTFunctionTypeProto) []*Functio
 }
 
 func (n *FunctionTypeNode) Kind() Kind { return KindFunctionType }
+
+func (n *FunctionTypeNode) String() string { return formatNode(n) }
 
 func (n *FunctionTypeNode) ArgList() *FunctionTypeArgListNode {
 	return newFunctionTypeArgListNode(n.raw.GetArgList())
@@ -11025,6 +11393,8 @@ func newGeneratedColumnInfoNodeSlice(raws []*generated.ASTGeneratedColumnInfoPro
 
 func (n *GeneratedColumnInfoNode) Kind() Kind { return KindGeneratedColumnInfo }
 
+func (n *GeneratedColumnInfoNode) String() string { return formatNode(n) }
+
 func (n *GeneratedColumnInfoNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
 }
@@ -11094,6 +11464,8 @@ func newGqlFilterNodeSlice(raws []*generated.ASTGqlFilterProto) []*GqlFilterNode
 
 func (n *GqlFilterNode) Kind() Kind { return KindGqlFilter }
 
+func (n *GqlFilterNode) String() string { return formatNode(n) }
+
 func (n *GqlFilterNode) Condition() *WhereClauseNode {
 	return newWhereClauseNode(n.raw.GetCondition())
 }
@@ -11141,6 +11513,8 @@ func newGqlForNodeSlice(raws []*generated.ASTGqlForProto) []*GqlForNode {
 }
 
 func (n *GqlForNode) Kind() Kind { return KindGqlFor }
+
+func (n *GqlForNode) String() string { return formatNode(n) }
 
 func (n *GqlForNode) Identifier() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetIdentifier())
@@ -11214,7 +11588,9 @@ func newGqlGraphPatternQueryNodeSlice(raws []*generated.ASTGqlGraphPatternQueryP
 	return nodes
 }
 
-func (n *GqlGraphPatternQueryNode) Kind() Kind           { return KindGqlGraphPatternQuery }
+func (n *GqlGraphPatternQueryNode) Kind() Kind { return KindGqlGraphPatternQuery }
+
+func (n *GqlGraphPatternQueryNode) String() string       { return formatNode(n) }
 func (n *GqlGraphPatternQueryNode) queryExpressionNode() {}
 
 func (n *GqlGraphPatternQueryNode) GraphReference() *PathExpressionNode {
@@ -11278,6 +11654,8 @@ func newGqlInlineSubqueryCallNodeSlice(raws []*generated.ASTGqlInlineSubqueryCal
 
 func (n *GqlInlineSubqueryCallNode) Kind() Kind { return KindGqlInlineSubqueryCall }
 
+func (n *GqlInlineSubqueryCallNode) String() string { return formatNode(n) }
+
 func (n *GqlInlineSubqueryCallNode) Subquery() *QueryNode {
 	return newQueryNode(n.raw.GetSubquery())
 }
@@ -11325,6 +11703,8 @@ func newGqlLetNodeSlice(raws []*generated.ASTGqlLetProto) []*GqlLetNode {
 }
 
 func (n *GqlLetNode) Kind() Kind { return KindGqlLet }
+
+func (n *GqlLetNode) String() string { return formatNode(n) }
 
 func (n *GqlLetNode) VariableDefinitionList() *GqlLetVariableDefinitionListNode {
 	return newGqlLetVariableDefinitionListNode(n.raw.GetVariableDefinitionList())
@@ -11374,6 +11754,8 @@ func newGqlLetVariableDefinitionListNodeSlice(raws []*generated.ASTGqlLetVariabl
 
 func (n *GqlLetVariableDefinitionListNode) Kind() Kind { return KindGqlLetVariableDefinitionList }
 
+func (n *GqlLetVariableDefinitionListNode) String() string { return formatNode(n) }
+
 func (n *GqlLetVariableDefinitionListNode) VariableDefinitions() []*GqlLetVariableDefinitionNode {
 	return newGqlLetVariableDefinitionNodeSlice(n.raw.GetVariableDefinitions())
 }
@@ -11420,6 +11802,8 @@ func newGqlLetVariableDefinitionNodeSlice(raws []*generated.ASTGqlLetVariableDef
 }
 
 func (n *GqlLetVariableDefinitionNode) Kind() Kind { return KindGqlLetVariableDefinition }
+
+func (n *GqlLetVariableDefinitionNode) String() string { return formatNode(n) }
 
 func (n *GqlLetVariableDefinitionNode) Identifier() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetIdentifier())
@@ -11480,7 +11864,9 @@ func newGqlLinearOpsQueryNodeSlice(raws []*generated.ASTGqlLinearOpsQueryProto) 
 	return nodes
 }
 
-func (n *GqlLinearOpsQueryNode) Kind() Kind           { return KindGqlLinearOpsQuery }
+func (n *GqlLinearOpsQueryNode) Kind() Kind { return KindGqlLinearOpsQuery }
+
+func (n *GqlLinearOpsQueryNode) String() string       { return formatNode(n) }
 func (n *GqlLinearOpsQueryNode) queryExpressionNode() {}
 
 func (n *GqlLinearOpsQueryNode) GraphReference() *PathExpressionNode {
@@ -11543,6 +11929,8 @@ func newGqlMatchNodeSlice(raws []*generated.ASTGqlMatchProto) []*GqlMatchNode {
 }
 
 func (n *GqlMatchNode) Kind() Kind { return KindGqlMatch }
+
+func (n *GqlMatchNode) String() string { return formatNode(n) }
 
 func (n *GqlMatchNode) GraphPattern() *GraphPatternNode {
 	return newGraphPatternNode(n.raw.GetGraphPattern())
@@ -11609,6 +11997,8 @@ func newGqlNamedCallNodeSlice(raws []*generated.ASTGqlNamedCallProto) []*GqlName
 
 func (n *GqlNamedCallNode) Kind() Kind { return KindGqlNamedCall }
 
+func (n *GqlNamedCallNode) String() string { return formatNode(n) }
+
 func (n *GqlNamedCallNode) TvfCall() *TVFNode {
 	return newTVFNode(n.raw.GetTvfCall())
 }
@@ -11670,6 +12060,8 @@ func newGqlOperatorListNodeSlice(raws []*generated.ASTGqlOperatorListProto) []*G
 
 func (n *GqlOperatorListNode) Kind() Kind { return KindGqlOperatorList }
 
+func (n *GqlOperatorListNode) String() string { return formatNode(n) }
+
 func (n *GqlOperatorListNode) Operators() []Node {
 	return wrapGqlOperatorSlice(n.raw.GetOperators())
 }
@@ -11716,6 +12108,8 @@ func newGqlOrderByAndPageNodeSlice(raws []*generated.ASTGqlOrderByAndPageProto) 
 }
 
 func (n *GqlOrderByAndPageNode) Kind() Kind { return KindGqlOrderByAndPage }
+
+func (n *GqlOrderByAndPageNode) String() string { return formatNode(n) }
 
 func (n *GqlOrderByAndPageNode) OrderBy() *OrderByNode {
 	return newOrderByNode(n.raw.GetOrderBy())
@@ -11778,6 +12172,8 @@ func newGqlPageLimitNodeSlice(raws []*generated.ASTGqlPageLimitProto) []*GqlPage
 
 func (n *GqlPageLimitNode) Kind() Kind { return KindGqlPageLimit }
 
+func (n *GqlPageLimitNode) String() string { return formatNode(n) }
+
 func (n *GqlPageLimitNode) Limit() ExpressionNode {
 	return wrapExpression(n.raw.GetLimit())
 }
@@ -11825,6 +12221,8 @@ func newGqlPageNodeSlice(raws []*generated.ASTGqlPageProto) []*GqlPageNode {
 }
 
 func (n *GqlPageNode) Kind() Kind { return KindGqlPage }
+
+func (n *GqlPageNode) String() string { return formatNode(n) }
 
 func (n *GqlPageNode) Offset() *GqlPageOffsetNode {
 	return newGqlPageOffsetNode(n.raw.GetOffset())
@@ -11887,6 +12285,8 @@ func newGqlPageOffsetNodeSlice(raws []*generated.ASTGqlPageOffsetProto) []*GqlPa
 
 func (n *GqlPageOffsetNode) Kind() Kind { return KindGqlPageOffset }
 
+func (n *GqlPageOffsetNode) String() string { return formatNode(n) }
+
 func (n *GqlPageOffsetNode) Offset() ExpressionNode {
 	return wrapExpression(n.raw.GetOffset())
 }
@@ -11933,7 +12333,9 @@ func newGqlQueryNodeSlice(raws []*generated.ASTGqlQueryProto) []*GqlQueryNode {
 	return nodes
 }
 
-func (n *GqlQueryNode) Kind() Kind           { return KindGqlQuery }
+func (n *GqlQueryNode) Kind() Kind { return KindGqlQuery }
+
+func (n *GqlQueryNode) String() string       { return formatNode(n) }
 func (n *GqlQueryNode) queryExpressionNode() {}
 
 func (n *GqlQueryNode) GraphTable() *GraphTableQueryNode {
@@ -11983,6 +12385,8 @@ func newGqlReturnNodeSlice(raws []*generated.ASTGqlReturnProto) []*GqlReturnNode
 }
 
 func (n *GqlReturnNode) Kind() Kind { return KindGqlReturn }
+
+func (n *GqlReturnNode) String() string { return formatNode(n) }
 
 func (n *GqlReturnNode) Select() *SelectNode {
 	return newSelectNode(n.raw.GetSelect())
@@ -12045,6 +12449,8 @@ func newGqlSampleNodeSlice(raws []*generated.ASTGqlSampleProto) []*GqlSampleNode
 
 func (n *GqlSampleNode) Kind() Kind { return KindGqlSample }
 
+func (n *GqlSampleNode) String() string { return formatNode(n) }
+
 func (n *GqlSampleNode) Sample() *SampleClauseNode {
 	return newSampleClauseNode(n.raw.GetSample())
 }
@@ -12092,6 +12498,8 @@ func newGqlSetOperationNodeSlice(raws []*generated.ASTGqlSetOperationProto) []*G
 }
 
 func (n *GqlSetOperationNode) Kind() Kind { return KindGqlSetOperation }
+
+func (n *GqlSetOperationNode) String() string { return formatNode(n) }
 
 func (n *GqlSetOperationNode) Metadata() *SetOperationMetadataListNode {
 	return newSetOperationMetadataListNode(n.raw.GetMetadata())
@@ -12153,6 +12561,8 @@ func newGqlWithNodeSlice(raws []*generated.ASTGqlWithProto) []*GqlWithNode {
 
 func (n *GqlWithNode) Kind() Kind { return KindGqlWith }
 
+func (n *GqlWithNode) String() string { return formatNode(n) }
+
 func (n *GqlWithNode) Select() *SelectNode {
 	return newSelectNode(n.raw.GetSelect())
 }
@@ -12199,7 +12609,9 @@ func newGrantStatementNodeSlice(raws []*generated.ASTGrantStatementProto) []*Gra
 	return nodes
 }
 
-func (n *GrantStatementNode) Kind() Kind     { return KindGrantStatement }
+func (n *GrantStatementNode) Kind() Kind { return KindGrantStatement }
+
+func (n *GrantStatementNode) String() string { return formatNode(n) }
 func (n *GrantStatementNode) statementNode() {}
 
 func (n *GrantStatementNode) Privileges() *PrivilegesNode {
@@ -12288,6 +12700,8 @@ func newGrantToClauseNodeSlice(raws []*generated.ASTGrantToClauseProto) []*Grant
 
 func (n *GrantToClauseNode) Kind() Kind { return KindGrantToClause }
 
+func (n *GrantToClauseNode) String() string { return formatNode(n) }
+
 func (n *GrantToClauseNode) GranteeList() *GranteeListNode {
 	return newGranteeListNode(n.raw.GetGranteeList())
 }
@@ -12340,6 +12754,8 @@ func newGranteeListNodeSlice(raws []*generated.ASTGranteeListProto) []*GranteeLi
 
 func (n *GranteeListNode) Kind() Kind { return KindGranteeList }
 
+func (n *GranteeListNode) String() string { return formatNode(n) }
+
 func (n *GranteeListNode) GranteeList() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetGranteeList())
 }
@@ -12387,6 +12803,8 @@ func newGraphDerivedPropertyListNodeSlice(raws []*generated.ASTGraphDerivedPrope
 
 func (n *GraphDerivedPropertyListNode) Kind() Kind { return KindGraphDerivedPropertyList }
 
+func (n *GraphDerivedPropertyListNode) String() string { return formatNode(n) }
+
 func (n *GraphDerivedPropertyListNode) Properties() []*GraphDerivedPropertyNode {
 	return newGraphDerivedPropertyNodeSlice(n.raw.GetProperties())
 }
@@ -12433,6 +12851,8 @@ func newGraphDerivedPropertyNodeSlice(raws []*generated.ASTGraphDerivedPropertyP
 }
 
 func (n *GraphDerivedPropertyNode) Kind() Kind { return KindGraphDerivedProperty }
+
+func (n *GraphDerivedPropertyNode) String() string { return formatNode(n) }
 
 func (n *GraphDerivedPropertyNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -12508,6 +12928,8 @@ func newGraphDynamicLabelNodeSlice(raws []*generated.ASTGraphDynamicLabelProto) 
 
 func (n *GraphDynamicLabelNode) Kind() Kind { return KindGraphDynamicLabel }
 
+func (n *GraphDynamicLabelNode) String() string { return formatNode(n) }
+
 func (n *GraphDynamicLabelNode) Label() ExpressionNode {
 	return wrapExpression(n.raw.GetLabel())
 }
@@ -12556,6 +12978,8 @@ func newGraphDynamicPropertiesNodeSlice(raws []*generated.ASTGraphDynamicPropert
 
 func (n *GraphDynamicPropertiesNode) Kind() Kind { return KindGraphDynamicProperties }
 
+func (n *GraphDynamicPropertiesNode) String() string { return formatNode(n) }
+
 func (n *GraphDynamicPropertiesNode) Properties() ExpressionNode {
 	return wrapExpression(n.raw.GetProperties())
 }
@@ -12603,6 +13027,8 @@ func newGraphEdgePatternNodeSlice(raws []*generated.ASTGraphEdgePatternProto) []
 }
 
 func (n *GraphEdgePatternNode) Kind() Kind { return KindGraphEdgePattern }
+
+func (n *GraphEdgePatternNode) String() string { return formatNode(n) }
 
 func (n *GraphEdgePatternNode) Orientation() generated.ASTGraphEdgePatternEnums_EdgeOrientation {
 	return n.raw.GetOrientation()
@@ -12671,6 +13097,8 @@ func (n *GraphElementLabelAndPropertiesListNode) Kind() Kind {
 	return KindGraphElementLabelAndPropertiesList
 }
 
+func (n *GraphElementLabelAndPropertiesListNode) String() string { return formatNode(n) }
+
 func (n *GraphElementLabelAndPropertiesListNode) LabelPropertiesList() []*GraphElementLabelAndPropertiesNode {
 	return newGraphElementLabelAndPropertiesNodeSlice(n.raw.GetLabelPropertiesList())
 }
@@ -12717,6 +13145,8 @@ func newGraphElementLabelAndPropertiesNodeSlice(raws []*generated.ASTGraphElemen
 }
 
 func (n *GraphElementLabelAndPropertiesNode) Kind() Kind { return KindGraphElementLabelAndProperties }
+
+func (n *GraphElementLabelAndPropertiesNode) String() string { return formatNode(n) }
 
 func (n *GraphElementLabelAndPropertiesNode) LabelName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetLabelName())
@@ -12792,6 +13222,8 @@ func newGraphElementLabelNodeSlice(raws []*generated.ASTGraphElementLabelProto) 
 
 func (n *GraphElementLabelNode) Kind() Kind { return KindGraphElementLabel }
 
+func (n *GraphElementLabelNode) String() string { return formatNode(n) }
+
 func (n *GraphElementLabelNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
 }
@@ -12839,6 +13271,8 @@ func newGraphElementPatternFillerNodeSlice(raws []*generated.ASTGraphElementPatt
 }
 
 func (n *GraphElementPatternFillerNode) Kind() Kind { return KindGraphElementPatternFiller }
+
+func (n *GraphElementPatternFillerNode) String() string { return formatNode(n) }
 
 func (n *GraphElementPatternFillerNode) VariableName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetVariableName())
@@ -12953,6 +13387,8 @@ func newGraphElementTableListNodeSlice(raws []*generated.ASTGraphElementTableLis
 
 func (n *GraphElementTableListNode) Kind() Kind { return KindGraphElementTableList }
 
+func (n *GraphElementTableListNode) String() string { return formatNode(n) }
+
 func (n *GraphElementTableListNode) ElementTables() []*GraphElementTableNode {
 	return newGraphElementTableNodeSlice(n.raw.GetElementTables())
 }
@@ -12999,6 +13435,8 @@ func newGraphElementTableNodeSlice(raws []*generated.ASTGraphElementTableProto) 
 }
 
 func (n *GraphElementTableNode) Kind() Kind { return KindGraphElementTable }
+
+func (n *GraphElementTableNode) String() string { return formatNode(n) }
 
 func (n *GraphElementTableNode) Name() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetName())
@@ -13150,7 +13588,9 @@ func newGraphIsLabeledPredicateNodeSlice(raws []*generated.ASTGraphIsLabeledPred
 	return nodes
 }
 
-func (n *GraphIsLabeledPredicateNode) Kind() Kind      { return KindGraphIsLabeledPredicate }
+func (n *GraphIsLabeledPredicateNode) Kind() Kind { return KindGraphIsLabeledPredicate }
+
+func (n *GraphIsLabeledPredicateNode) String() string  { return formatNode(n) }
 func (n *GraphIsLabeledPredicateNode) expressionNode() {}
 
 func (n *GraphIsLabeledPredicateNode) IsNot() bool {
@@ -13218,6 +13658,8 @@ func newGraphLabelFilterNodeSlice(raws []*generated.ASTGraphLabelFilterProto) []
 
 func (n *GraphLabelFilterNode) Kind() Kind { return KindGraphLabelFilter }
 
+func (n *GraphLabelFilterNode) String() string { return formatNode(n) }
+
 func (n *GraphLabelFilterNode) LabelExpression() Node {
 	return wrapGraphLabelExpression(n.raw.GetLabelExpression())
 }
@@ -13265,6 +13707,8 @@ func newGraphLabelOperationNodeSlice(raws []*generated.ASTGraphLabelOperationPro
 }
 
 func (n *GraphLabelOperationNode) Kind() Kind { return KindGraphLabelOperation }
+
+func (n *GraphLabelOperationNode) String() string { return formatNode(n) }
 
 func (n *GraphLabelOperationNode) OpType() generated.ASTGraphLabelOperationEnums_OperationType {
 	return n.raw.GetOpType()
@@ -13317,6 +13761,8 @@ func newGraphLhsHintNodeSlice(raws []*generated.ASTGraphLhsHintProto) []*GraphLh
 
 func (n *GraphLhsHintNode) Kind() Kind { return KindGraphLhsHint }
 
+func (n *GraphLhsHintNode) String() string { return formatNode(n) }
+
 func (n *GraphLhsHintNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
 }
@@ -13365,6 +13811,8 @@ func newGraphNodePatternNodeSlice(raws []*generated.ASTGraphNodePatternProto) []
 
 func (n *GraphNodePatternNode) Kind() Kind { return KindGraphNodePattern }
 
+func (n *GraphNodePatternNode) String() string { return formatNode(n) }
+
 func (n *GraphNodePatternNode) NumChildren() int {
 	count := 0
 	return count
@@ -13398,6 +13846,8 @@ func newGraphNodeTableReferenceNodeSlice(raws []*generated.ASTGraphNodeTableRefe
 }
 
 func (n *GraphNodeTableReferenceNode) Kind() Kind { return KindGraphNodeTableReference }
+
+func (n *GraphNodeTableReferenceNode) String() string { return formatNode(n) }
 
 func (n *GraphNodeTableReferenceNode) NodeTableIdentifier() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetNodeTableIdentifier())
@@ -13477,6 +13927,8 @@ func newGraphPathModeNodeSlice(raws []*generated.ASTGraphPathModeProto) []*Graph
 
 func (n *GraphPathModeNode) Kind() Kind { return KindGraphPathMode }
 
+func (n *GraphPathModeNode) String() string { return formatNode(n) }
+
 func (n *GraphPathModeNode) PathMode() generated.ASTGraphPathModeEnums_PathMode {
 	return n.raw.GetPathMode()
 }
@@ -13514,6 +13966,8 @@ func newGraphPathPatternNodeSlice(raws []*generated.ASTGraphPathPatternProto) []
 }
 
 func (n *GraphPathPatternNode) Kind() Kind { return KindGraphPathPattern }
+
+func (n *GraphPathPatternNode) String() string { return formatNode(n) }
 
 func (n *GraphPathPatternNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
@@ -13631,6 +14085,8 @@ func newGraphPathSearchPrefixCountNodeSlice(raws []*generated.ASTGraphPathSearch
 
 func (n *GraphPathSearchPrefixCountNode) Kind() Kind { return KindGraphPathSearchPrefixCount }
 
+func (n *GraphPathSearchPrefixCountNode) String() string { return formatNode(n) }
+
 func (n *GraphPathSearchPrefixCountNode) PathCount() ExpressionNode {
 	return wrapExpression(n.raw.GetPathCount())
 }
@@ -13678,6 +14134,8 @@ func newGraphPathSearchPrefixNodeSlice(raws []*generated.ASTGraphPathSearchPrefi
 }
 
 func (n *GraphPathSearchPrefixNode) Kind() Kind { return KindGraphPathSearchPrefix }
+
+func (n *GraphPathSearchPrefixNode) String() string { return formatNode(n) }
 
 func (n *GraphPathSearchPrefixNode) Type() generated.ASTGraphPathSearchPrefixEnums_PathSearchPrefixType {
 	return n.raw.GetType()
@@ -13730,6 +14188,8 @@ func newGraphPatternNodeSlice(raws []*generated.ASTGraphPatternProto) []*GraphPa
 }
 
 func (n *GraphPatternNode) Kind() Kind { return KindGraphPattern }
+
+func (n *GraphPatternNode) String() string { return formatNode(n) }
 
 func (n *GraphPatternNode) Paths() []*GraphPathPatternNode {
 	return newGraphPathPatternNodeSlice(n.raw.GetPaths())
@@ -13790,6 +14250,8 @@ func newGraphPropertiesNodeSlice(raws []*generated.ASTGraphPropertiesProto) []*G
 }
 
 func (n *GraphPropertiesNode) Kind() Kind { return KindGraphProperties }
+
+func (n *GraphPropertiesNode) String() string { return formatNode(n) }
 
 func (n *GraphPropertiesNode) NoProperties() bool {
 	return n.raw.GetNoProperties()
@@ -13856,6 +14318,8 @@ func newGraphPropertyNameAndValueNodeSlice(raws []*generated.ASTGraphPropertyNam
 
 func (n *GraphPropertyNameAndValueNode) Kind() Kind { return KindGraphPropertyNameAndValue }
 
+func (n *GraphPropertyNameAndValueNode) String() string { return formatNode(n) }
+
 func (n *GraphPropertyNameAndValueNode) PropertyName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetPropertyName())
 }
@@ -13917,6 +14381,8 @@ func newGraphPropertySpecificationNodeSlice(raws []*generated.ASTGraphPropertySp
 
 func (n *GraphPropertySpecificationNode) Kind() Kind { return KindGraphPropertySpecification }
 
+func (n *GraphPropertySpecificationNode) String() string { return formatNode(n) }
+
 func (n *GraphPropertySpecificationNode) PropertyNameAndValue() []*GraphPropertyNameAndValueNode {
 	return newGraphPropertyNameAndValueNodeSlice(n.raw.GetPropertyNameAndValue())
 }
@@ -13964,6 +14430,8 @@ func newGraphRhsHintNodeSlice(raws []*generated.ASTGraphRhsHintProto) []*GraphRh
 
 func (n *GraphRhsHintNode) Kind() Kind { return KindGraphRhsHint }
 
+func (n *GraphRhsHintNode) String() string { return formatNode(n) }
+
 func (n *GraphRhsHintNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
 }
@@ -14010,7 +14478,9 @@ func newGraphTableQueryNodeSlice(raws []*generated.ASTGraphTableQueryProto) []*G
 	return nodes
 }
 
-func (n *GraphTableQueryNode) Kind() Kind           { return KindGraphTableQuery }
+func (n *GraphTableQueryNode) Kind() Kind { return KindGraphTableQuery }
+
+func (n *GraphTableQueryNode) String() string       { return formatNode(n) }
 func (n *GraphTableQueryNode) tableExpressionNode() {}
 
 func (n *GraphTableQueryNode) GraphReference() *PathExpressionNode {
@@ -14100,6 +14570,8 @@ func newGraphWildcardLabelNodeSlice(raws []*generated.ASTGraphWildcardLabelProto
 
 func (n *GraphWildcardLabelNode) Kind() Kind { return KindGraphWildcardLabel }
 
+func (n *GraphWildcardLabelNode) String() string { return formatNode(n) }
+
 func (n *GraphWildcardLabelNode) NumChildren() int {
 	count := 0
 	return count
@@ -14134,6 +14606,8 @@ func newGroupByAllNodeSlice(raws []*generated.ASTGroupByAllProto) []*GroupByAllN
 
 func (n *GroupByAllNode) Kind() Kind { return KindGroupByAll }
 
+func (n *GroupByAllNode) String() string { return formatNode(n) }
+
 func (n *GroupByAllNode) NumChildren() int {
 	count := 0
 	return count
@@ -14167,6 +14641,8 @@ func newGroupByNodeSlice(raws []*generated.ASTGroupByProto) []*GroupByNode {
 }
 
 func (n *GroupByNode) Kind() Kind { return KindGroupBy }
+
+func (n *GroupByNode) String() string { return formatNode(n) }
 
 func (n *GroupByNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
@@ -14244,6 +14720,8 @@ func newGroupingItemNodeSlice(raws []*generated.ASTGroupingItemProto) []*Groupin
 }
 
 func (n *GroupingItemNode) Kind() Kind { return KindGroupingItem }
+
+func (n *GroupingItemNode) String() string { return formatNode(n) }
 
 func (n *GroupingItemNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -14358,6 +14836,8 @@ func newGroupingItemOrderNodeSlice(raws []*generated.ASTGroupingItemOrderProto) 
 
 func (n *GroupingItemOrderNode) Kind() Kind { return KindGroupingItemOrder }
 
+func (n *GroupingItemOrderNode) String() string { return formatNode(n) }
+
 func (n *GroupingItemOrderNode) OrderingSpec() generated.ASTOrderingExpressionEnums_OrderingSpec {
 	return n.raw.GetOrderingSpec()
 }
@@ -14410,6 +14890,8 @@ func newGroupingSetListNodeSlice(raws []*generated.ASTGroupingSetListProto) []*G
 
 func (n *GroupingSetListNode) Kind() Kind { return KindGroupingSetList }
 
+func (n *GroupingSetListNode) String() string { return formatNode(n) }
+
 func (n *GroupingSetListNode) GroupingSets() []*GroupingSetNode {
 	return newGroupingSetNodeSlice(n.raw.GetGroupingSets())
 }
@@ -14456,6 +14938,8 @@ func newGroupingSetNodeSlice(raws []*generated.ASTGroupingSetProto) []*GroupingS
 }
 
 func (n *GroupingSetNode) Kind() Kind { return KindGroupingSet }
+
+func (n *GroupingSetNode) String() string { return formatNode(n) }
 
 func (n *GroupingSetNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -14531,6 +15015,8 @@ func newHavingModifierNodeSlice(raws []*generated.ASTHavingModifierProto) []*Hav
 
 func (n *HavingModifierNode) Kind() Kind { return KindHavingModifier }
 
+func (n *HavingModifierNode) String() string { return formatNode(n) }
+
 func (n *HavingModifierNode) Expr() ExpressionNode {
 	return wrapExpression(n.raw.GetExpr())
 }
@@ -14583,6 +15069,8 @@ func newHavingNodeSlice(raws []*generated.ASTHavingProto) []*HavingNode {
 
 func (n *HavingNode) Kind() Kind { return KindHaving }
 
+func (n *HavingNode) String() string { return formatNode(n) }
+
 func (n *HavingNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
 }
@@ -14631,6 +15119,8 @@ func newHiddenColumnAttributeNodeSlice(raws []*generated.ASTHiddenColumnAttribut
 
 func (n *HiddenColumnAttributeNode) Kind() Kind { return KindHiddenColumnAttribute }
 
+func (n *HiddenColumnAttributeNode) String() string { return formatNode(n) }
+
 func (n *HiddenColumnAttributeNode) NumChildren() int {
 	count := 0
 	return count
@@ -14664,6 +15154,8 @@ func newHintEntryNodeSlice(raws []*generated.ASTHintEntryProto) []*HintEntryNode
 }
 
 func (n *HintEntryNode) Kind() Kind { return KindHintEntry }
+
+func (n *HintEntryNode) String() string { return formatNode(n) }
 
 func (n *HintEntryNode) Qualifier() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetQualifier())
@@ -14739,6 +15231,8 @@ func newHintNodeSlice(raws []*generated.ASTHintProto) []*HintNode {
 
 func (n *HintNode) Kind() Kind { return KindHint }
 
+func (n *HintNode) String() string { return formatNode(n) }
+
 func (n *HintNode) NumShardsHint() *IntLiteralNode {
 	return newIntLiteralNode(n.raw.GetNumShardsHint())
 }
@@ -14797,7 +15291,9 @@ func newHintedStatementNodeSlice(raws []*generated.ASTHintedStatementProto) []*H
 	return nodes
 }
 
-func (n *HintedStatementNode) Kind() Kind     { return KindHintedStatement }
+func (n *HintedStatementNode) Kind() Kind { return KindHintedStatement }
+
+func (n *HintedStatementNode) String() string { return formatNode(n) }
 func (n *HintedStatementNode) statementNode() {}
 
 func (n *HintedStatementNode) Hint() *HintNode {
@@ -14861,6 +15357,8 @@ func newIdentifierListNodeSlice(raws []*generated.ASTIdentifierListProto) []*Ide
 
 func (n *IdentifierListNode) Kind() Kind { return KindIdentifierList }
 
+func (n *IdentifierListNode) String() string { return formatNode(n) }
+
 func (n *IdentifierListNode) IdentifierList() []*IdentifierNode {
 	return newIdentifierNodeSlice(n.raw.GetIdentifierList())
 }
@@ -14906,7 +15404,9 @@ func newIdentifierNodeSlice(raws []*generated.ASTIdentifierProto) []*IdentifierN
 	return nodes
 }
 
-func (n *IdentifierNode) Kind() Kind      { return KindIdentifier }
+func (n *IdentifierNode) Kind() Kind { return KindIdentifier }
+
+func (n *IdentifierNode) String() string  { return formatNode(n) }
 func (n *IdentifierNode) expressionNode() {}
 
 func (n *IdentifierNode) IdString() string {
@@ -14950,6 +15450,8 @@ func newIdentityColumnIncrementByNodeSlice(raws []*generated.ASTIdentityColumnIn
 }
 
 func (n *IdentityColumnIncrementByNode) Kind() Kind { return KindIdentityColumnIncrementBy }
+
+func (n *IdentityColumnIncrementByNode) String() string { return formatNode(n) }
 
 func (n *IdentityColumnIncrementByNode) Value() ExpressionNode {
 	return wrapExpression(n.raw.GetValue())
@@ -14998,6 +15500,8 @@ func newIdentityColumnInfoNodeSlice(raws []*generated.ASTIdentityColumnInfoProto
 }
 
 func (n *IdentityColumnInfoNode) Kind() Kind { return KindIdentityColumnInfo }
+
+func (n *IdentityColumnInfoNode) String() string { return formatNode(n) }
 
 func (n *IdentityColumnInfoNode) StartWithValue() *IdentityColumnStartWithNode {
 	return newIdentityColumnStartWithNode(n.raw.GetStartWithValue())
@@ -15090,6 +15594,8 @@ func newIdentityColumnMaxValueNodeSlice(raws []*generated.ASTIdentityColumnMaxVa
 
 func (n *IdentityColumnMaxValueNode) Kind() Kind { return KindIdentityColumnMaxValue }
 
+func (n *IdentityColumnMaxValueNode) String() string { return formatNode(n) }
+
 func (n *IdentityColumnMaxValueNode) Value() ExpressionNode {
 	return wrapExpression(n.raw.GetValue())
 }
@@ -15137,6 +15643,8 @@ func newIdentityColumnMinValueNodeSlice(raws []*generated.ASTIdentityColumnMinVa
 }
 
 func (n *IdentityColumnMinValueNode) Kind() Kind { return KindIdentityColumnMinValue }
+
+func (n *IdentityColumnMinValueNode) String() string { return formatNode(n) }
 
 func (n *IdentityColumnMinValueNode) Value() ExpressionNode {
 	return wrapExpression(n.raw.GetValue())
@@ -15186,6 +15694,8 @@ func newIdentityColumnStartWithNodeSlice(raws []*generated.ASTIdentityColumnStar
 
 func (n *IdentityColumnStartWithNode) Kind() Kind { return KindIdentityColumnStartWith }
 
+func (n *IdentityColumnStartWithNode) String() string { return formatNode(n) }
+
 func (n *IdentityColumnStartWithNode) Value() ExpressionNode {
 	return wrapExpression(n.raw.GetValue())
 }
@@ -15232,7 +15742,9 @@ func newIfStatementNodeSlice(raws []*generated.ASTIfStatementProto) []*IfStateme
 	return nodes
 }
 
-func (n *IfStatementNode) Kind() Kind     { return KindIfStatement }
+func (n *IfStatementNode) Kind() Kind { return KindIfStatement }
+
+func (n *IfStatementNode) String() string { return formatNode(n) }
 func (n *IfStatementNode) statementNode() {}
 
 func (n *IfStatementNode) Condition() ExpressionNode {
@@ -15320,7 +15832,9 @@ func newImportStatementNodeSlice(raws []*generated.ASTImportStatementProto) []*I
 	return nodes
 }
 
-func (n *ImportStatementNode) Kind() Kind     { return KindImportStatement }
+func (n *ImportStatementNode) Kind() Kind { return KindImportStatement }
+
+func (n *ImportStatementNode) String() string { return formatNode(n) }
 func (n *ImportStatementNode) statementNode() {}
 
 func (n *ImportStatementNode) Name() *PathExpressionNode {
@@ -15425,7 +15939,9 @@ func newInExpressionNodeSlice(raws []*generated.ASTInExpressionProto) []*InExpre
 	return nodes
 }
 
-func (n *InExpressionNode) Kind() Kind      { return KindInExpression }
+func (n *InExpressionNode) Kind() Kind { return KindInExpression }
+
+func (n *InExpressionNode) String() string  { return formatNode(n) }
 func (n *InExpressionNode) expressionNode() {}
 
 func (n *InExpressionNode) Lhs() ExpressionNode {
@@ -15545,6 +16061,8 @@ func newInListNodeSlice(raws []*generated.ASTInListProto) []*InListNode {
 
 func (n *InListNode) Kind() Kind { return KindInList }
 
+func (n *InListNode) String() string { return formatNode(n) }
+
 func (n *InListNode) List() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetList())
 }
@@ -15590,7 +16108,9 @@ func newIndexAllColumnsNodeSlice(raws []*generated.ASTIndexAllColumnsProto) []*I
 	return nodes
 }
 
-func (n *IndexAllColumnsNode) Kind() Kind      { return KindIndexAllColumns }
+func (n *IndexAllColumnsNode) Kind() Kind { return KindIndexAllColumns }
+
+func (n *IndexAllColumnsNode) String() string  { return formatNode(n) }
 func (n *IndexAllColumnsNode) expressionNode() {}
 func (n *IndexAllColumnsNode) leafNode()       {}
 
@@ -15642,6 +16162,8 @@ func newIndexItemListNodeSlice(raws []*generated.ASTIndexItemListProto) []*Index
 
 func (n *IndexItemListNode) Kind() Kind { return KindIndexItemList }
 
+func (n *IndexItemListNode) String() string { return formatNode(n) }
+
 func (n *IndexItemListNode) OrderingExpressions() []*OrderingExpressionNode {
 	return newOrderingExpressionNodeSlice(n.raw.GetOrderingExpressions())
 }
@@ -15688,6 +16210,8 @@ func newIndexStoringExpressionListNodeSlice(raws []*generated.ASTIndexStoringExp
 }
 
 func (n *IndexStoringExpressionListNode) Kind() Kind { return KindIndexStoringExpressionList }
+
+func (n *IndexStoringExpressionListNode) String() string { return formatNode(n) }
 
 func (n *IndexStoringExpressionListNode) Expressions() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetExpressions())
@@ -15736,6 +16260,8 @@ func newIndexUnnestExpressionListNodeSlice(raws []*generated.ASTIndexUnnestExpre
 
 func (n *IndexUnnestExpressionListNode) Kind() Kind { return KindIndexUnnestExpressionList }
 
+func (n *IndexUnnestExpressionListNode) String() string { return formatNode(n) }
+
 func (n *IndexUnnestExpressionListNode) UnnestExpressions() []*UnnestExpressionWithOptAliasAndOffsetNode {
 	return newUnnestExpressionWithOptAliasAndOffsetNodeSlice(n.raw.GetUnnestExpressions())
 }
@@ -15783,6 +16309,8 @@ func newInferredTypeColumnSchemaNodeSlice(raws []*generated.ASTInferredTypeColum
 
 func (n *InferredTypeColumnSchemaNode) Kind() Kind { return KindInferredTypeColumnSchema }
 
+func (n *InferredTypeColumnSchemaNode) String() string { return formatNode(n) }
+
 func (n *InferredTypeColumnSchemaNode) NumChildren() int {
 	count := 0
 	return count
@@ -15816,6 +16344,8 @@ func newInputOutputClauseNodeSlice(raws []*generated.ASTInputOutputClauseProto) 
 }
 
 func (n *InputOutputClauseNode) Kind() Kind { return KindInputOutputClause }
+
+func (n *InputOutputClauseNode) String() string { return formatNode(n) }
 
 func (n *InputOutputClauseNode) Input() *TableElementListNode {
 	return newTableElementListNode(n.raw.GetInput())
@@ -15876,7 +16406,9 @@ func newInputTableArgumentNodeSlice(raws []*generated.ASTInputTableArgumentProto
 	return nodes
 }
 
-func (n *InputTableArgumentNode) Kind() Kind      { return KindInputTableArgument }
+func (n *InputTableArgumentNode) Kind() Kind { return KindInputTableArgument }
+
+func (n *InputTableArgumentNode) String() string  { return formatNode(n) }
 func (n *InputTableArgumentNode) expressionNode() {}
 
 func (n *InputTableArgumentNode) NumChildren() int {
@@ -15911,7 +16443,9 @@ func newInsertStatementNodeSlice(raws []*generated.ASTInsertStatementProto) []*I
 	return nodes
 }
 
-func (n *InsertStatementNode) Kind() Kind     { return KindInsertStatement }
+func (n *InsertStatementNode) Kind() Kind { return KindInsertStatement }
+
+func (n *InsertStatementNode) String() string { return formatNode(n) }
 func (n *InsertStatementNode) statementNode() {}
 
 func (n *InsertStatementNode) TargetPath() ExpressionNode {
@@ -16061,6 +16595,8 @@ func newInsertValuesRowListNodeSlice(raws []*generated.ASTInsertValuesRowListPro
 
 func (n *InsertValuesRowListNode) Kind() Kind { return KindInsertValuesRowList }
 
+func (n *InsertValuesRowListNode) String() string { return formatNode(n) }
+
 func (n *InsertValuesRowListNode) Rows() []*InsertValuesRowNode {
 	return newInsertValuesRowNodeSlice(n.raw.GetRows())
 }
@@ -16108,6 +16644,8 @@ func newInsertValuesRowNodeSlice(raws []*generated.ASTInsertValuesRowProto) []*I
 
 func (n *InsertValuesRowNode) Kind() Kind { return KindInsertValuesRow }
 
+func (n *InsertValuesRowNode) String() string { return formatNode(n) }
+
 func (n *InsertValuesRowNode) Values() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetValues())
 }
@@ -16153,7 +16691,9 @@ func newIntLiteralNodeSlice(raws []*generated.ASTIntLiteralProto) []*IntLiteralN
 	return nodes
 }
 
-func (n *IntLiteralNode) Kind() Kind      { return KindIntLiteral }
+func (n *IntLiteralNode) Kind() Kind { return KindIntLiteral }
+
+func (n *IntLiteralNode) String() string  { return formatNode(n) }
 func (n *IntLiteralNode) expressionNode() {}
 func (n *IntLiteralNode) leafNode()       {}
 
@@ -16189,7 +16729,9 @@ func newIntOrUnboundedNodeSlice(raws []*generated.ASTIntOrUnboundedProto) []*Int
 	return nodes
 }
 
-func (n *IntOrUnboundedNode) Kind() Kind      { return KindIntOrUnbounded }
+func (n *IntOrUnboundedNode) Kind() Kind { return KindIntOrUnbounded }
+
+func (n *IntOrUnboundedNode) String() string  { return formatNode(n) }
 func (n *IntOrUnboundedNode) expressionNode() {}
 
 func (n *IntOrUnboundedNode) Bound() ExpressionNode {
@@ -16238,7 +16780,9 @@ func newIntervalExprNodeSlice(raws []*generated.ASTIntervalExprProto) []*Interva
 	return nodes
 }
 
-func (n *IntervalExprNode) Kind() Kind      { return KindIntervalExpr }
+func (n *IntervalExprNode) Kind() Kind { return KindIntervalExpr }
+
+func (n *IntervalExprNode) String() string  { return formatNode(n) }
 func (n *IntervalExprNode) expressionNode() {}
 
 func (n *IntervalExprNode) IntervalValue() ExpressionNode {
@@ -16315,6 +16859,8 @@ func newIntoAliasNodeSlice(raws []*generated.ASTIntoAliasProto) []*IntoAliasNode
 
 func (n *IntoAliasNode) Kind() Kind { return KindIntoAlias }
 
+func (n *IntoAliasNode) String() string { return formatNode(n) }
+
 func (n *IntoAliasNode) Identifier() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetIdentifier())
 }
@@ -16361,7 +16907,9 @@ func newJSONLiteralNodeSlice(raws []*generated.ASTJSONLiteralProto) []*JSONLiter
 	return nodes
 }
 
-func (n *JSONLiteralNode) Kind() Kind      { return KindJSONLiteral }
+func (n *JSONLiteralNode) Kind() Kind { return KindJSONLiteral }
+
+func (n *JSONLiteralNode) String() string  { return formatNode(n) }
 func (n *JSONLiteralNode) expressionNode() {}
 func (n *JSONLiteralNode) leafNode()       {}
 
@@ -16411,7 +16959,9 @@ func newJoinNodeSlice(raws []*generated.ASTJoinProto) []*JoinNode {
 	return nodes
 }
 
-func (n *JoinNode) Kind() Kind           { return KindJoin }
+func (n *JoinNode) Kind() Kind { return KindJoin }
+
+func (n *JoinNode) String() string       { return formatNode(n) }
 func (n *JoinNode) tableExpressionNode() {}
 
 func (n *JoinNode) Lhs() TableExpressionNode {
@@ -16564,6 +17114,8 @@ func newLabelNodeSlice(raws []*generated.ASTLabelProto) []*LabelNode {
 
 func (n *LabelNode) Kind() Kind { return KindLabel }
 
+func (n *LabelNode) String() string { return formatNode(n) }
+
 func (n *LabelNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
 }
@@ -16610,7 +17162,9 @@ func newLambdaNodeSlice(raws []*generated.ASTLambdaProto) []*LambdaNode {
 	return nodes
 }
 
-func (n *LambdaNode) Kind() Kind      { return KindLambda }
+func (n *LambdaNode) Kind() Kind { return KindLambda }
+
+func (n *LambdaNode) String() string  { return formatNode(n) }
 func (n *LambdaNode) expressionNode() {}
 
 func (n *LambdaNode) ArgumentList() ExpressionNode {
@@ -16672,7 +17226,9 @@ func newLikeExpressionNodeSlice(raws []*generated.ASTLikeExpressionProto) []*Lik
 	return nodes
 }
 
-func (n *LikeExpressionNode) Kind() Kind      { return KindLikeExpression }
+func (n *LikeExpressionNode) Kind() Kind { return KindLikeExpression }
+
+func (n *LikeExpressionNode) String() string  { return formatNode(n) }
 func (n *LikeExpressionNode) expressionNode() {}
 
 func (n *LikeExpressionNode) Lhs() ExpressionNode {
@@ -16805,6 +17361,8 @@ func newLimitAllNodeSlice(raws []*generated.ASTLimitAllProto) []*LimitAllNode {
 
 func (n *LimitAllNode) Kind() Kind { return KindLimitAll }
 
+func (n *LimitAllNode) String() string { return formatNode(n) }
+
 func (n *LimitAllNode) NumChildren() int {
 	count := 0
 	return count
@@ -16838,6 +17396,8 @@ func newLimitNodeSlice(raws []*generated.ASTLimitProto) []*LimitNode {
 }
 
 func (n *LimitNode) Kind() Kind { return KindLimit }
+
+func (n *LimitNode) String() string { return formatNode(n) }
 
 func (n *LimitNode) All() *LimitAllNode {
 	return newLimitAllNode(n.raw.GetAll())
@@ -16900,6 +17460,8 @@ func newLimitOffsetNodeSlice(raws []*generated.ASTLimitOffsetProto) []*LimitOffs
 
 func (n *LimitOffsetNode) Kind() Kind { return KindLimitOffset }
 
+func (n *LimitOffsetNode) String() string { return formatNode(n) }
+
 func (n *LimitOffsetNode) Limit() *LimitNode {
 	return newLimitNode(n.raw.GetLimit())
 }
@@ -16961,6 +17523,8 @@ func newLocationNodeSlice(raws []*generated.ASTLocationProto) []*LocationNode {
 
 func (n *LocationNode) Kind() Kind { return KindLocation }
 
+func (n *LocationNode) String() string { return formatNode(n) }
+
 func (n *LocationNode) NumChildren() int {
 	count := 0
 	return count
@@ -16994,6 +17558,8 @@ func newLockModeNodeSlice(raws []*generated.ASTLockModeProto) []*LockModeNode {
 }
 
 func (n *LockModeNode) Kind() Kind { return KindLockMode }
+
+func (n *LockModeNode) String() string { return formatNode(n) }
 
 func (n *LockModeNode) Strength() generated.ASTLockModeEnums_LockStrengthSpec {
 	return n.raw.GetStrength()
@@ -17031,7 +17597,9 @@ func newMacroBodyNodeSlice(raws []*generated.ASTMacroBodyProto) []*MacroBodyNode
 	return nodes
 }
 
-func (n *MacroBodyNode) Kind() Kind      { return KindMacroBody }
+func (n *MacroBodyNode) Kind() Kind { return KindMacroBody }
+
+func (n *MacroBodyNode) String() string  { return formatNode(n) }
 func (n *MacroBodyNode) expressionNode() {}
 func (n *MacroBodyNode) leafNode()       {}
 
@@ -17068,6 +17636,8 @@ func newMapTypeNodeSlice(raws []*generated.ASTMapTypeProto) []*MapTypeNode {
 }
 
 func (n *MapTypeNode) Kind() Kind { return KindMapType }
+
+func (n *MapTypeNode) String() string { return formatNode(n) }
 
 func (n *MapTypeNode) KeyType() Node {
 	return wrapType(n.raw.GetKeyType())
@@ -17155,6 +17725,8 @@ func newMatchRecognizeClauseNodeSlice(raws []*generated.ASTMatchRecognizeClauseP
 }
 
 func (n *MatchRecognizeClauseNode) Kind() Kind { return KindMatchRecognizeClause }
+
+func (n *MatchRecognizeClauseNode) String() string { return formatNode(n) }
 
 func (n *MatchRecognizeClauseNode) PartitionBy() *PartitionByNode {
 	return newPartitionByNode(n.raw.GetPartitionBy())
@@ -17293,7 +17865,9 @@ func newMaxLiteralNodeSlice(raws []*generated.ASTMaxLiteralProto) []*MaxLiteralN
 	return nodes
 }
 
-func (n *MaxLiteralNode) Kind() Kind      { return KindMaxLiteral }
+func (n *MaxLiteralNode) Kind() Kind { return KindMaxLiteral }
+
+func (n *MaxLiteralNode) String() string  { return formatNode(n) }
 func (n *MaxLiteralNode) expressionNode() {}
 func (n *MaxLiteralNode) leafNode()       {}
 
@@ -17330,6 +17904,8 @@ func newMergeActionNodeSlice(raws []*generated.ASTMergeActionProto) []*MergeActi
 }
 
 func (n *MergeActionNode) Kind() Kind { return KindMergeAction }
+
+func (n *MergeActionNode) String() string { return formatNode(n) }
 
 func (n *MergeActionNode) InsertColumnList() *ColumnListNode {
 	return newColumnListNode(n.raw.GetInsertColumnList())
@@ -17407,7 +17983,9 @@ func newMergeStatementNodeSlice(raws []*generated.ASTMergeStatementProto) []*Mer
 	return nodes
 }
 
-func (n *MergeStatementNode) Kind() Kind     { return KindMergeStatement }
+func (n *MergeStatementNode) Kind() Kind { return KindMergeStatement }
+
+func (n *MergeStatementNode) String() string { return formatNode(n) }
 func (n *MergeStatementNode) statementNode() {}
 
 func (n *MergeStatementNode) TargetPath() *PathExpressionNode {
@@ -17510,6 +18088,8 @@ func newMergeWhenClauseListNodeSlice(raws []*generated.ASTMergeWhenClauseListPro
 
 func (n *MergeWhenClauseListNode) Kind() Kind { return KindMergeWhenClauseList }
 
+func (n *MergeWhenClauseListNode) String() string { return formatNode(n) }
+
 func (n *MergeWhenClauseListNode) ClauseList() []*MergeWhenClauseNode {
 	return newMergeWhenClauseNodeSlice(n.raw.GetClauseList())
 }
@@ -17556,6 +18136,8 @@ func newMergeWhenClauseNodeSlice(raws []*generated.ASTMergeWhenClauseProto) []*M
 }
 
 func (n *MergeWhenClauseNode) Kind() Kind { return KindMergeWhenClause }
+
+func (n *MergeWhenClauseNode) String() string { return formatNode(n) }
 
 func (n *MergeWhenClauseNode) SearchCondition() ExpressionNode {
 	return wrapExpression(n.raw.GetSearchCondition())
@@ -17622,6 +18204,8 @@ func newModelClauseNodeSlice(raws []*generated.ASTModelClauseProto) []*ModelClau
 
 func (n *ModelClauseNode) Kind() Kind { return KindModelClause }
 
+func (n *ModelClauseNode) String() string { return formatNode(n) }
+
 func (n *ModelClauseNode) ModelPath() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetModelPath())
 }
@@ -17668,7 +18252,9 @@ func newModuleStatementNodeSlice(raws []*generated.ASTModuleStatementProto) []*M
 	return nodes
 }
 
-func (n *ModuleStatementNode) Kind() Kind     { return KindModuleStatement }
+func (n *ModuleStatementNode) Kind() Kind { return KindModuleStatement }
+
+func (n *ModuleStatementNode) String() string { return formatNode(n) }
 func (n *ModuleStatementNode) statementNode() {}
 
 func (n *ModuleStatementNode) Name() *PathExpressionNode {
@@ -17730,7 +18316,9 @@ func newNamedArgumentNodeSlice(raws []*generated.ASTNamedArgumentProto) []*Named
 	return nodes
 }
 
-func (n *NamedArgumentNode) Kind() Kind      { return KindNamedArgument }
+func (n *NamedArgumentNode) Kind() Kind { return KindNamedArgument }
+
+func (n *NamedArgumentNode) String() string  { return formatNode(n) }
 func (n *NamedArgumentNode) expressionNode() {}
 
 func (n *NamedArgumentNode) Name() *IdentifierNode {
@@ -17793,6 +18381,8 @@ func newNewConstructorArgNodeSlice(raws []*generated.ASTNewConstructorArgProto) 
 }
 
 func (n *NewConstructorArgNode) Kind() Kind { return KindNewConstructorArg }
+
+func (n *NewConstructorArgNode) String() string { return formatNode(n) }
 
 func (n *NewConstructorArgNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -17866,7 +18456,9 @@ func newNewConstructorNodeSlice(raws []*generated.ASTNewConstructorProto) []*New
 	return nodes
 }
 
-func (n *NewConstructorNode) Kind() Kind      { return KindNewConstructor }
+func (n *NewConstructorNode) Kind() Kind { return KindNewConstructor }
+
+func (n *NewConstructorNode) String() string  { return formatNode(n) }
 func (n *NewConstructorNode) expressionNode() {}
 
 func (n *NewConstructorNode) TypeName() *SimpleTypeNode {
@@ -17929,6 +18521,8 @@ func newNotNullColumnAttributeNodeSlice(raws []*generated.ASTNotNullColumnAttrib
 
 func (n *NotNullColumnAttributeNode) Kind() Kind { return KindNotNullColumnAttribute }
 
+func (n *NotNullColumnAttributeNode) String() string { return formatNode(n) }
+
 func (n *NotNullColumnAttributeNode) NumChildren() int {
 	count := 0
 	return count
@@ -17961,7 +18555,9 @@ func newNullLiteralNodeSlice(raws []*generated.ASTNullLiteralProto) []*NullLiter
 	return nodes
 }
 
-func (n *NullLiteralNode) Kind() Kind      { return KindNullLiteral }
+func (n *NullLiteralNode) Kind() Kind { return KindNullLiteral }
+
+func (n *NullLiteralNode) String() string  { return formatNode(n) }
 func (n *NullLiteralNode) expressionNode() {}
 func (n *NullLiteralNode) leafNode()       {}
 
@@ -17999,6 +18595,8 @@ func newNullOrderNodeSlice(raws []*generated.ASTNullOrderProto) []*NullOrderNode
 
 func (n *NullOrderNode) Kind() Kind { return KindNullOrder }
 
+func (n *NullOrderNode) String() string { return formatNode(n) }
+
 func (n *NullOrderNode) NullsFirst() bool {
 	return n.raw.GetNullsFirst()
 }
@@ -18035,7 +18633,9 @@ func newNumericLiteralNodeSlice(raws []*generated.ASTNumericLiteralProto) []*Num
 	return nodes
 }
 
-func (n *NumericLiteralNode) Kind() Kind      { return KindNumericLiteral }
+func (n *NumericLiteralNode) Kind() Kind { return KindNumericLiteral }
+
+func (n *NumericLiteralNode) String() string  { return formatNode(n) }
 func (n *NumericLiteralNode) expressionNode() {}
 func (n *NumericLiteralNode) leafNode()       {}
 
@@ -18087,6 +18687,8 @@ func newOnClauseNodeSlice(raws []*generated.ASTOnClauseProto) []*OnClauseNode {
 
 func (n *OnClauseNode) Kind() Kind { return KindOnClause }
 
+func (n *OnClauseNode) String() string { return formatNode(n) }
+
 func (n *OnClauseNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
 }
@@ -18134,6 +18736,8 @@ func newOnConflictClauseNodeSlice(raws []*generated.ASTOnConflictClauseProto) []
 }
 
 func (n *OnConflictClauseNode) Kind() Kind { return KindOnConflictClause }
+
+func (n *OnConflictClauseNode) String() string { return formatNode(n) }
 
 func (n *OnConflictClauseNode) ConflictAction() generated.ASTOnConflictClauseEnums_ConflictAction {
 	return n.raw.GetConflictAction()
@@ -18226,6 +18830,8 @@ func newOnOrUsingClauseListNodeSlice(raws []*generated.ASTOnOrUsingClauseListPro
 
 func (n *OnOrUsingClauseListNode) Kind() Kind { return KindOnOrUsingClauseList }
 
+func (n *OnOrUsingClauseListNode) String() string { return formatNode(n) }
+
 func (n *OnOrUsingClauseListNode) OnOrUsingClauseList() any {
 	return n.raw.GetOnOrUsingClauseList()
 }
@@ -18263,6 +18869,8 @@ func newOptionsEntryNodeSlice(raws []*generated.ASTOptionsEntryProto) []*Options
 }
 
 func (n *OptionsEntryNode) Kind() Kind { return KindOptionsEntry }
+
+func (n *OptionsEntryNode) String() string { return formatNode(n) }
 
 func (n *OptionsEntryNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
@@ -18329,6 +18937,8 @@ func newOptionsListNodeSlice(raws []*generated.ASTOptionsListProto) []*OptionsLi
 
 func (n *OptionsListNode) Kind() Kind { return KindOptionsList }
 
+func (n *OptionsListNode) String() string { return formatNode(n) }
+
 func (n *OptionsListNode) OptionsEntries() []*OptionsEntryNode {
 	return newOptionsEntryNodeSlice(n.raw.GetOptionsEntries())
 }
@@ -18374,7 +18984,9 @@ func newOrExprNodeSlice(raws []*generated.ASTOrExprProto) []*OrExprNode {
 	return nodes
 }
 
-func (n *OrExprNode) Kind() Kind      { return KindOrExpr }
+func (n *OrExprNode) Kind() Kind { return KindOrExpr }
+
+func (n *OrExprNode) String() string  { return formatNode(n) }
 func (n *OrExprNode) expressionNode() {}
 
 func (n *OrExprNode) Disjuncts() []ExpressionNode {
@@ -18423,6 +19035,8 @@ func newOrderByNodeSlice(raws []*generated.ASTOrderByProto) []*OrderByNode {
 }
 
 func (n *OrderByNode) Kind() Kind { return KindOrderBy }
+
+func (n *OrderByNode) String() string { return formatNode(n) }
 
 func (n *OrderByNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
@@ -18483,6 +19097,8 @@ func newOrderingExpressionNodeSlice(raws []*generated.ASTOrderingExpressionProto
 }
 
 func (n *OrderingExpressionNode) Kind() Kind { return KindOrderingExpression }
+
+func (n *OrderingExpressionNode) String() string { return formatNode(n) }
 
 func (n *OrderingExpressionNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -18573,7 +19189,9 @@ func newParameterAssignmentNodeSlice(raws []*generated.ASTParameterAssignmentPro
 	return nodes
 }
 
-func (n *ParameterAssignmentNode) Kind() Kind     { return KindParameterAssignment }
+func (n *ParameterAssignmentNode) Kind() Kind { return KindParameterAssignment }
+
+func (n *ParameterAssignmentNode) String() string { return formatNode(n) }
 func (n *ParameterAssignmentNode) statementNode() {}
 
 func (n *ParameterAssignmentNode) Parameter() *ParameterExprNode {
@@ -18635,7 +19253,9 @@ func newParameterExprNodeSlice(raws []*generated.ASTParameterExprProto) []*Param
 	return nodes
 }
 
-func (n *ParameterExprNode) Kind() Kind      { return KindParameterExpr }
+func (n *ParameterExprNode) Kind() Kind { return KindParameterExpr }
+
+func (n *ParameterExprNode) String() string  { return formatNode(n) }
 func (n *ParameterExprNode) expressionNode() {}
 
 func (n *ParameterExprNode) Name() *IdentifierNode {
@@ -18688,7 +19308,9 @@ func newParenthesizedJoinNodeSlice(raws []*generated.ASTParenthesizedJoinProto) 
 	return nodes
 }
 
-func (n *ParenthesizedJoinNode) Kind() Kind           { return KindParenthesizedJoin }
+func (n *ParenthesizedJoinNode) Kind() Kind { return KindParenthesizedJoin }
+
+func (n *ParenthesizedJoinNode) String() string       { return formatNode(n) }
 func (n *ParenthesizedJoinNode) tableExpressionNode() {}
 
 func (n *ParenthesizedJoinNode) Join() *JoinNode {
@@ -18738,6 +19360,8 @@ func newPartitionByNodeSlice(raws []*generated.ASTPartitionByProto) []*Partition
 }
 
 func (n *PartitionByNode) Kind() Kind { return KindPartitionBy }
+
+func (n *PartitionByNode) String() string { return formatNode(n) }
 
 func (n *PartitionByNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
@@ -18799,6 +19423,8 @@ func newPathExpressionListNodeSlice(raws []*generated.ASTPathExpressionListProto
 
 func (n *PathExpressionListNode) Kind() Kind { return KindPathExpressionList }
 
+func (n *PathExpressionListNode) String() string { return formatNode(n) }
+
 func (n *PathExpressionListNode) PathExpressionList() []*PathExpressionNode {
 	return newPathExpressionNodeSlice(n.raw.GetPathExpressionList())
 }
@@ -18844,7 +19470,9 @@ func newPathExpressionNodeSlice(raws []*generated.ASTPathExpressionProto) []*Pat
 	return nodes
 }
 
-func (n *PathExpressionNode) Kind() Kind      { return KindPathExpression }
+func (n *PathExpressionNode) Kind() Kind { return KindPathExpression }
+
+func (n *PathExpressionNode) String() string  { return formatNode(n) }
 func (n *PathExpressionNode) expressionNode() {}
 
 func (n *PathExpressionNode) Names() []*IdentifierNode {
@@ -18893,6 +19521,8 @@ func newPipeAggregateNodeSlice(raws []*generated.ASTPipeAggregateProto) []*PipeA
 }
 
 func (n *PipeAggregateNode) Kind() Kind { return KindPipeAggregate }
+
+func (n *PipeAggregateNode) String() string { return formatNode(n) }
 
 func (n *PipeAggregateNode) Select() *SelectNode {
 	return newSelectNode(n.raw.GetSelect())
@@ -18955,6 +19585,8 @@ func newPipeAsNodeSlice(raws []*generated.ASTPipeAsProto) []*PipeAsNode {
 
 func (n *PipeAsNode) Kind() Kind { return KindPipeAs }
 
+func (n *PipeAsNode) String() string { return formatNode(n) }
+
 func (n *PipeAsNode) Alias() *AliasNode {
 	return newAliasNode(n.raw.GetAlias())
 }
@@ -19002,6 +19634,8 @@ func newPipeAssertNodeSlice(raws []*generated.ASTPipeAssertProto) []*PipeAssertN
 }
 
 func (n *PipeAssertNode) Kind() Kind { return KindPipeAssert }
+
+func (n *PipeAssertNode) String() string { return formatNode(n) }
 
 func (n *PipeAssertNode) Condition() ExpressionNode {
 	return wrapExpression(n.raw.GetCondition())
@@ -19063,6 +19697,8 @@ func newPipeCallNodeSlice(raws []*generated.ASTPipeCallProto) []*PipeCallNode {
 
 func (n *PipeCallNode) Kind() Kind { return KindPipeCall }
 
+func (n *PipeCallNode) String() string { return formatNode(n) }
+
 func (n *PipeCallNode) Tvf() *TVFNode {
 	return newTVFNode(n.raw.GetTvf())
 }
@@ -19110,6 +19746,8 @@ func newPipeCreateTableNodeSlice(raws []*generated.ASTPipeCreateTableProto) []*P
 }
 
 func (n *PipeCreateTableNode) Kind() Kind { return KindPipeCreateTable }
+
+func (n *PipeCreateTableNode) String() string { return formatNode(n) }
 
 func (n *PipeCreateTableNode) CreateTableStatement() *CreateTableStatementNode {
 	return newCreateTableStatementNode(n.raw.GetCreateTableStatement())
@@ -19159,6 +19797,8 @@ func newPipeDescribeNodeSlice(raws []*generated.ASTPipeDescribeProto) []*PipeDes
 
 func (n *PipeDescribeNode) Kind() Kind { return KindPipeDescribe }
 
+func (n *PipeDescribeNode) String() string { return formatNode(n) }
+
 func (n *PipeDescribeNode) NumChildren() int {
 	count := 0
 	return count
@@ -19193,6 +19833,8 @@ func newPipeDistinctNodeSlice(raws []*generated.ASTPipeDistinctProto) []*PipeDis
 
 func (n *PipeDistinctNode) Kind() Kind { return KindPipeDistinct }
 
+func (n *PipeDistinctNode) String() string { return formatNode(n) }
+
 func (n *PipeDistinctNode) NumChildren() int {
 	count := 0
 	return count
@@ -19226,6 +19868,8 @@ func newPipeDropNodeSlice(raws []*generated.ASTPipeDropProto) []*PipeDropNode {
 }
 
 func (n *PipeDropNode) Kind() Kind { return KindPipeDrop }
+
+func (n *PipeDropNode) String() string { return formatNode(n) }
 
 func (n *PipeDropNode) ColumnList() *IdentifierListNode {
 	return newIdentifierListNode(n.raw.GetColumnList())
@@ -19275,6 +19919,8 @@ func newPipeExportDataNodeSlice(raws []*generated.ASTPipeExportDataProto) []*Pip
 
 func (n *PipeExportDataNode) Kind() Kind { return KindPipeExportData }
 
+func (n *PipeExportDataNode) String() string { return formatNode(n) }
+
 func (n *PipeExportDataNode) ExportDataStatement() *ExportDataStatementNode {
 	return newExportDataStatementNode(n.raw.GetExportDataStatement())
 }
@@ -19323,6 +19969,8 @@ func newPipeExtendNodeSlice(raws []*generated.ASTPipeExtendProto) []*PipeExtendN
 
 func (n *PipeExtendNode) Kind() Kind { return KindPipeExtend }
 
+func (n *PipeExtendNode) String() string { return formatNode(n) }
+
 func (n *PipeExtendNode) Select() *SelectNode {
 	return newSelectNode(n.raw.GetSelect())
 }
@@ -19370,6 +20018,8 @@ func newPipeForkNodeSlice(raws []*generated.ASTPipeForkProto) []*PipeForkNode {
 }
 
 func (n *PipeForkNode) Kind() Kind { return KindPipeFork }
+
+func (n *PipeForkNode) String() string { return formatNode(n) }
 
 func (n *PipeForkNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
@@ -19431,6 +20081,8 @@ func newPipeIfCaseNodeSlice(raws []*generated.ASTPipeIfCaseProto) []*PipeIfCaseN
 
 func (n *PipeIfCaseNode) Kind() Kind { return KindPipeIfCase }
 
+func (n *PipeIfCaseNode) String() string { return formatNode(n) }
+
 func (n *PipeIfCaseNode) Condition() ExpressionNode {
 	return wrapExpression(n.raw.GetCondition())
 }
@@ -19491,6 +20143,8 @@ func newPipeIfNodeSlice(raws []*generated.ASTPipeIfProto) []*PipeIfNode {
 }
 
 func (n *PipeIfNode) Kind() Kind { return KindPipeIf }
+
+func (n *PipeIfNode) String() string { return formatNode(n) }
 
 func (n *PipeIfNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
@@ -19565,6 +20219,8 @@ func newPipeInsertNodeSlice(raws []*generated.ASTPipeInsertProto) []*PipeInsertN
 
 func (n *PipeInsertNode) Kind() Kind { return KindPipeInsert }
 
+func (n *PipeInsertNode) String() string { return formatNode(n) }
+
 func (n *PipeInsertNode) InsertStatement() *InsertStatementNode {
 	return newInsertStatementNode(n.raw.GetInsertStatement())
 }
@@ -19611,7 +20267,9 @@ func newPipeJoinLhsPlaceholderNodeSlice(raws []*generated.ASTPipeJoinLhsPlacehol
 	return nodes
 }
 
-func (n *PipeJoinLhsPlaceholderNode) Kind() Kind           { return KindPipeJoinLhsPlaceholder }
+func (n *PipeJoinLhsPlaceholderNode) Kind() Kind { return KindPipeJoinLhsPlaceholder }
+
+func (n *PipeJoinLhsPlaceholderNode) String() string       { return formatNode(n) }
 func (n *PipeJoinLhsPlaceholderNode) tableExpressionNode() {}
 
 func (n *PipeJoinLhsPlaceholderNode) NumChildren() int {
@@ -19647,6 +20305,8 @@ func newPipeJoinNodeSlice(raws []*generated.ASTPipeJoinProto) []*PipeJoinNode {
 }
 
 func (n *PipeJoinNode) Kind() Kind { return KindPipeJoin }
+
+func (n *PipeJoinNode) String() string { return formatNode(n) }
 
 func (n *PipeJoinNode) Join() *JoinNode {
 	return newJoinNode(n.raw.GetJoin())
@@ -19696,6 +20356,8 @@ func newPipeLimitOffsetNodeSlice(raws []*generated.ASTPipeLimitOffsetProto) []*P
 
 func (n *PipeLimitOffsetNode) Kind() Kind { return KindPipeLimitOffset }
 
+func (n *PipeLimitOffsetNode) String() string { return formatNode(n) }
+
 func (n *PipeLimitOffsetNode) LimitOffset() *LimitOffsetNode {
 	return newLimitOffsetNode(n.raw.GetLimitOffset())
 }
@@ -19743,6 +20405,8 @@ func newPipeLogNodeSlice(raws []*generated.ASTPipeLogProto) []*PipeLogNode {
 }
 
 func (n *PipeLogNode) Kind() Kind { return KindPipeLog }
+
+func (n *PipeLogNode) String() string { return formatNode(n) }
 
 func (n *PipeLogNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
@@ -19805,6 +20469,8 @@ func newPipeMatchRecognizeNodeSlice(raws []*generated.ASTPipeMatchRecognizeProto
 
 func (n *PipeMatchRecognizeNode) Kind() Kind { return KindPipeMatchRecognize }
 
+func (n *PipeMatchRecognizeNode) String() string { return formatNode(n) }
+
 func (n *PipeMatchRecognizeNode) MatchRecognize() *MatchRecognizeClauseNode {
 	return newMatchRecognizeClauseNode(n.raw.GetMatchRecognize())
 }
@@ -19852,6 +20518,8 @@ func newPipeOrderByNodeSlice(raws []*generated.ASTPipeOrderByProto) []*PipeOrder
 }
 
 func (n *PipeOrderByNode) Kind() Kind { return KindPipeOrderBy }
+
+func (n *PipeOrderByNode) String() string { return formatNode(n) }
 
 func (n *PipeOrderByNode) OrderBy() *OrderByNode {
 	return newOrderByNode(n.raw.GetOrderBy())
@@ -19901,6 +20569,8 @@ func newPipePivotNodeSlice(raws []*generated.ASTPipePivotProto) []*PipePivotNode
 
 func (n *PipePivotNode) Kind() Kind { return KindPipePivot }
 
+func (n *PipePivotNode) String() string { return formatNode(n) }
+
 func (n *PipePivotNode) PivotClause() *PivotClauseNode {
 	return newPivotClauseNode(n.raw.GetPivotClause())
 }
@@ -19948,6 +20618,8 @@ func newPipeRecursiveUnionNodeSlice(raws []*generated.ASTPipeRecursiveUnionProto
 }
 
 func (n *PipeRecursiveUnionNode) Kind() Kind { return KindPipeRecursiveUnion }
+
+func (n *PipeRecursiveUnionNode) String() string { return formatNode(n) }
 
 func (n *PipeRecursiveUnionNode) Metadata() *SetOperationMetadataNode {
 	return newSetOperationMetadataNode(n.raw.GetMetadata())
@@ -20049,6 +20721,8 @@ func newPipeRenameItemNodeSlice(raws []*generated.ASTPipeRenameItemProto) []*Pip
 
 func (n *PipeRenameItemNode) Kind() Kind { return KindPipeRenameItem }
 
+func (n *PipeRenameItemNode) String() string { return formatNode(n) }
+
 func (n *PipeRenameItemNode) OldName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetOldName())
 }
@@ -20110,6 +20784,8 @@ func newPipeRenameNodeSlice(raws []*generated.ASTPipeRenameProto) []*PipeRenameN
 
 func (n *PipeRenameNode) Kind() Kind { return KindPipeRename }
 
+func (n *PipeRenameNode) String() string { return formatNode(n) }
+
 func (n *PipeRenameNode) RenameItemList() []*PipeRenameItemNode {
 	return newPipeRenameItemNodeSlice(n.raw.GetRenameItemList())
 }
@@ -20156,6 +20832,8 @@ func newPipeSelectNodeSlice(raws []*generated.ASTPipeSelectProto) []*PipeSelectN
 }
 
 func (n *PipeSelectNode) Kind() Kind { return KindPipeSelect }
+
+func (n *PipeSelectNode) String() string { return formatNode(n) }
 
 func (n *PipeSelectNode) Select() *SelectNode {
 	return newSelectNode(n.raw.GetSelect())
@@ -20204,6 +20882,8 @@ func newPipeSetItemNodeSlice(raws []*generated.ASTPipeSetItemProto) []*PipeSetIt
 }
 
 func (n *PipeSetItemNode) Kind() Kind { return KindPipeSetItem }
+
+func (n *PipeSetItemNode) String() string { return formatNode(n) }
 
 func (n *PipeSetItemNode) Column() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetColumn())
@@ -20266,6 +20946,8 @@ func newPipeSetNodeSlice(raws []*generated.ASTPipeSetProto) []*PipeSetNode {
 
 func (n *PipeSetNode) Kind() Kind { return KindPipeSet }
 
+func (n *PipeSetNode) String() string { return formatNode(n) }
+
 func (n *PipeSetNode) SetItemList() []*PipeSetItemNode {
 	return newPipeSetItemNodeSlice(n.raw.GetSetItemList())
 }
@@ -20312,6 +20994,8 @@ func newPipeSetOperationNodeSlice(raws []*generated.ASTPipeSetOperationProto) []
 }
 
 func (n *PipeSetOperationNode) Kind() Kind { return KindPipeSetOperation }
+
+func (n *PipeSetOperationNode) String() string { return formatNode(n) }
 
 func (n *PipeSetOperationNode) Metadata() *SetOperationMetadataNode {
 	return newSetOperationMetadataNode(n.raw.GetMetadata())
@@ -20373,6 +21057,8 @@ func newPipeStaticDescribeNodeSlice(raws []*generated.ASTPipeStaticDescribeProto
 
 func (n *PipeStaticDescribeNode) Kind() Kind { return KindPipeStaticDescribe }
 
+func (n *PipeStaticDescribeNode) String() string { return formatNode(n) }
+
 func (n *PipeStaticDescribeNode) NumChildren() int {
 	count := 0
 	return count
@@ -20406,6 +21092,8 @@ func newPipeTablesampleNodeSlice(raws []*generated.ASTPipeTablesampleProto) []*P
 }
 
 func (n *PipeTablesampleNode) Kind() Kind { return KindPipeTablesample }
+
+func (n *PipeTablesampleNode) String() string { return formatNode(n) }
 
 func (n *PipeTablesampleNode) Sample() *SampleClauseNode {
 	return newSampleClauseNode(n.raw.GetSample())
@@ -20454,6 +21142,8 @@ func newPipeTeeNodeSlice(raws []*generated.ASTPipeTeeProto) []*PipeTeeNode {
 }
 
 func (n *PipeTeeNode) Kind() Kind { return KindPipeTee }
+
+func (n *PipeTeeNode) String() string { return formatNode(n) }
 
 func (n *PipeTeeNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
@@ -20515,6 +21205,8 @@ func newPipeUnpivotNodeSlice(raws []*generated.ASTPipeUnpivotProto) []*PipeUnpiv
 
 func (n *PipeUnpivotNode) Kind() Kind { return KindPipeUnpivot }
 
+func (n *PipeUnpivotNode) String() string { return formatNode(n) }
+
 func (n *PipeUnpivotNode) UnpivotClause() *UnpivotClauseNode {
 	return newUnpivotClauseNode(n.raw.GetUnpivotClause())
 }
@@ -20562,6 +21254,8 @@ func newPipeWhereNodeSlice(raws []*generated.ASTPipeWhereProto) []*PipeWhereNode
 }
 
 func (n *PipeWhereNode) Kind() Kind { return KindPipeWhere }
+
+func (n *PipeWhereNode) String() string { return formatNode(n) }
 
 func (n *PipeWhereNode) Where() *WhereClauseNode {
 	return newWhereClauseNode(n.raw.GetWhere())
@@ -20611,6 +21305,8 @@ func newPipeWindowNodeSlice(raws []*generated.ASTPipeWindowProto) []*PipeWindowN
 
 func (n *PipeWindowNode) Kind() Kind { return KindPipeWindow }
 
+func (n *PipeWindowNode) String() string { return formatNode(n) }
+
 func (n *PipeWindowNode) Select() *SelectNode {
 	return newSelectNode(n.raw.GetSelect())
 }
@@ -20659,6 +21355,8 @@ func newPipeWithNodeSlice(raws []*generated.ASTPipeWithProto) []*PipeWithNode {
 
 func (n *PipeWithNode) Kind() Kind { return KindPipeWith }
 
+func (n *PipeWithNode) String() string { return formatNode(n) }
+
 func (n *PipeWithNode) WithClause() *WithClauseNode {
 	return newWithClauseNode(n.raw.GetWithClause())
 }
@@ -20706,6 +21404,8 @@ func newPivotClauseNodeSlice(raws []*generated.ASTPivotClauseProto) []*PivotClau
 }
 
 func (n *PivotClauseNode) Kind() Kind { return KindPivotClause }
+
+func (n *PivotClauseNode) String() string { return formatNode(n) }
 
 func (n *PivotClauseNode) PivotExpressions() *PivotExpressionListNode {
 	return newPivotExpressionListNode(n.raw.GetPivotExpressions())
@@ -20794,6 +21494,8 @@ func newPivotExpressionListNodeSlice(raws []*generated.ASTPivotExpressionListPro
 
 func (n *PivotExpressionListNode) Kind() Kind { return KindPivotExpressionList }
 
+func (n *PivotExpressionListNode) String() string { return formatNode(n) }
+
 func (n *PivotExpressionListNode) Expressions() []*PivotExpressionNode {
 	return newPivotExpressionNodeSlice(n.raw.GetExpressions())
 }
@@ -20840,6 +21542,8 @@ func newPivotExpressionNodeSlice(raws []*generated.ASTPivotExpressionProto) []*P
 }
 
 func (n *PivotExpressionNode) Kind() Kind { return KindPivotExpression }
+
+func (n *PivotExpressionNode) String() string { return formatNode(n) }
 
 func (n *PivotExpressionNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -20902,6 +21606,8 @@ func newPivotValueListNodeSlice(raws []*generated.ASTPivotValueListProto) []*Piv
 
 func (n *PivotValueListNode) Kind() Kind { return KindPivotValueList }
 
+func (n *PivotValueListNode) String() string { return formatNode(n) }
+
 func (n *PivotValueListNode) Values() []*PivotValueNode {
 	return newPivotValueNodeSlice(n.raw.GetValues())
 }
@@ -20948,6 +21654,8 @@ func newPivotValueNodeSlice(raws []*generated.ASTPivotValueProto) []*PivotValueN
 }
 
 func (n *PivotValueNode) Kind() Kind { return KindPivotValue }
+
+func (n *PivotValueNode) String() string { return formatNode(n) }
 
 func (n *PivotValueNode) Value() ExpressionNode {
 	return wrapExpression(n.raw.GetValue())
@@ -21010,6 +21718,8 @@ func newPrimaryKeyColumnAttributeNodeSlice(raws []*generated.ASTPrimaryKeyColumn
 
 func (n *PrimaryKeyColumnAttributeNode) Kind() Kind { return KindPrimaryKeyColumnAttribute }
 
+func (n *PrimaryKeyColumnAttributeNode) String() string { return formatNode(n) }
+
 func (n *PrimaryKeyColumnAttributeNode) Enforced() bool {
 	return n.raw.GetEnforced()
 }
@@ -21047,6 +21757,8 @@ func newPrimaryKeyElementListNodeSlice(raws []*generated.ASTPrimaryKeyElementLis
 }
 
 func (n *PrimaryKeyElementListNode) Kind() Kind { return KindPrimaryKeyElementList }
+
+func (n *PrimaryKeyElementListNode) String() string { return formatNode(n) }
 
 func (n *PrimaryKeyElementListNode) Elements() []*PrimaryKeyElementNode {
 	return newPrimaryKeyElementNodeSlice(n.raw.GetElements())
@@ -21094,6 +21806,8 @@ func newPrimaryKeyElementNodeSlice(raws []*generated.ASTPrimaryKeyElementProto) 
 }
 
 func (n *PrimaryKeyElementNode) Kind() Kind { return KindPrimaryKeyElement }
+
+func (n *PrimaryKeyElementNode) String() string { return formatNode(n) }
 
 func (n *PrimaryKeyElementNode) Column() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetColumn())
@@ -21159,6 +21873,8 @@ func newPrimaryKeyNodeSlice(raws []*generated.ASTPrimaryKeyProto) []*PrimaryKeyN
 }
 
 func (n *PrimaryKeyNode) Kind() Kind { return KindPrimaryKey }
+
+func (n *PrimaryKeyNode) String() string { return formatNode(n) }
 
 func (n *PrimaryKeyNode) ElementList() *PrimaryKeyElementListNode {
 	return newPrimaryKeyElementListNode(n.raw.GetElementList())
@@ -21238,6 +21954,8 @@ func newPrivilegeNodeSlice(raws []*generated.ASTPrivilegeProto) []*PrivilegeNode
 
 func (n *PrivilegeNode) Kind() Kind { return KindPrivilege }
 
+func (n *PrivilegeNode) String() string { return formatNode(n) }
+
 func (n *PrivilegeNode) PrivilegeAction() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetPrivilegeAction())
 }
@@ -21299,6 +22017,8 @@ func newPrivilegesNodeSlice(raws []*generated.ASTPrivilegesProto) []*PrivilegesN
 
 func (n *PrivilegesNode) Kind() Kind { return KindPrivileges }
 
+func (n *PrivilegesNode) String() string { return formatNode(n) }
+
 func (n *PrivilegesNode) Privileges() []*PrivilegeNode {
 	return newPrivilegeNodeSlice(n.raw.GetPrivileges())
 }
@@ -21345,6 +22065,8 @@ func newQualifyNodeSlice(raws []*generated.ASTQualifyProto) []*QualifyNode {
 }
 
 func (n *QualifyNode) Kind() Kind { return KindQualify }
+
+func (n *QualifyNode) String() string { return formatNode(n) }
 
 func (n *QualifyNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -21394,6 +22116,8 @@ func newQuantifierBoundNodeSlice(raws []*generated.ASTQuantifierBoundProto) []*Q
 
 func (n *QuantifierBoundNode) Kind() Kind { return KindQuantifierBound }
 
+func (n *QuantifierBoundNode) String() string { return formatNode(n) }
+
 func (n *QuantifierBoundNode) Bound() ExpressionNode {
 	return wrapExpression(n.raw.GetBound())
 }
@@ -21440,7 +22164,9 @@ func newQueryNodeSlice(raws []*generated.ASTQueryProto) []*QueryNode {
 	return nodes
 }
 
-func (n *QueryNode) Kind() Kind           { return KindQuery }
+func (n *QueryNode) Kind() Kind { return KindQuery }
+
+func (n *QueryNode) String() string       { return formatNode(n) }
 func (n *QueryNode) queryExpressionNode() {}
 
 func (n *QueryNode) WithClause() *WithClauseNode {
@@ -21561,7 +22287,9 @@ func newQueryStatementNodeSlice(raws []*generated.ASTQueryStatementProto) []*Que
 	return nodes
 }
 
-func (n *QueryStatementNode) Kind() Kind     { return KindQueryStatement }
+func (n *QueryStatementNode) Kind() Kind { return KindQueryStatement }
+
+func (n *QueryStatementNode) String() string { return formatNode(n) }
 func (n *QueryStatementNode) statementNode() {}
 
 func (n *QueryStatementNode) Query() *QueryNode {
@@ -21610,7 +22338,9 @@ func newRaiseStatementNodeSlice(raws []*generated.ASTRaiseStatementProto) []*Rai
 	return nodes
 }
 
-func (n *RaiseStatementNode) Kind() Kind     { return KindRaiseStatement }
+func (n *RaiseStatementNode) Kind() Kind { return KindRaiseStatement }
+
+func (n *RaiseStatementNode) String() string { return formatNode(n) }
 func (n *RaiseStatementNode) statementNode() {}
 
 func (n *RaiseStatementNode) Message() ExpressionNode {
@@ -21661,6 +22391,8 @@ func newRangeColumnSchemaNodeSlice(raws []*generated.ASTRangeColumnSchemaProto) 
 
 func (n *RangeColumnSchemaNode) Kind() Kind { return KindRangeColumnSchema }
 
+func (n *RangeColumnSchemaNode) String() string { return formatNode(n) }
+
 func (n *RangeColumnSchemaNode) NumChildren() int {
 	count := 0
 	return count
@@ -21693,7 +22425,9 @@ func newRangeLiteralNodeSlice(raws []*generated.ASTRangeLiteralProto) []*RangeLi
 	return nodes
 }
 
-func (n *RangeLiteralNode) Kind() Kind      { return KindRangeLiteral }
+func (n *RangeLiteralNode) Kind() Kind { return KindRangeLiteral }
+
+func (n *RangeLiteralNode) String() string  { return formatNode(n) }
 func (n *RangeLiteralNode) expressionNode() {}
 
 func (n *RangeLiteralNode) Type() *RangeTypeNode {
@@ -21756,6 +22490,8 @@ func newRangeTypeNodeSlice(raws []*generated.ASTRangeTypeProto) []*RangeTypeNode
 }
 
 func (n *RangeTypeNode) Kind() Kind { return KindRangeType }
+
+func (n *RangeTypeNode) String() string { return formatNode(n) }
 
 func (n *RangeTypeNode) ElementType() Node {
 	return wrapType(n.raw.GetElementType())
@@ -21831,6 +22567,8 @@ func newRebuildActionNodeSlice(raws []*generated.ASTRebuildActionProto) []*Rebui
 
 func (n *RebuildActionNode) Kind() Kind { return KindRebuildAction }
 
+func (n *RebuildActionNode) String() string { return formatNode(n) }
+
 func (n *RebuildActionNode) NumChildren() int {
 	count := 0
 	return count
@@ -21864,6 +22602,8 @@ func newRecursionDepthModifierNodeSlice(raws []*generated.ASTRecursionDepthModif
 }
 
 func (n *RecursionDepthModifierNode) Kind() Kind { return KindRecursionDepthModifier }
+
+func (n *RecursionDepthModifierNode) String() string { return formatNode(n) }
 
 func (n *RecursionDepthModifierNode) Alias() *AliasNode {
 	return newAliasNode(n.raw.GetAlias())
@@ -21939,6 +22679,8 @@ func newRemoveFromRestricteeListClauseNodeSlice(raws []*generated.ASTRemoveFromR
 
 func (n *RemoveFromRestricteeListClauseNode) Kind() Kind { return KindRemoveFromRestricteeListClause }
 
+func (n *RemoveFromRestricteeListClauseNode) String() string { return formatNode(n) }
+
 func (n *RemoveFromRestricteeListClauseNode) IsIfExists() bool {
 	return n.raw.GetIsIfExists()
 }
@@ -21990,6 +22732,8 @@ func newRenameColumnActionNodeSlice(raws []*generated.ASTRenameColumnActionProto
 }
 
 func (n *RenameColumnActionNode) Kind() Kind { return KindRenameColumnAction }
+
+func (n *RenameColumnActionNode) String() string { return formatNode(n) }
 
 func (n *RenameColumnActionNode) ColumnName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetColumnName())
@@ -22054,7 +22798,9 @@ func newRenameStatementNodeSlice(raws []*generated.ASTRenameStatementProto) []*R
 	return nodes
 }
 
-func (n *RenameStatementNode) Kind() Kind     { return KindRenameStatement }
+func (n *RenameStatementNode) Kind() Kind { return KindRenameStatement }
+
+func (n *RenameStatementNode) String() string { return formatNode(n) }
 func (n *RenameStatementNode) statementNode() {}
 
 func (n *RenameStatementNode) Identifier() *IdentifierNode {
@@ -22131,6 +22877,8 @@ func newRenameToClauseNodeSlice(raws []*generated.ASTRenameToClauseProto) []*Ren
 
 func (n *RenameToClauseNode) Kind() Kind { return KindRenameToClause }
 
+func (n *RenameToClauseNode) String() string { return formatNode(n) }
+
 func (n *RenameToClauseNode) NewName() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetNewName())
 }
@@ -22177,7 +22925,9 @@ func newRepeatStatementNodeSlice(raws []*generated.ASTRepeatStatementProto) []*R
 	return nodes
 }
 
-func (n *RepeatStatementNode) Kind() Kind     { return KindRepeatStatement }
+func (n *RepeatStatementNode) Kind() Kind { return KindRepeatStatement }
+
+func (n *RepeatStatementNode) String() string { return formatNode(n) }
 func (n *RepeatStatementNode) statementNode() {}
 
 func (n *RepeatStatementNode) UntilClause() *UntilClauseNode {
@@ -22228,6 +22978,8 @@ func newRepeatableClauseNodeSlice(raws []*generated.ASTRepeatableClauseProto) []
 
 func (n *RepeatableClauseNode) Kind() Kind { return KindRepeatableClause }
 
+func (n *RepeatableClauseNode) String() string { return formatNode(n) }
+
 func (n *RepeatableClauseNode) Argument() ExpressionNode {
 	return wrapExpression(n.raw.GetArgument())
 }
@@ -22275,6 +23027,8 @@ func newReplaceFieldsArgNodeSlice(raws []*generated.ASTReplaceFieldsArgProto) []
 }
 
 func (n *ReplaceFieldsArgNode) Kind() Kind { return KindReplaceFieldsArg }
+
+func (n *ReplaceFieldsArgNode) String() string { return formatNode(n) }
 
 func (n *ReplaceFieldsArgNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -22335,7 +23089,9 @@ func newReplaceFieldsExpressionNodeSlice(raws []*generated.ASTReplaceFieldsExpre
 	return nodes
 }
 
-func (n *ReplaceFieldsExpressionNode) Kind() Kind      { return KindReplaceFieldsExpression }
+func (n *ReplaceFieldsExpressionNode) Kind() Kind { return KindReplaceFieldsExpression }
+
+func (n *ReplaceFieldsExpressionNode) String() string  { return formatNode(n) }
 func (n *ReplaceFieldsExpressionNode) expressionNode() {}
 
 func (n *ReplaceFieldsExpressionNode) Expr() ExpressionNode {
@@ -22398,6 +23154,8 @@ func newReplaceTtlActionNodeSlice(raws []*generated.ASTReplaceTtlActionProto) []
 
 func (n *ReplaceTtlActionNode) Kind() Kind { return KindReplaceTtlAction }
 
+func (n *ReplaceTtlActionNode) String() string { return formatNode(n) }
+
 func (n *ReplaceTtlActionNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
 }
@@ -22450,6 +23208,8 @@ func newRestrictToClauseNodeSlice(raws []*generated.ASTRestrictToClauseProto) []
 
 func (n *RestrictToClauseNode) Kind() Kind { return KindRestrictToClause }
 
+func (n *RestrictToClauseNode) String() string { return formatNode(n) }
+
 func (n *RestrictToClauseNode) RestricteeList() *GranteeListNode {
 	return newGranteeListNode(n.raw.GetRestricteeList())
 }
@@ -22496,7 +23256,9 @@ func newReturnStatementNodeSlice(raws []*generated.ASTReturnStatementProto) []*R
 	return nodes
 }
 
-func (n *ReturnStatementNode) Kind() Kind     { return KindReturnStatement }
+func (n *ReturnStatementNode) Kind() Kind { return KindReturnStatement }
+
+func (n *ReturnStatementNode) String() string { return formatNode(n) }
 func (n *ReturnStatementNode) statementNode() {}
 
 func (n *ReturnStatementNode) NumChildren() int {
@@ -22532,6 +23294,8 @@ func newReturningClauseNodeSlice(raws []*generated.ASTReturningClauseProto) []*R
 }
 
 func (n *ReturningClauseNode) Kind() Kind { return KindReturningClause }
+
+func (n *ReturningClauseNode) String() string { return formatNode(n) }
 
 func (n *ReturningClauseNode) SelectList() *SelectListNode {
 	return newSelectListNode(n.raw.GetSelectList())
@@ -22594,6 +23358,8 @@ func newRevokeFromClauseNodeSlice(raws []*generated.ASTRevokeFromClauseProto) []
 
 func (n *RevokeFromClauseNode) Kind() Kind { return KindRevokeFromClause }
 
+func (n *RevokeFromClauseNode) String() string { return formatNode(n) }
+
 func (n *RevokeFromClauseNode) RevokeFromList() *GranteeListNode {
 	return newGranteeListNode(n.raw.GetRevokeFromList())
 }
@@ -22644,7 +23410,9 @@ func newRevokeStatementNodeSlice(raws []*generated.ASTRevokeStatementProto) []*R
 	return nodes
 }
 
-func (n *RevokeStatementNode) Kind() Kind     { return KindRevokeStatement }
+func (n *RevokeStatementNode) Kind() Kind { return KindRevokeStatement }
+
+func (n *RevokeStatementNode) String() string { return formatNode(n) }
 func (n *RevokeStatementNode) statementNode() {}
 
 func (n *RevokeStatementNode) Privileges() *PrivilegesNode {
@@ -22731,7 +23499,9 @@ func newRollbackStatementNodeSlice(raws []*generated.ASTRollbackStatementProto) 
 	return nodes
 }
 
-func (n *RollbackStatementNode) Kind() Kind     { return KindRollbackStatement }
+func (n *RollbackStatementNode) Kind() Kind { return KindRollbackStatement }
+
+func (n *RollbackStatementNode) String() string { return formatNode(n) }
 func (n *RollbackStatementNode) statementNode() {}
 
 func (n *RollbackStatementNode) NumChildren() int {
@@ -22767,6 +23537,8 @@ func newRollupNodeSlice(raws []*generated.ASTRollupProto) []*RollupNode {
 }
 
 func (n *RollupNode) Kind() Kind { return KindRollup }
+
+func (n *RollupNode) String() string { return formatNode(n) }
 
 func (n *RollupNode) Expressions() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetExpressions())
@@ -22815,6 +23587,8 @@ func newRowPatternAnchorNodeSlice(raws []*generated.ASTRowPatternAnchorProto) []
 
 func (n *RowPatternAnchorNode) Kind() Kind { return KindRowPatternAnchor }
 
+func (n *RowPatternAnchorNode) String() string { return formatNode(n) }
+
 func (n *RowPatternAnchorNode) Anchor() generated.ASTRowPatternAnchorEnums_Anchor {
 	return n.raw.GetAnchor()
 }
@@ -22852,6 +23626,8 @@ func newRowPatternOperationNodeSlice(raws []*generated.ASTRowPatternOperationPro
 }
 
 func (n *RowPatternOperationNode) Kind() Kind { return KindRowPatternOperation }
+
+func (n *RowPatternOperationNode) String() string { return formatNode(n) }
 
 func (n *RowPatternOperationNode) OpType() generated.ASTRowPatternOperationEnums_OperationType {
 	return n.raw.GetOpType()
@@ -22903,6 +23679,8 @@ func newRowPatternQuantificationNodeSlice(raws []*generated.ASTRowPatternQuantif
 }
 
 func (n *RowPatternQuantificationNode) Kind() Kind { return KindRowPatternQuantification }
+
+func (n *RowPatternQuantificationNode) String() string { return formatNode(n) }
 
 func (n *RowPatternQuantificationNode) Operand() Node {
 	return wrapRowPatternExpression(n.raw.GetOperand())
@@ -22965,6 +23743,8 @@ func newRowPatternVariableNodeSlice(raws []*generated.ASTRowPatternVariableProto
 
 func (n *RowPatternVariableNode) Kind() Kind { return KindRowPatternVariable }
 
+func (n *RowPatternVariableNode) String() string { return formatNode(n) }
+
 func (n *RowPatternVariableNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
 }
@@ -23011,7 +23791,9 @@ func newRunBatchStatementNodeSlice(raws []*generated.ASTRunBatchStatementProto) 
 	return nodes
 }
 
-func (n *RunBatchStatementNode) Kind() Kind     { return KindRunBatchStatement }
+func (n *RunBatchStatementNode) Kind() Kind { return KindRunBatchStatement }
+
+func (n *RunBatchStatementNode) String() string { return formatNode(n) }
 func (n *RunBatchStatementNode) statementNode() {}
 
 func (n *RunBatchStatementNode) NumChildren() int {
@@ -23046,7 +23828,9 @@ func newRunStatementNodeSlice(raws []*generated.ASTRunStatementProto) []*RunStat
 	return nodes
 }
 
-func (n *RunStatementNode) Kind() Kind     { return KindRunStatement }
+func (n *RunStatementNode) Kind() Kind { return KindRunStatement }
+
+func (n *RunStatementNode) String() string { return formatNode(n) }
 func (n *RunStatementNode) statementNode() {}
 
 func (n *RunStatementNode) TargetPathExpression() *PathExpressionNode {
@@ -23122,6 +23906,8 @@ func newSampleClauseNodeSlice(raws []*generated.ASTSampleClauseProto) []*SampleC
 
 func (n *SampleClauseNode) Kind() Kind { return KindSampleClause }
 
+func (n *SampleClauseNode) String() string { return formatNode(n) }
+
 func (n *SampleClauseNode) SampleMethod() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetSampleMethod())
 }
@@ -23196,6 +23982,8 @@ func newSampleSizeNodeSlice(raws []*generated.ASTSampleSizeProto) []*SampleSizeN
 
 func (n *SampleSizeNode) Kind() Kind { return KindSampleSize }
 
+func (n *SampleSizeNode) String() string { return formatNode(n) }
+
 func (n *SampleSizeNode) Size() ExpressionNode {
 	return wrapExpression(n.raw.GetSize())
 }
@@ -23261,6 +24049,8 @@ func newSampleSuffixNodeSlice(raws []*generated.ASTSampleSuffixProto) []*SampleS
 
 func (n *SampleSuffixNode) Kind() Kind { return KindSampleSuffix }
 
+func (n *SampleSuffixNode) String() string { return formatNode(n) }
+
 func (n *SampleSuffixNode) Weight() *WithWeightNode {
 	return newWithWeightNode(n.raw.GetWeight())
 }
@@ -23322,6 +24112,8 @@ func newScriptNodeSlice(raws []*generated.ASTScriptProto) []*ScriptNode {
 
 func (n *ScriptNode) Kind() Kind { return KindScript }
 
+func (n *ScriptNode) String() string { return formatNode(n) }
+
 func (n *ScriptNode) StatementListNode() *StatementListNode {
 	return newStatementListNode(n.raw.GetStatementListNode())
 }
@@ -23369,6 +24161,8 @@ func newSelectAsNodeSlice(raws []*generated.ASTSelectAsProto) []*SelectAsNode {
 }
 
 func (n *SelectAsNode) Kind() Kind { return KindSelectAs }
+
+func (n *SelectAsNode) String() string { return formatNode(n) }
 
 func (n *SelectAsNode) TypeName() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetTypeName())
@@ -23421,6 +24215,8 @@ func newSelectColumnNodeSlice(raws []*generated.ASTSelectColumnProto) []*SelectC
 }
 
 func (n *SelectColumnNode) Kind() Kind { return KindSelectColumn }
+
+func (n *SelectColumnNode) String() string { return formatNode(n) }
 
 func (n *SelectColumnNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -23496,6 +24292,8 @@ func newSelectListNodeSlice(raws []*generated.ASTSelectListProto) []*SelectListN
 
 func (n *SelectListNode) Kind() Kind { return KindSelectList }
 
+func (n *SelectListNode) String() string { return formatNode(n) }
+
 func (n *SelectListNode) Columns() []*SelectColumnNode {
 	return newSelectColumnNodeSlice(n.raw.GetColumns())
 }
@@ -23541,7 +24339,9 @@ func newSelectNodeSlice(raws []*generated.ASTSelectProto) []*SelectNode {
 	return nodes
 }
 
-func (n *SelectNode) Kind() Kind           { return KindSelect }
+func (n *SelectNode) Kind() Kind { return KindSelect }
+
+func (n *SelectNode) String() string       { return formatNode(n) }
 func (n *SelectNode) queryExpressionNode() {}
 
 func (n *SelectNode) Hint() *HintNode {
@@ -23711,7 +24511,9 @@ func newSequenceArgNodeSlice(raws []*generated.ASTSequenceArgProto) []*SequenceA
 	return nodes
 }
 
-func (n *SequenceArgNode) Kind() Kind      { return KindSequenceArg }
+func (n *SequenceArgNode) Kind() Kind { return KindSequenceArg }
+
+func (n *SequenceArgNode) String() string  { return formatNode(n) }
 func (n *SequenceArgNode) expressionNode() {}
 
 func (n *SequenceArgNode) SequencePath() *PathExpressionNode {
@@ -23761,6 +24563,8 @@ func newSetAsActionNodeSlice(raws []*generated.ASTSetAsActionProto) []*SetAsActi
 }
 
 func (n *SetAsActionNode) Kind() Kind { return KindSetAsAction }
+
+func (n *SetAsActionNode) String() string { return formatNode(n) }
 
 func (n *SetAsActionNode) JsonBody() *JSONLiteralNode {
 	return newJSONLiteralNode(n.raw.GetJsonBody())
@@ -23823,6 +24627,8 @@ func newSetCollateClauseNodeSlice(raws []*generated.ASTSetCollateClauseProto) []
 
 func (n *SetCollateClauseNode) Kind() Kind { return KindSetCollateClause }
 
+func (n *SetCollateClauseNode) String() string { return formatNode(n) }
+
 func (n *SetCollateClauseNode) Collate() *CollateNode {
 	return newCollateNode(n.raw.GetCollate())
 }
@@ -23871,6 +24677,8 @@ func newSetOperationAllOrDistinctNodeSlice(raws []*generated.ASTSetOperationAllO
 
 func (n *SetOperationAllOrDistinctNode) Kind() Kind { return KindSetOperationAllOrDistinct }
 
+func (n *SetOperationAllOrDistinctNode) String() string { return formatNode(n) }
+
 func (n *SetOperationAllOrDistinctNode) Value() generated.ASTSetOperationEnums_AllOrDistinct {
 	return n.raw.GetValue()
 }
@@ -23908,6 +24716,8 @@ func newSetOperationColumnMatchModeNodeSlice(raws []*generated.ASTSetOperationCo
 }
 
 func (n *SetOperationColumnMatchModeNode) Kind() Kind { return KindSetOperationColumnMatchMode }
+
+func (n *SetOperationColumnMatchModeNode) String() string { return formatNode(n) }
 
 func (n *SetOperationColumnMatchModeNode) Value() generated.ASTSetOperationEnums_ColumnMatchMode {
 	return n.raw.GetValue()
@@ -23949,6 +24759,8 @@ func (n *SetOperationColumnPropagationModeNode) Kind() Kind {
 	return KindSetOperationColumnPropagationMode
 }
 
+func (n *SetOperationColumnPropagationModeNode) String() string { return formatNode(n) }
+
 func (n *SetOperationColumnPropagationModeNode) Value() generated.ASTSetOperationEnums_ColumnPropagationMode {
 	return n.raw.GetValue()
 }
@@ -23986,6 +24798,8 @@ func newSetOperationMetadataListNodeSlice(raws []*generated.ASTSetOperationMetad
 }
 
 func (n *SetOperationMetadataListNode) Kind() Kind { return KindSetOperationMetadataList }
+
+func (n *SetOperationMetadataListNode) String() string { return formatNode(n) }
 
 func (n *SetOperationMetadataListNode) SetOperationMetadataList() []*SetOperationMetadataNode {
 	return newSetOperationMetadataNodeSlice(n.raw.GetSetOperationMetadataList())
@@ -24033,6 +24847,8 @@ func newSetOperationMetadataNodeSlice(raws []*generated.ASTSetOperationMetadataP
 }
 
 func (n *SetOperationMetadataNode) Kind() Kind { return KindSetOperationMetadata }
+
+func (n *SetOperationMetadataNode) String() string { return formatNode(n) }
 
 func (n *SetOperationMetadataNode) OpType() *SetOperationTypeNode {
 	return newSetOperationTypeNode(n.raw.GetOpType())
@@ -24145,7 +24961,9 @@ func newSetOperationNodeSlice(raws []*generated.ASTSetOperationProto) []*SetOper
 	return nodes
 }
 
-func (n *SetOperationNode) Kind() Kind           { return KindSetOperation }
+func (n *SetOperationNode) Kind() Kind { return KindSetOperation }
+
+func (n *SetOperationNode) String() string       { return formatNode(n) }
 func (n *SetOperationNode) queryExpressionNode() {}
 
 func (n *SetOperationNode) Metadata() *SetOperationMetadataListNode {
@@ -24208,6 +25026,8 @@ func newSetOperationTypeNodeSlice(raws []*generated.ASTSetOperationTypeProto) []
 
 func (n *SetOperationTypeNode) Kind() Kind { return KindSetOperationType }
 
+func (n *SetOperationTypeNode) String() string { return formatNode(n) }
+
 func (n *SetOperationTypeNode) Value() generated.ASTSetOperationEnums_OperationType {
 	return n.raw.GetValue()
 }
@@ -24245,6 +25065,8 @@ func newSetOptionsActionNodeSlice(raws []*generated.ASTSetOptionsActionProto) []
 }
 
 func (n *SetOptionsActionNode) Kind() Kind { return KindSetOptionsAction }
+
+func (n *SetOptionsActionNode) String() string { return formatNode(n) }
 
 func (n *SetOptionsActionNode) OptionsList() *OptionsListNode {
 	return newOptionsListNode(n.raw.GetOptionsList())
@@ -24292,7 +25114,9 @@ func newSetTransactionStatementNodeSlice(raws []*generated.ASTSetTransactionStat
 	return nodes
 }
 
-func (n *SetTransactionStatementNode) Kind() Kind     { return KindSetTransactionStatement }
+func (n *SetTransactionStatementNode) Kind() Kind { return KindSetTransactionStatement }
+
+func (n *SetTransactionStatementNode) String() string { return formatNode(n) }
 func (n *SetTransactionStatementNode) statementNode() {}
 
 func (n *SetTransactionStatementNode) ModeList() *TransactionModeListNode {
@@ -24341,7 +25165,9 @@ func newShowStatementNodeSlice(raws []*generated.ASTShowStatementProto) []*ShowS
 	return nodes
 }
 
-func (n *ShowStatementNode) Kind() Kind     { return KindShowStatement }
+func (n *ShowStatementNode) Kind() Kind { return KindShowStatement }
+
+func (n *ShowStatementNode) String() string { return formatNode(n) }
 func (n *ShowStatementNode) statementNode() {}
 
 func (n *ShowStatementNode) Identifier() *IdentifierNode {
@@ -24418,6 +25244,8 @@ func newSimpleColumnSchemaNodeSlice(raws []*generated.ASTSimpleColumnSchemaProto
 
 func (n *SimpleColumnSchemaNode) Kind() Kind { return KindSimpleColumnSchema }
 
+func (n *SimpleColumnSchemaNode) String() string { return formatNode(n) }
+
 func (n *SimpleColumnSchemaNode) TypeName() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetTypeName())
 }
@@ -24465,6 +25293,8 @@ func newSimpleTypeNodeSlice(raws []*generated.ASTSimpleTypeProto) []*SimpleTypeN
 }
 
 func (n *SimpleTypeNode) Kind() Kind { return KindSimpleType }
+
+func (n *SimpleTypeNode) String() string { return formatNode(n) }
 
 func (n *SimpleTypeNode) TypeName() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetTypeName())
@@ -24538,7 +25368,9 @@ func newSingleAssignmentNodeSlice(raws []*generated.ASTSingleAssignmentProto) []
 	return nodes
 }
 
-func (n *SingleAssignmentNode) Kind() Kind     { return KindSingleAssignment }
+func (n *SingleAssignmentNode) Kind() Kind { return KindSingleAssignment }
+
+func (n *SingleAssignmentNode) String() string { return formatNode(n) }
 func (n *SingleAssignmentNode) statementNode() {}
 
 func (n *SingleAssignmentNode) Variable() *IdentifierNode {
@@ -24602,6 +25434,8 @@ func newSpannerAlterColumnActionNodeSlice(raws []*generated.ASTSpannerAlterColum
 
 func (n *SpannerAlterColumnActionNode) Kind() Kind { return KindSpannerAlterColumnAction }
 
+func (n *SpannerAlterColumnActionNode) String() string { return formatNode(n) }
+
 func (n *SpannerAlterColumnActionNode) ColumnDefinition() *ColumnDefinitionNode {
 	return newColumnDefinitionNode(n.raw.GetColumnDefinition())
 }
@@ -24649,6 +25483,8 @@ func newSpannerInterleaveClauseNodeSlice(raws []*generated.ASTSpannerInterleaveC
 }
 
 func (n *SpannerInterleaveClauseNode) Kind() Kind { return KindSpannerInterleaveClause }
+
+func (n *SpannerInterleaveClauseNode) String() string { return formatNode(n) }
 
 func (n *SpannerInterleaveClauseNode) TableName() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetTableName())
@@ -24706,6 +25542,8 @@ func newSpannerSetOnDeleteActionNodeSlice(raws []*generated.ASTSpannerSetOnDelet
 
 func (n *SpannerSetOnDeleteActionNode) Kind() Kind { return KindSpannerSetOnDeleteAction }
 
+func (n *SpannerSetOnDeleteActionNode) String() string { return formatNode(n) }
+
 func (n *SpannerSetOnDeleteActionNode) Action() generated.ASTForeignKeyActionsEnums_Action {
 	return n.raw.GetAction()
 }
@@ -24743,6 +25581,8 @@ func newSpannerTableOptionsNodeSlice(raws []*generated.ASTSpannerTableOptionsPro
 }
 
 func (n *SpannerTableOptionsNode) Kind() Kind { return KindSpannerTableOptions }
+
+func (n *SpannerTableOptionsNode) String() string { return formatNode(n) }
 
 func (n *SpannerTableOptionsNode) PrimaryKey() *PrimaryKeyNode {
 	return newPrimaryKeyNode(n.raw.GetPrimaryKey())
@@ -24805,6 +25645,8 @@ func newSqlFunctionBodyNodeSlice(raws []*generated.ASTSqlFunctionBodyProto) []*S
 
 func (n *SqlFunctionBodyNode) Kind() Kind { return KindSqlFunctionBody }
 
+func (n *SqlFunctionBodyNode) String() string { return formatNode(n) }
+
 func (n *SqlFunctionBodyNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
 }
@@ -24853,6 +25695,8 @@ func newStarExceptListNodeSlice(raws []*generated.ASTStarExceptListProto) []*Sta
 
 func (n *StarExceptListNode) Kind() Kind { return KindStarExceptList }
 
+func (n *StarExceptListNode) String() string { return formatNode(n) }
+
 func (n *StarExceptListNode) Identifiers() []*IdentifierNode {
 	return newIdentifierNodeSlice(n.raw.GetIdentifiers())
 }
@@ -24899,6 +25743,8 @@ func newStarModifiersNodeSlice(raws []*generated.ASTStarModifiersProto) []*StarM
 }
 
 func (n *StarModifiersNode) Kind() Kind { return KindStarModifiers }
+
+func (n *StarModifiersNode) String() string { return formatNode(n) }
 
 func (n *StarModifiersNode) ExceptList() *StarExceptListNode {
 	return newStarExceptListNode(n.raw.GetExceptList())
@@ -24958,7 +25804,9 @@ func newStarNodeSlice(raws []*generated.ASTStarProto) []*StarNode {
 	return nodes
 }
 
-func (n *StarNode) Kind() Kind      { return KindStar }
+func (n *StarNode) Kind() Kind { return KindStar }
+
+func (n *StarNode) String() string  { return formatNode(n) }
 func (n *StarNode) expressionNode() {}
 func (n *StarNode) leafNode()       {}
 
@@ -24995,6 +25843,8 @@ func newStarReplaceItemNodeSlice(raws []*generated.ASTStarReplaceItemProto) []*S
 }
 
 func (n *StarReplaceItemNode) Kind() Kind { return KindStarReplaceItem }
+
+func (n *StarReplaceItemNode) String() string { return formatNode(n) }
 
 func (n *StarReplaceItemNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -25055,7 +25905,9 @@ func newStarWithModifiersNodeSlice(raws []*generated.ASTStarWithModifiersProto) 
 	return nodes
 }
 
-func (n *StarWithModifiersNode) Kind() Kind      { return KindStarWithModifiers }
+func (n *StarWithModifiersNode) Kind() Kind { return KindStarWithModifiers }
+
+func (n *StarWithModifiersNode) String() string  { return formatNode(n) }
 func (n *StarWithModifiersNode) expressionNode() {}
 
 func (n *StarWithModifiersNode) Modifiers() *StarModifiersNode {
@@ -25104,7 +25956,9 @@ func newStartBatchStatementNodeSlice(raws []*generated.ASTStartBatchStatementPro
 	return nodes
 }
 
-func (n *StartBatchStatementNode) Kind() Kind     { return KindStartBatchStatement }
+func (n *StartBatchStatementNode) Kind() Kind { return KindStartBatchStatement }
+
+func (n *StartBatchStatementNode) String() string { return formatNode(n) }
 func (n *StartBatchStatementNode) statementNode() {}
 
 func (n *StartBatchStatementNode) BatchType() *IdentifierNode {
@@ -25155,6 +26009,8 @@ func newStatementListNodeSlice(raws []*generated.ASTStatementListProto) []*State
 
 func (n *StatementListNode) Kind() Kind { return KindStatementList }
 
+func (n *StatementListNode) String() string { return formatNode(n) }
+
 func (n *StatementListNode) StatementList() []StatementNode {
 	return wrapStatementSlice(n.raw.GetStatementList())
 }
@@ -25204,7 +26060,9 @@ func newStatementWithPipeOperatorsNodeSlice(raws []*generated.ASTStatementWithPi
 	return nodes
 }
 
-func (n *StatementWithPipeOperatorsNode) Kind() Kind     { return KindStatementWithPipeOperators }
+func (n *StatementWithPipeOperatorsNode) Kind() Kind { return KindStatementWithPipeOperators }
+
+func (n *StatementWithPipeOperatorsNode) String() string { return formatNode(n) }
 func (n *StatementWithPipeOperatorsNode) statementNode() {}
 
 func (n *StatementWithPipeOperatorsNode) Statement() StatementNode {
@@ -25266,7 +26124,9 @@ func newStringLiteralComponentNodeSlice(raws []*generated.ASTStringLiteralCompon
 	return nodes
 }
 
-func (n *StringLiteralComponentNode) Kind() Kind      { return KindStringLiteralComponent }
+func (n *StringLiteralComponentNode) Kind() Kind { return KindStringLiteralComponent }
+
+func (n *StringLiteralComponentNode) String() string  { return formatNode(n) }
 func (n *StringLiteralComponentNode) expressionNode() {}
 func (n *StringLiteralComponentNode) leafNode()       {}
 
@@ -25306,7 +26166,9 @@ func newStringLiteralNodeSlice(raws []*generated.ASTStringLiteralProto) []*Strin
 	return nodes
 }
 
-func (n *StringLiteralNode) Kind() Kind      { return KindStringLiteral }
+func (n *StringLiteralNode) Kind() Kind { return KindStringLiteral }
+
+func (n *StringLiteralNode) String() string  { return formatNode(n) }
 func (n *StringLiteralNode) expressionNode() {}
 func (n *StringLiteralNode) leafNode()       {}
 
@@ -25359,7 +26221,9 @@ func newStructBracedConstructorNodeSlice(raws []*generated.ASTStructBracedConstr
 	return nodes
 }
 
-func (n *StructBracedConstructorNode) Kind() Kind      { return KindStructBracedConstructor }
+func (n *StructBracedConstructorNode) Kind() Kind { return KindStructBracedConstructor }
+
+func (n *StructBracedConstructorNode) String() string  { return formatNode(n) }
 func (n *StructBracedConstructorNode) expressionNode() {}
 
 func (n *StructBracedConstructorNode) TypeName() Node {
@@ -25423,6 +26287,8 @@ func newStructColumnFieldNodeSlice(raws []*generated.ASTStructColumnFieldProto) 
 
 func (n *StructColumnFieldNode) Kind() Kind { return KindStructColumnField }
 
+func (n *StructColumnFieldNode) String() string { return formatNode(n) }
+
 func (n *StructColumnFieldNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
 }
@@ -25484,6 +26350,8 @@ func newStructColumnSchemaNodeSlice(raws []*generated.ASTStructColumnSchemaProto
 
 func (n *StructColumnSchemaNode) Kind() Kind { return KindStructColumnSchema }
 
+func (n *StructColumnSchemaNode) String() string { return formatNode(n) }
+
 func (n *StructColumnSchemaNode) StructFields() []*StructColumnFieldNode {
 	return newStructColumnFieldNodeSlice(n.raw.GetStructFields())
 }
@@ -25530,6 +26398,8 @@ func newStructConstructorArgNodeSlice(raws []*generated.ASTStructConstructorArgP
 }
 
 func (n *StructConstructorArgNode) Kind() Kind { return KindStructConstructorArg }
+
+func (n *StructConstructorArgNode) String() string { return formatNode(n) }
 
 func (n *StructConstructorArgNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
@@ -25590,7 +26460,9 @@ func newStructConstructorWithKeywordNodeSlice(raws []*generated.ASTStructConstru
 	return nodes
 }
 
-func (n *StructConstructorWithKeywordNode) Kind() Kind      { return KindStructConstructorWithKeyword }
+func (n *StructConstructorWithKeywordNode) Kind() Kind { return KindStructConstructorWithKeyword }
+
+func (n *StructConstructorWithKeywordNode) String() string  { return formatNode(n) }
 func (n *StructConstructorWithKeywordNode) expressionNode() {}
 
 func (n *StructConstructorWithKeywordNode) StructType() *StructTypeNode {
@@ -25651,7 +26523,9 @@ func newStructConstructorWithParensNodeSlice(raws []*generated.ASTStructConstruc
 	return nodes
 }
 
-func (n *StructConstructorWithParensNode) Kind() Kind      { return KindStructConstructorWithParens }
+func (n *StructConstructorWithParensNode) Kind() Kind { return KindStructConstructorWithParens }
+
+func (n *StructConstructorWithParensNode) String() string  { return formatNode(n) }
 func (n *StructConstructorWithParensNode) expressionNode() {}
 
 func (n *StructConstructorWithParensNode) FieldExpressions() []ExpressionNode {
@@ -25700,6 +26574,8 @@ func newStructFieldNodeSlice(raws []*generated.ASTStructFieldProto) []*StructFie
 }
 
 func (n *StructFieldNode) Kind() Kind { return KindStructField }
+
+func (n *StructFieldNode) String() string { return formatNode(n) }
 
 func (n *StructFieldNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
@@ -25761,6 +26637,8 @@ func newStructTypeNodeSlice(raws []*generated.ASTStructTypeProto) []*StructTypeN
 }
 
 func (n *StructTypeNode) Kind() Kind { return KindStructType }
+
+func (n *StructTypeNode) String() string { return formatNode(n) }
 
 func (n *StructTypeNode) StructFields() []*StructFieldNode {
 	return newStructFieldNodeSlice(n.raw.GetStructFields())
@@ -25835,6 +26713,8 @@ func newSubpipelineNodeSlice(raws []*generated.ASTSubpipelineProto) []*Subpipeli
 
 func (n *SubpipelineNode) Kind() Kind { return KindSubpipeline }
 
+func (n *SubpipelineNode) String() string { return formatNode(n) }
+
 func (n *SubpipelineNode) PipeOperatorList() []Node {
 	return wrapPipeOperatorSlice(n.raw.GetPipeOperatorList())
 }
@@ -25884,7 +26764,9 @@ func newSubpipelineStatementNodeSlice(raws []*generated.ASTSubpipelineStatementP
 	return nodes
 }
 
-func (n *SubpipelineStatementNode) Kind() Kind     { return KindSubpipelineStatement }
+func (n *SubpipelineStatementNode) Kind() Kind { return KindSubpipelineStatement }
+
+func (n *SubpipelineStatementNode) String() string { return formatNode(n) }
 func (n *SubpipelineStatementNode) statementNode() {}
 
 func (n *SubpipelineStatementNode) Subpipeline() *SubpipelineNode {
@@ -25935,6 +26817,8 @@ func newSymbolQuantifierNodeSlice(raws []*generated.ASTSymbolQuantifierProto) []
 
 func (n *SymbolQuantifierNode) Kind() Kind { return KindSymbolQuantifier }
 
+func (n *SymbolQuantifierNode) String() string { return formatNode(n) }
+
 func (n *SymbolQuantifierNode) Symbol() generated.ASTSymbolQuantifierEnums_Symbol {
 	return n.raw.GetSymbol()
 }
@@ -25971,7 +26855,9 @@ func newSystemVariableAssignmentNodeSlice(raws []*generated.ASTSystemVariableAss
 	return nodes
 }
 
-func (n *SystemVariableAssignmentNode) Kind() Kind     { return KindSystemVariableAssignment }
+func (n *SystemVariableAssignmentNode) Kind() Kind { return KindSystemVariableAssignment }
+
+func (n *SystemVariableAssignmentNode) String() string { return formatNode(n) }
 func (n *SystemVariableAssignmentNode) statementNode() {}
 
 func (n *SystemVariableAssignmentNode) SystemVariable() *SystemVariableExprNode {
@@ -26033,7 +26919,9 @@ func newSystemVariableExprNodeSlice(raws []*generated.ASTSystemVariableExprProto
 	return nodes
 }
 
-func (n *SystemVariableExprNode) Kind() Kind      { return KindSystemVariableExpr }
+func (n *SystemVariableExprNode) Kind() Kind { return KindSystemVariableExpr }
+
+func (n *SystemVariableExprNode) String() string  { return formatNode(n) }
 func (n *SystemVariableExprNode) expressionNode() {}
 
 func (n *SystemVariableExprNode) Path() *PathExpressionNode {
@@ -26083,6 +26971,8 @@ func newTVFArgumentNodeSlice(raws []*generated.ASTTVFArgumentProto) []*TVFArgume
 }
 
 func (n *TVFArgumentNode) Kind() Kind { return KindTVFArgument }
+
+func (n *TVFArgumentNode) String() string { return formatNode(n) }
 
 func (n *TVFArgumentNode) Expr() ExpressionNode {
 	return wrapExpression(n.raw.GetExpr())
@@ -26182,7 +27072,9 @@ func newTVFNodeSlice(raws []*generated.ASTTVFProto) []*TVFNode {
 	return nodes
 }
 
-func (n *TVFNode) Kind() Kind           { return KindTVF }
+func (n *TVFNode) Kind() Kind { return KindTVF }
+
+func (n *TVFNode) String() string       { return formatNode(n) }
 func (n *TVFNode) tableExpressionNode() {}
 
 func (n *TVFNode) Name() *PathExpressionNode {
@@ -26275,6 +27167,8 @@ func newTVFSchemaColumnNodeSlice(raws []*generated.ASTTVFSchemaColumnProto) []*T
 
 func (n *TVFSchemaColumnNode) Kind() Kind { return KindTVFSchemaColumn }
 
+func (n *TVFSchemaColumnNode) String() string { return formatNode(n) }
+
 func (n *TVFSchemaColumnNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
 }
@@ -26336,6 +27230,8 @@ func newTVFSchemaNodeSlice(raws []*generated.ASTTVFSchemaProto) []*TVFSchemaNode
 
 func (n *TVFSchemaNode) Kind() Kind { return KindTVFSchema }
 
+func (n *TVFSchemaNode) String() string { return formatNode(n) }
+
 func (n *TVFSchemaNode) Columns() []*TVFSchemaColumnNode {
 	return newTVFSchemaColumnNodeSlice(n.raw.GetColumns())
 }
@@ -26383,6 +27279,8 @@ func newTableAndColumnInfoListNodeSlice(raws []*generated.ASTTableAndColumnInfoL
 
 func (n *TableAndColumnInfoListNode) Kind() Kind { return KindTableAndColumnInfoList }
 
+func (n *TableAndColumnInfoListNode) String() string { return formatNode(n) }
+
 func (n *TableAndColumnInfoListNode) TableAndColumnInfoEntries() []*TableAndColumnInfoNode {
 	return newTableAndColumnInfoNodeSlice(n.raw.GetTableAndColumnInfoEntries())
 }
@@ -26429,6 +27327,8 @@ func newTableAndColumnInfoNodeSlice(raws []*generated.ASTTableAndColumnInfoProto
 }
 
 func (n *TableAndColumnInfoNode) Kind() Kind { return KindTableAndColumnInfo }
+
+func (n *TableAndColumnInfoNode) String() string { return formatNode(n) }
 
 func (n *TableAndColumnInfoNode) TableName() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetTableName())
@@ -26489,7 +27389,9 @@ func newTableClauseNodeSlice(raws []*generated.ASTTableClauseProto) []*TableClau
 	return nodes
 }
 
-func (n *TableClauseNode) Kind() Kind           { return KindTableClause }
+func (n *TableClauseNode) Kind() Kind { return KindTableClause }
+
+func (n *TableClauseNode) String() string       { return formatNode(n) }
 func (n *TableClauseNode) queryExpressionNode() {}
 
 func (n *TableClauseNode) TablePath() *PathExpressionNode {
@@ -26566,6 +27468,8 @@ func newTableElementListNodeSlice(raws []*generated.ASTTableElementListProto) []
 
 func (n *TableElementListNode) Kind() Kind { return KindTableElementList }
 
+func (n *TableElementListNode) String() string { return formatNode(n) }
+
 func (n *TableElementListNode) Elements() []Node {
 	return wrapTableElementSlice(n.raw.GetElements())
 }
@@ -26611,7 +27515,9 @@ func newTablePathExpressionNodeSlice(raws []*generated.ASTTablePathExpressionPro
 	return nodes
 }
 
-func (n *TablePathExpressionNode) Kind() Kind           { return KindTablePathExpression }
+func (n *TablePathExpressionNode) Kind() Kind { return KindTablePathExpression }
+
+func (n *TablePathExpressionNode) String() string       { return formatNode(n) }
 func (n *TablePathExpressionNode) tableExpressionNode() {}
 
 func (n *TablePathExpressionNode) PathExpr() *PathExpressionNode {
@@ -26725,7 +27631,9 @@ func newTableSubqueryNodeSlice(raws []*generated.ASTTableSubqueryProto) []*Table
 	return nodes
 }
 
-func (n *TableSubqueryNode) Kind() Kind           { return KindTableSubquery }
+func (n *TableSubqueryNode) Kind() Kind { return KindTableSubquery }
+
+func (n *TableSubqueryNode) String() string       { return formatNode(n) }
 func (n *TableSubqueryNode) tableExpressionNode() {}
 
 func (n *TableSubqueryNode) Subquery() *QueryNode {
@@ -26793,6 +27701,8 @@ func newTemplatedParameterTypeNodeSlice(raws []*generated.ASTTemplatedParameterT
 
 func (n *TemplatedParameterTypeNode) Kind() Kind { return KindTemplatedParameterType }
 
+func (n *TemplatedParameterTypeNode) String() string { return formatNode(n) }
+
 func (n *TemplatedParameterTypeNode) KindValue() generated.ASTTemplatedParameterTypeEnums_TemplatedTypeKind {
 	return n.raw.GetKind()
 }
@@ -26830,6 +27740,8 @@ func newTransactionIsolationLevelNodeSlice(raws []*generated.ASTTransactionIsola
 }
 
 func (n *TransactionIsolationLevelNode) Kind() Kind { return KindTransactionIsolationLevel }
+
+func (n *TransactionIsolationLevelNode) String() string { return formatNode(n) }
 
 func (n *TransactionIsolationLevelNode) Identifier1() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetIdentifier1())
@@ -26892,6 +27804,8 @@ func newTransactionModeListNodeSlice(raws []*generated.ASTTransactionModeListPro
 
 func (n *TransactionModeListNode) Kind() Kind { return KindTransactionModeList }
 
+func (n *TransactionModeListNode) String() string { return formatNode(n) }
+
 func (n *TransactionModeListNode) Elements() []Node {
 	return wrapTransactionModeSlice(n.raw.GetElements())
 }
@@ -26939,6 +27853,8 @@ func newTransactionReadWriteModeNodeSlice(raws []*generated.ASTTransactionReadWr
 
 func (n *TransactionReadWriteModeNode) Kind() Kind { return KindTransactionReadWriteMode }
 
+func (n *TransactionReadWriteModeNode) String() string { return formatNode(n) }
+
 func (n *TransactionReadWriteModeNode) Mode() generated.ASTTransactionReadWriteModeEnums_Mode {
 	return n.raw.GetMode()
 }
@@ -26976,6 +27892,8 @@ func newTransformClauseNodeSlice(raws []*generated.ASTTransformClauseProto) []*T
 }
 
 func (n *TransformClauseNode) Kind() Kind { return KindTransformClause }
+
+func (n *TransformClauseNode) String() string { return formatNode(n) }
 
 func (n *TransformClauseNode) SelectList() *SelectListNode {
 	return newSelectListNode(n.raw.GetSelectList())
@@ -27023,7 +27941,9 @@ func newTruncateStatementNodeSlice(raws []*generated.ASTTruncateStatementProto) 
 	return nodes
 }
 
-func (n *TruncateStatementNode) Kind() Kind     { return KindTruncateStatement }
+func (n *TruncateStatementNode) Kind() Kind { return KindTruncateStatement }
+
+func (n *TruncateStatementNode) String() string { return formatNode(n) }
 func (n *TruncateStatementNode) statementNode() {}
 
 func (n *TruncateStatementNode) TargetPath() *PathExpressionNode {
@@ -27087,6 +28007,8 @@ func newTtlClauseNodeSlice(raws []*generated.ASTTtlClauseProto) []*TtlClauseNode
 
 func (n *TtlClauseNode) Kind() Kind { return KindTtlClause }
 
+func (n *TtlClauseNode) String() string { return formatNode(n) }
+
 func (n *TtlClauseNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
 }
@@ -27135,6 +28057,8 @@ func newTypeParameterListNodeSlice(raws []*generated.ASTTypeParameterListProto) 
 
 func (n *TypeParameterListNode) Kind() Kind { return KindTypeParameterList }
 
+func (n *TypeParameterListNode) String() string { return formatNode(n) }
+
 func (n *TypeParameterListNode) Parameters() []LeafNode {
 	return wrapLeafSlice(n.raw.GetParameters())
 }
@@ -27180,7 +28104,9 @@ func newUnaryExpressionNodeSlice(raws []*generated.ASTUnaryExpressionProto) []*U
 	return nodes
 }
 
-func (n *UnaryExpressionNode) Kind() Kind      { return KindUnaryExpression }
+func (n *UnaryExpressionNode) Kind() Kind { return KindUnaryExpression }
+
+func (n *UnaryExpressionNode) String() string  { return formatNode(n) }
 func (n *UnaryExpressionNode) expressionNode() {}
 
 func (n *UnaryExpressionNode) Operand() ExpressionNode {
@@ -27233,7 +28159,9 @@ func newUndropStatementNodeSlice(raws []*generated.ASTUndropStatementProto) []*U
 	return nodes
 }
 
-func (n *UndropStatementNode) Kind() Kind     { return KindUndropStatement }
+func (n *UndropStatementNode) Kind() Kind { return KindUndropStatement }
+
+func (n *UndropStatementNode) String() string { return formatNode(n) }
 func (n *UndropStatementNode) statementNode() {}
 
 func (n *UndropStatementNode) SchemaObjectKind() generated.SchemaObjectKind {
@@ -27318,6 +28246,8 @@ func newUnnestExpressionNodeSlice(raws []*generated.ASTUnnestExpressionProto) []
 
 func (n *UnnestExpressionNode) Kind() Kind { return KindUnnestExpression }
 
+func (n *UnnestExpressionNode) String() string { return formatNode(n) }
+
 func (n *UnnestExpressionNode) Expressions() []*ExpressionWithOptAliasNode {
 	return newExpressionWithOptAliasNodeSlice(n.raw.GetExpressions())
 }
@@ -27379,6 +28309,8 @@ func newUnnestExpressionWithOptAliasAndOffsetNodeSlice(raws []*generated.ASTUnne
 func (n *UnnestExpressionWithOptAliasAndOffsetNode) Kind() Kind {
 	return KindUnnestExpressionWithOptAliasAndOffset
 }
+
+func (n *UnnestExpressionWithOptAliasAndOffsetNode) String() string { return formatNode(n) }
 
 func (n *UnnestExpressionWithOptAliasAndOffsetNode) UnnestExpression() *UnnestExpressionNode {
 	return newUnnestExpressionNode(n.raw.GetUnnestExpression())
@@ -27453,6 +28385,8 @@ func newUnpivotClauseNodeSlice(raws []*generated.ASTUnpivotClauseProto) []*Unpiv
 }
 
 func (n *UnpivotClauseNode) Kind() Kind { return KindUnpivotClause }
+
+func (n *UnpivotClauseNode) String() string { return formatNode(n) }
 
 func (n *UnpivotClauseNode) UnpivotOutputValueColumns() *PathExpressionListNode {
 	return newPathExpressionListNode(n.raw.GetUnpivotOutputValueColumns())
@@ -27545,6 +28479,8 @@ func newUnpivotInItemLabelNodeSlice(raws []*generated.ASTUnpivotInItemLabelProto
 
 func (n *UnpivotInItemLabelNode) Kind() Kind { return KindUnpivotInItemLabel }
 
+func (n *UnpivotInItemLabelNode) String() string { return formatNode(n) }
+
 func (n *UnpivotInItemLabelNode) StringLabel() *StringLiteralNode {
 	return newStringLiteralNode(n.raw.GetStringLabel())
 }
@@ -27606,6 +28542,8 @@ func newUnpivotInItemListNodeSlice(raws []*generated.ASTUnpivotInItemListProto) 
 
 func (n *UnpivotInItemListNode) Kind() Kind { return KindUnpivotInItemList }
 
+func (n *UnpivotInItemListNode) String() string { return formatNode(n) }
+
 func (n *UnpivotInItemListNode) InItems() []*UnpivotInItemNode {
 	return newUnpivotInItemNodeSlice(n.raw.GetInItems())
 }
@@ -27652,6 +28590,8 @@ func newUnpivotInItemNodeSlice(raws []*generated.ASTUnpivotInItemProto) []*Unpiv
 }
 
 func (n *UnpivotInItemNode) Kind() Kind { return KindUnpivotInItem }
+
+func (n *UnpivotInItemNode) String() string { return formatNode(n) }
 
 func (n *UnpivotInItemNode) UnpivotColumns() *PathExpressionListNode {
 	return newPathExpressionListNode(n.raw.GetUnpivotColumns())
@@ -27714,6 +28654,8 @@ func newUntilClauseNodeSlice(raws []*generated.ASTUntilClauseProto) []*UntilClau
 
 func (n *UntilClauseNode) Kind() Kind { return KindUntilClause }
 
+func (n *UntilClauseNode) String() string { return formatNode(n) }
+
 func (n *UntilClauseNode) Condition() ExpressionNode {
 	return wrapExpression(n.raw.GetCondition())
 }
@@ -27760,7 +28702,9 @@ func newUpdateConstructorNodeSlice(raws []*generated.ASTUpdateConstructorProto) 
 	return nodes
 }
 
-func (n *UpdateConstructorNode) Kind() Kind      { return KindUpdateConstructor }
+func (n *UpdateConstructorNode) Kind() Kind { return KindUpdateConstructor }
+
+func (n *UpdateConstructorNode) String() string  { return formatNode(n) }
 func (n *UpdateConstructorNode) expressionNode() {}
 
 func (n *UpdateConstructorNode) Function() *FunctionCallNode {
@@ -27824,6 +28768,8 @@ func newUpdateItemListNodeSlice(raws []*generated.ASTUpdateItemListProto) []*Upd
 
 func (n *UpdateItemListNode) Kind() Kind { return KindUpdateItemList }
 
+func (n *UpdateItemListNode) String() string { return formatNode(n) }
+
 func (n *UpdateItemListNode) UpdateItems() []*UpdateItemNode {
 	return newUpdateItemNodeSlice(n.raw.GetUpdateItems())
 }
@@ -27870,6 +28816,8 @@ func newUpdateItemNodeSlice(raws []*generated.ASTUpdateItemProto) []*UpdateItemN
 }
 
 func (n *UpdateItemNode) Kind() Kind { return KindUpdateItem }
+
+func (n *UpdateItemNode) String() string { return formatNode(n) }
 
 func (n *UpdateItemNode) SetValue() *UpdateSetValueNode {
 	return newUpdateSetValueNode(n.raw.GetSetValue())
@@ -27958,6 +28906,8 @@ func newUpdateSetValueNodeSlice(raws []*generated.ASTUpdateSetValueProto) []*Upd
 
 func (n *UpdateSetValueNode) Kind() Kind { return KindUpdateSetValue }
 
+func (n *UpdateSetValueNode) String() string { return formatNode(n) }
+
 func (n *UpdateSetValueNode) Path() ExpressionNode {
 	return wrapGeneralizedPathExpression(n.raw.GetPath())
 }
@@ -28017,7 +28967,9 @@ func newUpdateStatementNodeSlice(raws []*generated.ASTUpdateStatementProto) []*U
 	return nodes
 }
 
-func (n *UpdateStatementNode) Kind() Kind     { return KindUpdateStatement }
+func (n *UpdateStatementNode) Kind() Kind { return KindUpdateStatement }
+
+func (n *UpdateStatementNode) String() string { return formatNode(n) }
 func (n *UpdateStatementNode) statementNode() {}
 
 func (n *UpdateStatementNode) TargetPath() ExpressionNode {
@@ -28172,6 +29124,8 @@ func newUsingClauseNodeSlice(raws []*generated.ASTUsingClauseProto) []*UsingClau
 
 func (n *UsingClauseNode) Kind() Kind { return KindUsingClause }
 
+func (n *UsingClauseNode) String() string { return formatNode(n) }
+
 func (n *UsingClauseNode) Keys() []*IdentifierNode {
 	return newIdentifierNodeSlice(n.raw.GetKeys())
 }
@@ -28217,7 +29171,9 @@ func newVariableDeclarationNodeSlice(raws []*generated.ASTVariableDeclarationPro
 	return nodes
 }
 
-func (n *VariableDeclarationNode) Kind() Kind     { return KindVariableDeclaration }
+func (n *VariableDeclarationNode) Kind() Kind { return KindVariableDeclaration }
+
+func (n *VariableDeclarationNode) String() string { return formatNode(n) }
 func (n *VariableDeclarationNode) statementNode() {}
 
 func (n *VariableDeclarationNode) VariableList() *IdentifierListNode {
@@ -28294,6 +29250,8 @@ func newWhenThenClauseListNodeSlice(raws []*generated.ASTWhenThenClauseListProto
 
 func (n *WhenThenClauseListNode) Kind() Kind { return KindWhenThenClauseList }
 
+func (n *WhenThenClauseListNode) String() string { return formatNode(n) }
+
 func (n *WhenThenClauseListNode) WhenThenClauses() []*WhenThenClauseNode {
 	return newWhenThenClauseNodeSlice(n.raw.GetWhenThenClauses())
 }
@@ -28340,6 +29298,8 @@ func newWhenThenClauseNodeSlice(raws []*generated.ASTWhenThenClauseProto) []*Whe
 }
 
 func (n *WhenThenClauseNode) Kind() Kind { return KindWhenThenClause }
+
+func (n *WhenThenClauseNode) String() string { return formatNode(n) }
 
 func (n *WhenThenClauseNode) Condition() ExpressionNode {
 	return wrapExpression(n.raw.GetCondition())
@@ -28402,6 +29362,8 @@ func newWhereClauseNodeSlice(raws []*generated.ASTWhereClauseProto) []*WhereClau
 
 func (n *WhereClauseNode) Kind() Kind { return KindWhereClause }
 
+func (n *WhereClauseNode) String() string { return formatNode(n) }
+
 func (n *WhereClauseNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
 }
@@ -28448,7 +29410,9 @@ func newWhileStatementNodeSlice(raws []*generated.ASTWhileStatementProto) []*Whi
 	return nodes
 }
 
-func (n *WhileStatementNode) Kind() Kind     { return KindWhileStatement }
+func (n *WhileStatementNode) Kind() Kind { return KindWhileStatement }
+
+func (n *WhileStatementNode) String() string { return formatNode(n) }
 func (n *WhileStatementNode) statementNode() {}
 
 func (n *WhileStatementNode) Condition() ExpressionNode {
@@ -28499,6 +29463,8 @@ func newWindowClauseNodeSlice(raws []*generated.ASTWindowClauseProto) []*WindowC
 
 func (n *WindowClauseNode) Kind() Kind { return KindWindowClause }
 
+func (n *WindowClauseNode) String() string { return formatNode(n) }
+
 func (n *WindowClauseNode) Windows() []*WindowDefinitionNode {
 	return newWindowDefinitionNodeSlice(n.raw.GetWindows())
 }
@@ -28545,6 +29511,8 @@ func newWindowDefinitionNodeSlice(raws []*generated.ASTWindowDefinitionProto) []
 }
 
 func (n *WindowDefinitionNode) Kind() Kind { return KindWindowDefinition }
+
+func (n *WindowDefinitionNode) String() string { return formatNode(n) }
 
 func (n *WindowDefinitionNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
@@ -28607,6 +29575,8 @@ func newWindowFrameExprNodeSlice(raws []*generated.ASTWindowFrameExprProto) []*W
 
 func (n *WindowFrameExprNode) Kind() Kind { return KindWindowFrameExpr }
 
+func (n *WindowFrameExprNode) String() string { return formatNode(n) }
+
 func (n *WindowFrameExprNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
 }
@@ -28658,6 +29628,8 @@ func newWindowFrameNodeSlice(raws []*generated.ASTWindowFrameProto) []*WindowFra
 }
 
 func (n *WindowFrameNode) Kind() Kind { return KindWindowFrame }
+
+func (n *WindowFrameNode) String() string { return formatNode(n) }
 
 func (n *WindowFrameNode) StartExpr() *WindowFrameExprNode {
 	return newWindowFrameExprNode(n.raw.GetStartExpr())
@@ -28723,6 +29695,8 @@ func newWindowSpecificationNodeSlice(raws []*generated.ASTWindowSpecificationPro
 }
 
 func (n *WindowSpecificationNode) Kind() Kind { return KindWindowSpecification }
+
+func (n *WindowSpecificationNode) String() string { return formatNode(n) }
 
 func (n *WindowSpecificationNode) BaseWindowName() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetBaseWindowName())
@@ -28811,6 +29785,8 @@ func newWithClauseEntryNodeSlice(raws []*generated.ASTWithClauseEntryProto) []*W
 
 func (n *WithClauseEntryNode) Kind() Kind { return KindWithClauseEntry }
 
+func (n *WithClauseEntryNode) String() string { return formatNode(n) }
+
 func (n *WithClauseEntryNode) AliasedQuery() *AliasedQueryNode {
 	return newAliasedQueryNode(n.raw.GetAliasedQuery())
 }
@@ -28872,6 +29848,8 @@ func newWithClauseNodeSlice(raws []*generated.ASTWithClauseProto) []*WithClauseN
 
 func (n *WithClauseNode) Kind() Kind { return KindWithClause }
 
+func (n *WithClauseNode) String() string { return formatNode(n) }
+
 func (n *WithClauseNode) Entry() []*WithClauseEntryNode {
 	return newWithClauseEntryNodeSlice(n.raw.GetEntry())
 }
@@ -28923,6 +29901,8 @@ func newWithConnectionClauseNodeSlice(raws []*generated.ASTWithConnectionClauseP
 
 func (n *WithConnectionClauseNode) Kind() Kind { return KindWithConnectionClause }
 
+func (n *WithConnectionClauseNode) String() string { return formatNode(n) }
+
 func (n *WithConnectionClauseNode) ConnectionClause() *ConnectionClauseNode {
 	return newConnectionClauseNode(n.raw.GetConnectionClause())
 }
@@ -28969,7 +29949,9 @@ func newWithExpressionNodeSlice(raws []*generated.ASTWithExpressionProto) []*Wit
 	return nodes
 }
 
-func (n *WithExpressionNode) Kind() Kind      { return KindWithExpression }
+func (n *WithExpressionNode) Kind() Kind { return KindWithExpression }
+
+func (n *WithExpressionNode) String() string  { return formatNode(n) }
 func (n *WithExpressionNode) expressionNode() {}
 
 func (n *WithExpressionNode) Variables() *SelectListNode {
@@ -29033,6 +30015,8 @@ func newWithModifierNodeSlice(raws []*generated.ASTWithModifierProto) []*WithMod
 
 func (n *WithModifierNode) Kind() Kind { return KindWithModifier }
 
+func (n *WithModifierNode) String() string { return formatNode(n) }
+
 func (n *WithModifierNode) Identifier() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetIdentifier())
 }
@@ -29094,6 +30078,8 @@ func newWithOffsetNodeSlice(raws []*generated.ASTWithOffsetProto) []*WithOffsetN
 
 func (n *WithOffsetNode) Kind() Kind { return KindWithOffset }
 
+func (n *WithOffsetNode) String() string { return formatNode(n) }
+
 func (n *WithOffsetNode) Alias() *AliasNode {
 	return newAliasNode(n.raw.GetAlias())
 }
@@ -29141,6 +30127,8 @@ func newWithPartitionColumnsClauseNodeSlice(raws []*generated.ASTWithPartitionCo
 }
 
 func (n *WithPartitionColumnsClauseNode) Kind() Kind { return KindWithPartitionColumnsClause }
+
+func (n *WithPartitionColumnsClauseNode) String() string { return formatNode(n) }
 
 func (n *WithPartitionColumnsClauseNode) TableElementList() *TableElementListNode {
 	return newTableElementListNode(n.raw.GetTableElementList())
@@ -29190,6 +30178,8 @@ func newWithReportModifierNodeSlice(raws []*generated.ASTWithReportModifierProto
 
 func (n *WithReportModifierNode) Kind() Kind { return KindWithReportModifier }
 
+func (n *WithReportModifierNode) String() string { return formatNode(n) }
+
 func (n *WithReportModifierNode) OptionsList() *OptionsListNode {
 	return newOptionsListNode(n.raw.GetOptionsList())
 }
@@ -29238,6 +30228,8 @@ func newWithWeightNodeSlice(raws []*generated.ASTWithWeightProto) []*WithWeightN
 
 func (n *WithWeightNode) Kind() Kind { return KindWithWeight }
 
+func (n *WithWeightNode) String() string { return formatNode(n) }
+
 func (n *WithWeightNode) Alias() *AliasNode {
 	return newAliasNode(n.raw.GetAlias())
 }
@@ -29285,6 +30277,8 @@ func newYieldItemListNodeSlice(raws []*generated.ASTYieldItemListProto) []*Yield
 }
 
 func (n *YieldItemListNode) Kind() Kind { return KindYieldItemList }
+
+func (n *YieldItemListNode) String() string { return formatNode(n) }
 
 func (n *YieldItemListNode) YieldItems() []*ExpressionWithOptAliasNode {
 	return newExpressionWithOptAliasNodeSlice(n.raw.GetYieldItems())

@@ -102,7 +102,7 @@ func TestAnalyzer_AnalyzeNextStatement_AST(t *testing.T) {
 			for {
 				out, more, err := sut.AnalyzeNextStatement(ctx, loc, nil, opts)
 				require.NoError(t, err)
-				got = append(got, resolvedDebugString(out.Statement))
+				got = append(got, out.Statement.String())
 				if !more {
 					break
 				}
@@ -232,7 +232,7 @@ func TestAnalyzer_AnalyzeStatement_CustomFunction(t *testing.T) {
 			// Act
 			out, err := sut.AnalyzeStatement(ctx, tt.sql, cat, NewAnalyzerOptions())
 			require.NoError(t, err)
-			got := resolvedDebugString(out.Statement)
+			got := out.Statement.String()
 
 			// Assert
 			assert.Equal(t, tt.want, got)
@@ -308,7 +308,7 @@ func TestAnalyzer_AnalyzeStatement_TemplatedFunction(t *testing.T) {
 			// Act
 			out, err := sut.AnalyzeStatement(ctx, tt.sql, cat, NewAnalyzerOptions())
 			require.NoError(t, err)
-			got := resolvedDebugString(out.Statement)
+			got := out.Statement.String()
 
 			// Assert
 			assert.Equal(t, tt.want, got)

@@ -12,6 +12,9 @@ type Node interface {
 	Kind() Kind
 	NumChildren() int
 	Child(i int) Node
+	// String returns the canonical multi-line string representation of the
+	// subtree rooted at this node (see formatNode for the exact shape).
+	String() string
 }
 
 // StatementFromBytes unmarshals serialized proto bytes into a StatementNode.

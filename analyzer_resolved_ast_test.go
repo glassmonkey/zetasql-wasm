@@ -2,8 +2,6 @@ package zetasql
 
 import (
 	"context"
-	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/catalog"
@@ -58,43 +56,6 @@ func findNode[T resolved_ast.Node](t *testing.T, root resolved_ast.Node) T {
 	})
 	require.True(t, found, "node of type %T not found", result)
 	return result
-}
-
-// resolvedDebugString flattens a resolved AST tree to indented Kind names
-// with a single trailing scalar per node (one accessor per case). Each case
-// is a one-liner so the helper has no formatting logic worth testing.
-func resolvedDebugString(n resolved_ast.Node) string {
-	var b strings.Builder
-	writeResolvedDebug(&b, n, 0)
-	return b.String()
-}
-
-func writeResolvedDebug(b *strings.Builder, n resolved_ast.Node, depth int) {
-	if n == nil {
-		return
-	}
-	fmt.Fprintf(b, "%s%s%s\n", strings.Repeat("  ", depth), n.Kind(), resolvedScalar(n))
-	for i := 0; i < n.NumChildren(); i++ {
-		writeResolvedDebug(b, n.Child(i), depth+1)
-	}
-}
-
-func resolvedScalar(n resolved_ast.Node) string {
-	switch v := n.(type) {
-	case *resolved_ast.OutputColumnNode:
-		return " " + v.Name()
-	case *resolved_ast.TableScanNode:
-		return " " + v.Table().GetName()
-	case *resolved_ast.FunctionCallNode:
-		return " " + v.Function().GetName()
-	case *resolved_ast.LiteralNode:
-		return fmt.Sprintf(" %d", v.Value().GetValue().GetInt64Value())
-	case *resolved_ast.ColumnRefNode:
-		return " " + v.Column().GetName()
-	case *resolved_ast.JoinScanNode:
-		return " " + v.JoinType().String()
-	}
-	return ""
 }
 
 // ----- Tests -----
@@ -203,7 +164,7 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
 			// Act
 			out, err := sut.AnalyzeStatement(ctx, tt.sql, tt.cat, NewAnalyzerOptions())
 			require.NoError(t, err)
-			got := resolvedDebugString(out.Statement)
+			got := out.Statement.String()
 
 			// Assert
 			assert.Equal(t, tt.want, got)

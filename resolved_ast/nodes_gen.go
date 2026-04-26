@@ -29,7 +29,9 @@ func newAbortBatchStmtNodeSlice(raws []*generated.ResolvedAbortBatchStmtProto) [
 	return nodes
 }
 
-func (n *AbortBatchStmtNode) Kind() Kind     { return KindAbortBatchStmt }
+func (n *AbortBatchStmtNode) Kind() Kind { return KindAbortBatchStmt }
+
+func (n *AbortBatchStmtNode) String() string { return formatNode(n) }
 func (n *AbortBatchStmtNode) statementNode() {}
 
 func (n *AbortBatchStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -72,8 +74,10 @@ func newAddColumnActionNodeSlice(raws []*generated.ResolvedAddColumnActionProto)
 	return nodes
 }
 
-func (n *AddColumnActionNode) Kind() Kind    { return KindAddColumnAction }
-func (n *AddColumnActionNode) argumentNode() {}
+func (n *AddColumnActionNode) Kind() Kind { return KindAddColumnAction }
+
+func (n *AddColumnActionNode) String() string { return formatNode(n) }
+func (n *AddColumnActionNode) argumentNode()  {}
 
 func (n *AddColumnActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -129,8 +133,10 @@ func newAddColumnIdentifierActionNodeSlice(raws []*generated.ResolvedAddColumnId
 	return nodes
 }
 
-func (n *AddColumnIdentifierActionNode) Kind() Kind    { return KindAddColumnIdentifierAction }
-func (n *AddColumnIdentifierActionNode) argumentNode() {}
+func (n *AddColumnIdentifierActionNode) Kind() Kind { return KindAddColumnIdentifierAction }
+
+func (n *AddColumnIdentifierActionNode) String() string { return formatNode(n) }
+func (n *AddColumnIdentifierActionNode) argumentNode()  {}
 
 func (n *AddColumnIdentifierActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -189,8 +195,10 @@ func newAddConstraintActionNodeSlice(raws []*generated.ResolvedAddConstraintActi
 	return nodes
 }
 
-func (n *AddConstraintActionNode) Kind() Kind    { return KindAddConstraintAction }
-func (n *AddConstraintActionNode) argumentNode() {}
+func (n *AddConstraintActionNode) Kind() Kind { return KindAddConstraintAction }
+
+func (n *AddConstraintActionNode) String() string { return formatNode(n) }
+func (n *AddConstraintActionNode) argumentNode()  {}
 
 func (n *AddConstraintActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -250,8 +258,10 @@ func newAddSubEntityActionNodeSlice(raws []*generated.ResolvedAddSubEntityAction
 	return nodes
 }
 
-func (n *AddSubEntityActionNode) Kind() Kind    { return KindAddSubEntityAction }
-func (n *AddSubEntityActionNode) argumentNode() {}
+func (n *AddSubEntityActionNode) Kind() Kind { return KindAddSubEntityAction }
+
+func (n *AddSubEntityActionNode) String() string { return formatNode(n) }
+func (n *AddSubEntityActionNode) argumentNode()  {}
 
 func (n *AddSubEntityActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -314,8 +324,10 @@ func newAddToRestricteeListActionNodeSlice(raws []*generated.ResolvedAddToRestri
 	return nodes
 }
 
-func (n *AddToRestricteeListActionNode) Kind() Kind    { return KindAddToRestricteeListAction }
-func (n *AddToRestricteeListActionNode) argumentNode() {}
+func (n *AddToRestricteeListActionNode) Kind() Kind { return KindAddToRestricteeListAction }
+
+func (n *AddToRestricteeListActionNode) String() string { return formatNode(n) }
+func (n *AddToRestricteeListActionNode) argumentNode()  {}
 
 func (n *AddToRestricteeListActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -371,7 +383,9 @@ func newAggregateFunctionCallNodeSlice(raws []*generated.ResolvedAggregateFuncti
 }
 
 func (n *AggregateFunctionCallNode) Kind() Kind { return KindAggregateFunctionCall }
-func (n *AggregateFunctionCallNode) exprNode()  {}
+
+func (n *AggregateFunctionCallNode) String() string { return formatNode(n) }
+func (n *AggregateFunctionCallNode) exprNode()      {}
 
 func (n *AggregateFunctionCallNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -533,8 +547,10 @@ func newAggregateHavingModifierNodeSlice(raws []*generated.ResolvedAggregateHavi
 	return nodes
 }
 
-func (n *AggregateHavingModifierNode) Kind() Kind    { return KindAggregateHavingModifier }
-func (n *AggregateHavingModifierNode) argumentNode() {}
+func (n *AggregateHavingModifierNode) Kind() Kind { return KindAggregateHavingModifier }
+
+func (n *AggregateHavingModifierNode) String() string { return formatNode(n) }
+func (n *AggregateHavingModifierNode) argumentNode()  {}
 
 func (n *AggregateHavingModifierNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -591,7 +607,9 @@ func newAggregateScanNodeSlice(raws []*generated.ResolvedAggregateScanProto) []*
 }
 
 func (n *AggregateScanNode) Kind() Kind { return KindAggregateScan }
-func (n *AggregateScanNode) scanNode()  {}
+
+func (n *AggregateScanNode) String() string { return formatNode(n) }
+func (n *AggregateScanNode) scanNode()      {}
 
 func (n *AggregateScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -718,7 +736,9 @@ func newAggregationThresholdAggregateScanNodeSlice(raws []*generated.ResolvedAgg
 func (n *AggregationThresholdAggregateScanNode) Kind() Kind {
 	return KindAggregationThresholdAggregateScan
 }
-func (n *AggregationThresholdAggregateScanNode) scanNode() {}
+
+func (n *AggregationThresholdAggregateScanNode) String() string { return formatNode(n) }
+func (n *AggregationThresholdAggregateScanNode) scanNode()      {}
 
 func (n *AggregationThresholdAggregateScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -846,7 +866,9 @@ func newAlterAllRowAccessPoliciesStmtNodeSlice(raws []*generated.ResolvedAlterAl
 	return nodes
 }
 
-func (n *AlterAllRowAccessPoliciesStmtNode) Kind() Kind     { return KindAlterAllRowAccessPoliciesStmt }
+func (n *AlterAllRowAccessPoliciesStmtNode) Kind() Kind { return KindAlterAllRowAccessPoliciesStmt }
+
+func (n *AlterAllRowAccessPoliciesStmtNode) String() string { return formatNode(n) }
 func (n *AlterAllRowAccessPoliciesStmtNode) statementNode() {}
 
 func (n *AlterAllRowAccessPoliciesStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -931,7 +953,9 @@ func newAlterApproxViewStmtNodeSlice(raws []*generated.ResolvedAlterApproxViewSt
 	return nodes
 }
 
-func (n *AlterApproxViewStmtNode) Kind() Kind     { return KindAlterApproxViewStmt }
+func (n *AlterApproxViewStmtNode) Kind() Kind { return KindAlterApproxViewStmt }
+
+func (n *AlterApproxViewStmtNode) String() string { return formatNode(n) }
 func (n *AlterApproxViewStmtNode) statementNode() {}
 
 func (n *AlterApproxViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -1003,8 +1027,10 @@ func newAlterColumnDropDefaultActionNodeSlice(raws []*generated.ResolvedAlterCol
 	return nodes
 }
 
-func (n *AlterColumnDropDefaultActionNode) Kind() Kind    { return KindAlterColumnDropDefaultAction }
-func (n *AlterColumnDropDefaultActionNode) argumentNode() {}
+func (n *AlterColumnDropDefaultActionNode) Kind() Kind { return KindAlterColumnDropDefaultAction }
+
+func (n *AlterColumnDropDefaultActionNode) String() string { return formatNode(n) }
+func (n *AlterColumnDropDefaultActionNode) argumentNode()  {}
 
 func (n *AlterColumnDropDefaultActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -1050,8 +1076,10 @@ func newAlterColumnDropGeneratedActionNodeSlice(raws []*generated.ResolvedAlterC
 	return nodes
 }
 
-func (n *AlterColumnDropGeneratedActionNode) Kind() Kind    { return KindAlterColumnDropGeneratedAction }
-func (n *AlterColumnDropGeneratedActionNode) argumentNode() {}
+func (n *AlterColumnDropGeneratedActionNode) Kind() Kind { return KindAlterColumnDropGeneratedAction }
+
+func (n *AlterColumnDropGeneratedActionNode) String() string { return formatNode(n) }
+func (n *AlterColumnDropGeneratedActionNode) argumentNode()  {}
 
 func (n *AlterColumnDropGeneratedActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -1097,8 +1125,10 @@ func newAlterColumnDropNotNullActionNodeSlice(raws []*generated.ResolvedAlterCol
 	return nodes
 }
 
-func (n *AlterColumnDropNotNullActionNode) Kind() Kind    { return KindAlterColumnDropNotNullAction }
-func (n *AlterColumnDropNotNullActionNode) argumentNode() {}
+func (n *AlterColumnDropNotNullActionNode) Kind() Kind { return KindAlterColumnDropNotNullAction }
+
+func (n *AlterColumnDropNotNullActionNode) String() string { return formatNode(n) }
+func (n *AlterColumnDropNotNullActionNode) argumentNode()  {}
 
 func (n *AlterColumnDropNotNullActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -1144,8 +1174,10 @@ func newAlterColumnOptionsActionNodeSlice(raws []*generated.ResolvedAlterColumnO
 	return nodes
 }
 
-func (n *AlterColumnOptionsActionNode) Kind() Kind    { return KindAlterColumnOptionsAction }
-func (n *AlterColumnOptionsActionNode) argumentNode() {}
+func (n *AlterColumnOptionsActionNode) Kind() Kind { return KindAlterColumnOptionsAction }
+
+func (n *AlterColumnOptionsActionNode) String() string { return formatNode(n) }
+func (n *AlterColumnOptionsActionNode) argumentNode()  {}
 
 func (n *AlterColumnOptionsActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -1204,8 +1236,10 @@ func newAlterColumnSetDataTypeActionNodeSlice(raws []*generated.ResolvedAlterCol
 	return nodes
 }
 
-func (n *AlterColumnSetDataTypeActionNode) Kind() Kind    { return KindAlterColumnSetDataTypeAction }
-func (n *AlterColumnSetDataTypeActionNode) argumentNode() {}
+func (n *AlterColumnSetDataTypeActionNode) Kind() Kind { return KindAlterColumnSetDataTypeAction }
+
+func (n *AlterColumnSetDataTypeActionNode) String() string { return formatNode(n) }
+func (n *AlterColumnSetDataTypeActionNode) argumentNode()  {}
 
 func (n *AlterColumnSetDataTypeActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -1273,8 +1307,10 @@ func newAlterColumnSetDefaultActionNodeSlice(raws []*generated.ResolvedAlterColu
 	return nodes
 }
 
-func (n *AlterColumnSetDefaultActionNode) Kind() Kind    { return KindAlterColumnSetDefaultAction }
-func (n *AlterColumnSetDefaultActionNode) argumentNode() {}
+func (n *AlterColumnSetDefaultActionNode) Kind() Kind { return KindAlterColumnSetDefaultAction }
+
+func (n *AlterColumnSetDefaultActionNode) String() string { return formatNode(n) }
+func (n *AlterColumnSetDefaultActionNode) argumentNode()  {}
 
 func (n *AlterColumnSetDefaultActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -1334,8 +1370,10 @@ func newAlterColumnSetGeneratedActionNodeSlice(raws []*generated.ResolvedAlterCo
 	return nodes
 }
 
-func (n *AlterColumnSetGeneratedActionNode) Kind() Kind    { return KindAlterColumnSetGeneratedAction }
-func (n *AlterColumnSetGeneratedActionNode) argumentNode() {}
+func (n *AlterColumnSetGeneratedActionNode) Kind() Kind { return KindAlterColumnSetGeneratedAction }
+
+func (n *AlterColumnSetGeneratedActionNode) String() string { return formatNode(n) }
+func (n *AlterColumnSetGeneratedActionNode) argumentNode()  {}
 
 func (n *AlterColumnSetGeneratedActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -1395,7 +1433,9 @@ func newAlterConnectionStmtNodeSlice(raws []*generated.ResolvedAlterConnectionSt
 	return nodes
 }
 
-func (n *AlterConnectionStmtNode) Kind() Kind     { return KindAlterConnectionStmt }
+func (n *AlterConnectionStmtNode) Kind() Kind { return KindAlterConnectionStmt }
+
+func (n *AlterConnectionStmtNode) String() string { return formatNode(n) }
 func (n *AlterConnectionStmtNode) statementNode() {}
 
 func (n *AlterConnectionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -1467,7 +1507,9 @@ func newAlterDatabaseStmtNodeSlice(raws []*generated.ResolvedAlterDatabaseStmtPr
 	return nodes
 }
 
-func (n *AlterDatabaseStmtNode) Kind() Kind     { return KindAlterDatabaseStmt }
+func (n *AlterDatabaseStmtNode) Kind() Kind { return KindAlterDatabaseStmt }
+
+func (n *AlterDatabaseStmtNode) String() string { return formatNode(n) }
 func (n *AlterDatabaseStmtNode) statementNode() {}
 
 func (n *AlterDatabaseStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -1539,7 +1581,9 @@ func newAlterEntityStmtNodeSlice(raws []*generated.ResolvedAlterEntityStmtProto)
 	return nodes
 }
 
-func (n *AlterEntityStmtNode) Kind() Kind     { return KindAlterEntityStmt }
+func (n *AlterEntityStmtNode) Kind() Kind { return KindAlterEntityStmt }
+
+func (n *AlterEntityStmtNode) String() string { return formatNode(n) }
 func (n *AlterEntityStmtNode) statementNode() {}
 
 func (n *AlterEntityStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -1615,7 +1659,9 @@ func newAlterExternalSchemaStmtNodeSlice(raws []*generated.ResolvedAlterExternal
 	return nodes
 }
 
-func (n *AlterExternalSchemaStmtNode) Kind() Kind     { return KindAlterExternalSchemaStmt }
+func (n *AlterExternalSchemaStmtNode) Kind() Kind { return KindAlterExternalSchemaStmt }
+
+func (n *AlterExternalSchemaStmtNode) String() string { return formatNode(n) }
 func (n *AlterExternalSchemaStmtNode) statementNode() {}
 
 func (n *AlterExternalSchemaStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -1687,7 +1733,9 @@ func newAlterIndexStmtNodeSlice(raws []*generated.ResolvedAlterIndexStmtProto) [
 	return nodes
 }
 
-func (n *AlterIndexStmtNode) Kind() Kind     { return KindAlterIndexStmt }
+func (n *AlterIndexStmtNode) Kind() Kind { return KindAlterIndexStmt }
+
+func (n *AlterIndexStmtNode) String() string { return formatNode(n) }
 func (n *AlterIndexStmtNode) statementNode() {}
 
 func (n *AlterIndexStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -1780,7 +1828,9 @@ func newAlterMaterializedViewStmtNodeSlice(raws []*generated.ResolvedAlterMateri
 	return nodes
 }
 
-func (n *AlterMaterializedViewStmtNode) Kind() Kind     { return KindAlterMaterializedViewStmt }
+func (n *AlterMaterializedViewStmtNode) Kind() Kind { return KindAlterMaterializedViewStmt }
+
+func (n *AlterMaterializedViewStmtNode) String() string { return formatNode(n) }
 func (n *AlterMaterializedViewStmtNode) statementNode() {}
 
 func (n *AlterMaterializedViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -1852,7 +1902,9 @@ func newAlterModelStmtNodeSlice(raws []*generated.ResolvedAlterModelStmtProto) [
 	return nodes
 }
 
-func (n *AlterModelStmtNode) Kind() Kind     { return KindAlterModelStmt }
+func (n *AlterModelStmtNode) Kind() Kind { return KindAlterModelStmt }
+
+func (n *AlterModelStmtNode) String() string { return formatNode(n) }
 func (n *AlterModelStmtNode) statementNode() {}
 
 func (n *AlterModelStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -1924,7 +1976,9 @@ func newAlterPrivilegeRestrictionStmtNodeSlice(raws []*generated.ResolvedAlterPr
 	return nodes
 }
 
-func (n *AlterPrivilegeRestrictionStmtNode) Kind() Kind     { return KindAlterPrivilegeRestrictionStmt }
+func (n *AlterPrivilegeRestrictionStmtNode) Kind() Kind { return KindAlterPrivilegeRestrictionStmt }
+
+func (n *AlterPrivilegeRestrictionStmtNode) String() string { return formatNode(n) }
 func (n *AlterPrivilegeRestrictionStmtNode) statementNode() {}
 
 func (n *AlterPrivilegeRestrictionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -2012,7 +2066,9 @@ func newAlterRowAccessPolicyStmtNodeSlice(raws []*generated.ResolvedAlterRowAcce
 	return nodes
 }
 
-func (n *AlterRowAccessPolicyStmtNode) Kind() Kind     { return KindAlterRowAccessPolicyStmt }
+func (n *AlterRowAccessPolicyStmtNode) Kind() Kind { return KindAlterRowAccessPolicyStmt }
+
+func (n *AlterRowAccessPolicyStmtNode) String() string { return formatNode(n) }
 func (n *AlterRowAccessPolicyStmtNode) statementNode() {}
 
 func (n *AlterRowAccessPolicyStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -2101,7 +2157,9 @@ func newAlterSchemaStmtNodeSlice(raws []*generated.ResolvedAlterSchemaStmtProto)
 	return nodes
 }
 
-func (n *AlterSchemaStmtNode) Kind() Kind     { return KindAlterSchemaStmt }
+func (n *AlterSchemaStmtNode) Kind() Kind { return KindAlterSchemaStmt }
+
+func (n *AlterSchemaStmtNode) String() string { return formatNode(n) }
 func (n *AlterSchemaStmtNode) statementNode() {}
 
 func (n *AlterSchemaStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -2173,7 +2231,9 @@ func newAlterSequenceStmtNodeSlice(raws []*generated.ResolvedAlterSequenceStmtPr
 	return nodes
 }
 
-func (n *AlterSequenceStmtNode) Kind() Kind     { return KindAlterSequenceStmt }
+func (n *AlterSequenceStmtNode) Kind() Kind { return KindAlterSequenceStmt }
+
+func (n *AlterSequenceStmtNode) String() string { return formatNode(n) }
 func (n *AlterSequenceStmtNode) statementNode() {}
 
 func (n *AlterSequenceStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -2245,8 +2305,10 @@ func newAlterSubEntityActionNodeSlice(raws []*generated.ResolvedAlterSubEntityAc
 	return nodes
 }
 
-func (n *AlterSubEntityActionNode) Kind() Kind    { return KindAlterSubEntityAction }
-func (n *AlterSubEntityActionNode) argumentNode() {}
+func (n *AlterSubEntityActionNode) Kind() Kind { return KindAlterSubEntityAction }
+
+func (n *AlterSubEntityActionNode) String() string { return formatNode(n) }
+func (n *AlterSubEntityActionNode) argumentNode()  {}
 
 func (n *AlterSubEntityActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -2310,7 +2372,9 @@ func newAlterTableSetOptionsStmtNodeSlice(raws []*generated.ResolvedAlterTableSe
 	return nodes
 }
 
-func (n *AlterTableSetOptionsStmtNode) Kind() Kind     { return KindAlterTableSetOptionsStmt }
+func (n *AlterTableSetOptionsStmtNode) Kind() Kind { return KindAlterTableSetOptionsStmt }
+
+func (n *AlterTableSetOptionsStmtNode) String() string { return formatNode(n) }
 func (n *AlterTableSetOptionsStmtNode) statementNode() {}
 
 func (n *AlterTableSetOptionsStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -2382,7 +2446,9 @@ func newAlterTableStmtNodeSlice(raws []*generated.ResolvedAlterTableStmtProto) [
 	return nodes
 }
 
-func (n *AlterTableStmtNode) Kind() Kind     { return KindAlterTableStmt }
+func (n *AlterTableStmtNode) Kind() Kind { return KindAlterTableStmt }
+
+func (n *AlterTableStmtNode) String() string { return formatNode(n) }
 func (n *AlterTableStmtNode) statementNode() {}
 
 func (n *AlterTableStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -2454,7 +2520,9 @@ func newAlterViewStmtNodeSlice(raws []*generated.ResolvedAlterViewStmtProto) []*
 	return nodes
 }
 
-func (n *AlterViewStmtNode) Kind() Kind     { return KindAlterViewStmt }
+func (n *AlterViewStmtNode) Kind() Kind { return KindAlterViewStmt }
+
+func (n *AlterViewStmtNode) String() string { return formatNode(n) }
 func (n *AlterViewStmtNode) statementNode() {}
 
 func (n *AlterViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -2527,7 +2595,9 @@ func newAnalyticFunctionCallNodeSlice(raws []*generated.ResolvedAnalyticFunction
 }
 
 func (n *AnalyticFunctionCallNode) Kind() Kind { return KindAnalyticFunctionCall }
-func (n *AnalyticFunctionCallNode) exprNode()  {}
+
+func (n *AnalyticFunctionCallNode) String() string { return formatNode(n) }
+func (n *AnalyticFunctionCallNode) exprNode()      {}
 
 func (n *AnalyticFunctionCallNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -2635,8 +2705,10 @@ func newAnalyticFunctionGroupNodeSlice(raws []*generated.ResolvedAnalyticFunctio
 	return nodes
 }
 
-func (n *AnalyticFunctionGroupNode) Kind() Kind    { return KindAnalyticFunctionGroup }
-func (n *AnalyticFunctionGroupNode) argumentNode() {}
+func (n *AnalyticFunctionGroupNode) Kind() Kind { return KindAnalyticFunctionGroup }
+
+func (n *AnalyticFunctionGroupNode) String() string { return formatNode(n) }
+func (n *AnalyticFunctionGroupNode) argumentNode()  {}
 
 func (n *AnalyticFunctionGroupNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -2714,7 +2786,9 @@ func newAnalyticScanNodeSlice(raws []*generated.ResolvedAnalyticScanProto) []*An
 }
 
 func (n *AnalyticScanNode) Kind() Kind { return KindAnalyticScan }
-func (n *AnalyticScanNode) scanNode()  {}
+
+func (n *AnalyticScanNode) String() string { return formatNode(n) }
+func (n *AnalyticScanNode) scanNode()      {}
 
 func (n *AnalyticScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -2786,7 +2860,9 @@ func newAnalyzeStmtNodeSlice(raws []*generated.ResolvedAnalyzeStmtProto) []*Anal
 	return nodes
 }
 
-func (n *AnalyzeStmtNode) Kind() Kind     { return KindAnalyzeStmt }
+func (n *AnalyzeStmtNode) Kind() Kind { return KindAnalyzeStmt }
+
+func (n *AnalyzeStmtNode) String() string { return formatNode(n) }
 func (n *AnalyzeStmtNode) statementNode() {}
 
 func (n *AnalyzeStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -2863,7 +2939,9 @@ func newAnonymizedAggregateScanNodeSlice(raws []*generated.ResolvedAnonymizedAgg
 }
 
 func (n *AnonymizedAggregateScanNode) Kind() Kind { return KindAnonymizedAggregateScan }
-func (n *AnonymizedAggregateScanNode) scanNode()  {}
+
+func (n *AnonymizedAggregateScanNode) String() string { return formatNode(n) }
+func (n *AnonymizedAggregateScanNode) scanNode()      {}
 
 func (n *AnonymizedAggregateScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -3004,8 +3082,10 @@ func newArgumentDefNodeSlice(raws []*generated.ResolvedArgumentDefProto) []*Argu
 	return nodes
 }
 
-func (n *ArgumentDefNode) Kind() Kind    { return KindArgumentDef }
-func (n *ArgumentDefNode) argumentNode() {}
+func (n *ArgumentDefNode) Kind() Kind { return KindArgumentDef }
+
+func (n *ArgumentDefNode) String() string { return formatNode(n) }
+func (n *ArgumentDefNode) argumentNode()  {}
 
 func (n *ArgumentDefNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -3055,8 +3135,10 @@ func newArgumentListNodeSlice(raws []*generated.ResolvedArgumentListProto) []*Ar
 	return nodes
 }
 
-func (n *ArgumentListNode) Kind() Kind    { return KindArgumentList }
-func (n *ArgumentListNode) argumentNode() {}
+func (n *ArgumentListNode) Kind() Kind { return KindArgumentList }
+
+func (n *ArgumentListNode) String() string { return formatNode(n) }
+func (n *ArgumentListNode) argumentNode()  {}
 
 func (n *ArgumentListNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -3108,7 +3190,9 @@ func newArgumentRefNodeSlice(raws []*generated.ResolvedArgumentRefProto) []*Argu
 }
 
 func (n *ArgumentRefNode) Kind() Kind { return KindArgumentRef }
-func (n *ArgumentRefNode) exprNode()  {}
+
+func (n *ArgumentRefNode) String() string { return formatNode(n) }
+func (n *ArgumentRefNode) exprNode()      {}
 
 func (n *ArgumentRefNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -3163,7 +3247,9 @@ func newArrayAggregateNodeSlice(raws []*generated.ResolvedArrayAggregateProto) [
 }
 
 func (n *ArrayAggregateNode) Kind() Kind { return KindArrayAggregate }
-func (n *ArrayAggregateNode) exprNode()  {}
+
+func (n *ArrayAggregateNode) String() string { return formatNode(n) }
+func (n *ArrayAggregateNode) exprNode()      {}
 
 func (n *ArrayAggregateNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -3253,7 +3339,9 @@ func newArrayScanNodeSlice(raws []*generated.ResolvedArrayScanProto) []*ArraySca
 }
 
 func (n *ArrayScanNode) Kind() Kind { return KindArrayScan }
-func (n *ArrayScanNode) scanNode()  {}
+
+func (n *ArrayScanNode) String() string { return formatNode(n) }
+func (n *ArrayScanNode) scanNode()      {}
 
 func (n *ArrayScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -3371,8 +3459,10 @@ func newAssertRowsModifiedNodeSlice(raws []*generated.ResolvedAssertRowsModified
 	return nodes
 }
 
-func (n *AssertRowsModifiedNode) Kind() Kind    { return KindAssertRowsModified }
-func (n *AssertRowsModifiedNode) argumentNode() {}
+func (n *AssertRowsModifiedNode) Kind() Kind { return KindAssertRowsModified }
+
+func (n *AssertRowsModifiedNode) String() string { return formatNode(n) }
+func (n *AssertRowsModifiedNode) argumentNode()  {}
 
 func (n *AssertRowsModifiedNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -3425,7 +3515,9 @@ func newAssertScanNodeSlice(raws []*generated.ResolvedAssertScanProto) []*Assert
 }
 
 func (n *AssertScanNode) Kind() Kind { return KindAssertScan }
-func (n *AssertScanNode) scanNode()  {}
+
+func (n *AssertScanNode) String() string { return formatNode(n) }
+func (n *AssertScanNode) scanNode()      {}
 
 func (n *AssertScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -3527,7 +3619,9 @@ func newAssertStmtNodeSlice(raws []*generated.ResolvedAssertStmtProto) []*Assert
 	return nodes
 }
 
-func (n *AssertStmtNode) Kind() Kind     { return KindAssertStmt }
+func (n *AssertStmtNode) Kind() Kind { return KindAssertStmt }
+
+func (n *AssertStmtNode) String() string { return formatNode(n) }
 func (n *AssertStmtNode) statementNode() {}
 
 func (n *AssertStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -3596,7 +3690,9 @@ func newAssignmentStmtNodeSlice(raws []*generated.ResolvedAssignmentStmtProto) [
 	return nodes
 }
 
-func (n *AssignmentStmtNode) Kind() Kind     { return KindAssignmentStmt }
+func (n *AssignmentStmtNode) Kind() Kind { return KindAssignmentStmt }
+
+func (n *AssignmentStmtNode) String() string { return formatNode(n) }
 func (n *AssignmentStmtNode) statementNode() {}
 
 func (n *AssignmentStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -3674,8 +3770,10 @@ func newAuxLoadDataPartitionFilterNodeSlice(raws []*generated.ResolvedAuxLoadDat
 	return nodes
 }
 
-func (n *AuxLoadDataPartitionFilterNode) Kind() Kind    { return KindAuxLoadDataPartitionFilter }
-func (n *AuxLoadDataPartitionFilterNode) argumentNode() {}
+func (n *AuxLoadDataPartitionFilterNode) Kind() Kind { return KindAuxLoadDataPartitionFilter }
+
+func (n *AuxLoadDataPartitionFilterNode) String() string { return formatNode(n) }
+func (n *AuxLoadDataPartitionFilterNode) argumentNode()  {}
 
 func (n *AuxLoadDataPartitionFilterNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -3731,7 +3829,9 @@ func newAuxLoadDataStmtNodeSlice(raws []*generated.ResolvedAuxLoadDataStmtProto)
 	return nodes
 }
 
-func (n *AuxLoadDataStmtNode) Kind() Kind     { return KindAuxLoadDataStmt }
+func (n *AuxLoadDataStmtNode) Kind() Kind { return KindAuxLoadDataStmt }
+
+func (n *AuxLoadDataStmtNode) String() string { return formatNode(n) }
 func (n *AuxLoadDataStmtNode) statementNode() {}
 
 func (n *AuxLoadDataStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -3948,7 +4048,9 @@ func newBarrierScanNodeSlice(raws []*generated.ResolvedBarrierScanProto) []*Barr
 }
 
 func (n *BarrierScanNode) Kind() Kind { return KindBarrierScan }
-func (n *BarrierScanNode) scanNode()  {}
+
+func (n *BarrierScanNode) String() string { return formatNode(n) }
+func (n *BarrierScanNode) scanNode()      {}
 
 func (n *BarrierScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -4024,7 +4126,9 @@ func newBeginStmtNodeSlice(raws []*generated.ResolvedBeginStmtProto) []*BeginStm
 	return nodes
 }
 
-func (n *BeginStmtNode) Kind() Kind     { return KindBeginStmt }
+func (n *BeginStmtNode) Kind() Kind { return KindBeginStmt }
+
+func (n *BeginStmtNode) String() string { return formatNode(n) }
 func (n *BeginStmtNode) statementNode() {}
 
 func (n *BeginStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -4075,7 +4179,9 @@ func newCallStmtNodeSlice(raws []*generated.ResolvedCallStmtProto) []*CallStmtNo
 	return nodes
 }
 
-func (n *CallStmtNode) Kind() Kind     { return KindCallStmt }
+func (n *CallStmtNode) Kind() Kind { return KindCallStmt }
+
+func (n *CallStmtNode) String() string { return formatNode(n) }
 func (n *CallStmtNode) statementNode() {}
 
 func (n *CallStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -4148,7 +4254,9 @@ func newCastNodeSlice(raws []*generated.ResolvedCastProto) []*CastNode {
 }
 
 func (n *CastNode) Kind() Kind { return KindCast }
-func (n *CastNode) exprNode()  {}
+
+func (n *CastNode) String() string { return formatNode(n) }
+func (n *CastNode) exprNode()      {}
 
 func (n *CastNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -4256,7 +4364,9 @@ func newCatalogColumnRefNodeSlice(raws []*generated.ResolvedCatalogColumnRefProt
 }
 
 func (n *CatalogColumnRefNode) Kind() Kind { return KindCatalogColumnRef }
-func (n *CatalogColumnRefNode) exprNode()  {}
+
+func (n *CatalogColumnRefNode) String() string { return formatNode(n) }
+func (n *CatalogColumnRefNode) exprNode()      {}
 
 func (n *CatalogColumnRefNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -4306,8 +4416,10 @@ func newCheckConstraintNodeSlice(raws []*generated.ResolvedCheckConstraintProto)
 	return nodes
 }
 
-func (n *CheckConstraintNode) Kind() Kind    { return KindCheckConstraint }
-func (n *CheckConstraintNode) argumentNode() {}
+func (n *CheckConstraintNode) Kind() Kind { return KindCheckConstraint }
+
+func (n *CheckConstraintNode) String() string { return formatNode(n) }
+func (n *CheckConstraintNode) argumentNode()  {}
 
 func (n *CheckConstraintNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -4371,7 +4483,9 @@ func newCloneDataStmtNodeSlice(raws []*generated.ResolvedCloneDataStmtProto) []*
 	return nodes
 }
 
-func (n *CloneDataStmtNode) Kind() Kind     { return KindCloneDataStmt }
+func (n *CloneDataStmtNode) Kind() Kind { return KindCloneDataStmt }
+
+func (n *CloneDataStmtNode) String() string { return formatNode(n) }
 func (n *CloneDataStmtNode) statementNode() {}
 
 func (n *CloneDataStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -4449,8 +4563,10 @@ func newColumnAnnotationsNodeSlice(raws []*generated.ResolvedColumnAnnotationsPr
 	return nodes
 }
 
-func (n *ColumnAnnotationsNode) Kind() Kind    { return KindColumnAnnotations }
-func (n *ColumnAnnotationsNode) argumentNode() {}
+func (n *ColumnAnnotationsNode) Kind() Kind { return KindColumnAnnotations }
+
+func (n *ColumnAnnotationsNode) String() string { return formatNode(n) }
+func (n *ColumnAnnotationsNode) argumentNode()  {}
 
 func (n *ColumnAnnotationsNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -4526,8 +4642,10 @@ func newColumnDefaultValueNodeSlice(raws []*generated.ResolvedColumnDefaultValue
 	return nodes
 }
 
-func (n *ColumnDefaultValueNode) Kind() Kind    { return KindColumnDefaultValue }
-func (n *ColumnDefaultValueNode) argumentNode() {}
+func (n *ColumnDefaultValueNode) Kind() Kind { return KindColumnDefaultValue }
+
+func (n *ColumnDefaultValueNode) String() string { return formatNode(n) }
+func (n *ColumnDefaultValueNode) argumentNode()  {}
 
 func (n *ColumnDefaultValueNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -4583,8 +4701,10 @@ func newColumnDefinitionNodeSlice(raws []*generated.ResolvedColumnDefinitionProt
 	return nodes
 }
 
-func (n *ColumnDefinitionNode) Kind() Kind    { return KindColumnDefinition }
-func (n *ColumnDefinitionNode) argumentNode() {}
+func (n *ColumnDefinitionNode) Kind() Kind { return KindColumnDefinition }
+
+func (n *ColumnDefinitionNode) String() string { return formatNode(n) }
+func (n *ColumnDefinitionNode) argumentNode()  {}
 
 func (n *ColumnDefinitionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -4678,8 +4798,10 @@ func newColumnHolderNodeSlice(raws []*generated.ResolvedColumnHolderProto) []*Co
 	return nodes
 }
 
-func (n *ColumnHolderNode) Kind() Kind    { return KindColumnHolder }
-func (n *ColumnHolderNode) argumentNode() {}
+func (n *ColumnHolderNode) Kind() Kind { return KindColumnHolder }
+
+func (n *ColumnHolderNode) String() string { return formatNode(n) }
+func (n *ColumnHolderNode) argumentNode()  {}
 
 func (n *ColumnHolderNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -4722,7 +4844,9 @@ func newColumnRefNodeSlice(raws []*generated.ResolvedColumnRefProto) []*ColumnRe
 }
 
 func (n *ColumnRefNode) Kind() Kind { return KindColumnRef }
-func (n *ColumnRefNode) exprNode()  {}
+
+func (n *ColumnRefNode) String() string { return formatNode(n) }
+func (n *ColumnRefNode) exprNode()      {}
 
 func (n *ColumnRefNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -4776,7 +4900,9 @@ func newCommitStmtNodeSlice(raws []*generated.ResolvedCommitStmtProto) []*Commit
 	return nodes
 }
 
-func (n *CommitStmtNode) Kind() Kind     { return KindCommitStmt }
+func (n *CommitStmtNode) Kind() Kind { return KindCommitStmt }
+
+func (n *CommitStmtNode) String() string { return formatNode(n) }
 func (n *CommitStmtNode) statementNode() {}
 
 func (n *CommitStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -4819,8 +4945,10 @@ func newComputedColumnNodeSlice(raws []*generated.ResolvedComputedColumnProto) [
 	return nodes
 }
 
-func (n *ComputedColumnNode) Kind() Kind    { return KindComputedColumn }
-func (n *ComputedColumnNode) argumentNode() {}
+func (n *ComputedColumnNode) Kind() Kind { return KindComputedColumn }
+
+func (n *ComputedColumnNode) String() string { return formatNode(n) }
+func (n *ComputedColumnNode) argumentNode()  {}
 
 func (n *ComputedColumnNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -4876,8 +5004,10 @@ func newConnectionNodeSlice(raws []*generated.ResolvedConnectionProto) []*Connec
 	return nodes
 }
 
-func (n *ConnectionNode) Kind() Kind    { return KindConnection }
-func (n *ConnectionNode) argumentNode() {}
+func (n *ConnectionNode) Kind() Kind { return KindConnection }
+
+func (n *ConnectionNode) String() string { return formatNode(n) }
+func (n *ConnectionNode) argumentNode()  {}
 
 func (n *ConnectionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -4920,7 +5050,9 @@ func newConstantNodeSlice(raws []*generated.ResolvedConstantProto) []*ConstantNo
 }
 
 func (n *ConstantNode) Kind() Kind { return KindConstant }
-func (n *ConstantNode) exprNode()  {}
+
+func (n *ConstantNode) String() string { return formatNode(n) }
+func (n *ConstantNode) exprNode()      {}
 
 func (n *ConstantNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -4970,7 +5102,9 @@ func newCreateApproxViewStmtNodeSlice(raws []*generated.ResolvedCreateApproxView
 	return nodes
 }
 
-func (n *CreateApproxViewStmtNode) Kind() Kind     { return KindCreateApproxViewStmt }
+func (n *CreateApproxViewStmtNode) Kind() Kind { return KindCreateApproxViewStmt }
+
+func (n *CreateApproxViewStmtNode) String() string { return formatNode(n) }
 func (n *CreateApproxViewStmtNode) statementNode() {}
 
 func (n *CreateApproxViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -5103,7 +5237,9 @@ func newCreateConnectionStmtNodeSlice(raws []*generated.ResolvedCreateConnection
 	return nodes
 }
 
-func (n *CreateConnectionStmtNode) Kind() Kind     { return KindCreateConnectionStmt }
+func (n *CreateConnectionStmtNode) Kind() Kind { return KindCreateConnectionStmt }
+
+func (n *CreateConnectionStmtNode) String() string { return formatNode(n) }
 func (n *CreateConnectionStmtNode) statementNode() {}
 
 func (n *CreateConnectionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -5179,7 +5315,9 @@ func newCreateConstantStmtNodeSlice(raws []*generated.ResolvedCreateConstantStmt
 	return nodes
 }
 
-func (n *CreateConstantStmtNode) Kind() Kind     { return KindCreateConstantStmt }
+func (n *CreateConstantStmtNode) Kind() Kind { return KindCreateConstantStmt }
+
+func (n *CreateConstantStmtNode) String() string { return formatNode(n) }
 func (n *CreateConstantStmtNode) statementNode() {}
 
 func (n *CreateConstantStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -5256,7 +5394,9 @@ func newCreateDatabaseStmtNodeSlice(raws []*generated.ResolvedCreateDatabaseStmt
 	return nodes
 }
 
-func (n *CreateDatabaseStmtNode) Kind() Kind     { return KindCreateDatabaseStmt }
+func (n *CreateDatabaseStmtNode) Kind() Kind { return KindCreateDatabaseStmt }
+
+func (n *CreateDatabaseStmtNode) String() string { return formatNode(n) }
 func (n *CreateDatabaseStmtNode) statementNode() {}
 
 func (n *CreateDatabaseStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -5307,7 +5447,9 @@ func newCreateEntityStmtNodeSlice(raws []*generated.ResolvedCreateEntityStmtProt
 	return nodes
 }
 
-func (n *CreateEntityStmtNode) Kind() Kind     { return KindCreateEntityStmt }
+func (n *CreateEntityStmtNode) Kind() Kind { return KindCreateEntityStmt }
+
+func (n *CreateEntityStmtNode) String() string { return formatNode(n) }
 func (n *CreateEntityStmtNode) statementNode() {}
 
 func (n *CreateEntityStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -5395,7 +5537,9 @@ func newCreateExternalSchemaStmtNodeSlice(raws []*generated.ResolvedCreateExtern
 	return nodes
 }
 
-func (n *CreateExternalSchemaStmtNode) Kind() Kind     { return KindCreateExternalSchemaStmt }
+func (n *CreateExternalSchemaStmtNode) Kind() Kind { return KindCreateExternalSchemaStmt }
+
+func (n *CreateExternalSchemaStmtNode) String() string { return formatNode(n) }
 func (n *CreateExternalSchemaStmtNode) statementNode() {}
 
 func (n *CreateExternalSchemaStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -5468,7 +5612,9 @@ func newCreateExternalTableStmtNodeSlice(raws []*generated.ResolvedCreateExterna
 	return nodes
 }
 
-func (n *CreateExternalTableStmtNode) Kind() Kind     { return KindCreateExternalTableStmt }
+func (n *CreateExternalTableStmtNode) Kind() Kind { return KindCreateExternalTableStmt }
+
+func (n *CreateExternalTableStmtNode) String() string { return formatNode(n) }
 func (n *CreateExternalTableStmtNode) statementNode() {}
 
 func (n *CreateExternalTableStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -5628,7 +5774,9 @@ func newCreateFunctionStmtNodeSlice(raws []*generated.ResolvedCreateFunctionStmt
 	return nodes
 }
 
-func (n *CreateFunctionStmtNode) Kind() Kind     { return KindCreateFunctionStmt }
+func (n *CreateFunctionStmtNode) Kind() Kind { return KindCreateFunctionStmt }
+
+func (n *CreateFunctionStmtNode) String() string { return formatNode(n) }
 func (n *CreateFunctionStmtNode) statementNode() {}
 
 func (n *CreateFunctionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -5782,7 +5930,9 @@ func newCreateIndexStmtNodeSlice(raws []*generated.ResolvedCreateIndexStmtProto)
 	return nodes
 }
 
-func (n *CreateIndexStmtNode) Kind() Kind     { return KindCreateIndexStmt }
+func (n *CreateIndexStmtNode) Kind() Kind { return KindCreateIndexStmt }
+
+func (n *CreateIndexStmtNode) String() string { return formatNode(n) }
 func (n *CreateIndexStmtNode) statementNode() {}
 
 func (n *CreateIndexStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -5935,7 +6085,9 @@ func newCreateMaterializedViewStmtNodeSlice(raws []*generated.ResolvedCreateMate
 	return nodes
 }
 
-func (n *CreateMaterializedViewStmtNode) Kind() Kind     { return KindCreateMaterializedViewStmt }
+func (n *CreateMaterializedViewStmtNode) Kind() Kind { return KindCreateMaterializedViewStmt }
+
+func (n *CreateMaterializedViewStmtNode) String() string { return formatNode(n) }
 func (n *CreateMaterializedViewStmtNode) statementNode() {}
 
 func (n *CreateMaterializedViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -6105,8 +6257,10 @@ func newCreateModelAliasedQueryNodeSlice(raws []*generated.ResolvedCreateModelAl
 	return nodes
 }
 
-func (n *CreateModelAliasedQueryNode) Kind() Kind    { return KindCreateModelAliasedQuery }
-func (n *CreateModelAliasedQueryNode) argumentNode() {}
+func (n *CreateModelAliasedQueryNode) Kind() Kind { return KindCreateModelAliasedQuery }
+
+func (n *CreateModelAliasedQueryNode) String() string { return formatNode(n) }
+func (n *CreateModelAliasedQueryNode) argumentNode()  {}
 
 func (n *CreateModelAliasedQueryNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -6174,7 +6328,9 @@ func newCreateModelStmtNodeSlice(raws []*generated.ResolvedCreateModelStmtProto)
 	return nodes
 }
 
-func (n *CreateModelStmtNode) Kind() Kind     { return KindCreateModelStmt }
+func (n *CreateModelStmtNode) Kind() Kind { return KindCreateModelStmt }
+
+func (n *CreateModelStmtNode) String() string { return formatNode(n) }
 func (n *CreateModelStmtNode) statementNode() {}
 
 func (n *CreateModelStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -6352,7 +6508,9 @@ func newCreatePrivilegeRestrictionStmtNodeSlice(raws []*generated.ResolvedCreate
 	return nodes
 }
 
-func (n *CreatePrivilegeRestrictionStmtNode) Kind() Kind     { return KindCreatePrivilegeRestrictionStmt }
+func (n *CreatePrivilegeRestrictionStmtNode) Kind() Kind { return KindCreatePrivilegeRestrictionStmt }
+
+func (n *CreatePrivilegeRestrictionStmtNode) String() string { return formatNode(n) }
 func (n *CreatePrivilegeRestrictionStmtNode) statementNode() {}
 
 func (n *CreatePrivilegeRestrictionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -6444,7 +6602,9 @@ func newCreateProcedureStmtNodeSlice(raws []*generated.ResolvedCreateProcedureSt
 	return nodes
 }
 
-func (n *CreateProcedureStmtNode) Kind() Kind     { return KindCreateProcedureStmt }
+func (n *CreateProcedureStmtNode) Kind() Kind { return KindCreateProcedureStmt }
+
+func (n *CreateProcedureStmtNode) String() string { return formatNode(n) }
 func (n *CreateProcedureStmtNode) statementNode() {}
 
 func (n *CreateProcedureStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -6557,7 +6717,9 @@ func newCreatePropertyGraphStmtNodeSlice(raws []*generated.ResolvedCreatePropert
 	return nodes
 }
 
-func (n *CreatePropertyGraphStmtNode) Kind() Kind     { return KindCreatePropertyGraphStmt }
+func (n *CreatePropertyGraphStmtNode) Kind() Kind { return KindCreatePropertyGraphStmt }
+
+func (n *CreatePropertyGraphStmtNode) String() string { return formatNode(n) }
 func (n *CreatePropertyGraphStmtNode) statementNode() {}
 
 func (n *CreatePropertyGraphStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -6649,7 +6811,9 @@ func newCreateRowAccessPolicyStmtNodeSlice(raws []*generated.ResolvedCreateRowAc
 	return nodes
 }
 
-func (n *CreateRowAccessPolicyStmtNode) Kind() Kind     { return KindCreateRowAccessPolicyStmt }
+func (n *CreateRowAccessPolicyStmtNode) Kind() Kind { return KindCreateRowAccessPolicyStmt }
+
+func (n *CreateRowAccessPolicyStmtNode) String() string { return formatNode(n) }
 func (n *CreateRowAccessPolicyStmtNode) statementNode() {}
 
 func (n *CreateRowAccessPolicyStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -6759,7 +6923,9 @@ func newCreateSchemaStmtNodeSlice(raws []*generated.ResolvedCreateSchemaStmtProt
 	return nodes
 }
 
-func (n *CreateSchemaStmtNode) Kind() Kind     { return KindCreateSchemaStmt }
+func (n *CreateSchemaStmtNode) Kind() Kind { return KindCreateSchemaStmt }
+
+func (n *CreateSchemaStmtNode) String() string { return formatNode(n) }
 func (n *CreateSchemaStmtNode) statementNode() {}
 
 func (n *CreateSchemaStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -6832,7 +6998,9 @@ func newCreateSequenceStmtNodeSlice(raws []*generated.ResolvedCreateSequenceStmt
 	return nodes
 }
 
-func (n *CreateSequenceStmtNode) Kind() Kind     { return KindCreateSequenceStmt }
+func (n *CreateSequenceStmtNode) Kind() Kind { return KindCreateSequenceStmt }
+
+func (n *CreateSequenceStmtNode) String() string { return formatNode(n) }
 func (n *CreateSequenceStmtNode) statementNode() {}
 
 func (n *CreateSequenceStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -6908,7 +7076,9 @@ func newCreateSnapshotTableStmtNodeSlice(raws []*generated.ResolvedCreateSnapsho
 	return nodes
 }
 
-func (n *CreateSnapshotTableStmtNode) Kind() Kind     { return KindCreateSnapshotTableStmt }
+func (n *CreateSnapshotTableStmtNode) Kind() Kind { return KindCreateSnapshotTableStmt }
+
+func (n *CreateSnapshotTableStmtNode) String() string { return formatNode(n) }
 func (n *CreateSnapshotTableStmtNode) statementNode() {}
 
 func (n *CreateSnapshotTableStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -6981,7 +7151,9 @@ func newCreateTableAsSelectStmtNodeSlice(raws []*generated.ResolvedCreateTableAs
 	return nodes
 }
 
-func (n *CreateTableAsSelectStmtNode) Kind() Kind     { return KindCreateTableAsSelectStmt }
+func (n *CreateTableAsSelectStmtNode) Kind() Kind { return KindCreateTableAsSelectStmt }
+
+func (n *CreateTableAsSelectStmtNode) String() string { return formatNode(n) }
 func (n *CreateTableAsSelectStmtNode) statementNode() {}
 
 func (n *CreateTableAsSelectStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -7177,7 +7349,9 @@ func newCreateTableFunctionStmtNodeSlice(raws []*generated.ResolvedCreateTableFu
 	return nodes
 }
 
-func (n *CreateTableFunctionStmtNode) Kind() Kind     { return KindCreateTableFunctionStmt }
+func (n *CreateTableFunctionStmtNode) Kind() Kind { return KindCreateTableFunctionStmt }
+
+func (n *CreateTableFunctionStmtNode) String() string { return formatNode(n) }
 func (n *CreateTableFunctionStmtNode) statementNode() {}
 
 func (n *CreateTableFunctionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -7306,7 +7480,9 @@ func newCreateTableStmtNodeSlice(raws []*generated.ResolvedCreateTableStmtProto)
 	return nodes
 }
 
-func (n *CreateTableStmtNode) Kind() Kind     { return KindCreateTableStmt }
+func (n *CreateTableStmtNode) Kind() Kind { return KindCreateTableStmt }
+
+func (n *CreateTableStmtNode) String() string { return formatNode(n) }
 func (n *CreateTableStmtNode) statementNode() {}
 
 func (n *CreateTableStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -7503,7 +7679,9 @@ func newCreateViewStmtNodeSlice(raws []*generated.ResolvedCreateViewStmtProto) [
 	return nodes
 }
 
-func (n *CreateViewStmtNode) Kind() Kind     { return KindCreateViewStmt }
+func (n *CreateViewStmtNode) Kind() Kind { return KindCreateViewStmt }
+
+func (n *CreateViewStmtNode) String() string { return formatNode(n) }
 func (n *CreateViewStmtNode) statementNode() {}
 
 func (n *CreateViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -7620,7 +7798,9 @@ func newCreateWithEntryStmtNodeSlice(raws []*generated.ResolvedCreateWithEntrySt
 	return nodes
 }
 
-func (n *CreateWithEntryStmtNode) Kind() Kind     { return KindCreateWithEntryStmt }
+func (n *CreateWithEntryStmtNode) Kind() Kind { return KindCreateWithEntryStmt }
+
+func (n *CreateWithEntryStmtNode) String() string { return formatNode(n) }
 func (n *CreateWithEntryStmtNode) statementNode() {}
 
 func (n *CreateWithEntryStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -7667,8 +7847,10 @@ func newCubeNodeSlice(raws []*generated.ResolvedCubeProto) []*CubeNode {
 	return nodes
 }
 
-func (n *CubeNode) Kind() Kind    { return KindCube }
-func (n *CubeNode) argumentNode() {}
+func (n *CubeNode) Kind() Kind { return KindCube }
+
+func (n *CubeNode) String() string { return formatNode(n) }
+func (n *CubeNode) argumentNode()  {}
 
 func (n *CubeNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -7720,7 +7902,9 @@ func newDMLDefaultNodeSlice(raws []*generated.ResolvedDMLDefaultProto) []*DMLDef
 }
 
 func (n *DMLDefaultNode) Kind() Kind { return KindDMLDefault }
-func (n *DMLDefaultNode) exprNode()  {}
+
+func (n *DMLDefaultNode) String() string { return formatNode(n) }
+func (n *DMLDefaultNode) exprNode()      {}
 
 func (n *DMLDefaultNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -7766,8 +7950,10 @@ func newDMLValueNodeSlice(raws []*generated.ResolvedDMLValueProto) []*DMLValueNo
 	return nodes
 }
 
-func (n *DMLValueNode) Kind() Kind    { return KindDMLValue }
-func (n *DMLValueNode) argumentNode() {}
+func (n *DMLValueNode) Kind() Kind { return KindDMLValue }
+
+func (n *DMLValueNode) String() string { return formatNode(n) }
+func (n *DMLValueNode) argumentNode()  {}
 
 func (n *DMLValueNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -7819,8 +8005,10 @@ func newDeferredComputedColumnNodeSlice(raws []*generated.ResolvedDeferredComput
 	return nodes
 }
 
-func (n *DeferredComputedColumnNode) Kind() Kind    { return KindDeferredComputedColumn }
-func (n *DeferredComputedColumnNode) argumentNode() {}
+func (n *DeferredComputedColumnNode) Kind() Kind { return KindDeferredComputedColumn }
+
+func (n *DeferredComputedColumnNode) String() string { return formatNode(n) }
+func (n *DeferredComputedColumnNode) argumentNode()  {}
 
 func (n *DeferredComputedColumnNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -7880,7 +8068,9 @@ func newDefineTableStmtNodeSlice(raws []*generated.ResolvedDefineTableStmtProto)
 	return nodes
 }
 
-func (n *DefineTableStmtNode) Kind() Kind     { return KindDefineTableStmt }
+func (n *DefineTableStmtNode) Kind() Kind { return KindDefineTableStmt }
+
+func (n *DefineTableStmtNode) String() string { return formatNode(n) }
 func (n *DefineTableStmtNode) statementNode() {}
 
 func (n *DefineTableStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -7931,7 +8121,9 @@ func newDeleteStmtNodeSlice(raws []*generated.ResolvedDeleteStmtProto) []*Delete
 	return nodes
 }
 
-func (n *DeleteStmtNode) Kind() Kind     { return KindDeleteStmt }
+func (n *DeleteStmtNode) Kind() Kind { return KindDeleteStmt }
+
+func (n *DeleteStmtNode) String() string { return formatNode(n) }
 func (n *DeleteStmtNode) statementNode() {}
 
 func (n *DeleteStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -8044,7 +8236,9 @@ func newDescribeScanNodeSlice(raws []*generated.ResolvedDescribeScanProto) []*De
 }
 
 func (n *DescribeScanNode) Kind() Kind { return KindDescribeScan }
-func (n *DescribeScanNode) scanNode()  {}
+
+func (n *DescribeScanNode) String() string { return formatNode(n) }
+func (n *DescribeScanNode) scanNode()      {}
 
 func (n *DescribeScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -8133,7 +8327,9 @@ func newDescribeStmtNodeSlice(raws []*generated.ResolvedDescribeStmtProto) []*De
 	return nodes
 }
 
-func (n *DescribeStmtNode) Kind() Kind     { return KindDescribeStmt }
+func (n *DescribeStmtNode) Kind() Kind { return KindDescribeStmt }
+
+func (n *DescribeStmtNode) String() string { return formatNode(n) }
 func (n *DescribeStmtNode) statementNode() {}
 
 func (n *DescribeStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -8188,8 +8384,10 @@ func newDescriptorNodeSlice(raws []*generated.ResolvedDescriptorProto) []*Descri
 	return nodes
 }
 
-func (n *DescriptorNode) Kind() Kind    { return KindDescriptor }
-func (n *DescriptorNode) argumentNode() {}
+func (n *DescriptorNode) Kind() Kind { return KindDescriptor }
+
+func (n *DescriptorNode) String() string { return formatNode(n) }
+func (n *DescriptorNode) argumentNode()  {}
 
 func (n *DescriptorNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -8238,7 +8436,9 @@ func newDifferentialPrivacyAggregateScanNodeSlice(raws []*generated.ResolvedDiff
 func (n *DifferentialPrivacyAggregateScanNode) Kind() Kind {
 	return KindDifferentialPrivacyAggregateScan
 }
-func (n *DifferentialPrivacyAggregateScanNode) scanNode() {}
+
+func (n *DifferentialPrivacyAggregateScanNode) String() string { return formatNode(n) }
+func (n *DifferentialPrivacyAggregateScanNode) scanNode()      {}
 
 func (n *DifferentialPrivacyAggregateScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -8379,8 +8579,10 @@ func newDropColumnActionNodeSlice(raws []*generated.ResolvedDropColumnActionProt
 	return nodes
 }
 
-func (n *DropColumnActionNode) Kind() Kind    { return KindDropColumnAction }
-func (n *DropColumnActionNode) argumentNode() {}
+func (n *DropColumnActionNode) Kind() Kind { return KindDropColumnAction }
+
+func (n *DropColumnActionNode) String() string { return formatNode(n) }
+func (n *DropColumnActionNode) argumentNode()  {}
 
 func (n *DropColumnActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -8426,8 +8628,10 @@ func newDropConstraintActionNodeSlice(raws []*generated.ResolvedDropConstraintAc
 	return nodes
 }
 
-func (n *DropConstraintActionNode) Kind() Kind    { return KindDropConstraintAction }
-func (n *DropConstraintActionNode) argumentNode() {}
+func (n *DropConstraintActionNode) Kind() Kind { return KindDropConstraintAction }
+
+func (n *DropConstraintActionNode) String() string { return formatNode(n) }
+func (n *DropConstraintActionNode) argumentNode()  {}
 
 func (n *DropConstraintActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -8473,7 +8677,9 @@ func newDropFunctionStmtNodeSlice(raws []*generated.ResolvedDropFunctionStmtProt
 	return nodes
 }
 
-func (n *DropFunctionStmtNode) Kind() Kind     { return KindDropFunctionStmt }
+func (n *DropFunctionStmtNode) Kind() Kind { return KindDropFunctionStmt }
+
+func (n *DropFunctionStmtNode) String() string { return formatNode(n) }
 func (n *DropFunctionStmtNode) statementNode() {}
 
 func (n *DropFunctionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -8559,7 +8765,9 @@ func newDropIndexStmtNodeSlice(raws []*generated.ResolvedDropIndexStmtProto) []*
 	return nodes
 }
 
-func (n *DropIndexStmtNode) Kind() Kind     { return KindDropIndexStmt }
+func (n *DropIndexStmtNode) Kind() Kind { return KindDropIndexStmt }
+
+func (n *DropIndexStmtNode) String() string { return formatNode(n) }
 func (n *DropIndexStmtNode) statementNode() {}
 
 func (n *DropIndexStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -8627,7 +8835,9 @@ func newDropMaterializedViewStmtNodeSlice(raws []*generated.ResolvedDropMaterial
 	return nodes
 }
 
-func (n *DropMaterializedViewStmtNode) Kind() Kind     { return KindDropMaterializedViewStmt }
+func (n *DropMaterializedViewStmtNode) Kind() Kind { return KindDropMaterializedViewStmt }
+
+func (n *DropMaterializedViewStmtNode) String() string { return formatNode(n) }
 func (n *DropMaterializedViewStmtNode) statementNode() {}
 
 func (n *DropMaterializedViewStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -8678,8 +8888,10 @@ func newDropPrimaryKeyActionNodeSlice(raws []*generated.ResolvedDropPrimaryKeyAc
 	return nodes
 }
 
-func (n *DropPrimaryKeyActionNode) Kind() Kind    { return KindDropPrimaryKeyAction }
-func (n *DropPrimaryKeyActionNode) argumentNode() {}
+func (n *DropPrimaryKeyActionNode) Kind() Kind { return KindDropPrimaryKeyAction }
+
+func (n *DropPrimaryKeyActionNode) String() string { return formatNode(n) }
+func (n *DropPrimaryKeyActionNode) argumentNode()  {}
 
 func (n *DropPrimaryKeyActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -8721,7 +8933,9 @@ func newDropPrivilegeRestrictionStmtNodeSlice(raws []*generated.ResolvedDropPriv
 	return nodes
 }
 
-func (n *DropPrivilegeRestrictionStmtNode) Kind() Kind     { return KindDropPrivilegeRestrictionStmt }
+func (n *DropPrivilegeRestrictionStmtNode) Kind() Kind { return KindDropPrivilegeRestrictionStmt }
+
+func (n *DropPrivilegeRestrictionStmtNode) String() string { return formatNode(n) }
 func (n *DropPrivilegeRestrictionStmtNode) statementNode() {}
 
 func (n *DropPrivilegeRestrictionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -8797,7 +9011,9 @@ func newDropRowAccessPolicyStmtNodeSlice(raws []*generated.ResolvedDropRowAccess
 	return nodes
 }
 
-func (n *DropRowAccessPolicyStmtNode) Kind() Kind     { return KindDropRowAccessPolicyStmt }
+func (n *DropRowAccessPolicyStmtNode) Kind() Kind { return KindDropRowAccessPolicyStmt }
+
+func (n *DropRowAccessPolicyStmtNode) String() string { return formatNode(n) }
 func (n *DropRowAccessPolicyStmtNode) statementNode() {}
 
 func (n *DropRowAccessPolicyStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -8865,7 +9081,9 @@ func newDropSnapshotTableStmtNodeSlice(raws []*generated.ResolvedDropSnapshotTab
 	return nodes
 }
 
-func (n *DropSnapshotTableStmtNode) Kind() Kind     { return KindDropSnapshotTableStmt }
+func (n *DropSnapshotTableStmtNode) Kind() Kind { return KindDropSnapshotTableStmt }
+
+func (n *DropSnapshotTableStmtNode) String() string { return formatNode(n) }
 func (n *DropSnapshotTableStmtNode) statementNode() {}
 
 func (n *DropSnapshotTableStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -8916,7 +9134,9 @@ func newDropStmtNodeSlice(raws []*generated.ResolvedDropStmtProto) []*DropStmtNo
 	return nodes
 }
 
-func (n *DropStmtNode) Kind() Kind     { return KindDropStmt }
+func (n *DropStmtNode) Kind() Kind { return KindDropStmt }
+
+func (n *DropStmtNode) String() string { return formatNode(n) }
 func (n *DropStmtNode) statementNode() {}
 
 func (n *DropStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -8975,8 +9195,10 @@ func newDropSubEntityActionNodeSlice(raws []*generated.ResolvedDropSubEntityActi
 	return nodes
 }
 
-func (n *DropSubEntityActionNode) Kind() Kind    { return KindDropSubEntityAction }
-func (n *DropSubEntityActionNode) argumentNode() {}
+func (n *DropSubEntityActionNode) Kind() Kind { return KindDropSubEntityAction }
+
+func (n *DropSubEntityActionNode) String() string { return formatNode(n) }
+func (n *DropSubEntityActionNode) argumentNode()  {}
 
 func (n *DropSubEntityActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -9026,7 +9248,9 @@ func newDropTableFunctionStmtNodeSlice(raws []*generated.ResolvedDropTableFuncti
 	return nodes
 }
 
-func (n *DropTableFunctionStmtNode) Kind() Kind     { return KindDropTableFunctionStmt }
+func (n *DropTableFunctionStmtNode) Kind() Kind { return KindDropTableFunctionStmt }
+
+func (n *DropTableFunctionStmtNode) String() string { return formatNode(n) }
 func (n *DropTableFunctionStmtNode) statementNode() {}
 
 func (n *DropTableFunctionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -9087,7 +9311,9 @@ func newExecuteAsRoleScanNodeSlice(raws []*generated.ResolvedExecuteAsRoleScanPr
 }
 
 func (n *ExecuteAsRoleScanNode) Kind() Kind { return KindExecuteAsRoleScan }
-func (n *ExecuteAsRoleScanNode) scanNode()  {}
+
+func (n *ExecuteAsRoleScanNode) String() string { return formatNode(n) }
+func (n *ExecuteAsRoleScanNode) scanNode()      {}
 
 func (n *ExecuteAsRoleScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -9163,8 +9389,10 @@ func newExecuteImmediateArgumentNodeSlice(raws []*generated.ResolvedExecuteImmed
 	return nodes
 }
 
-func (n *ExecuteImmediateArgumentNode) Kind() Kind    { return KindExecuteImmediateArgument }
-func (n *ExecuteImmediateArgumentNode) argumentNode() {}
+func (n *ExecuteImmediateArgumentNode) Kind() Kind { return KindExecuteImmediateArgument }
+
+func (n *ExecuteImmediateArgumentNode) String() string { return formatNode(n) }
+func (n *ExecuteImmediateArgumentNode) argumentNode()  {}
 
 func (n *ExecuteImmediateArgumentNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -9220,7 +9448,9 @@ func newExecuteImmediateStmtNodeSlice(raws []*generated.ResolvedExecuteImmediate
 	return nodes
 }
 
-func (n *ExecuteImmediateStmtNode) Kind() Kind     { return KindExecuteImmediateStmt }
+func (n *ExecuteImmediateStmtNode) Kind() Kind { return KindExecuteImmediateStmt }
+
+func (n *ExecuteImmediateStmtNode) String() string { return formatNode(n) }
 func (n *ExecuteImmediateStmtNode) statementNode() {}
 
 func (n *ExecuteImmediateStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -9301,7 +9531,9 @@ func newExplainStmtNodeSlice(raws []*generated.ResolvedExplainStmtProto) []*Expl
 	return nodes
 }
 
-func (n *ExplainStmtNode) Kind() Kind     { return KindExplainStmt }
+func (n *ExplainStmtNode) Kind() Kind { return KindExplainStmt }
+
+func (n *ExplainStmtNode) String() string { return formatNode(n) }
 func (n *ExplainStmtNode) statementNode() {}
 
 func (n *ExplainStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -9358,7 +9590,9 @@ func newExportDataStmtNodeSlice(raws []*generated.ResolvedExportDataStmtProto) [
 	return nodes
 }
 
-func (n *ExportDataStmtNode) Kind() Kind     { return KindExportDataStmt }
+func (n *ExportDataStmtNode) Kind() Kind { return KindExportDataStmt }
+
+func (n *ExportDataStmtNode) String() string { return formatNode(n) }
 func (n *ExportDataStmtNode) statementNode() {}
 
 func (n *ExportDataStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -9448,7 +9682,9 @@ func newExportMetadataStmtNodeSlice(raws []*generated.ResolvedExportMetadataStmt
 	return nodes
 }
 
-func (n *ExportMetadataStmtNode) Kind() Kind     { return KindExportMetadataStmt }
+func (n *ExportMetadataStmtNode) Kind() Kind { return KindExportMetadataStmt }
+
+func (n *ExportMetadataStmtNode) String() string { return formatNode(n) }
 func (n *ExportMetadataStmtNode) statementNode() {}
 
 func (n *ExportMetadataStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -9517,7 +9753,9 @@ func newExportModelStmtNodeSlice(raws []*generated.ResolvedExportModelStmtProto)
 	return nodes
 }
 
-func (n *ExportModelStmtNode) Kind() Kind     { return KindExportModelStmt }
+func (n *ExportModelStmtNode) Kind() Kind { return KindExportModelStmt }
+
+func (n *ExportModelStmtNode) String() string { return formatNode(n) }
 func (n *ExportModelStmtNode) statementNode() {}
 
 func (n *ExportModelStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -9583,7 +9821,9 @@ func newExpressionColumnNodeSlice(raws []*generated.ResolvedExpressionColumnProt
 }
 
 func (n *ExpressionColumnNode) Kind() Kind { return KindExpressionColumn }
-func (n *ExpressionColumnNode) exprNode()  {}
+
+func (n *ExpressionColumnNode) String() string { return formatNode(n) }
+func (n *ExpressionColumnNode) exprNode()      {}
 
 func (n *ExpressionColumnNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -9633,8 +9873,10 @@ func newExtendedCastElementNodeSlice(raws []*generated.ResolvedExtendedCastEleme
 	return nodes
 }
 
-func (n *ExtendedCastElementNode) Kind() Kind    { return KindExtendedCastElement }
-func (n *ExtendedCastElementNode) argumentNode() {}
+func (n *ExtendedCastElementNode) Kind() Kind { return KindExtendedCastElement }
+
+func (n *ExtendedCastElementNode) String() string { return formatNode(n) }
+func (n *ExtendedCastElementNode) argumentNode()  {}
 
 func (n *ExtendedCastElementNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -9684,8 +9926,10 @@ func newExtendedCastNodeSlice(raws []*generated.ResolvedExtendedCastProto) []*Ex
 	return nodes
 }
 
-func (n *ExtendedCastNode) Kind() Kind    { return KindExtendedCast }
-func (n *ExtendedCastNode) argumentNode() {}
+func (n *ExtendedCastNode) Kind() Kind { return KindExtendedCast }
+
+func (n *ExtendedCastNode) String() string { return formatNode(n) }
+func (n *ExtendedCastNode) argumentNode()  {}
 
 func (n *ExtendedCastNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -9736,8 +9980,10 @@ func newFilterFieldArgNodeSlice(raws []*generated.ResolvedFilterFieldArgProto) [
 	return nodes
 }
 
-func (n *FilterFieldArgNode) Kind() Kind    { return KindFilterFieldArg }
-func (n *FilterFieldArgNode) argumentNode() {}
+func (n *FilterFieldArgNode) Kind() Kind { return KindFilterFieldArg }
+
+func (n *FilterFieldArgNode) String() string { return formatNode(n) }
+func (n *FilterFieldArgNode) argumentNode()  {}
 
 func (n *FilterFieldArgNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -9784,7 +10030,9 @@ func newFilterFieldNodeSlice(raws []*generated.ResolvedFilterFieldProto) []*Filt
 }
 
 func (n *FilterFieldNode) Kind() Kind { return KindFilterField }
-func (n *FilterFieldNode) exprNode()  {}
+
+func (n *FilterFieldNode) String() string { return formatNode(n) }
+func (n *FilterFieldNode) exprNode()      {}
 
 func (n *FilterFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -9861,7 +10109,9 @@ func newFilterScanNodeSlice(raws []*generated.ResolvedFilterScanProto) []*Filter
 }
 
 func (n *FilterScanNode) Kind() Kind { return KindFilterScan }
-func (n *FilterScanNode) scanNode()  {}
+
+func (n *FilterScanNode) String() string { return formatNode(n) }
+func (n *FilterScanNode) scanNode()      {}
 
 func (n *FilterScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -9942,8 +10192,10 @@ func newFilterUsingActionNodeSlice(raws []*generated.ResolvedFilterUsingActionPr
 	return nodes
 }
 
-func (n *FilterUsingActionNode) Kind() Kind    { return KindFilterUsingAction }
-func (n *FilterUsingActionNode) argumentNode() {}
+func (n *FilterUsingActionNode) Kind() Kind { return KindFilterUsingAction }
+
+func (n *FilterUsingActionNode) String() string { return formatNode(n) }
+func (n *FilterUsingActionNode) argumentNode()  {}
 
 func (n *FilterUsingActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -10000,7 +10252,9 @@ func newFlattenNodeSlice(raws []*generated.ResolvedFlattenProto) []*FlattenNode 
 }
 
 func (n *FlattenNode) Kind() Kind { return KindFlatten }
-func (n *FlattenNode) exprNode()  {}
+
+func (n *FlattenNode) String() string { return formatNode(n) }
+func (n *FlattenNode) exprNode()      {}
 
 func (n *FlattenNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -10073,7 +10327,9 @@ func newFlattenedArgNodeSlice(raws []*generated.ResolvedFlattenedArgProto) []*Fl
 }
 
 func (n *FlattenedArgNode) Kind() Kind { return KindFlattenedArg }
-func (n *FlattenedArgNode) exprNode()  {}
+
+func (n *FlattenedArgNode) String() string { return formatNode(n) }
+func (n *FlattenedArgNode) exprNode()      {}
 
 func (n *FlattenedArgNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -10119,8 +10375,10 @@ func newForeignKeyNodeSlice(raws []*generated.ResolvedForeignKeyProto) []*Foreig
 	return nodes
 }
 
-func (n *ForeignKeyNode) Kind() Kind    { return KindForeignKey }
-func (n *ForeignKeyNode) argumentNode() {}
+func (n *ForeignKeyNode) Kind() Kind { return KindForeignKey }
+
+func (n *ForeignKeyNode) String() string { return formatNode(n) }
+func (n *ForeignKeyNode) argumentNode()  {}
 
 func (n *ForeignKeyNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -10198,8 +10456,10 @@ func newFunctionArgumentNodeSlice(raws []*generated.ResolvedFunctionArgumentProt
 	return nodes
 }
 
-func (n *FunctionArgumentNode) Kind() Kind    { return KindFunctionArgument }
-func (n *FunctionArgumentNode) argumentNode() {}
+func (n *FunctionArgumentNode) Kind() Kind { return KindFunctionArgument }
+
+func (n *FunctionArgumentNode) String() string { return formatNode(n) }
+func (n *FunctionArgumentNode) argumentNode()  {}
 
 func (n *FunctionArgumentNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -10342,7 +10602,9 @@ func newFunctionCallNodeSlice(raws []*generated.ResolvedFunctionCallProto) []*Fu
 }
 
 func (n *FunctionCallNode) Kind() Kind { return KindFunctionCall }
-func (n *FunctionCallNode) exprNode()  {}
+
+func (n *FunctionCallNode) String() string { return formatNode(n) }
+func (n *FunctionCallNode) exprNode()      {}
 
 func (n *FunctionCallNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -10429,8 +10691,10 @@ func newFunctionSignatureHolderNodeSlice(raws []*generated.ResolvedFunctionSigna
 	return nodes
 }
 
-func (n *FunctionSignatureHolderNode) Kind() Kind    { return KindFunctionSignatureHolder }
-func (n *FunctionSignatureHolderNode) argumentNode() {}
+func (n *FunctionSignatureHolderNode) Kind() Kind { return KindFunctionSignatureHolder }
+
+func (n *FunctionSignatureHolderNode) String() string { return formatNode(n) }
+func (n *FunctionSignatureHolderNode) argumentNode()  {}
 
 func (n *FunctionSignatureHolderNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -10472,7 +10736,9 @@ func newGeneralizedQueryStmtNodeSlice(raws []*generated.ResolvedGeneralizedQuery
 	return nodes
 }
 
-func (n *GeneralizedQueryStmtNode) Kind() Kind     { return KindGeneralizedQueryStmt }
+func (n *GeneralizedQueryStmtNode) Kind() Kind { return KindGeneralizedQueryStmt }
+
+func (n *GeneralizedQueryStmtNode) String() string { return formatNode(n) }
 func (n *GeneralizedQueryStmtNode) statementNode() {}
 
 func (n *GeneralizedQueryStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -10542,8 +10808,10 @@ func newGeneralizedQuerySubpipelineNodeSlice(raws []*generated.ResolvedGeneraliz
 	return nodes
 }
 
-func (n *GeneralizedQuerySubpipelineNode) Kind() Kind    { return KindGeneralizedQuerySubpipeline }
-func (n *GeneralizedQuerySubpipelineNode) argumentNode() {}
+func (n *GeneralizedQuerySubpipelineNode) Kind() Kind { return KindGeneralizedQuerySubpipeline }
+
+func (n *GeneralizedQuerySubpipelineNode) String() string { return formatNode(n) }
+func (n *GeneralizedQuerySubpipelineNode) argumentNode()  {}
 
 func (n *GeneralizedQuerySubpipelineNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -10608,8 +10876,10 @@ func newGeneratedColumnInfoNodeSlice(raws []*generated.ResolvedGeneratedColumnIn
 	return nodes
 }
 
-func (n *GeneratedColumnInfoNode) Kind() Kind    { return KindGeneratedColumnInfo }
-func (n *GeneratedColumnInfoNode) argumentNode() {}
+func (n *GeneratedColumnInfoNode) Kind() Kind { return KindGeneratedColumnInfo }
+
+func (n *GeneratedColumnInfoNode) String() string { return formatNode(n) }
+func (n *GeneratedColumnInfoNode) argumentNode()  {}
 
 func (n *GeneratedColumnInfoNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -10674,7 +10944,9 @@ func newGetJsonFieldNodeSlice(raws []*generated.ResolvedGetJsonFieldProto) []*Ge
 }
 
 func (n *GetJsonFieldNode) Kind() Kind { return KindGetJsonField }
-func (n *GetJsonFieldNode) exprNode()  {}
+
+func (n *GetJsonFieldNode) String() string { return formatNode(n) }
+func (n *GetJsonFieldNode) exprNode()      {}
 
 func (n *GetJsonFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -10739,7 +11011,9 @@ func newGetProtoFieldNodeSlice(raws []*generated.ResolvedGetProtoFieldProto) []*
 }
 
 func (n *GetProtoFieldNode) Kind() Kind { return KindGetProtoField }
-func (n *GetProtoFieldNode) exprNode()  {}
+
+func (n *GetProtoFieldNode) String() string { return formatNode(n) }
+func (n *GetProtoFieldNode) exprNode()      {}
 
 func (n *GetProtoFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -10820,7 +11094,9 @@ func newGetProtoOneofNodeSlice(raws []*generated.ResolvedGetProtoOneofProto) []*
 }
 
 func (n *GetProtoOneofNode) Kind() Kind { return KindGetProtoOneof }
-func (n *GetProtoOneofNode) exprNode()  {}
+
+func (n *GetProtoOneofNode) String() string { return formatNode(n) }
+func (n *GetProtoOneofNode) exprNode()      {}
 
 func (n *GetProtoOneofNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -10885,7 +11161,9 @@ func newGetRowFieldNodeSlice(raws []*generated.ResolvedGetRowFieldProto) []*GetR
 }
 
 func (n *GetRowFieldNode) Kind() Kind { return KindGetRowField }
-func (n *GetRowFieldNode) exprNode()  {}
+
+func (n *GetRowFieldNode) String() string { return formatNode(n) }
+func (n *GetRowFieldNode) exprNode()      {}
 
 func (n *GetRowFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -10950,7 +11228,9 @@ func newGetStructFieldNodeSlice(raws []*generated.ResolvedGetStructFieldProto) [
 }
 
 func (n *GetStructFieldNode) Kind() Kind { return KindGetStructField }
-func (n *GetStructFieldNode) exprNode()  {}
+
+func (n *GetStructFieldNode) String() string { return formatNode(n) }
+func (n *GetStructFieldNode) exprNode()      {}
 
 func (n *GetStructFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -11018,7 +11298,9 @@ func newGrantStmtNodeSlice(raws []*generated.ResolvedGrantStmtProto) []*GrantStm
 	return nodes
 }
 
-func (n *GrantStmtNode) Kind() Kind     { return KindGrantStmt }
+func (n *GrantStmtNode) Kind() Kind { return KindGrantStmt }
+
+func (n *GrantStmtNode) String() string { return formatNode(n) }
 func (n *GrantStmtNode) statementNode() {}
 
 func (n *GrantStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -11106,8 +11388,10 @@ func newGrantToActionNodeSlice(raws []*generated.ResolvedGrantToActionProto) []*
 	return nodes
 }
 
-func (n *GrantToActionNode) Kind() Kind    { return KindGrantToAction }
-func (n *GrantToActionNode) argumentNode() {}
+func (n *GrantToActionNode) Kind() Kind { return KindGrantToAction }
+
+func (n *GrantToActionNode) String() string { return formatNode(n) }
+func (n *GrantToActionNode) argumentNode()  {}
 
 func (n *GrantToActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -11159,7 +11443,9 @@ func newGraphCallScanNodeSlice(raws []*generated.ResolvedGraphCallScanProto) []*
 }
 
 func (n *GraphCallScanNode) Kind() Kind { return KindGraphCallScan }
-func (n *GraphCallScanNode) scanNode()  {}
+
+func (n *GraphCallScanNode) String() string { return formatNode(n) }
+func (n *GraphCallScanNode) scanNode()      {}
 
 func (n *GraphCallScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -11264,8 +11550,10 @@ func newGraphDynamicLabelSpecificationNodeSlice(raws []*generated.ResolvedGraphD
 	return nodes
 }
 
-func (n *GraphDynamicLabelSpecificationNode) Kind() Kind    { return KindGraphDynamicLabelSpecification }
-func (n *GraphDynamicLabelSpecificationNode) argumentNode() {}
+func (n *GraphDynamicLabelSpecificationNode) Kind() Kind { return KindGraphDynamicLabelSpecification }
+
+func (n *GraphDynamicLabelSpecificationNode) String() string { return formatNode(n) }
+func (n *GraphDynamicLabelSpecificationNode) argumentNode()  {}
 
 func (n *GraphDynamicLabelSpecificationNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -11320,7 +11608,9 @@ func newGraphDynamicPropertiesSpecificationNodeSlice(raws []*generated.ResolvedG
 func (n *GraphDynamicPropertiesSpecificationNode) Kind() Kind {
 	return KindGraphDynamicPropertiesSpecification
 }
-func (n *GraphDynamicPropertiesSpecificationNode) argumentNode() {}
+
+func (n *GraphDynamicPropertiesSpecificationNode) String() string { return formatNode(n) }
+func (n *GraphDynamicPropertiesSpecificationNode) argumentNode()  {}
 
 func (n *GraphDynamicPropertiesSpecificationNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -11373,7 +11663,9 @@ func newGraphEdgeScanNodeSlice(raws []*generated.ResolvedGraphEdgeScanProto) []*
 }
 
 func (n *GraphEdgeScanNode) Kind() Kind { return KindGraphEdgeScan }
-func (n *GraphEdgeScanNode) scanNode()  {}
+
+func (n *GraphEdgeScanNode) String() string { return formatNode(n) }
+func (n *GraphEdgeScanNode) scanNode()      {}
 
 func (n *GraphEdgeScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -11507,8 +11799,10 @@ func newGraphElementIdentifierNodeSlice(raws []*generated.ResolvedGraphElementId
 	return nodes
 }
 
-func (n *GraphElementIdentifierNode) Kind() Kind    { return KindGraphElementIdentifier }
-func (n *GraphElementIdentifierNode) argumentNode() {}
+func (n *GraphElementIdentifierNode) Kind() Kind { return KindGraphElementIdentifier }
+
+func (n *GraphElementIdentifierNode) String() string { return formatNode(n) }
+func (n *GraphElementIdentifierNode) argumentNode()  {}
 
 func (n *GraphElementIdentifierNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -11589,8 +11883,10 @@ func newGraphElementLabelNodeSlice(raws []*generated.ResolvedGraphElementLabelPr
 	return nodes
 }
 
-func (n *GraphElementLabelNode) Kind() Kind    { return KindGraphElementLabel }
-func (n *GraphElementLabelNode) argumentNode() {}
+func (n *GraphElementLabelNode) Kind() Kind { return KindGraphElementLabel }
+
+func (n *GraphElementLabelNode) String() string { return formatNode(n) }
+func (n *GraphElementLabelNode) argumentNode()  {}
 
 func (n *GraphElementLabelNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -11649,8 +11945,10 @@ func newGraphElementPropertyNodeSlice(raws []*generated.ResolvedGraphElementProp
 	return nodes
 }
 
-func (n *GraphElementPropertyNode) Kind() Kind    { return KindGraphElementProperty }
-func (n *GraphElementPropertyNode) argumentNode() {}
+func (n *GraphElementPropertyNode) Kind() Kind { return KindGraphElementProperty }
+
+func (n *GraphElementPropertyNode) String() string { return formatNode(n) }
+func (n *GraphElementPropertyNode) argumentNode()  {}
 
 func (n *GraphElementPropertyNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -11706,8 +12004,10 @@ func newGraphElementTableNodeSlice(raws []*generated.ResolvedGraphElementTablePr
 	return nodes
 }
 
-func (n *GraphElementTableNode) Kind() Kind    { return KindGraphElementTable }
-func (n *GraphElementTableNode) argumentNode() {}
+func (n *GraphElementTableNode) Kind() Kind { return KindGraphElementTable }
+
+func (n *GraphElementTableNode) String() string { return formatNode(n) }
+func (n *GraphElementTableNode) argumentNode()  {}
 
 func (n *GraphElementTableNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -11800,7 +12100,9 @@ func newGraphGetElementPropertyNodeSlice(raws []*generated.ResolvedGraphGetEleme
 }
 
 func (n *GraphGetElementPropertyNode) Kind() Kind { return KindGraphGetElementProperty }
-func (n *GraphGetElementPropertyNode) exprNode()  {}
+
+func (n *GraphGetElementPropertyNode) String() string { return formatNode(n) }
+func (n *GraphGetElementPropertyNode) exprNode()      {}
 
 func (n *GraphGetElementPropertyNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -11878,7 +12180,9 @@ func newGraphIsLabeledPredicateNodeSlice(raws []*generated.ResolvedGraphIsLabele
 }
 
 func (n *GraphIsLabeledPredicateNode) Kind() Kind { return KindGraphIsLabeledPredicate }
-func (n *GraphIsLabeledPredicateNode) exprNode()  {}
+
+func (n *GraphIsLabeledPredicateNode) String() string { return formatNode(n) }
+func (n *GraphIsLabeledPredicateNode) exprNode()      {}
 
 func (n *GraphIsLabeledPredicateNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -11955,8 +12259,10 @@ func newGraphLabelNaryExprNodeSlice(raws []*generated.ResolvedGraphLabelNaryExpr
 	return nodes
 }
 
-func (n *GraphLabelNaryExprNode) Kind() Kind    { return KindGraphLabelNaryExpr }
-func (n *GraphLabelNaryExprNode) argumentNode() {}
+func (n *GraphLabelNaryExprNode) Kind() Kind { return KindGraphLabelNaryExpr }
+
+func (n *GraphLabelNaryExprNode) String() string { return formatNode(n) }
+func (n *GraphLabelNaryExprNode) argumentNode()  {}
 
 func (n *GraphLabelNaryExprNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -12011,8 +12317,10 @@ func newGraphLabelNodeSlice(raws []*generated.ResolvedGraphLabelProto) []*GraphL
 	return nodes
 }
 
-func (n *GraphLabelNode) Kind() Kind    { return KindGraphLabel }
-func (n *GraphLabelNode) argumentNode() {}
+func (n *GraphLabelNode) Kind() Kind { return KindGraphLabel }
+
+func (n *GraphLabelNode) String() string { return formatNode(n) }
+func (n *GraphLabelNode) argumentNode()  {}
 
 func (n *GraphLabelNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -12069,7 +12377,9 @@ func newGraphLinearScanNodeSlice(raws []*generated.ResolvedGraphLinearScanProto)
 }
 
 func (n *GraphLinearScanNode) Kind() Kind { return KindGraphLinearScan }
-func (n *GraphLinearScanNode) scanNode()  {}
+
+func (n *GraphLinearScanNode) String() string { return formatNode(n) }
+func (n *GraphLinearScanNode) scanNode()      {}
 
 func (n *GraphLinearScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -12144,8 +12454,10 @@ func newGraphMakeArrayVariableNodeSlice(raws []*generated.ResolvedGraphMakeArray
 	return nodes
 }
 
-func (n *GraphMakeArrayVariableNode) Kind() Kind    { return KindGraphMakeArrayVariable }
-func (n *GraphMakeArrayVariableNode) argumentNode() {}
+func (n *GraphMakeArrayVariableNode) Kind() Kind { return KindGraphMakeArrayVariable }
+
+func (n *GraphMakeArrayVariableNode) String() string { return formatNode(n) }
+func (n *GraphMakeArrayVariableNode) argumentNode()  {}
 
 func (n *GraphMakeArrayVariableNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -12192,7 +12504,9 @@ func newGraphMakeElementNodeSlice(raws []*generated.ResolvedGraphMakeElementProt
 }
 
 func (n *GraphMakeElementNode) Kind() Kind { return KindGraphMakeElement }
-func (n *GraphMakeElementNode) exprNode()  {}
+
+func (n *GraphMakeElementNode) String() string { return formatNode(n) }
+func (n *GraphMakeElementNode) exprNode()      {}
 
 func (n *GraphMakeElementNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -12295,7 +12609,9 @@ func newGraphNodeScanNodeSlice(raws []*generated.ResolvedGraphNodeScanProto) []*
 }
 
 func (n *GraphNodeScanNode) Kind() Kind { return KindGraphNodeScan }
-func (n *GraphNodeScanNode) scanNode()  {}
+
+func (n *GraphNodeScanNode) String() string { return formatNode(n) }
+func (n *GraphNodeScanNode) scanNode()      {}
 
 func (n *GraphNodeScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -12388,8 +12704,10 @@ func newGraphNodeTableReferenceNodeSlice(raws []*generated.ResolvedGraphNodeTabl
 	return nodes
 }
 
-func (n *GraphNodeTableReferenceNode) Kind() Kind    { return KindGraphNodeTableReference }
-func (n *GraphNodeTableReferenceNode) argumentNode() {}
+func (n *GraphNodeTableReferenceNode) Kind() Kind { return KindGraphNodeTableReference }
+
+func (n *GraphNodeTableReferenceNode) String() string { return formatNode(n) }
+func (n *GraphNodeTableReferenceNode) argumentNode()  {}
 
 func (n *GraphNodeTableReferenceNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -12456,8 +12774,10 @@ func newGraphPathCostNodeSlice(raws []*generated.ResolvedGraphPathCostProto) []*
 	return nodes
 }
 
-func (n *GraphPathCostNode) Kind() Kind    { return KindGraphPathCost }
-func (n *GraphPathCostNode) argumentNode() {}
+func (n *GraphPathCostNode) Kind() Kind { return KindGraphPathCost }
+
+func (n *GraphPathCostNode) String() string { return formatNode(n) }
+func (n *GraphPathCostNode) argumentNode()  {}
 
 func (n *GraphPathCostNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -12499,8 +12819,10 @@ func newGraphPathModeNodeSlice(raws []*generated.ResolvedGraphPathModeProto) []*
 	return nodes
 }
 
-func (n *GraphPathModeNode) Kind() Kind    { return KindGraphPathMode }
-func (n *GraphPathModeNode) argumentNode() {}
+func (n *GraphPathModeNode) Kind() Kind { return KindGraphPathMode }
+
+func (n *GraphPathModeNode) String() string { return formatNode(n) }
+func (n *GraphPathModeNode) argumentNode()  {}
 
 func (n *GraphPathModeNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -12542,8 +12864,10 @@ func newGraphPathPatternQuantifierNodeSlice(raws []*generated.ResolvedGraphPathP
 	return nodes
 }
 
-func (n *GraphPathPatternQuantifierNode) Kind() Kind    { return KindGraphPathPatternQuantifier }
-func (n *GraphPathPatternQuantifierNode) argumentNode() {}
+func (n *GraphPathPatternQuantifierNode) Kind() Kind { return KindGraphPathPatternQuantifier }
+
+func (n *GraphPathPatternQuantifierNode) String() string { return formatNode(n) }
+func (n *GraphPathPatternQuantifierNode) argumentNode()  {}
 
 func (n *GraphPathPatternQuantifierNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -12609,7 +12933,9 @@ func newGraphPathScanNodeSlice(raws []*generated.ResolvedGraphPathScanProto) []*
 }
 
 func (n *GraphPathScanNode) Kind() Kind { return KindGraphPathScan }
-func (n *GraphPathScanNode) scanNode()  {}
+
+func (n *GraphPathScanNode) String() string { return formatNode(n) }
+func (n *GraphPathScanNode) scanNode()      {}
 
 func (n *GraphPathScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -12794,8 +13120,10 @@ func newGraphPathSearchPrefixNodeSlice(raws []*generated.ResolvedGraphPathSearch
 	return nodes
 }
 
-func (n *GraphPathSearchPrefixNode) Kind() Kind    { return KindGraphPathSearchPrefix }
-func (n *GraphPathSearchPrefixNode) argumentNode() {}
+func (n *GraphPathSearchPrefixNode) Kind() Kind { return KindGraphPathSearchPrefix }
+
+func (n *GraphPathSearchPrefixNode) String() string { return formatNode(n) }
+func (n *GraphPathSearchPrefixNode) argumentNode()  {}
 
 func (n *GraphPathSearchPrefixNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -12851,8 +13179,10 @@ func newGraphPropertyDeclarationNodeSlice(raws []*generated.ResolvedGraphPropert
 	return nodes
 }
 
-func (n *GraphPropertyDeclarationNode) Kind() Kind    { return KindGraphPropertyDeclaration }
-func (n *GraphPropertyDeclarationNode) argumentNode() {}
+func (n *GraphPropertyDeclarationNode) Kind() Kind { return KindGraphPropertyDeclaration }
+
+func (n *GraphPropertyDeclarationNode) String() string { return formatNode(n) }
+func (n *GraphPropertyDeclarationNode) argumentNode()  {}
 
 func (n *GraphPropertyDeclarationNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -12898,8 +13228,10 @@ func newGraphPropertyDefinitionNodeSlice(raws []*generated.ResolvedGraphProperty
 	return nodes
 }
 
-func (n *GraphPropertyDefinitionNode) Kind() Kind    { return KindGraphPropertyDefinition }
-func (n *GraphPropertyDefinitionNode) argumentNode() {}
+func (n *GraphPropertyDefinitionNode) Kind() Kind { return KindGraphPropertyDefinition }
+
+func (n *GraphPropertyDefinitionNode) String() string { return formatNode(n) }
+func (n *GraphPropertyDefinitionNode) argumentNode()  {}
 
 func (n *GraphPropertyDefinitionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -12972,7 +13304,9 @@ func newGraphRefScanNodeSlice(raws []*generated.ResolvedGraphRefScanProto) []*Gr
 }
 
 func (n *GraphRefScanNode) Kind() Kind { return KindGraphRefScan }
-func (n *GraphRefScanNode) scanNode()  {}
+
+func (n *GraphRefScanNode) String() string { return formatNode(n) }
+func (n *GraphRefScanNode) scanNode()      {}
 
 func (n *GraphRefScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -13036,7 +13370,9 @@ func newGraphScanNodeSlice(raws []*generated.ResolvedGraphScanProto) []*GraphSca
 }
 
 func (n *GraphScanNode) Kind() Kind { return KindGraphScan }
-func (n *GraphScanNode) scanNode()  {}
+
+func (n *GraphScanNode) String() string { return formatNode(n) }
+func (n *GraphScanNode) scanNode()      {}
 
 func (n *GraphScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -13134,7 +13470,9 @@ func newGraphTableScanNodeSlice(raws []*generated.ResolvedGraphTableScanProto) [
 }
 
 func (n *GraphTableScanNode) Kind() Kind { return KindGraphTableScan }
-func (n *GraphTableScanNode) scanNode()  {}
+
+func (n *GraphTableScanNode) String() string { return formatNode(n) }
+func (n *GraphTableScanNode) scanNode()      {}
 
 func (n *GraphTableScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -13226,8 +13564,10 @@ func newGraphWildCardLabelNodeSlice(raws []*generated.ResolvedGraphWildCardLabel
 	return nodes
 }
 
-func (n *GraphWildCardLabelNode) Kind() Kind    { return KindGraphWildCardLabel }
-func (n *GraphWildCardLabelNode) argumentNode() {}
+func (n *GraphWildCardLabelNode) Kind() Kind { return KindGraphWildCardLabel }
+
+func (n *GraphWildCardLabelNode) String() string { return formatNode(n) }
+func (n *GraphWildCardLabelNode) argumentNode()  {}
 
 func (n *GraphWildCardLabelNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -13266,7 +13606,9 @@ func newGroupRowsScanNodeSlice(raws []*generated.ResolvedGroupRowsScanProto) []*
 }
 
 func (n *GroupRowsScanNode) Kind() Kind { return KindGroupRowsScan }
-func (n *GroupRowsScanNode) scanNode()  {}
+
+func (n *GroupRowsScanNode) String() string { return formatNode(n) }
+func (n *GroupRowsScanNode) scanNode()      {}
 
 func (n *GroupRowsScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -13337,8 +13679,10 @@ func newGroupingCallNodeSlice(raws []*generated.ResolvedGroupingCallProto) []*Gr
 	return nodes
 }
 
-func (n *GroupingCallNode) Kind() Kind    { return KindGroupingCall }
-func (n *GroupingCallNode) argumentNode() {}
+func (n *GroupingCallNode) Kind() Kind { return KindGroupingCall }
+
+func (n *GroupingCallNode) String() string { return formatNode(n) }
+func (n *GroupingCallNode) argumentNode()  {}
 
 func (n *GroupingCallNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -13394,8 +13738,10 @@ func newGroupingSetListNodeSlice(raws []*generated.ResolvedGroupingSetListProto)
 	return nodes
 }
 
-func (n *GroupingSetListNode) Kind() Kind    { return KindGroupingSetList }
-func (n *GroupingSetListNode) argumentNode() {}
+func (n *GroupingSetListNode) Kind() Kind { return KindGroupingSetList }
+
+func (n *GroupingSetListNode) String() string { return formatNode(n) }
+func (n *GroupingSetListNode) argumentNode()  {}
 
 func (n *GroupingSetListNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -13446,8 +13792,10 @@ func newGroupingSetMultiColumnNodeSlice(raws []*generated.ResolvedGroupingSetMul
 	return nodes
 }
 
-func (n *GroupingSetMultiColumnNode) Kind() Kind    { return KindGroupingSetMultiColumn }
-func (n *GroupingSetMultiColumnNode) argumentNode() {}
+func (n *GroupingSetMultiColumnNode) Kind() Kind { return KindGroupingSetMultiColumn }
+
+func (n *GroupingSetMultiColumnNode) String() string { return formatNode(n) }
+func (n *GroupingSetMultiColumnNode) argumentNode()  {}
 
 func (n *GroupingSetMultiColumnNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -13498,8 +13846,10 @@ func newGroupingSetNodeSlice(raws []*generated.ResolvedGroupingSetProto) []*Grou
 	return nodes
 }
 
-func (n *GroupingSetNode) Kind() Kind    { return KindGroupingSet }
-func (n *GroupingSetNode) argumentNode() {}
+func (n *GroupingSetNode) Kind() Kind { return KindGroupingSet }
+
+func (n *GroupingSetNode) String() string { return formatNode(n) }
+func (n *GroupingSetNode) argumentNode()  {}
 
 func (n *GroupingSetNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -13550,8 +13900,10 @@ func newGroupingSetProductNodeSlice(raws []*generated.ResolvedGroupingSetProduct
 	return nodes
 }
 
-func (n *GroupingSetProductNode) Kind() Kind    { return KindGroupingSetProduct }
-func (n *GroupingSetProductNode) argumentNode() {}
+func (n *GroupingSetProductNode) Kind() Kind { return KindGroupingSetProduct }
+
+func (n *GroupingSetProductNode) String() string { return formatNode(n) }
+func (n *GroupingSetProductNode) argumentNode()  {}
 
 func (n *GroupingSetProductNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -13602,8 +13954,10 @@ func newIdentityColumnInfoNodeSlice(raws []*generated.ResolvedIdentityColumnInfo
 	return nodes
 }
 
-func (n *IdentityColumnInfoNode) Kind() Kind    { return KindIdentityColumnInfo }
-func (n *IdentityColumnInfoNode) argumentNode() {}
+func (n *IdentityColumnInfoNode) Kind() Kind { return KindIdentityColumnInfo }
+
+func (n *IdentityColumnInfoNode) String() string { return formatNode(n) }
+func (n *IdentityColumnInfoNode) argumentNode()  {}
 
 func (n *IdentityColumnInfoNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -13661,7 +14015,9 @@ func newImportStmtNodeSlice(raws []*generated.ResolvedImportStmtProto) []*Import
 	return nodes
 }
 
-func (n *ImportStmtNode) Kind() Kind     { return KindImportStmt }
+func (n *ImportStmtNode) Kind() Kind { return KindImportStmt }
+
+func (n *ImportStmtNode) String() string { return formatNode(n) }
 func (n *ImportStmtNode) statementNode() {}
 
 func (n *ImportStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -13745,8 +14101,10 @@ func newIndexItemNodeSlice(raws []*generated.ResolvedIndexItemProto) []*IndexIte
 	return nodes
 }
 
-func (n *IndexItemNode) Kind() Kind    { return KindIndexItem }
-func (n *IndexItemNode) argumentNode() {}
+func (n *IndexItemNode) Kind() Kind { return KindIndexItem }
+
+func (n *IndexItemNode) String() string { return formatNode(n) }
+func (n *IndexItemNode) argumentNode()  {}
 
 func (n *IndexItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -13806,8 +14164,10 @@ func newInlineLambdaNodeSlice(raws []*generated.ResolvedInlineLambdaProto) []*In
 	return nodes
 }
 
-func (n *InlineLambdaNode) Kind() Kind    { return KindInlineLambda }
-func (n *InlineLambdaNode) argumentNode() {}
+func (n *InlineLambdaNode) Kind() Kind { return KindInlineLambda }
+
+func (n *InlineLambdaNode) String() string { return formatNode(n) }
+func (n *InlineLambdaNode) argumentNode()  {}
 
 func (n *InlineLambdaNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -13875,8 +14235,10 @@ func newInsertRowNodeSlice(raws []*generated.ResolvedInsertRowProto) []*InsertRo
 	return nodes
 }
 
-func (n *InsertRowNode) Kind() Kind    { return KindInsertRow }
-func (n *InsertRowNode) argumentNode() {}
+func (n *InsertRowNode) Kind() Kind { return KindInsertRow }
+
+func (n *InsertRowNode) String() string { return formatNode(n) }
+func (n *InsertRowNode) argumentNode()  {}
 
 func (n *InsertRowNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -13927,7 +14289,9 @@ func newInsertStmtNodeSlice(raws []*generated.ResolvedInsertStmtProto) []*Insert
 	return nodes
 }
 
-func (n *InsertStmtNode) Kind() Kind     { return KindInsertStmt }
+func (n *InsertStmtNode) Kind() Kind { return KindInsertStmt }
+
+func (n *InsertStmtNode) String() string { return formatNode(n) }
 func (n *InsertStmtNode) statementNode() {}
 
 func (n *InsertStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -14092,7 +14456,9 @@ func newJoinScanNodeSlice(raws []*generated.ResolvedJoinScanProto) []*JoinScanNo
 }
 
 func (n *JoinScanNode) Kind() Kind { return KindJoinScan }
-func (n *JoinScanNode) scanNode()  {}
+
+func (n *JoinScanNode) String() string { return formatNode(n) }
+func (n *JoinScanNode) scanNode()      {}
 
 func (n *JoinScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -14211,7 +14577,9 @@ func newLimitOffsetScanNodeSlice(raws []*generated.ResolvedLimitOffsetScanProto)
 }
 
 func (n *LimitOffsetScanNode) Kind() Kind { return KindLimitOffsetScan }
-func (n *LimitOffsetScanNode) scanNode()  {}
+
+func (n *LimitOffsetScanNode) String() string { return formatNode(n) }
+func (n *LimitOffsetScanNode) scanNode()      {}
 
 func (n *LimitOffsetScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -14306,7 +14674,9 @@ func newLiteralNodeSlice(raws []*generated.ResolvedLiteralProto) []*LiteralNode 
 }
 
 func (n *LiteralNode) Kind() Kind { return KindLiteral }
-func (n *LiteralNode) exprNode()  {}
+
+func (n *LiteralNode) String() string { return formatNode(n) }
+func (n *LiteralNode) exprNode()      {}
 
 func (n *LiteralNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -14368,8 +14738,10 @@ func newLockModeNodeSlice(raws []*generated.ResolvedLockModeProto) []*LockModeNo
 	return nodes
 }
 
-func (n *LockModeNode) Kind() Kind    { return KindLockMode }
-func (n *LockModeNode) argumentNode() {}
+func (n *LockModeNode) Kind() Kind { return KindLockMode }
+
+func (n *LockModeNode) String() string { return formatNode(n) }
+func (n *LockModeNode) argumentNode()  {}
 
 func (n *LockModeNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -14412,7 +14784,9 @@ func newLogScanNodeSlice(raws []*generated.ResolvedLogScanProto) []*LogScanNode 
 }
 
 func (n *LogScanNode) Kind() Kind { return KindLogScan }
-func (n *LogScanNode) scanNode()  {}
+
+func (n *LogScanNode) String() string { return formatNode(n) }
+func (n *LogScanNode) scanNode()      {}
 
 func (n *LogScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -14505,8 +14879,10 @@ func newMakeProtoFieldNodeSlice(raws []*generated.ResolvedMakeProtoFieldProto) [
 	return nodes
 }
 
-func (n *MakeProtoFieldNode) Kind() Kind    { return KindMakeProtoField }
-func (n *MakeProtoFieldNode) argumentNode() {}
+func (n *MakeProtoFieldNode) Kind() Kind { return KindMakeProtoField }
+
+func (n *MakeProtoFieldNode) String() string { return formatNode(n) }
+func (n *MakeProtoFieldNode) argumentNode()  {}
 
 func (n *MakeProtoFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -14567,7 +14943,9 @@ func newMakeProtoNodeSlice(raws []*generated.ResolvedMakeProtoProto) []*MakeProt
 }
 
 func (n *MakeProtoNode) Kind() Kind { return KindMakeProto }
-func (n *MakeProtoNode) exprNode()  {}
+
+func (n *MakeProtoNode) String() string { return formatNode(n) }
+func (n *MakeProtoNode) exprNode()      {}
 
 func (n *MakeProtoNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -14618,7 +14996,9 @@ func newMakeStructNodeSlice(raws []*generated.ResolvedMakeStructProto) []*MakeSt
 }
 
 func (n *MakeStructNode) Kind() Kind { return KindMakeStruct }
-func (n *MakeStructNode) exprNode()  {}
+
+func (n *MakeStructNode) String() string { return formatNode(n) }
+func (n *MakeStructNode) exprNode()      {}
 
 func (n *MakeStructNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -14677,8 +15057,10 @@ func newMatchRecognizePatternAnchorNodeSlice(raws []*generated.ResolvedMatchReco
 	return nodes
 }
 
-func (n *MatchRecognizePatternAnchorNode) Kind() Kind    { return KindMatchRecognizePatternAnchor }
-func (n *MatchRecognizePatternAnchorNode) argumentNode() {}
+func (n *MatchRecognizePatternAnchorNode) Kind() Kind { return KindMatchRecognizePatternAnchor }
+
+func (n *MatchRecognizePatternAnchorNode) String() string { return formatNode(n) }
+func (n *MatchRecognizePatternAnchorNode) argumentNode()  {}
 
 func (n *MatchRecognizePatternAnchorNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -14720,8 +15102,10 @@ func newMatchRecognizePatternEmptyNodeSlice(raws []*generated.ResolvedMatchRecog
 	return nodes
 }
 
-func (n *MatchRecognizePatternEmptyNode) Kind() Kind    { return KindMatchRecognizePatternEmpty }
-func (n *MatchRecognizePatternEmptyNode) argumentNode() {}
+func (n *MatchRecognizePatternEmptyNode) Kind() Kind { return KindMatchRecognizePatternEmpty }
+
+func (n *MatchRecognizePatternEmptyNode) String() string { return formatNode(n) }
+func (n *MatchRecognizePatternEmptyNode) argumentNode()  {}
 
 func (n *MatchRecognizePatternEmptyNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -14759,8 +15143,10 @@ func newMatchRecognizePatternOperationNodeSlice(raws []*generated.ResolvedMatchR
 	return nodes
 }
 
-func (n *MatchRecognizePatternOperationNode) Kind() Kind    { return KindMatchRecognizePatternOperation }
-func (n *MatchRecognizePatternOperationNode) argumentNode() {}
+func (n *MatchRecognizePatternOperationNode) Kind() Kind { return KindMatchRecognizePatternOperation }
+
+func (n *MatchRecognizePatternOperationNode) String() string { return formatNode(n) }
+func (n *MatchRecognizePatternOperationNode) argumentNode()  {}
 
 func (n *MatchRecognizePatternOperationNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -14818,7 +15204,9 @@ func newMatchRecognizePatternQuantificationNodeSlice(raws []*generated.ResolvedM
 func (n *MatchRecognizePatternQuantificationNode) Kind() Kind {
 	return KindMatchRecognizePatternQuantification
 }
-func (n *MatchRecognizePatternQuantificationNode) argumentNode() {}
+
+func (n *MatchRecognizePatternQuantificationNode) String() string { return formatNode(n) }
+func (n *MatchRecognizePatternQuantificationNode) argumentNode()  {}
 
 func (n *MatchRecognizePatternQuantificationNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -14903,7 +15291,9 @@ func newMatchRecognizePatternVariableRefNodeSlice(raws []*generated.ResolvedMatc
 func (n *MatchRecognizePatternVariableRefNode) Kind() Kind {
 	return KindMatchRecognizePatternVariableRef
 }
-func (n *MatchRecognizePatternVariableRefNode) argumentNode() {}
+
+func (n *MatchRecognizePatternVariableRefNode) String() string { return formatNode(n) }
+func (n *MatchRecognizePatternVariableRefNode) argumentNode()  {}
 
 func (n *MatchRecognizePatternVariableRefNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -14946,7 +15336,9 @@ func newMatchRecognizeScanNodeSlice(raws []*generated.ResolvedMatchRecognizeScan
 }
 
 func (n *MatchRecognizeScanNode) Kind() Kind { return KindMatchRecognizeScan }
-func (n *MatchRecognizeScanNode) scanNode()  {}
+
+func (n *MatchRecognizeScanNode) String() string { return formatNode(n) }
+func (n *MatchRecognizeScanNode) scanNode()      {}
 
 func (n *MatchRecognizeScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -15086,7 +15478,9 @@ func newMatchRecognizeVariableDefinitionNodeSlice(raws []*generated.ResolvedMatc
 func (n *MatchRecognizeVariableDefinitionNode) Kind() Kind {
 	return KindMatchRecognizeVariableDefinition
 }
-func (n *MatchRecognizeVariableDefinitionNode) argumentNode() {}
+
+func (n *MatchRecognizeVariableDefinitionNode) String() string { return formatNode(n) }
+func (n *MatchRecognizeVariableDefinitionNode) argumentNode()  {}
 
 func (n *MatchRecognizeVariableDefinitionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -15142,8 +15536,10 @@ func newMeasureGroupNodeSlice(raws []*generated.ResolvedMeasureGroupProto) []*Me
 	return nodes
 }
 
-func (n *MeasureGroupNode) Kind() Kind    { return KindMeasureGroup }
-func (n *MeasureGroupNode) argumentNode() {}
+func (n *MeasureGroupNode) Kind() Kind { return KindMeasureGroup }
+
+func (n *MeasureGroupNode) String() string { return formatNode(n) }
+func (n *MeasureGroupNode) argumentNode()  {}
 
 func (n *MeasureGroupNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -15198,7 +15594,9 @@ func newMergeStmtNodeSlice(raws []*generated.ResolvedMergeStmtProto) []*MergeStm
 	return nodes
 }
 
-func (n *MergeStmtNode) Kind() Kind     { return KindMergeStmt }
+func (n *MergeStmtNode) Kind() Kind { return KindMergeStmt }
+
+func (n *MergeStmtNode) String() string { return formatNode(n) }
 func (n *MergeStmtNode) statementNode() {}
 
 func (n *MergeStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -15305,8 +15703,10 @@ func newMergeWhenNodeSlice(raws []*generated.ResolvedMergeWhenProto) []*MergeWhe
 	return nodes
 }
 
-func (n *MergeWhenNode) Kind() Kind    { return KindMergeWhen }
-func (n *MergeWhenNode) argumentNode() {}
+func (n *MergeWhenNode) Kind() Kind { return KindMergeWhen }
+
+func (n *MergeWhenNode) String() string { return formatNode(n) }
+func (n *MergeWhenNode) argumentNode()  {}
 
 func (n *MergeWhenNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -15395,8 +15795,10 @@ func newModelNodeSlice(raws []*generated.ResolvedModelProto) []*ModelNode {
 	return nodes
 }
 
-func (n *ModelNode) Kind() Kind    { return KindModel }
-func (n *ModelNode) argumentNode() {}
+func (n *ModelNode) Kind() Kind { return KindModel }
+
+func (n *ModelNode) String() string { return formatNode(n) }
+func (n *ModelNode) argumentNode()  {}
 
 func (n *ModelNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -15438,7 +15840,9 @@ func newModuleStmtNodeSlice(raws []*generated.ResolvedModuleStmtProto) []*Module
 	return nodes
 }
 
-func (n *ModuleStmtNode) Kind() Kind     { return KindModuleStmt }
+func (n *ModuleStmtNode) Kind() Kind { return KindModuleStmt }
+
+func (n *ModuleStmtNode) String() string { return formatNode(n) }
 func (n *ModuleStmtNode) statementNode() {}
 
 func (n *ModuleStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -15506,7 +15910,9 @@ func newMultiStmtNodeSlice(raws []*generated.ResolvedMultiStmtProto) []*MultiStm
 	return nodes
 }
 
-func (n *MultiStmtNode) Kind() Kind     { return KindMultiStmt }
+func (n *MultiStmtNode) Kind() Kind { return KindMultiStmt }
+
+func (n *MultiStmtNode) String() string { return formatNode(n) }
 func (n *MultiStmtNode) statementNode() {}
 
 func (n *MultiStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -15562,8 +15968,10 @@ func newObjectUnitNodeSlice(raws []*generated.ResolvedObjectUnitProto) []*Object
 	return nodes
 }
 
-func (n *ObjectUnitNode) Kind() Kind    { return KindObjectUnit }
-func (n *ObjectUnitNode) argumentNode() {}
+func (n *ObjectUnitNode) Kind() Kind { return KindObjectUnit }
+
+func (n *ObjectUnitNode) String() string { return formatNode(n) }
+func (n *ObjectUnitNode) argumentNode()  {}
 
 func (n *ObjectUnitNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -15605,8 +16013,10 @@ func newOnConflictClauseNodeSlice(raws []*generated.ResolvedOnConflictClauseProt
 	return nodes
 }
 
-func (n *OnConflictClauseNode) Kind() Kind    { return KindOnConflictClause }
-func (n *OnConflictClauseNode) argumentNode() {}
+func (n *OnConflictClauseNode) Kind() Kind { return KindOnConflictClause }
+
+func (n *OnConflictClauseNode) String() string { return formatNode(n) }
+func (n *OnConflictClauseNode) argumentNode()  {}
 
 func (n *OnConflictClauseNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -15687,8 +16097,10 @@ func newOptionNodeSlice(raws []*generated.ResolvedOptionProto) []*OptionNode {
 	return nodes
 }
 
-func (n *OptionNode) Kind() Kind    { return KindOption }
-func (n *OptionNode) argumentNode() {}
+func (n *OptionNode) Kind() Kind { return KindOption }
+
+func (n *OptionNode) String() string { return formatNode(n) }
+func (n *OptionNode) argumentNode()  {}
 
 func (n *OptionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -15752,8 +16164,10 @@ func newOrderByItemNodeSlice(raws []*generated.ResolvedOrderByItemProto) []*Orde
 	return nodes
 }
 
-func (n *OrderByItemNode) Kind() Kind    { return KindOrderByItem }
-func (n *OrderByItemNode) argumentNode() {}
+func (n *OrderByItemNode) Kind() Kind { return KindOrderByItem }
+
+func (n *OrderByItemNode) String() string { return formatNode(n) }
+func (n *OrderByItemNode) argumentNode()  {}
 
 func (n *OrderByItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -15831,7 +16245,9 @@ func newOrderByScanNodeSlice(raws []*generated.ResolvedOrderByScanProto) []*Orde
 }
 
 func (n *OrderByScanNode) Kind() Kind { return KindOrderByScan }
-func (n *OrderByScanNode) scanNode()  {}
+
+func (n *OrderByScanNode) String() string { return formatNode(n) }
+func (n *OrderByScanNode) scanNode()      {}
 
 func (n *OrderByScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -15903,8 +16319,10 @@ func newOutputColumnNodeSlice(raws []*generated.ResolvedOutputColumnProto) []*Ou
 	return nodes
 }
 
-func (n *OutputColumnNode) Kind() Kind    { return KindOutputColumn }
-func (n *OutputColumnNode) argumentNode() {}
+func (n *OutputColumnNode) Kind() Kind { return KindOutputColumn }
+
+func (n *OutputColumnNode) String() string { return formatNode(n) }
+func (n *OutputColumnNode) argumentNode()  {}
 
 func (n *OutputColumnNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -15950,8 +16368,10 @@ func newOutputSchemaNodeSlice(raws []*generated.ResolvedOutputSchemaProto) []*Ou
 	return nodes
 }
 
-func (n *OutputSchemaNode) Kind() Kind    { return KindOutputSchema }
-func (n *OutputSchemaNode) argumentNode() {}
+func (n *OutputSchemaNode) Kind() Kind { return KindOutputSchema }
+
+func (n *OutputSchemaNode) String() string { return formatNode(n) }
+func (n *OutputSchemaNode) argumentNode()  {}
 
 func (n *OutputSchemaNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16007,7 +16427,9 @@ func newParameterNodeSlice(raws []*generated.ResolvedParameterProto) []*Paramete
 }
 
 func (n *ParameterNode) Kind() Kind { return KindParameter }
-func (n *ParameterNode) exprNode()  {}
+
+func (n *ParameterNode) String() string { return formatNode(n) }
+func (n *ParameterNode) exprNode()      {}
 
 func (n *ParameterNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16066,7 +16488,9 @@ func newPipeCreateTableScanNodeSlice(raws []*generated.ResolvedPipeCreateTableSc
 }
 
 func (n *PipeCreateTableScanNode) Kind() Kind { return KindPipeCreateTableScan }
-func (n *PipeCreateTableScanNode) scanNode()  {}
+
+func (n *PipeCreateTableScanNode) String() string { return formatNode(n) }
+func (n *PipeCreateTableScanNode) scanNode()      {}
 
 func (n *PipeCreateTableScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16143,7 +16567,9 @@ func newPipeExportDataScanNodeSlice(raws []*generated.ResolvedPipeExportDataScan
 }
 
 func (n *PipeExportDataScanNode) Kind() Kind { return KindPipeExportDataScan }
-func (n *PipeExportDataScanNode) scanNode()  {}
+
+func (n *PipeExportDataScanNode) String() string { return formatNode(n) }
+func (n *PipeExportDataScanNode) scanNode()      {}
 
 func (n *PipeExportDataScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16220,7 +16646,9 @@ func newPipeForkScanNodeSlice(raws []*generated.ResolvedPipeForkScanProto) []*Pi
 }
 
 func (n *PipeForkScanNode) Kind() Kind { return KindPipeForkScan }
-func (n *PipeForkScanNode) scanNode()  {}
+
+func (n *PipeForkScanNode) String() string { return formatNode(n) }
+func (n *PipeForkScanNode) scanNode()      {}
 
 func (n *PipeForkScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16300,8 +16728,10 @@ func newPipeIfCaseNodeSlice(raws []*generated.ResolvedPipeIfCaseProto) []*PipeIf
 	return nodes
 }
 
-func (n *PipeIfCaseNode) Kind() Kind    { return KindPipeIfCase }
-func (n *PipeIfCaseNode) argumentNode() {}
+func (n *PipeIfCaseNode) Kind() Kind { return KindPipeIfCase }
+
+func (n *PipeIfCaseNode) String() string { return formatNode(n) }
+func (n *PipeIfCaseNode) argumentNode()  {}
 
 func (n *PipeIfCaseNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16362,7 +16792,9 @@ func newPipeIfScanNodeSlice(raws []*generated.ResolvedPipeIfScanProto) []*PipeIf
 }
 
 func (n *PipeIfScanNode) Kind() Kind { return KindPipeIfScan }
-func (n *PipeIfScanNode) scanNode()  {}
+
+func (n *PipeIfScanNode) String() string { return formatNode(n) }
+func (n *PipeIfScanNode) scanNode()      {}
 
 func (n *PipeIfScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16447,7 +16879,9 @@ func newPipeInsertScanNodeSlice(raws []*generated.ResolvedPipeInsertScanProto) [
 }
 
 func (n *PipeInsertScanNode) Kind() Kind { return KindPipeInsertScan }
-func (n *PipeInsertScanNode) scanNode()  {}
+
+func (n *PipeInsertScanNode) String() string { return formatNode(n) }
+func (n *PipeInsertScanNode) scanNode()      {}
 
 func (n *PipeInsertScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16524,7 +16958,9 @@ func newPipeTeeScanNodeSlice(raws []*generated.ResolvedPipeTeeScanProto) []*Pipe
 }
 
 func (n *PipeTeeScanNode) Kind() Kind { return KindPipeTeeScan }
-func (n *PipeTeeScanNode) scanNode()  {}
+
+func (n *PipeTeeScanNode) String() string { return formatNode(n) }
+func (n *PipeTeeScanNode) scanNode()      {}
 
 func (n *PipeTeeScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16604,8 +17040,10 @@ func newPivotColumnNodeSlice(raws []*generated.ResolvedPivotColumnProto) []*Pivo
 	return nodes
 }
 
-func (n *PivotColumnNode) Kind() Kind    { return KindPivotColumn }
-func (n *PivotColumnNode) argumentNode() {}
+func (n *PivotColumnNode) Kind() Kind { return KindPivotColumn }
+
+func (n *PivotColumnNode) String() string { return formatNode(n) }
+func (n *PivotColumnNode) argumentNode()  {}
 
 func (n *PivotColumnNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16656,7 +17094,9 @@ func newPivotScanNodeSlice(raws []*generated.ResolvedPivotScanProto) []*PivotSca
 }
 
 func (n *PivotScanNode) Kind() Kind { return KindPivotScan }
-func (n *PivotScanNode) scanNode()  {}
+
+func (n *PivotScanNode) String() string { return formatNode(n) }
+func (n *PivotScanNode) scanNode()      {}
 
 func (n *PivotScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16793,8 +17233,10 @@ func newPrimaryKeyNodeSlice(raws []*generated.ResolvedPrimaryKeyProto) []*Primar
 	return nodes
 }
 
-func (n *PrimaryKeyNode) Kind() Kind    { return KindPrimaryKey }
-func (n *PrimaryKeyNode) argumentNode() {}
+func (n *PrimaryKeyNode) Kind() Kind { return KindPrimaryKey }
+
+func (n *PrimaryKeyNode) String() string { return formatNode(n) }
+func (n *PrimaryKeyNode) argumentNode()  {}
 
 func (n *PrimaryKeyNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -16852,8 +17294,10 @@ func newPrivilegeNodeSlice(raws []*generated.ResolvedPrivilegeProto) []*Privileg
 	return nodes
 }
 
-func (n *PrivilegeNode) Kind() Kind    { return KindPrivilege }
-func (n *PrivilegeNode) argumentNode() {}
+func (n *PrivilegeNode) Kind() Kind { return KindPrivilege }
+
+func (n *PrivilegeNode) String() string { return formatNode(n) }
+func (n *PrivilegeNode) argumentNode()  {}
 
 func (n *PrivilegeNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16909,7 +17353,9 @@ func newProjectScanNodeSlice(raws []*generated.ResolvedProjectScanProto) []*Proj
 }
 
 func (n *ProjectScanNode) Kind() Kind { return KindProjectScan }
-func (n *ProjectScanNode) scanNode()  {}
+
+func (n *ProjectScanNode) String() string { return formatNode(n) }
+func (n *ProjectScanNode) scanNode()      {}
 
 func (n *ProjectScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -16989,7 +17435,9 @@ func newQueryStmtNodeSlice(raws []*generated.ResolvedQueryStmtProto) []*QueryStm
 	return nodes
 }
 
-func (n *QueryStmtNode) Kind() Kind     { return KindQueryStmt }
+func (n *QueryStmtNode) Kind() Kind { return KindQueryStmt }
+
+func (n *QueryStmtNode) String() string { return formatNode(n) }
 func (n *QueryStmtNode) statementNode() {}
 
 func (n *QueryStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -17062,8 +17510,10 @@ func newRebuildActionNodeSlice(raws []*generated.ResolvedRebuildActionProto) []*
 	return nodes
 }
 
-func (n *RebuildActionNode) Kind() Kind    { return KindRebuildAction }
-func (n *RebuildActionNode) argumentNode() {}
+func (n *RebuildActionNode) Kind() Kind { return KindRebuildAction }
+
+func (n *RebuildActionNode) String() string { return formatNode(n) }
+func (n *RebuildActionNode) argumentNode()  {}
 
 func (n *RebuildActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -17101,8 +17551,10 @@ func newRecursionDepthModifierNodeSlice(raws []*generated.ResolvedRecursionDepth
 	return nodes
 }
 
-func (n *RecursionDepthModifierNode) Kind() Kind    { return KindRecursionDepthModifier }
-func (n *RecursionDepthModifierNode) argumentNode() {}
+func (n *RecursionDepthModifierNode) Kind() Kind { return KindRecursionDepthModifier }
+
+func (n *RecursionDepthModifierNode) String() string { return formatNode(n) }
+func (n *RecursionDepthModifierNode) argumentNode()  {}
 
 func (n *RecursionDepthModifierNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -17181,7 +17633,9 @@ func newRecursiveRefScanNodeSlice(raws []*generated.ResolvedRecursiveRefScanProt
 }
 
 func (n *RecursiveRefScanNode) Kind() Kind { return KindRecursiveRefScan }
-func (n *RecursiveRefScanNode) scanNode()  {}
+
+func (n *RecursiveRefScanNode) String() string { return formatNode(n) }
+func (n *RecursiveRefScanNode) scanNode()      {}
 
 func (n *RecursiveRefScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -17236,7 +17690,9 @@ func newRecursiveScanNodeSlice(raws []*generated.ResolvedRecursiveScanProto) []*
 }
 
 func (n *RecursiveScanNode) Kind() Kind { return KindRecursiveScan }
-func (n *RecursiveScanNode) scanNode()  {}
+
+func (n *RecursiveScanNode) String() string { return formatNode(n) }
+func (n *RecursiveScanNode) scanNode()      {}
 
 func (n *RecursiveScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -17335,7 +17791,9 @@ func newRelationArgumentScanNodeSlice(raws []*generated.ResolvedRelationArgument
 }
 
 func (n *RelationArgumentScanNode) Kind() Kind { return KindRelationArgumentScan }
-func (n *RelationArgumentScanNode) scanNode()  {}
+
+func (n *RelationArgumentScanNode) String() string { return formatNode(n) }
+func (n *RelationArgumentScanNode) scanNode()      {}
 
 func (n *RelationArgumentScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -17406,8 +17864,10 @@ func newRemoveFromRestricteeListActionNodeSlice(raws []*generated.ResolvedRemove
 	return nodes
 }
 
-func (n *RemoveFromRestricteeListActionNode) Kind() Kind    { return KindRemoveFromRestricteeListAction }
-func (n *RemoveFromRestricteeListActionNode) argumentNode() {}
+func (n *RemoveFromRestricteeListActionNode) Kind() Kind { return KindRemoveFromRestricteeListAction }
+
+func (n *RemoveFromRestricteeListActionNode) String() string { return formatNode(n) }
+func (n *RemoveFromRestricteeListActionNode) argumentNode()  {}
 
 func (n *RemoveFromRestricteeListActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -17462,8 +17922,10 @@ func newRenameColumnActionNodeSlice(raws []*generated.ResolvedRenameColumnAction
 	return nodes
 }
 
-func (n *RenameColumnActionNode) Kind() Kind    { return KindRenameColumnAction }
-func (n *RenameColumnActionNode) argumentNode() {}
+func (n *RenameColumnActionNode) Kind() Kind { return KindRenameColumnAction }
+
+func (n *RenameColumnActionNode) String() string { return formatNode(n) }
+func (n *RenameColumnActionNode) argumentNode()  {}
 
 func (n *RenameColumnActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -17513,7 +17975,9 @@ func newRenameStmtNodeSlice(raws []*generated.ResolvedRenameStmtProto) []*Rename
 	return nodes
 }
 
-func (n *RenameStmtNode) Kind() Kind     { return KindRenameStmt }
+func (n *RenameStmtNode) Kind() Kind { return KindRenameStmt }
+
+func (n *RenameStmtNode) String() string { return formatNode(n) }
 func (n *RenameStmtNode) statementNode() {}
 
 func (n *RenameStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -17577,8 +18041,10 @@ func newRenameToActionNodeSlice(raws []*generated.ResolvedRenameToActionProto) [
 	return nodes
 }
 
-func (n *RenameToActionNode) Kind() Kind    { return KindRenameToAction }
-func (n *RenameToActionNode) argumentNode() {}
+func (n *RenameToActionNode) Kind() Kind { return KindRenameToAction }
+
+func (n *RenameToActionNode) String() string { return formatNode(n) }
+func (n *RenameToActionNode) argumentNode()  {}
 
 func (n *RenameToActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -17620,8 +18086,10 @@ func newReplaceFieldItemNodeSlice(raws []*generated.ResolvedReplaceFieldItemProt
 	return nodes
 }
 
-func (n *ReplaceFieldItemNode) Kind() Kind    { return KindReplaceFieldItem }
-func (n *ReplaceFieldItemNode) argumentNode() {}
+func (n *ReplaceFieldItemNode) Kind() Kind { return KindReplaceFieldItem }
+
+func (n *ReplaceFieldItemNode) String() string { return formatNode(n) }
+func (n *ReplaceFieldItemNode) argumentNode()  {}
 
 func (n *ReplaceFieldItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -17682,7 +18150,9 @@ func newReplaceFieldNodeSlice(raws []*generated.ResolvedReplaceFieldProto) []*Re
 }
 
 func (n *ReplaceFieldNode) Kind() Kind { return KindReplaceField }
-func (n *ReplaceFieldNode) exprNode()  {}
+
+func (n *ReplaceFieldNode) String() string { return formatNode(n) }
+func (n *ReplaceFieldNode) exprNode()      {}
 
 func (n *ReplaceFieldNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -17754,8 +18224,10 @@ func newRestrictToActionNodeSlice(raws []*generated.ResolvedRestrictToActionProt
 	return nodes
 }
 
-func (n *RestrictToActionNode) Kind() Kind    { return KindRestrictToAction }
-func (n *RestrictToActionNode) argumentNode() {}
+func (n *RestrictToActionNode) Kind() Kind { return KindRestrictToAction }
+
+func (n *RestrictToActionNode) String() string { return formatNode(n) }
+func (n *RestrictToActionNode) argumentNode()  {}
 
 func (n *RestrictToActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -17806,8 +18278,10 @@ func newReturningClauseNodeSlice(raws []*generated.ResolvedReturningClauseProto)
 	return nodes
 }
 
-func (n *ReturningClauseNode) Kind() Kind    { return KindReturningClause }
-func (n *ReturningClauseNode) argumentNode() {}
+func (n *ReturningClauseNode) Kind() Kind { return KindReturningClause }
+
+func (n *ReturningClauseNode) String() string { return formatNode(n) }
+func (n *ReturningClauseNode) argumentNode()  {}
 
 func (n *ReturningClauseNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -17883,8 +18357,10 @@ func newRevokeFromActionNodeSlice(raws []*generated.ResolvedRevokeFromActionProt
 	return nodes
 }
 
-func (n *RevokeFromActionNode) Kind() Kind    { return KindRevokeFromAction }
-func (n *RevokeFromActionNode) argumentNode() {}
+func (n *RevokeFromActionNode) Kind() Kind { return KindRevokeFromAction }
+
+func (n *RevokeFromActionNode) String() string { return formatNode(n) }
+func (n *RevokeFromActionNode) argumentNode()  {}
 
 func (n *RevokeFromActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -17939,7 +18415,9 @@ func newRevokeStmtNodeSlice(raws []*generated.ResolvedRevokeStmtProto) []*Revoke
 	return nodes
 }
 
-func (n *RevokeStmtNode) Kind() Kind     { return KindRevokeStmt }
+func (n *RevokeStmtNode) Kind() Kind { return KindRevokeStmt }
+
+func (n *RevokeStmtNode) String() string { return formatNode(n) }
 func (n *RevokeStmtNode) statementNode() {}
 
 func (n *RevokeStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -18027,7 +18505,9 @@ func newRollbackStmtNodeSlice(raws []*generated.ResolvedRollbackStmtProto) []*Ro
 	return nodes
 }
 
-func (n *RollbackStmtNode) Kind() Kind     { return KindRollbackStmt }
+func (n *RollbackStmtNode) Kind() Kind { return KindRollbackStmt }
+
+func (n *RollbackStmtNode) String() string { return formatNode(n) }
 func (n *RollbackStmtNode) statementNode() {}
 
 func (n *RollbackStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -18070,8 +18550,10 @@ func newRollupNodeSlice(raws []*generated.ResolvedRollupProto) []*RollupNode {
 	return nodes
 }
 
-func (n *RollupNode) Kind() Kind    { return KindRollup }
-func (n *RollupNode) argumentNode() {}
+func (n *RollupNode) Kind() Kind { return KindRollup }
+
+func (n *RollupNode) String() string { return formatNode(n) }
+func (n *RollupNode) argumentNode()  {}
 
 func (n *RollupNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -18122,7 +18604,9 @@ func newRunBatchStmtNodeSlice(raws []*generated.ResolvedRunBatchStmtProto) []*Ru
 	return nodes
 }
 
-func (n *RunBatchStmtNode) Kind() Kind     { return KindRunBatchStmt }
+func (n *RunBatchStmtNode) Kind() Kind { return KindRunBatchStmt }
+
+func (n *RunBatchStmtNode) String() string { return formatNode(n) }
 func (n *RunBatchStmtNode) statementNode() {}
 
 func (n *RunBatchStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -18166,7 +18650,9 @@ func newSampleScanNodeSlice(raws []*generated.ResolvedSampleScanProto) []*Sample
 }
 
 func (n *SampleScanNode) Kind() Kind { return KindSampleScan }
-func (n *SampleScanNode) scanNode()  {}
+
+func (n *SampleScanNode) String() string { return formatNode(n) }
+func (n *SampleScanNode) scanNode()      {}
 
 func (n *SampleScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -18293,8 +18779,10 @@ func newSequenceNodeSlice(raws []*generated.ResolvedSequenceProto) []*SequenceNo
 	return nodes
 }
 
-func (n *SequenceNode) Kind() Kind    { return KindSequence }
-func (n *SequenceNode) argumentNode() {}
+func (n *SequenceNode) Kind() Kind { return KindSequence }
+
+func (n *SequenceNode) String() string { return formatNode(n) }
+func (n *SequenceNode) argumentNode()  {}
 
 func (n *SequenceNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -18336,8 +18824,10 @@ func newSetAsActionNodeSlice(raws []*generated.ResolvedSetAsActionProto) []*SetA
 	return nodes
 }
 
-func (n *SetAsActionNode) Kind() Kind    { return KindSetAsAction }
-func (n *SetAsActionNode) argumentNode() {}
+func (n *SetAsActionNode) Kind() Kind { return KindSetAsAction }
+
+func (n *SetAsActionNode) String() string { return formatNode(n) }
+func (n *SetAsActionNode) argumentNode()  {}
 
 func (n *SetAsActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -18383,8 +18873,10 @@ func newSetCollateClauseNodeSlice(raws []*generated.ResolvedSetCollateClauseProt
 	return nodes
 }
 
-func (n *SetCollateClauseNode) Kind() Kind    { return KindSetCollateClause }
-func (n *SetCollateClauseNode) argumentNode() {}
+func (n *SetCollateClauseNode) Kind() Kind { return KindSetCollateClause }
+
+func (n *SetCollateClauseNode) String() string { return formatNode(n) }
+func (n *SetCollateClauseNode) argumentNode()  {}
 
 func (n *SetCollateClauseNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -18436,8 +18928,10 @@ func newSetOperationItemNodeSlice(raws []*generated.ResolvedSetOperationItemProt
 	return nodes
 }
 
-func (n *SetOperationItemNode) Kind() Kind    { return KindSetOperationItem }
-func (n *SetOperationItemNode) argumentNode() {}
+func (n *SetOperationItemNode) Kind() Kind { return KindSetOperationItem }
+
+func (n *SetOperationItemNode) String() string { return formatNode(n) }
+func (n *SetOperationItemNode) argumentNode()  {}
 
 func (n *SetOperationItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -18494,7 +18988,9 @@ func newSetOperationScanNodeSlice(raws []*generated.ResolvedSetOperationScanProt
 }
 
 func (n *SetOperationScanNode) Kind() Kind { return KindSetOperationScan }
-func (n *SetOperationScanNode) scanNode()  {}
+
+func (n *SetOperationScanNode) String() string { return formatNode(n) }
+func (n *SetOperationScanNode) scanNode()      {}
 
 func (n *SetOperationScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -18573,8 +19069,10 @@ func newSetOptionsActionNodeSlice(raws []*generated.ResolvedSetOptionsActionProt
 	return nodes
 }
 
-func (n *SetOptionsActionNode) Kind() Kind    { return KindSetOptionsAction }
-func (n *SetOptionsActionNode) argumentNode() {}
+func (n *SetOptionsActionNode) Kind() Kind { return KindSetOptionsAction }
+
+func (n *SetOptionsActionNode) String() string { return formatNode(n) }
+func (n *SetOptionsActionNode) argumentNode()  {}
 
 func (n *SetOptionsActionNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParent().GetParseLocationRange()
@@ -18625,7 +19123,9 @@ func newSetTransactionStmtNodeSlice(raws []*generated.ResolvedSetTransactionStmt
 	return nodes
 }
 
-func (n *SetTransactionStmtNode) Kind() Kind     { return KindSetTransactionStmt }
+func (n *SetTransactionStmtNode) Kind() Kind { return KindSetTransactionStmt }
+
+func (n *SetTransactionStmtNode) String() string { return formatNode(n) }
 func (n *SetTransactionStmtNode) statementNode() {}
 
 func (n *SetTransactionStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -18676,7 +19176,9 @@ func newShowStmtNodeSlice(raws []*generated.ResolvedShowStmtProto) []*ShowStmtNo
 	return nodes
 }
 
-func (n *ShowStmtNode) Kind() Kind     { return KindShowStmt }
+func (n *ShowStmtNode) Kind() Kind { return KindShowStmt }
+
+func (n *ShowStmtNode) String() string { return formatNode(n) }
 func (n *ShowStmtNode) statementNode() {}
 
 func (n *ShowStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -18742,7 +19244,9 @@ func newSingleRowScanNodeSlice(raws []*generated.ResolvedSingleRowScanProto) []*
 }
 
 func (n *SingleRowScanNode) Kind() Kind { return KindSingleRowScan }
-func (n *SingleRowScanNode) scanNode()  {}
+
+func (n *SingleRowScanNode) String() string { return formatNode(n) }
+func (n *SingleRowScanNode) scanNode()      {}
 
 func (n *SingleRowScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -18796,7 +19300,9 @@ func newStartBatchStmtNodeSlice(raws []*generated.ResolvedStartBatchStmtProto) [
 	return nodes
 }
 
-func (n *StartBatchStmtNode) Kind() Kind     { return KindStartBatchStmt }
+func (n *StartBatchStmtNode) Kind() Kind { return KindStartBatchStmt }
+
+func (n *StartBatchStmtNode) String() string { return formatNode(n) }
 func (n *StartBatchStmtNode) statementNode() {}
 
 func (n *StartBatchStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -18843,7 +19349,9 @@ func newStatementWithPipeOperatorsStmtNodeSlice(raws []*generated.ResolvedStatem
 	return nodes
 }
 
-func (n *StatementWithPipeOperatorsStmtNode) Kind() Kind     { return KindStatementWithPipeOperatorsStmt }
+func (n *StatementWithPipeOperatorsStmtNode) Kind() Kind { return KindStatementWithPipeOperatorsStmt }
+
+func (n *StatementWithPipeOperatorsStmtNode) String() string { return formatNode(n) }
 func (n *StatementWithPipeOperatorsStmtNode) statementNode() {}
 
 func (n *StatementWithPipeOperatorsStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -18905,7 +19413,9 @@ func newStaticDescribeScanNodeSlice(raws []*generated.ResolvedStaticDescribeScan
 }
 
 func (n *StaticDescribeScanNode) Kind() Kind { return KindStaticDescribeScan }
-func (n *StaticDescribeScanNode) scanNode()  {}
+
+func (n *StaticDescribeScanNode) String() string { return formatNode(n) }
+func (n *StaticDescribeScanNode) scanNode()      {}
 
 func (n *StaticDescribeScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -18986,7 +19496,9 @@ func newSubpipelineInputScanNodeSlice(raws []*generated.ResolvedSubpipelineInput
 }
 
 func (n *SubpipelineInputScanNode) Kind() Kind { return KindSubpipelineInputScan }
-func (n *SubpipelineInputScanNode) scanNode()  {}
+
+func (n *SubpipelineInputScanNode) String() string { return formatNode(n) }
+func (n *SubpipelineInputScanNode) scanNode()      {}
 
 func (n *SubpipelineInputScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -19049,8 +19561,10 @@ func newSubpipelineNodeSlice(raws []*generated.ResolvedSubpipelineProto) []*Subp
 	return nodes
 }
 
-func (n *SubpipelineNode) Kind() Kind    { return KindSubpipeline }
-func (n *SubpipelineNode) argumentNode() {}
+func (n *SubpipelineNode) Kind() Kind { return KindSubpipeline }
+
+func (n *SubpipelineNode) String() string { return formatNode(n) }
+func (n *SubpipelineNode) argumentNode()  {}
 
 func (n *SubpipelineNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -19102,7 +19616,9 @@ func newSubpipelineStmtNodeSlice(raws []*generated.ResolvedSubpipelineStmtProto)
 	return nodes
 }
 
-func (n *SubpipelineStmtNode) Kind() Kind     { return KindSubpipelineStmt }
+func (n *SubpipelineStmtNode) Kind() Kind { return KindSubpipelineStmt }
+
+func (n *SubpipelineStmtNode) String() string { return formatNode(n) }
 func (n *SubpipelineStmtNode) statementNode() {}
 
 func (n *SubpipelineStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -19194,7 +19710,9 @@ func newSubqueryExprNodeSlice(raws []*generated.ResolvedSubqueryExprProto) []*Su
 }
 
 func (n *SubqueryExprNode) Kind() Kind { return KindSubqueryExpr }
-func (n *SubqueryExprNode) exprNode()  {}
+
+func (n *SubqueryExprNode) String() string { return formatNode(n) }
+func (n *SubqueryExprNode) exprNode()      {}
 
 func (n *SubqueryExprNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -19292,7 +19810,9 @@ func newSystemVariableNodeSlice(raws []*generated.ResolvedSystemVariableProto) [
 }
 
 func (n *SystemVariableNode) Kind() Kind { return KindSystemVariable }
-func (n *SystemVariableNode) exprNode()  {}
+
+func (n *SystemVariableNode) String() string { return formatNode(n) }
+func (n *SystemVariableNode) exprNode()      {}
 
 func (n *SystemVariableNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -19343,7 +19863,9 @@ func newTVFScanNodeSlice(raws []*generated.ResolvedTVFScanProto) []*TVFScanNode 
 }
 
 func (n *TVFScanNode) Kind() Kind { return KindTVFScan }
-func (n *TVFScanNode) scanNode()  {}
+
+func (n *TVFScanNode) String() string { return formatNode(n) }
+func (n *TVFScanNode) scanNode()      {}
 
 func (n *TVFScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -19421,8 +19943,10 @@ func newTableAndColumnInfoNodeSlice(raws []*generated.ResolvedTableAndColumnInfo
 	return nodes
 }
 
-func (n *TableAndColumnInfoNode) Kind() Kind    { return KindTableAndColumnInfo }
-func (n *TableAndColumnInfoNode) argumentNode() {}
+func (n *TableAndColumnInfoNode) Kind() Kind { return KindTableAndColumnInfo }
+
+func (n *TableAndColumnInfoNode) String() string { return formatNode(n) }
+func (n *TableAndColumnInfoNode) argumentNode()  {}
 
 func (n *TableAndColumnInfoNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -19469,7 +19993,9 @@ func newTableScanNodeSlice(raws []*generated.ResolvedTableScanProto) []*TableSca
 }
 
 func (n *TableScanNode) Kind() Kind { return KindTableScan }
-func (n *TableScanNode) scanNode()  {}
+
+func (n *TableScanNode) String() string { return formatNode(n) }
+func (n *TableScanNode) scanNode()      {}
 
 func (n *TableScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -19561,7 +20087,9 @@ func newTruncateStmtNodeSlice(raws []*generated.ResolvedTruncateStmtProto) []*Tr
 	return nodes
 }
 
-func (n *TruncateStmtNode) Kind() Kind     { return KindTruncateStmt }
+func (n *TruncateStmtNode) Kind() Kind { return KindTruncateStmt }
+
+func (n *TruncateStmtNode) String() string { return formatNode(n) }
 func (n *TruncateStmtNode) statementNode() {}
 
 func (n *TruncateStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -19639,7 +20167,9 @@ func newUndropStmtNodeSlice(raws []*generated.ResolvedUndropStmtProto) []*Undrop
 	return nodes
 }
 
-func (n *UndropStmtNode) Kind() Kind     { return KindUndropStmt }
+func (n *UndropStmtNode) Kind() Kind { return KindUndropStmt }
+
+func (n *UndropStmtNode) String() string { return formatNode(n) }
 func (n *UndropStmtNode) statementNode() {}
 
 func (n *UndropStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -19728,8 +20258,10 @@ func newUnnestItemNodeSlice(raws []*generated.ResolvedUnnestItemProto) []*Unnest
 	return nodes
 }
 
-func (n *UnnestItemNode) Kind() Kind    { return KindUnnestItem }
-func (n *UnnestItemNode) argumentNode() {}
+func (n *UnnestItemNode) Kind() Kind { return KindUnnestItem }
+
+func (n *UnnestItemNode) String() string { return formatNode(n) }
+func (n *UnnestItemNode) argumentNode()  {}
 
 func (n *UnnestItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -19798,8 +20330,10 @@ func newUnpivotArgNodeSlice(raws []*generated.ResolvedUnpivotArgProto) []*Unpivo
 	return nodes
 }
 
-func (n *UnpivotArgNode) Kind() Kind    { return KindUnpivotArg }
-func (n *UnpivotArgNode) argumentNode() {}
+func (n *UnpivotArgNode) Kind() Kind { return KindUnpivotArg }
+
+func (n *UnpivotArgNode) String() string { return formatNode(n) }
+func (n *UnpivotArgNode) argumentNode()  {}
 
 func (n *UnpivotArgNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -19851,7 +20385,9 @@ func newUnpivotScanNodeSlice(raws []*generated.ResolvedUnpivotScanProto) []*Unpi
 }
 
 func (n *UnpivotScanNode) Kind() Kind { return KindUnpivotScan }
-func (n *UnpivotScanNode) scanNode()  {}
+
+func (n *UnpivotScanNode) String() string { return formatNode(n) }
+func (n *UnpivotScanNode) scanNode()      {}
 
 func (n *UnpivotScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -19976,7 +20512,9 @@ func newUnsetArgumentScanNodeSlice(raws []*generated.ResolvedUnsetArgumentScanPr
 }
 
 func (n *UnsetArgumentScanNode) Kind() Kind { return KindUnsetArgumentScan }
-func (n *UnsetArgumentScanNode) scanNode()  {}
+
+func (n *UnsetArgumentScanNode) String() string { return formatNode(n) }
+func (n *UnsetArgumentScanNode) scanNode()      {}
 
 func (n *UnsetArgumentScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20031,7 +20569,9 @@ func newUpdateConstructorNodeSlice(raws []*generated.ResolvedUpdateConstructorPr
 }
 
 func (n *UpdateConstructorNode) Kind() Kind { return KindUpdateConstructor }
-func (n *UpdateConstructorNode) exprNode()  {}
+
+func (n *UpdateConstructorNode) String() string { return formatNode(n) }
+func (n *UpdateConstructorNode) exprNode()      {}
 
 func (n *UpdateConstructorNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20107,8 +20647,10 @@ func newUpdateFieldItemNodeSlice(raws []*generated.ResolvedUpdateFieldItemProto)
 	return nodes
 }
 
-func (n *UpdateFieldItemNode) Kind() Kind    { return KindUpdateFieldItem }
-func (n *UpdateFieldItemNode) argumentNode() {}
+func (n *UpdateFieldItemNode) Kind() Kind { return KindUpdateFieldItem }
+
+func (n *UpdateFieldItemNode) String() string { return formatNode(n) }
+func (n *UpdateFieldItemNode) argumentNode()  {}
 
 func (n *UpdateFieldItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20168,8 +20710,10 @@ func newUpdateItemElementNodeSlice(raws []*generated.ResolvedUpdateItemElementPr
 	return nodes
 }
 
-func (n *UpdateItemElementNode) Kind() Kind    { return KindUpdateItemElement }
-func (n *UpdateItemElementNode) argumentNode() {}
+func (n *UpdateItemElementNode) Kind() Kind { return KindUpdateItemElement }
+
+func (n *UpdateItemElementNode) String() string { return formatNode(n) }
+func (n *UpdateItemElementNode) argumentNode()  {}
 
 func (n *UpdateItemElementNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20234,8 +20778,10 @@ func newUpdateItemNodeSlice(raws []*generated.ResolvedUpdateItemProto) []*Update
 	return nodes
 }
 
-func (n *UpdateItemNode) Kind() Kind    { return KindUpdateItem }
-func (n *UpdateItemNode) argumentNode() {}
+func (n *UpdateItemNode) Kind() Kind { return KindUpdateItem }
+
+func (n *UpdateItemNode) String() string { return formatNode(n) }
+func (n *UpdateItemNode) argumentNode()  {}
 
 func (n *UpdateItemNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20345,7 +20891,9 @@ func newUpdateStmtNodeSlice(raws []*generated.ResolvedUpdateStmtProto) []*Update
 	return nodes
 }
 
-func (n *UpdateStmtNode) Kind() Kind     { return KindUpdateStmt }
+func (n *UpdateStmtNode) Kind() Kind { return KindUpdateStmt }
+
+func (n *UpdateStmtNode) String() string { return formatNode(n) }
 func (n *UpdateStmtNode) statementNode() {}
 
 func (n *UpdateStmtNode) ParseLocationRange() *generated.ParseLocationRangeProto {
@@ -20498,8 +21046,10 @@ func newWindowFrameExprNodeSlice(raws []*generated.ResolvedWindowFrameExprProto)
 	return nodes
 }
 
-func (n *WindowFrameExprNode) Kind() Kind    { return KindWindowFrameExpr }
-func (n *WindowFrameExprNode) argumentNode() {}
+func (n *WindowFrameExprNode) Kind() Kind { return KindWindowFrameExpr }
+
+func (n *WindowFrameExprNode) String() string { return formatNode(n) }
+func (n *WindowFrameExprNode) argumentNode()  {}
 
 func (n *WindowFrameExprNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20555,8 +21105,10 @@ func newWindowFrameNodeSlice(raws []*generated.ResolvedWindowFrameProto) []*Wind
 	return nodes
 }
 
-func (n *WindowFrameNode) Kind() Kind    { return KindWindowFrame }
-func (n *WindowFrameNode) argumentNode() {}
+func (n *WindowFrameNode) Kind() Kind { return KindWindowFrame }
+
+func (n *WindowFrameNode) String() string { return formatNode(n) }
+func (n *WindowFrameNode) argumentNode()  {}
 
 func (n *WindowFrameNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20606,8 +21158,10 @@ func newWindowOrderingNodeSlice(raws []*generated.ResolvedWindowOrderingProto) [
 	return nodes
 }
 
-func (n *WindowOrderingNode) Kind() Kind    { return KindWindowOrdering }
-func (n *WindowOrderingNode) argumentNode() {}
+func (n *WindowOrderingNode) Kind() Kind { return KindWindowOrdering }
+
+func (n *WindowOrderingNode) String() string { return formatNode(n) }
+func (n *WindowOrderingNode) argumentNode()  {}
 
 func (n *WindowOrderingNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20670,8 +21224,10 @@ func newWindowPartitioningNodeSlice(raws []*generated.ResolvedWindowPartitioning
 	return nodes
 }
 
-func (n *WindowPartitioningNode) Kind() Kind    { return KindWindowPartitioning }
-func (n *WindowPartitioningNode) argumentNode() {}
+func (n *WindowPartitioningNode) Kind() Kind { return KindWindowPartitioning }
+
+func (n *WindowPartitioningNode) String() string { return formatNode(n) }
+func (n *WindowPartitioningNode) argumentNode()  {}
 
 func (n *WindowPartitioningNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20738,8 +21294,10 @@ func newWithEntryNodeSlice(raws []*generated.ResolvedWithEntryProto) []*WithEntr
 	return nodes
 }
 
-func (n *WithEntryNode) Kind() Kind    { return KindWithEntry }
-func (n *WithEntryNode) argumentNode() {}
+func (n *WithEntryNode) Kind() Kind { return KindWithEntry }
+
+func (n *WithEntryNode) String() string { return formatNode(n) }
+func (n *WithEntryNode) argumentNode()  {}
 
 func (n *WithEntryNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20796,7 +21354,9 @@ func newWithExprNodeSlice(raws []*generated.ResolvedWithExprProto) []*WithExprNo
 }
 
 func (n *WithExprNode) Kind() Kind { return KindWithExpr }
-func (n *WithExprNode) exprNode()  {}
+
+func (n *WithExprNode) String() string { return formatNode(n) }
+func (n *WithExprNode) exprNode()      {}
 
 func (n *WithExprNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20860,8 +21420,10 @@ func newWithPartitionColumnsNodeSlice(raws []*generated.ResolvedWithPartitionCol
 	return nodes
 }
 
-func (n *WithPartitionColumnsNode) Kind() Kind    { return KindWithPartitionColumns }
-func (n *WithPartitionColumnsNode) argumentNode() {}
+func (n *WithPartitionColumnsNode) Kind() Kind { return KindWithPartitionColumns }
+
+func (n *WithPartitionColumnsNode) String() string { return formatNode(n) }
+func (n *WithPartitionColumnsNode) argumentNode()  {}
 
 func (n *WithPartitionColumnsNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20913,7 +21475,9 @@ func newWithRefScanNodeSlice(raws []*generated.ResolvedWithRefScanProto) []*With
 }
 
 func (n *WithRefScanNode) Kind() Kind { return KindWithRefScan }
-func (n *WithRefScanNode) scanNode()  {}
+
+func (n *WithRefScanNode) String() string { return formatNode(n) }
+func (n *WithRefScanNode) scanNode()      {}
 
 func (n *WithRefScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
@@ -20972,7 +21536,9 @@ func newWithScanNodeSlice(raws []*generated.ResolvedWithScanProto) []*WithScanNo
 }
 
 func (n *WithScanNode) Kind() Kind { return KindWithScan }
-func (n *WithScanNode) scanNode()  {}
+
+func (n *WithScanNode) String() string { return formatNode(n) }
+func (n *WithScanNode) scanNode()      {}
 
 func (n *WithScanNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return n.raw.GetParent().GetParent().GetParseLocationRange()

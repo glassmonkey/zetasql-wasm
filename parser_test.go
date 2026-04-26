@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/glassmonkey/zetasql-wasm/ast"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-// TestParser_ParseStatement_AST verifies AST shape via ast.DebugString
-// (test helper that flattens the tree). Triangulated across multiple SQL shapes.
+// TestParser_ParseStatement_AST verifies AST shape via the canonical
+// String() representation defined in package ast. Triangulated across
+// multiple SQL shapes.
 func TestParser_ParseStatement_AST(t *testing.T) {
 	// Arrange (shared)
 	ctx := context.Background()
@@ -93,11 +93,12 @@ func TestParser_ParseStatement_AST(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
-			parsed, err := parser.ParseStatement(ctx, tt.sql)
-			require.NoError(t, err)
+			sut := parser
 
 			// Act
-			got := ast.DebugString(parsed.Root)
+			parsed, err := sut.ParseStatement(ctx, tt.sql)
+			require.NoError(t, err)
+			got := parsed.Root.String()
 
 			// Assert
 			assert.Equal(t, tt.want, got)
