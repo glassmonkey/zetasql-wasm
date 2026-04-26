@@ -6,12 +6,17 @@ description: >
   assertion implementation, AAA structure, table-driven triangulation,
   payload structs defined on the production side, no getters in tests,
   wantErr type witness, minimal helpers, behavior over internal state
-  (per xUnit Test Patterns). Use this skill whenever the user
-  says "write a test", "add a test for X", "review my tests", "look at this
-  test code", "do my tests follow the conventions?", "improve these tests",
-  "refactor these tests", or opens a *_test.go file with intent to author
-  or improve it. Production-code design concerns belong to the `developer`
-  skill; the TDD cycle belongs to the `tdd` skill.
+  (per xUnit Test Patterns). Includes a code-level red-flag table and a
+  mandatory pre-completion sniff scan so test smells (Mystery Guest,
+  Buggy Tests, Sensitive Equality, etc.) get caught proactively on the
+  first pass instead of after user pushback. Use this skill whenever
+  the user says "write a test", "add a test for X", "review my tests",
+  "look at this test code", "do my tests follow the conventions?",
+  "improve these tests", "refactor these tests", or opens a *_test.go
+  file with intent to author or improve it — and apply the sniff scan
+  to your own test work even if no review was requested. Production-code
+  design concerns belong to the `developer` skill; the TDD cycle belongs
+  to the `tdd` skill.
 ---
 
 # Tester
@@ -257,6 +262,48 @@ Phrase the test as "given <input>, when <SUT call>, then <observable result>". I
 
 **Why**: Without this filter, the test suite grows to mirror the implementation rather than the contract. Every refactor (renaming a field, swapping `Features` from `map` to `[]LanguageFeature`, dropping a redundant export check) breaks tests that aren't flagging real regressions, which conditions everyone to either skip the failing tests or skip the refactor. Both outcomes are worse than not having the test.
 
+## Code-level red flags (proactive scan)
+
+The rules above are diagnostic — they tell you *what's wrong* once you suspect a problem. This section is the inverse: **concrete code patterns that should immediately raise suspicion**, mapped to the rule/smell to invoke.
+
+The point is to catch issues on the first read, before any human pushback. Scan any test file (yours or someone else's) against this table. Each row is grep-able.
+
+| Pattern visible in the test code | Suspect | First action |
+|---|---|---|
+| `got := sut` with no method invocation between Arrange and Assert | R0 / R12 / AP6 | The test isn't probing any behavior — likely a constructor-only test. Delete it, or invoke a real method as Act. |
+| `got := sut.Field` after `sut := &X{...}` (no method called) | R12 / Sensitive Equality | Either the assertion goes through a method that has logic, or the test is verifying Go's `=`. Delete or refactor. |
+| `assert.True(t, sut.Map[k])` directly after `sut.SetX(k)` (or equivalent) | AP5 / R12 | Verify through an observable path (e.g., `sut.toProto()`) — or, if the mutator has no logic, delete the test entirely. |
+| `if tt.wantErr { assert.Error } else { assert.NoError }` inside a case loop | R8 / Conditional Test Logic | Replace `wantErr bool` with `wantErr error` (typed witness) and use `assert.IsType` / `assert.ErrorIs`. |
+| Helper body contains `if`/`switch`/`for` with a fallback `return ""` | R9 / Test Logic in Test | Inline the helper into the test, or split each branch into its own one-line case. |
+| Test name `TestNewXxx` whose body just compares `NewXxx(...)` to `&Xxx{...}` | AP6 / Buggy Tests candidate | Delete unless `NewXxx` has real defaults / validation / allocation. |
+| Test asserts that a particular entry exists in a generated/internal lookup (e.g., `compiledModule.ExportedFunctions()["foo"]`) | AP5 | A higher-level behavior test already exercises that entry. Confirm and delete the lookup test. |
+| Same Arrange block (more than ~5 lines) duplicated across 3+ tests | Test Code Duplication | Extract a Creation Method (`newXxxCatalog` etc.). The helper must stay R9-trivial. |
+| `t.Errorf` / `t.Fatalf` used as the assertion (not as a guard) | R1 | Migrate to `assert.*` / `require.*`. |
+| `cmp.Diff` used against a plain Go struct (no `protocmp.Transform()`) | R1 / convention drift | `assert.Equal` is sufficient and gives clearer failure output. |
+| Test depends on file paths, env vars, current time, or test execution order | R10 / Mystery Guest / Context Sensitivity | Inline the data, stub the dependency, or use a Virtual Clock. |
+| Test verifies a function that has zero production callers (only tests use it) | R11 | The function is dead code held alive by its test. Delete both unless it's about to gain a real caller. |
+| `t.Run(tt.name, func(t *testing.T) { ... })` body has 2+ unrelated `assert.*` calls | R3 / Assertion Roulette | Split into separate cases or build a complete `want` struct. |
+
+When in doubt about the smell name, look it up in [`references/xunit-patterns.md`](references/xunit-patterns.md). Naming the smell precisely makes the fix obvious.
+
+## Pre-completion sniff scan (mandatory)
+
+Before declaring any test work "done" — whether you authored it (Author mode) or reviewed it (Review mode) — run this scan over the affected files. Skipping this step is how the rules end up enforced only after user pushback, and that's exactly what this skill exists to prevent.
+
+The scan, in order:
+
+1. **R0 shape check**. For every `func Test...` you touched, confirm the body has both `sut := <target>` and `sut.<Method>(args)` (or the function-as-SUT equivalent `got := <fn>(args)`). If a test only constructs and asserts without invoking any method/function, suspect R12 / AP6 — investigate before proceeding.
+
+2. **Red-flag scan**. Walk the "Code-level red flags" table above against the diff. For each row that hits, take the prescribed first action (fix or delete). Do not defer to "follow-up" — the whole point is to handle these on the same pass.
+
+3. **Production-side dead code**. If you deleted a test, search for other callers of the production function that test exercised. If the test was the only consumer, the production function is now dead code held alive by nothing — delete it (R11). This is how exported `TypeFromProto` and `NodeFromBytes` should have been caught the first time.
+
+4. **Smell-naming pass**. For each issue found, name the Meszaros smell (Mystery Guest, Buggy Tests, Sensitive Equality, etc.) using `references/xunit-patterns.md`. If a fix is going into a commit, put the smell name in the commit message — future readers and skill iterations both benefit.
+
+5. **Borderline cases**. If a test feels off but you cannot point to a specific rule/smell, surface it to the user with the candidate diagnosis ("might be Fragile Test because Y"). Do not silently leave it. Borderline calls are the user's decision; smells you can name are yours.
+
+The bar: by the time you say "done", a reviewer reading the resulting test file should not need to point out any of the patterns above. If they do, it means this scan was skipped.
+
 ## Author mode (writing a new test)
 
 Use this when invoked from the `tdd` cycle (Step 2: red) or when the user asks "write a test for X".
@@ -331,6 +378,10 @@ What **not** to copy:
 
 When in doubt: the rules win, the example loses.
 
+### A7: Run the pre-completion sniff scan
+
+Before declaring the new test "done" (or before signalling that the TDD red phase is satisfied), execute the [Pre-completion sniff scan](#pre-completion-sniff-scan-mandatory). This is not optional — its purpose is to catch issues on the first pass instead of after user feedback. If the scan flags something, fix or delete it now; don't push it to a "follow-up".
+
 ## Review mode (reading an existing test)
 
 Use this when the user says "review my tests" or similar.
@@ -344,7 +395,10 @@ Ask the user which file/directory to review. If unspecified:
 Use the `Read` tool to load the target files completely. Include shared helper files within the same package.
 
 ### Step 3: Check rule by rule
-Walk each test function through R1–R11. Record every violation.
+Walk each test function through R1–R12. Record every violation.
+
+### Step 3b: Run the red-flag scan
+After the rule pass, sweep the same files against the [Code-level red flags](#code-level-red-flags-proactive-scan) table. The table targets surface patterns that the rule pass can miss when reading large files quickly — dead-code tests, internal-state assertions, conditional test logic, and the like. Add any new findings to the report.
 
 ### Step 4: Output the report
 
