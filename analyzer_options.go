@@ -4,8 +4,10 @@ import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 
 // AnalyzerOptions configures the behavior of the ZetaSQL analyzer.
 type AnalyzerOptions struct {
-	Language                *LanguageOptions
-	ParseLocationRecordType *generated.ParseLocationRecordType
+	Language                  *LanguageOptions
+	ParseLocationRecordType   *generated.ParseLocationRecordType
+	AllowUndeclaredParameters bool
+	ParameterMode             generated.ParameterMode
 }
 
 // NewAnalyzerOptions creates AnalyzerOptions with default settings.
@@ -18,7 +20,10 @@ func NewAnalyzerOptions() *AnalyzerOptions {
 // ParseLocationRecordType is duplicated so that mutations of either side
 // do not leak across.
 func (o *AnalyzerOptions) Clone() *AnalyzerOptions {
-	clone := &AnalyzerOptions{}
+	clone := &AnalyzerOptions{
+		AllowUndeclaredParameters: o.AllowUndeclaredParameters,
+		ParameterMode:             o.ParameterMode,
+	}
 	if o.Language != nil {
 		clone.Language = o.Language.clone()
 	}
@@ -36,6 +41,14 @@ func (o *AnalyzerOptions) toProto() *generated.AnalyzerOptionsProto {
 	}
 	if o.ParseLocationRecordType != nil {
 		p.ParseLocationRecordType = o.ParseLocationRecordType
+	}
+	if o.AllowUndeclaredParameters {
+		b := true
+		p.AllowUndeclaredParameters = &b
+	}
+	if o.ParameterMode != 0 {
+		m := o.ParameterMode
+		p.ParameterMode = &m
 	}
 	return p
 }
