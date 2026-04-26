@@ -37,7 +37,7 @@ type Statement struct {
 // NewParser creates a new ZetaSQL parser instance
 func NewParser(ctx context.Context) (*Parser, error) {
 	// Create a new WebAssembly runtime
-	runtime := wazero.NewRuntime(ctx)
+	runtime := wazero.NewRuntimeWithConfig(ctx, sharedRuntimeConfig())
 
 	// Instantiate WASI
 	if _, err := wasi_snapshot_preview1.Instantiate(ctx, runtime); err != nil {

@@ -13,6 +13,7 @@ import (
 // TestLanguageOptions_SetSupportedStatementKinds verifies that the kinds
 // passed to SetSupportedStatementKinds are reflected in ToProto output.
 func TestLanguageOptions_SetSupportedStatementKinds(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name  string
 		kinds []generated.ResolvedNodeKind
@@ -38,6 +39,7 @@ func TestLanguageOptions_SetSupportedStatementKinds(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Arrange
 			sut := NewLanguageOptions()
 			sut.SetSupportedStatementKinds(tt.kinds)
@@ -54,6 +56,7 @@ func TestLanguageOptions_SetSupportedStatementKinds(t *testing.T) {
 // TestLanguageOptions_SetSupportsAllStatementKinds verifies that the
 // "all kinds supported" signal is an empty slice in ToProto output.
 func TestLanguageOptions_SetSupportsAllStatementKinds(t *testing.T) {
+	t.Parallel()
 	// Arrange
 	sut := NewLanguageOptions()
 	sut.SetSupportedStatementKinds([]generated.ResolvedNodeKind{
@@ -73,6 +76,7 @@ func TestLanguageOptions_SetSupportsAllStatementKinds(t *testing.T) {
 // representative released features are enabled and test-only features are not.
 // Triangulated across feature flags rather than count thresholds.
 func TestLanguageOptions_EnableMaximumLanguageFeatures(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		feature generated.LanguageFeature
@@ -97,6 +101,7 @@ func TestLanguageOptions_EnableMaximumLanguageFeatures(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Arrange
 			sut := NewLanguageOptions()
 			sut.EnableMaximumLanguageFeatures()
@@ -115,6 +120,7 @@ func TestLanguageOptions_EnableMaximumLanguageFeatures(t *testing.T) {
 // FEATURE_TEST_IDEALLY_ENABLED_BUT_IN_DEVELOPMENT, which is excluded from
 // released because of its FEATURE_TEST_ prefix).
 func TestLanguageOptions_EnableMaximumLanguageFeaturesForDevelopment(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		feature generated.LanguageFeature
@@ -134,6 +140,7 @@ func TestLanguageOptions_EnableMaximumLanguageFeaturesForDevelopment(t *testing.
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Arrange
 			sut := NewLanguageOptions()
 			sut.EnableMaximumLanguageFeaturesForDevelopment()
@@ -150,6 +157,7 @@ func TestLanguageOptions_EnableMaximumLanguageFeaturesForDevelopment(t *testing.
 // TestLanguageOptions_EnableReservableKeyword verifies the reserved-keyword
 // list in ToProto reflects EnableReservableKeyword calls.
 func TestLanguageOptions_EnableReservableKeyword(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		enable  []string
@@ -171,6 +179,7 @@ func TestLanguageOptions_EnableReservableKeyword(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Arrange
 			sut := NewLanguageOptions()
 			for _, kw := range tt.enable {
@@ -271,6 +280,7 @@ func TestLanguageOptions_toProto_NameResolutionMode(t *testing.T) {
 // resolved literal value extracted from the analysis output. Triangulated
 // across two literal values.
 func TestLanguageOptions_AnalyzerIntegration(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name string
 		sql  string
@@ -282,6 +292,7 @@ func TestLanguageOptions_AnalyzerIntegration(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Arrange
 			ctx := t.Context()
 			a := newTestAnalyzer(t)
@@ -309,6 +320,7 @@ func TestLanguageOptions_AnalyzerIntegration(t *testing.T) {
 // analyzer rejects SQL whose statement kind is not in the supported list.
 // wantErr is a type witness compared via assert.IsType.
 func TestLanguageOptions_RejectsUnsupportedStatementKind(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name         string
 		allowedKinds []generated.ResolvedNodeKind
@@ -331,6 +343,7 @@ func TestLanguageOptions_RejectsUnsupportedStatementKind(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Arrange
 			ctx := t.Context()
 			a := newTestAnalyzer(t)

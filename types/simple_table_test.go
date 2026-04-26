@@ -10,6 +10,7 @@ import (
 )
 
 func TestSimpleTableToProto(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name  string
 		table *SimpleTable
@@ -51,12 +52,14 @@ func TestSimpleTableToProto(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			assert.Empty(t, cmp.Diff(tt.want, tt.table.ToProto(), protocmp.Transform()), "ToProto() mismatch")
 		})
 	}
 }
 
 func TestSimpleTableAddColumnToProto(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name string
 		add  []*SimpleColumn
@@ -106,6 +109,7 @@ func TestSimpleTableAddColumnToProto(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			table := NewSimpleTable("t")
 			table.Columns = append(table.Columns, tt.add...)
 			assert.Empty(t, cmp.Diff(tt.want, table.ToProto(), protocmp.Transform()), "ToProto() mismatch")

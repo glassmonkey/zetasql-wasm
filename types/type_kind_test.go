@@ -7,6 +7,7 @@ import (
 )
 
 func TestTypeKindIsSimple(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		kind TypeKind
 		want bool

@@ -38,7 +38,7 @@ type Analyzer struct {
 
 // NewAnalyzer creates a new ZetaSQL analyzer instance.
 func NewAnalyzer(ctx context.Context) (*Analyzer, error) {
-	runtime := wazero.NewRuntime(ctx)
+	runtime := wazero.NewRuntimeWithConfig(ctx, sharedRuntimeConfig())
 
 	if _, err := wasi_snapshot_preview1.Instantiate(ctx, runtime); err != nil {
 		_ = runtime.Close(ctx)

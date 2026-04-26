@@ -11,6 +11,7 @@ import (
 )
 
 func TestTypeInterfaceDispatch(t *testing.T) {
+	t.Parallel()
 	arr, _ := NewArrayType(Int64Type())
 	st, _ := NewStructType([]*StructField{NewStructField("x", Int64Type())})
 
@@ -27,6 +28,7 @@ func TestTypeInterfaceDispatch(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			assert.Equal(t, tt.wantKind, tt.typ.Kind())
 			assert.Equal(t, tt.wantArray, tt.typ.IsArray())
 			assert.Equal(t, tt.wantStruct, tt.typ.IsStruct())
@@ -35,6 +37,7 @@ func TestTypeInterfaceDispatch(t *testing.T) {
 }
 
 func TestScalarTypeToProtoRoundTrip(t *testing.T) {
+	t.Parallel()
 	for kind, typ := range scalarTypes {
 		got := typ.ToProto()
 		want := &generated.TypeProto{TypeKind: generated.TypeKind(kind).Enum()}
