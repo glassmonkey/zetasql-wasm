@@ -19,9 +19,32 @@ func TestNode_String(t *testing.T) {
 		want string
 	}{
 		{
-			name: "IntLiteral has no scalar suffix",
-			node: newIntLiteralNode(&generated.ASTIntLiteralProto{}),
-			want: "KindIntLiteral\n",
+			name: "IntLiteral emits [<image>]",
+			node: newIntLiteralNode(&generated.ASTIntLiteralProto{
+				Parent: &generated.ASTPrintableLeafProto{Image: ptr("42")},
+			}),
+			want: "KindIntLiteral [42]\n",
+		},
+		{
+			name: "FloatLiteral emits [<image>]",
+			node: newFloatLiteralNode(&generated.ASTFloatLiteralProto{
+				Parent: &generated.ASTPrintableLeafProto{Image: ptr("3.14")},
+			}),
+			want: "KindFloatLiteral [3.14]\n",
+		},
+		{
+			name: "BooleanLiteral emits [<image>]",
+			node: newBooleanLiteralNode(&generated.ASTBooleanLiteralProto{
+				Parent: &generated.ASTPrintableLeafProto{Image: ptr("true")},
+			}),
+			want: "KindBooleanLiteral [true]\n",
+		},
+		{
+			name: "NullLiteral emits [<image>]",
+			node: newNullLiteralNode(&generated.ASTNullLiteralProto{
+				Parent: &generated.ASTPrintableLeafProto{Image: ptr("NULL")},
+			}),
+			want: "KindNullLiteral [NULL]\n",
 		},
 		{
 			name: "Identifier emits [<id>]",
@@ -40,6 +63,42 @@ func TestNode_String(t *testing.T) {
 			}),
 			want: "KindQueryStatement\n" +
 				"  KindQuery\n",
+		},
+		{
+			name: "Select without DISTINCT emits no marker",
+			node: newSelectNode(&generated.ASTSelectProto{}),
+			want: "KindSelect\n",
+		},
+		{
+			name: "Select with DISTINCT emits [DISTINCT]",
+			node: newSelectNode(&generated.ASTSelectProto{Distinct: ptr(true)}),
+			want: "KindSelect [DISTINCT]\n",
+		},
+		{
+			name: "OrderingExpression unspecified emits [NOT_SET]",
+			node: newOrderingExpressionNode(&generated.ASTOrderingExpressionProto{}),
+			want: "KindOrderingExpression [NOT_SET]\n",
+		},
+		{
+			name: "OrderingExpression DESC emits [DESC]",
+			node: newOrderingExpressionNode(&generated.ASTOrderingExpressionProto{
+				OrderingSpec: ptr(generated.ASTOrderingExpressionEnums_DESC),
+			}),
+			want: "KindOrderingExpression [DESC]\n",
+		},
+		{
+			name: "SetOperationAllOrDistinct ALL emits [ALL]",
+			node: newSetOperationAllOrDistinctNode(&generated.ASTSetOperationAllOrDistinctProto{
+				Value: ptr(generated.ASTSetOperationEnums_ALL),
+			}),
+			want: "KindSetOperationAllOrDistinct [ALL]\n",
+		},
+		{
+			name: "SetOperationType UNION emits [UNION]",
+			node: newSetOperationTypeNode(&generated.ASTSetOperationTypeProto{
+				Value: ptr(generated.ASTSetOperationEnums_UNION),
+			}),
+			want: "KindSetOperationType [UNION]\n",
 		},
 	}
 

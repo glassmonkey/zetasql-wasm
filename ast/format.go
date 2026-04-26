@@ -31,6 +31,27 @@ func nodeScalar(n Node) string {
 		return " [" + v.IdString() + "]"
 	case *StringLiteralNode:
 		return " [" + v.StringValue() + "]"
+	case *IntLiteralNode:
+		return " [" + v.raw.GetParent().GetImage() + "]"
+	case *FloatLiteralNode:
+		return " [" + v.raw.GetParent().GetImage() + "]"
+	case *BooleanLiteralNode:
+		return " [" + v.raw.GetParent().GetImage() + "]"
+	case *NullLiteralNode:
+		return " [" + v.raw.GetParent().GetImage() + "]"
+	case *MaxLiteralNode:
+		return " [" + v.raw.GetParent().GetImage() + "]"
+	case *SelectNode:
+		if v.Distinct() {
+			return " [DISTINCT]"
+		}
+		return ""
+	case *OrderingExpressionNode:
+		return " [" + v.OrderingSpec().String() + "]"
+	case *SetOperationAllOrDistinctNode:
+		return " [" + v.Value().String() + "]"
+	case *SetOperationTypeNode:
+		return " [" + v.Value().String() + "]"
 	}
 	return ""
 }

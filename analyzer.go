@@ -208,9 +208,8 @@ func (a *Analyzer) callAnalyze(
 		return nil, fmt.Errorf("failed to read data from WASM memory")
 	}
 
-	dataStr := string(dataBytes)
-	if len(dataStr) > 6 && dataStr[:6] == "Error:" {
-		return nil, &AnalyzeError{Message: dataStr[7:]}
+	if msg := wasm.ParseResultMessage(dataBytes); msg != "" {
+		return nil, &AnalyzeError{Message: msg}
 	}
 
 	response := &generated.AnalyzeResponse{}
