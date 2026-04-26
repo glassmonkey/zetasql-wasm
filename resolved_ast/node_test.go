@@ -58,23 +58,3 @@ func TestStatementFromBytes_InvalidBytes(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestNodeFromBytes(t *testing.T) {
-	// Wrap a statement inside AnyResolvedNodeProto
-	nodeProto := &generated.AnyResolvedNodeProto{
-		Node: &generated.AnyResolvedNodeProto_ResolvedStatementNode{
-			ResolvedStatementNode: &generated.AnyResolvedStatementProto{
-				Node: &generated.AnyResolvedStatementProto_ResolvedQueryStmtNode{
-					ResolvedQueryStmtNode: &generated.ResolvedQueryStmtProto{},
-				},
-			},
-		},
-	}
-
-	data, err := proto.Marshal(nodeProto)
-	require.NoError(t, err)
-
-	node, err := NodeFromBytes(data)
-	require.NoError(t, err)
-
-	assert.Equal(t, KindQueryStmt, node.Kind())
-}

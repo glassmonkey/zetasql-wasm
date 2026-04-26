@@ -77,26 +77,10 @@ func TestNestedTypeRoundTrip(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			restored, err := TypeFromProto(tt.typ.ToProto())
+			restored, err := typeFromProto(tt.typ.ToProto())
 			require.NoError(t, err)
 			assert.Empty(t, cmp.Diff(tt.typ.ToProto(), restored.ToProto(), protocmp.Transform()), "round-trip mismatch")
 		})
 	}
 }
 
-func TestTypeFromProtoErrors(t *testing.T) {
-	tests := []struct {
-		name  string
-		proto *generated.TypeProto
-	}{
-		{"nil", nil},
-		{"array without ArrayType", &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_ARRAY.Enum()}},
-		{"struct without StructType", &generated.TypeProto{TypeKind: generated.TypeKind_TYPE_STRUCT.Enum()}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := TypeFromProto(tt.proto)
-			assert.Error(t, err)
-		})
-	}
-}

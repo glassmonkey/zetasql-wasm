@@ -44,7 +44,7 @@ func TestLanguageOptions_SetSupportedStatementKinds(t *testing.T) {
 			sut.SetSupportedStatementKinds(tt.kinds)
 
 			// Act
-			got := sut.ToProto().GetSupportedStatementKinds()
+			got := sut.toProto().GetSupportedStatementKinds()
 
 			// Assert
 			assert.Equal(t, tt.want, got)
@@ -63,7 +63,7 @@ func TestLanguageOptions_SetSupportsAllStatementKinds(t *testing.T) {
 	sut.SetSupportsAllStatementKinds()
 
 	// Act
-	got := sut.ToProto().GetSupportedStatementKinds()
+	got := sut.toProto().GetSupportedStatementKinds()
 
 	// Assert
 	var want []generated.ResolvedNodeKind
@@ -182,7 +182,7 @@ func TestLanguageOptions_EnableReservableKeyword(t *testing.T) {
 			}
 
 			// Act
-			got := sut.ToProto().GetReservedKeywords()
+			got := sut.toProto().GetReservedKeywords()
 			sort.Strings(got)
 
 			// Assert

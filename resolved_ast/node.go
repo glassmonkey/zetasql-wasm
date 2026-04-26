@@ -28,15 +28,6 @@ func StatementFromBytes(data []byte) (StatementNode, error) {
 	return wrapStatement(p), nil
 }
 
-// NodeFromBytes unmarshals serialized proto bytes into any Node.
-func NodeFromBytes(data []byte) (Node, error) {
-	p := &generated.AnyResolvedNodeProto{}
-	if err := proto.Unmarshal(data, p); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal proto: %w", err)
-	}
-	return wrapNode(p), nil
-}
-
 // StatementNode is the interface for resolved statement nodes.
 type StatementNode interface {
 	Node

@@ -32,7 +32,7 @@ func (o *AnalyzerOptions) Clone() *AnalyzerOptions {
 func (o *AnalyzerOptions) toProto() *generated.AnalyzerOptionsProto {
 	p := &generated.AnalyzerOptionsProto{}
 	if o.Language != nil {
-		p.LanguageOptions = o.Language.ToProto()
+		p.LanguageOptions = o.Language.toProto()
 	}
 	if o.ParseLocationRecordType != nil {
 		p.ParseLocationRecordType = o.ParseLocationRecordType

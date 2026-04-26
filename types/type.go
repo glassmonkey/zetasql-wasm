@@ -94,11 +94,11 @@ var scalarTypes = map[TypeKind]Type{
 	Interval:   intervalType,
 }
 
-// TypeFromKind returns the singleton Type for the given scalar TypeKind.
+// typeFromKind returns the singleton Type for the given scalar TypeKind.
 // Returns an error for compound kinds (Array, Struct, etc.).
-func TypeFromKind(kind TypeKind) (Type, error) {
+func typeFromKind(kind TypeKind) (Type, error) {
 	if t, ok := scalarTypes[kind]; ok {
 		return t, nil
 	}
-	return nil, fmt.Errorf("TypeFromKind: %d is not a simple type kind", kind)
+	return nil, fmt.Errorf("typeFromKind: %d is not a simple type kind", kind)
 }

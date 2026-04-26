@@ -95,8 +95,8 @@ func (o *LanguageOptions) clone() *LanguageOptions {
 	return c
 }
 
-// ToProto converts to the protobuf representation.
-func (o *LanguageOptions) ToProto() *generated.LanguageOptionsProto {
+// toProto converts to the protobuf representation.
+func (o *LanguageOptions) toProto() *generated.LanguageOptionsProto {
 	p := &generated.LanguageOptionsProto{}
 
 	for f := range o.Features {

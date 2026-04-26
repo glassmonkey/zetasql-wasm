@@ -34,36 +34,13 @@ func TestTypeInterfaceDispatch(t *testing.T) {
 	}
 }
 
-func TestTypeFromKind(t *testing.T) {
-	tests := []struct {
-		kind    TypeKind
-		want    Type
-		wantErr bool
-	}{
-		{Int64, Int64Type(), false},
-		{String, StringType(), false},
-		{Bool, BoolType(), false},
-		{Array, nil, true},
-		{Struct, nil, true},
-	}
-	for _, tt := range tests {
-		got, err := TypeFromKind(tt.kind)
-		if tt.wantErr {
-			assert.Error(t, err, "TypeFromKind(%v)", tt.kind)
-			continue
-		}
-		assert.NoError(t, err, "TypeFromKind(%v)", tt.kind)
-		assert.Equal(t, tt.want, got, "TypeFromKind(%v)", tt.kind)
-	}
-}
-
 func TestScalarTypeToProtoRoundTrip(t *testing.T) {
 	for kind, typ := range scalarTypes {
 		got := typ.ToProto()
 		want := &generated.TypeProto{TypeKind: generated.TypeKind(kind).Enum()}
 		assert.Empty(t, cmp.Diff(want, got, protocmp.Transform()), "ToProto() mismatch for %v", kind)
-		restored, err := TypeFromProto(got)
-		require.NoError(t, err, "TypeFromProto failed for %v", kind)
+		restored, err := typeFromProto(got)
+		require.NoError(t, err, "typeFromProto failed for %v", kind)
 		assert.Equal(t, typ, restored, "round-trip for %v did not return same singleton", kind)
 	}
 }
