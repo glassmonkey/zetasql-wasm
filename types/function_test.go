@@ -4,8 +4,10 @@ import (
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 func TestFunction_ToProto(t *testing.T) {
@@ -83,29 +85,39 @@ func TestFunction_MultipleSignatures(t *testing.T) {
 	assert.Len(t, fn.ToProto().GetSignature(), 2)
 }
 
-func TestFunctionArgumentType_OptionsCardinality(t *testing.T) {
+// TestFunctionArgumentType_toProto_Options verifies how the Options
+// sub-proto is serialized: nil Options yields no Options on the wire,
+// an Options with REQUIRED (zero) cardinality yields an empty Options
+// proto, and non-zero cardinalities propagate. Want is the full Options
+// proto so a future Options field shows up in the diff.
+func TestFunctionArgumentType_toProto_Options(t *testing.T) {
 	repeated := generated.FunctionEnums_REPEATED
 	optional := generated.FunctionEnums_OPTIONAL
 
 	tests := []struct {
-		name        string
-		cardinality generated.FunctionEnums_ArgumentCardinality
-		want        *generated.FunctionEnums_ArgumentCardinality
+		name    string
+		options *FunctionArgumentTypeOptions
+		want    *generated.FunctionArgumentTypeOptionsProto
 	}{
 		{
-			name:        "REQUIRED (zero) is omitted",
-			cardinality: generated.FunctionEnums_REQUIRED,
-			want:        nil,
+			name:    "nil Options yields no Options proto",
+			options: nil,
+			want:    nil,
 		},
 		{
-			name:        "REPEATED is propagated",
-			cardinality: generated.FunctionEnums_REPEATED,
-			want:        &repeated,
+			name:    "REQUIRED (zero) yields empty Options proto",
+			options: &FunctionArgumentTypeOptions{Cardinality: generated.FunctionEnums_REQUIRED},
+			want:    &generated.FunctionArgumentTypeOptionsProto{},
 		},
 		{
-			name:        "OPTIONAL is propagated",
-			cardinality: generated.FunctionEnums_OPTIONAL,
-			want:        &optional,
+			name:    "REPEATED is propagated",
+			options: &FunctionArgumentTypeOptions{Cardinality: generated.FunctionEnums_REPEATED},
+			want:    &generated.FunctionArgumentTypeOptionsProto{Cardinality: &repeated},
+		},
+		{
+			name:    "OPTIONAL is propagated",
+			options: &FunctionArgumentTypeOptions{Cardinality: generated.FunctionEnums_OPTIONAL},
+			want:    &generated.FunctionArgumentTypeOptionsProto{Cardinality: &optional},
 		},
 	}
 
@@ -115,27 +127,16 @@ func TestFunctionArgumentType_OptionsCardinality(t *testing.T) {
 			sut := &FunctionArgumentType{
 				Kind:    generated.SignatureArgumentKind_ARG_TYPE_FIXED,
 				Type:    Int64Type(),
-				Options: &FunctionArgumentTypeOptions{Cardinality: tt.cardinality},
+				Options: tt.options,
 			}
 
 			// Act
-			got := sut.toProto().GetOptions().Cardinality
+			got := sut.toProto().GetOptions()
 
 			// Assert
-			assert.Equal(t, tt.want, got)
+			assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform()))
 		})
 	}
-}
-
-func TestFunctionArgumentType_NilOptionsOmitsProtoOptions(t *testing.T) {
-	// Arrange
-	sut := NewFunctionArgumentType(Int64Type())
-
-	// Act
-	got := sut.toProto().GetOptions()
-
-	// Assert
-	assert.Nil(t, got)
 }
 
 func TestFunction_AggregateMode(t *testing.T) {
