@@ -1,128 +1,133 @@
 ---
 name: bazel-build-expert
 description: >
-  Bazel + Emscripten + C++ WASM ビルドエラーの解析専門スキル。
-  ビルドログ(wasm/build.log)を読み取り、エビデンスに基づいた解決策を提案する。
-  ユーザーが「ビルドエラー」「build failed」「ビルドが通らない」「make buildが失敗」
-  「Bazelエラー」「コンパイルエラー」「リンカーエラー」と言及した場合、
-  またはwasm/build.logの解析を求められた場合にこのスキルを使うこと。
+  Specialist skill for analyzing Bazel + Emscripten + C++ WASM build errors.
+  Reads the build log (wasm/build.log) and proposes evidence-backed fixes.
+  Use this skill when the user mentions "build error", "build failed",
+  "build won't pass", "make build failed", "Bazel error", "compile error",
+  or "linker error", or when asked to analyze wasm/build.log.
 ---
 
 # Bazel Build Expert
 
-Bazel + Emscripten + C++ ツールチェーンのビルドエラー解析を行う。
-このプロジェクトは Docker 内で Bazel + Emscripten を使い ZetaSQL を WASM にコンパイルしている。
+Analyze build errors from the Bazel + Emscripten + C++ toolchain.
+This project compiles ZetaSQL into WASM using Bazel + Emscripten inside Docker.
 
-## 分析フロー
+## Analysis flow
 
-1. `wasm/build.log` からエラーメッセージを抽出（パスが異なる場合はユーザーに確認）
-2. エラーの種類と影響範囲を特定
-   - ターゲット用ビルド(Emscripten/WASM) か ホストツール用ビルド(GCC/clang x86_64) か
-   - コンパイルエラー / リンカーエラー / Bazel設定エラー / ツールチェーンエラー / パッチエラー
-   - `[for tool]` と `[for target]` を区別する
-3. 既知の問題を公式リポジトリで検索（可能なら `gh api` を使う）
-4. エビデンス付きで解決策を提示、またはエビデンス不足なら正直に伝える
+1. Extract the error message from `wasm/build.log` (ask the user if the path differs).
+2. Identify the kind and scope of the error:
+   - Target build (Emscripten/WASM) vs. host-tool build (GCC/clang x86_64)
+   - Compile error / linker error / Bazel config error / toolchain error / patch error
+   - Distinguish `[for tool]` from `[for target]`.
+3. Search the upstream repositories for known issues (use `gh api` when possible).
+4. Present an evidence-backed fix, or honestly report when evidence is insufficient.
 
-## エビデンスの基準
+## Evidence standards
 
-有効なエビデンスは以下のみ：
+The only acceptable evidence:
 
-- **公式ドキュメント引用**: Bazel / Emscripten / 該当ライブラリの公式ドキュメントからの直接引用（URL付き）
-- **GitHub issue/PR**: bazelbuild/bazel, emscripten-core/emscripten 等の公式リポジトリ（issue番号 + URL + 引用）
-- **ソースコード**: `.bazelrc`, ツールチェーン定義, ビルド設定の該当行（ファイルパス + 行番号）
-- **コマンド実行結果**: `gh api` や CLI ツールの実際の出力
+- **Official documentation**: direct quotes from the Bazel / Emscripten / library
+  documentation, with URLs.
+- **GitHub issue/PR**: from official repos like bazelbuild/bazel,
+  emscripten-core/emscripten (issue number + URL + quote).
+- **Source code**: the actual line of `.bazelrc`, toolchain definition, or
+  build config (file path + line number).
+- **Command output**: real output from `gh api` or other CLI tools.
 
-以下はエビデンスとして認めない：
-- WebSearch結果のみ（ブログ, Stack Overflow は補助参考のみ）
-- 「一般的に」「通常」などの曖昧な表現
-- 確認できない報告や推測
+The following are **not** acceptable as evidence:
 
-## 引用形式
+- WebSearch results alone (blog posts, Stack Overflow are reference only).
+- Vague hedges like "in general", "usually".
+- Unverifiable reports or speculation.
+
+## Citation format
 
 ```
-**出典**: [タイトル](URL)
-> "引用文"
-**ステータス**: Open/Closed（issue の場合）
+**Source**: [title](URL)
+> "quoted text"
+**Status**: Open/Closed (for issues)
 ```
 
-## 報告フォーマット
+## Report format
 
-### エビデンスがある場合
+### When evidence exists
 
 ```markdown
-## 問題の特定
-[エラーの説明]
+## Problem
+[error description]
 
-## 根本原因
-[原因の説明]
+## Root cause
+[explanation]
 
-**出典**: [リンク]
-> "引用文"
+**Source**: [link]
+> "quote"
 
-## 解決策
-[具体的な修正方法]
+## Fix
+[concrete change]
 ```
 
-### エビデンスが不足する場合
+### When evidence is insufficient
 
 ```markdown
-## 問題の特定
-[エラーの説明]
+## Problem
+[error description]
 
-## 調査結果
-以下を調査しましたが、確実な解決策は見つかりませんでした：
-1. [調査項目] - [結果]
+## Investigation
+The following were checked but no definitive fix was found:
+1. [checked item] - [result]
 
-## 提案（エビデンス不足）
-以下を**試行**することを提案しますが、確実に動作するエビデンスはありません：
-1. [アプローチ] - 根拠: [論理的推論] / リスク: [副作用] / 検証方法: [確認方法]
+## Suggestion (no firm evidence)
+The following is suggested as something to **try**, but there is no firm
+evidence that it will work:
+1. [approach] - rationale: [reasoning] / risk: [side effects] / verification: [how to confirm]
 ```
 
-## よくある問題パターン
+## Common patterns
 
-### パッチファイルエラー
+### Patch file error
 ```
 Cannot find patch file: /home/builder/workspace/patches/xxx.patch
 ```
-→ MODULE.bazel の patches リストと `wasm/assets/patches/` の実ファイルを照合
+→ Cross-check the `patches` list in `MODULE.bazel` against the actual files in `wasm/assets/patches/`.
 
-### 絶対パスインクルージョン
+### Absolute-path inclusion
 ```
 ERROR: absolute path inclusion(s) found in rule
 ```
-→ `[for tool]` vs `[for target]` を確認、`--features=-layering_check` の適用範囲を調査
+→ Confirm `[for tool]` vs `[for target]`; check the scope of `--features=-layering_check`.
 
-### コンパイラフラグエラー
+### Unknown compiler flag
 ```
 clang: error: unknown argument: '-fxxx'
 ```
-→ GCC専用 vs clang専用フラグの区別、`--copt` vs `--host_copt` の使い分け
+→ Distinguish GCC-only flags from clang-only flags; check `--copt` vs `--host_copt`.
 
-### リンカーエラー
+### Linker error
 ```
 undefined reference to `xxx'
 ```
-→ deps の欠落、Emscripten のシステムライブラリ設定を確認
+→ Look for missing `deps`; check Emscripten system-library settings.
 
-### Bazel 依存解決エラー
+### Bazel target resolution error
 ```
 no such target '@zetasql//zetasql/xxx:yyy'
 ```
-→ ZetaSQL リポジトリの実際の BUILD ファイルでターゲット名を確認
+→ Verify the actual target name in the upstream ZetaSQL repository's BUILD file.
 
-## プロジェクト固有の情報
+## Project-specific paths
 
-- ビルドは Docker 内で実行（環境隔離済み）
-- `wasm/assets/bridge.cc` — C++ ブリッジコード
-- `wasm/assets/BUILD.bazel` — Bazel ビルド定義
-- `wasm/assets/MODULE.bazel` — 依存管理（ZetaSQL バージョン、パッチ）
-- `wasm/assets/.bazelrc` — Bazel 設定フラグ
-- `wasm/assets/patches/` — ZetaSQL 用パッチファイル
-- `wasm/Makefile` — `make build` / `make rebuild` エントリポイント
-- `wasm/script/build.sh` — Docker ビルドオーケストレーション
+- Builds run inside Docker (environment is isolated).
+- `wasm/assets/bridge.cc` — C++ bridge code.
+- `wasm/assets/BUILD.bazel` — Bazel build definitions.
+- `wasm/assets/MODULE.bazel` — dependencies (ZetaSQL version, patches).
+- `wasm/assets/.bazelrc` — Bazel configuration flags.
+- `wasm/assets/patches/` — patches applied to ZetaSQL.
+- `wasm/Makefile` — `make build` / `make rebuild` entry points.
+- `wasm/script/build.sh` — Docker build orchestration.
 
-## 禁止事項
+## Prohibitions
 
-- 推測を断定として提示しない（「これで解決します」ではなく「試すことを提案します」）
-- 未確認の issue/PR 内容を引用しない
-- GCC 専用フラグを clang/Emscripten 向けに提案しない
+- Do not present speculation as fact ("this will fix it" → "I suggest trying").
+- Do not cite unverified issue/PR contents.
+- Do not propose GCC-only flags for clang/Emscripten.
