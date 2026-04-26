@@ -1,7 +1,6 @@
 package zetasql
 
 import (
-	"context"
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/catalog"
@@ -15,11 +14,20 @@ import (
 
 func newTestAnalyzer(t *testing.T) *Analyzer {
 	t.Helper()
-	ctx := context.Background()
+	ctx := t.Context()
 	a, err := NewAnalyzer(ctx)
 	require.NoError(t, err)
 	t.Cleanup(func() { a.Close(ctx) })
 	return a
+}
+
+func newTestParser(t *testing.T) *Parser {
+	t.Helper()
+	ctx := t.Context()
+	p, err := NewParser(ctx)
+	require.NoError(t, err)
+	t.Cleanup(func() { p.Close(ctx) })
+	return p
 }
 
 func newUsersCatalog() *catalog.SimpleCatalog {
@@ -64,10 +72,6 @@ func findNode[T resolved_ast.Node](t *testing.T, root resolved_ast.Node) T {
 // by the analyzer for a variety of SQL inputs. Triangulated across multiple
 // query patterns (literal, table scan, join, filter, project, function call).
 func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
-	// Arrange (shared)
-	a := newTestAnalyzer(t)
-	ctx := context.Background()
-
 	tests := []struct {
 		name string
 		sql  string
@@ -159,7 +163,8 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
-			sut := a
+			ctx := t.Context()
+			sut := newTestAnalyzer(t)
 
 			// Act
 			out, err := sut.AnalyzeStatement(ctx, tt.sql, tt.cat, NewAnalyzerOptions())

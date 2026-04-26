@@ -1,7 +1,6 @@
 package zetasql
 
 import (
-	"context"
 	"slices"
 	"testing"
 
@@ -13,11 +12,10 @@ import (
 
 func analyzeWithLocations(t *testing.T, a *Analyzer, sql string) *AnalyzeOutput {
 	t.Helper()
-	ctx := context.Background()
 	opts := &AnalyzerOptions{}
 	pt := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE
 	opts.ParseLocationRecordType = &pt
-	out, err := a.AnalyzeStatement(ctx, sql, nil, opts)
+	out, err := a.AnalyzeStatement(t.Context(), sql, nil, opts)
 	require.NoError(t, err, "AnalyzeStatement(%q)", sql)
 	return out
 }
@@ -26,9 +24,6 @@ func analyzeWithLocations(t *testing.T, a *Analyzer, sql string) *AnalyzeOutput 
 // [start, end) byte range. The got is the node returned by NodeAt; want
 // is the same node found via tree walk (identity check via Same).
 func TestNodeMap_NodeAt(t *testing.T) {
-	// Arrange (shared)
-	a := newTestAnalyzer(t)
-
 	tests := []struct {
 		name     string
 		sql      string
@@ -46,6 +41,7 @@ func TestNodeMap_NodeAt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
+			a := newTestAnalyzer(t)
 			out := analyzeWithLocations(t, a, tt.sql)
 			sut := NewNodeMap(out.Statement)
 
@@ -64,9 +60,6 @@ func TestNodeMap_NodeAt(t *testing.T) {
 // only nodes fully contained in [start, end). The got is the sorted slice
 // of node Kinds returned; want is the expected list.
 func TestNodeMap_NodesInRange_Containment(t *testing.T) {
-	// Arrange (shared)
-	a := newTestAnalyzer(t)
-
 	tests := []struct {
 		name  string
 		sql   string
@@ -91,6 +84,7 @@ func TestNodeMap_NodesInRange_Containment(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
+			a := newTestAnalyzer(t)
 			out := analyzeWithLocations(t, a, tt.sql)
 			sut := NewNodeMap(out.Statement)
 
@@ -109,9 +103,8 @@ func TestNodeMap_NodesInRange_Containment(t *testing.T) {
 func TestNodeMap_RequiresParseLocationRecordType(t *testing.T) {
 	// Arrange
 	a := newTestAnalyzer(t)
-	ctx := context.Background()
 	opts := &AnalyzerOptions{} // deliberately omit ParseLocationRecordType
-	out, err := a.AnalyzeStatement(ctx, "SELECT 1", nil, opts)
+	out, err := a.AnalyzeStatement(t.Context(), "SELECT 1", nil, opts)
 	require.NoError(t, err)
 	sut := NewNodeMap(out.Statement)
 

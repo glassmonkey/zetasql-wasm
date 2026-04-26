@@ -1,7 +1,6 @@
 package zetasql
 
 import (
-	"context"
 	"sort"
 	"testing"
 
@@ -196,10 +195,6 @@ func TestLanguageOptions_EnableReservableKeyword(t *testing.T) {
 // resolved literal value extracted from the analysis output. Triangulated
 // across two literal values.
 func TestLanguageOptions_AnalyzerIntegration(t *testing.T) {
-	// Arrange (shared)
-	a := newTestAnalyzer(t)
-	ctx := context.Background()
-
 	tests := []struct {
 		name string
 		sql  string
@@ -212,6 +207,8 @@ func TestLanguageOptions_AnalyzerIntegration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
+			ctx := t.Context()
+			a := newTestAnalyzer(t)
 			lang := NewLanguageOptions()
 			lang.EnableLanguageFeature(generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS)
 			lang.SetSupportedStatementKinds([]generated.ResolvedNodeKind{
@@ -236,10 +233,6 @@ func TestLanguageOptions_AnalyzerIntegration(t *testing.T) {
 // analyzer rejects SQL whose statement kind is not in the supported list.
 // wantErr is a type witness compared via assert.IsType.
 func TestLanguageOptions_RejectsUnsupportedStatementKind(t *testing.T) {
-	// Arrange (shared)
-	a := newTestAnalyzer(t)
-	ctx := context.Background()
-
 	tests := []struct {
 		name         string
 		allowedKinds []generated.ResolvedNodeKind
@@ -263,6 +256,8 @@ func TestLanguageOptions_RejectsUnsupportedStatementKind(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
+			ctx := t.Context()
+			a := newTestAnalyzer(t)
 			lang := NewLanguageOptions()
 			lang.SetSupportedStatementKinds(tt.allowedKinds)
 			opts := &AnalyzerOptions{Language: lang}
