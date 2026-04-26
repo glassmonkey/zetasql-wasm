@@ -39,6 +39,20 @@ assert.Equal(t, want, got)
 
 **Why**: One pass/fail signal per test case. When something breaks, the failure points to a single behavior.
 
+### Splitting a test function: fixture is the axis, not happy/error
+
+When deciding whether to put cases in the same `func TestX` or split into separate functions, the criterion is **fixture similarity**, not whether the case is a happy path vs an error path.
+
+- **Same fixture / same Setup function calls** → one function, one table. Error cases live next to happy cases in the same table via a `wantErr error` field. Within the case body, `if tt.wantErr != nil { assert.IsType(...); return } require.NoError; assert.Equal` is acceptable — it branches on test-data shape, not on SUT state, so it does not count as *Conditional Test Logic* in the smell sense (see R9).
+- **Cases need materially different fixture** (different catalog construction, different Setup function, different shape of arguments) → split into separate `func TestX_<aspect>` functions. Each function's table covers cases that share that fixture.
+
+**Examples in this repo**:
+
+- `TestAnalyzer_AnalyzeStatement_Errors`, `TestAnalyzer_AnalyzeStatement_AST`, `TestAnalyzer_AnalyzeStatement_CustomFunction`, `TestAnalyzer_AnalyzeStatement_TemplatedFunction` are split because the catalog construction differs (no catalog vs `newUsersCatalog()` vs custom-function-registered vs templated-function-registered). The split is correct.
+- `TestParser_ParseStatement_AST` and `TestParser_ParseStatement_Errors` share the same fixture (just `newTestParser(t)`). They could be one function with `wantErr error` in the table — the current split is legacy and may merge in a cleanup pass.
+
+**Why this axis**: a function-per-fixture keeps the table at function scope (read-only) describing one set of conditions. Splitting by error/success duplicates the for-loop scaffolding for no fixture reason and forces the reader to cross-reference two functions to see the contract for one method.
+
 ## R4: Explicit AAA comments
 - Each test case carries `// Arrange`, `// Act`, `// Assert` markers
 - The whole Arrange happens inside each `t.Run` body; the test function scope is for the parameter table only (see `fixture-management.md`)
@@ -85,6 +99,8 @@ This rule applies to **every test helper**, not just tree-comparison helpers. Th
 | Numeric type conversions (`string(rune(int))`, `strconv.*`) | semantic conversion | linters cannot catch intent errors here |
 | "Default"/fallback returns (`return "[?]"`, `return ""`) | lossy fallback | masks real failures behind an opaque value |
 | Comparing values inside the helper | hidden assertion | the assertion's failure is invisible |
+
+**Not the same as Conditional Test Logic**: this rule targets logic inside *test helpers* (functions called from tests). A test case body that branches on test-data shape — e.g., `if tt.wantErr != nil { assert.IsType(...); return }` inside the `t.Run` body — is not a R9 violation. It is dispatching on the table row, not encoding hidden logic. Conditional Test Logic (Meszaros) refers to tests that branch on SUT state or environment to decide what to assert; that is the pattern to avoid.
 
 **Tree-comparison helpers specifically** (e.g., flattening AST to `<Kind> <single-accessor>\n`):
 - Each `case` in the type switch is a **single accessor call** — no compound formatting, no multi-field joins

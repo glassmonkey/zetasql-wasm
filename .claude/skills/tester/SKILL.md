@@ -135,6 +135,7 @@ The point is to catch issues on the first read, before any human pushback. Scan 
 | Test verifies a function that has zero production callers (only tests use it) | R11 | The function is dead code held alive by its test. Delete both unless it's about to gain a real caller. |
 | `t.Run(tt.name, func(t *testing.T) { ... })` body has 2+ unrelated `assert.*` calls | R3 / Assertion Roulette | Split into separate cases or build a complete `want` struct. |
 | Mutable fixture (`*Analyzer`, `*FilterOptions`, etc.) constructed at the test function scope and reused across `t.Run` cases — often labeled `// Arrange (shared)` | R10 / Fixture management / Erratic Test | Move the construction inside each `t.Run` body. Use `t.Context()` instead of a shared `context.Background()`. |
+| Two test functions covering the same SUT method with the same Setup function calls, differing only in happy-vs-error split (e.g., `TestX_AST` and `TestX_Errors` both calling `newTestParser(t)` with no other fixture difference) | R3 (split axis) | The split should be by *fixture difference*, not by error/success. Merge into one function with a `wantErr error` field; the case body's `if tt.wantErr != nil { assert.IsType(...); return }` is acceptable test-data branching, not Conditional Test Logic. |
 
 When in doubt about the smell name, look it up in `references/xunit-patterns.md`. Naming the smell precisely makes the fix obvious.
 
