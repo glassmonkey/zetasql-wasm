@@ -17,11 +17,28 @@ const (
 // SignatureArgumentKind represents the kind of a function argument.
 type SignatureArgumentKind = generated.SignatureArgumentKind
 
+// FunctionArgumentTypeOptions holds optional per-argument metadata such as
+// cardinality (REQUIRED / REPEATED / OPTIONAL). Zero values map to the proto
+// defaults and are omitted from the wire representation.
+type FunctionArgumentTypeOptions struct {
+	Cardinality generated.FunctionEnums_ArgumentCardinality
+}
+
+func (o *FunctionArgumentTypeOptions) toProto() *generated.FunctionArgumentTypeOptionsProto {
+	p := &generated.FunctionArgumentTypeOptionsProto{}
+	if o.Cardinality != 0 {
+		c := o.Cardinality
+		p.Cardinality = &c
+	}
+	return p
+}
+
 // FunctionArgumentType represents a single function argument type.
 // Type is nil for templated arguments.
 type FunctionArgumentType struct {
-	Kind generated.SignatureArgumentKind
-	Type Type
+	Kind    generated.SignatureArgumentKind
+	Type    Type
+	Options *FunctionArgumentTypeOptions
 }
 
 // NewFunctionArgumentType creates a fixed-type function argument.
@@ -44,6 +61,9 @@ func (a *FunctionArgumentType) toProto() *generated.FunctionArgumentTypeProto {
 	}
 	if a.Type != nil {
 		p.Type = a.Type.ToProto()
+	}
+	if a.Options != nil {
+		p.Options = a.Options.toProto()
 	}
 	return p
 }
