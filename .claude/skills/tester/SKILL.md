@@ -35,7 +35,38 @@ A new test starts at `assert.Equal(t, want, got)` and works backward to define `
 
 The other principle behind these rules — **separation of behavior and data** (DTOs are data, no getters, public fields) — lives in the `developer` skill. Several rules below (R6, R7, R11) are the test-side reflection of that production-side principle.
 
-## Rules (R1–R11)
+## xUnit Test Patterns vocabulary (Meszaros)
+
+Most rules below are concrete instances of named patterns and smells from Gerard Meszaros, *xUnit Test Patterns: Refactoring Test Code* (2007). The mapping below is the shared vocabulary for diagnosing test problems on this project.
+
+| Rule | xUnit pattern / smell | What the term means |
+|---|---|---|
+| R1 (testify) | Custom Assertion | The assertion library *is* the assertion implementation; tests don't reinvent `if/t.Errorf`. |
+| R2 (SUT/got/want) | Tests as Documentation | Each test reads as a sentence; arrangement makes the contract obvious. |
+| R3 (one assert per case) | Assertion Roulette · Eager Test | Multiple unrelated assertions in one case make the failure ambiguous and slow to localize. |
+| R4 (AAA comments) | Four-Phase Test (Setup / Exercise / Verify / Teardown) | The four phases are the canonical structure; AAA is the conventional Go labelling of the first three. |
+| R5 (triangulation) | Hard-Coded Test Data | A single positive case can be passed by an implementation that hard-codes the magic value; multiple inputs force the real generalization. |
+| R6 (production-side payload) | Production Logic in Test | A test-only struct duplicates the production schema, then drifts; the test ends up describing what the test *thinks* the SUT does, not what it does. |
+| R7 (no getters) | Test Method Acne | Trivial accessor tests proliferate without adding signal — every getter brings its own one-line "assertion". |
+| R8 (typed wantErr) | Specific Assertion | Asserting on the error *type* (or value) verifies the failure mode, not just that "something failed." |
+| R9 (helpers stay trivially correct) | Test Logic in Test (Conditional Test Logic) · Untested Test Code | Logic inside helpers becomes second-tier production code — untested, and silent when it goes wrong. |
+| R10 (test independence) | Mystery Guest · Erratic Test (Test Run War, Resource Optimism, Resource Leakage) | A test that depends on hidden external state (file system, env, run order, leaked handles) flakes for reasons unrelated to the SUT. |
+| R11 (no test-only production APIs) | Test Logic in Production · Test Hook | Production code that exists only for testing carries weight no caller benefits from. |
+| R12 (behavior, not state) | Sensitive Equality · Fragile Test (Overspecified Software) · State vs Behavior Verification | Asserting on internal storage that the SUT holds verbatim, or on construction that has no logic, locks the test to the implementation rather than the contract. |
+
+**Test Doubles taxonomy** (Chapter 11): when this project introduces a test double, name it precisely — *Dummy* (passed but not used), *Stub* (canned answers), *Spy* (records calls), *Mock* (verifies expectations), *Fake* (working but not production-grade implementation). Most tests here run the real WASM module rather than a double, so the taxonomy rarely comes up — but when it does, the imprecise word "mock" should not stand in for any of the five.
+
+**Goals of Test Automation** (Chapter 3): a test must (a) help us understand the SUT, (b) reduce risk of defects, (c) survive refactoring, (d) be easy to write/maintain, (e) run fast enough to be run often. Every rule above serves one or more of these goals; if a proposed test or convention serves none, push back on it.
+
+**Other smells worth naming when reviewing**:
+
+- *Obscure Test* (Eager Test, General Fixture, Irrelevant Information, Hard-Coded Test Data) — a test the reader cannot follow at a glance. Counter with R2 + R5 + minimal `Arrange`.
+- *Slow Test* — a test slow enough that it discourages running the suite. The WASM-backed integration tests already toe this line; do not add more unless the behavior cannot be exercised any other way.
+- *Tested Behavior* vs *Tested Outcome* — what the SUT does vs the externally visible result. R12 enforces "tested outcome must be observable"; both verification styles are valid as long as that holds.
+
+When pointing out a problem in review, name the smell. "This is a *Sensitive Equality* on the internal map" gives the author a vocabulary to fix it; "this test feels off" does not.
+
+## Rules (R1–R12)
 
 ### R1: Use testify
 - Don't use bare `t.Errorf` / `t.Fatalf` for assertions
