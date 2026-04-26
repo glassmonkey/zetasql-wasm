@@ -2,6 +2,7 @@ package zetasql
 
 import (
 	"context"
+	"slices"
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
@@ -173,11 +174,6 @@ func nodeKinds(nodes []resolved_ast.Node) []resolved_ast.Kind {
 	for i, n := range nodes {
 		kinds[i] = n.Kind()
 	}
-	// Stable order for comparison
-	for i := 1; i < len(kinds); i++ {
-		for j := i; j > 0 && kinds[j-1] > kinds[j]; j-- {
-			kinds[j-1], kinds[j] = kinds[j], kinds[j-1]
-		}
-	}
+	slices.Sort(kinds)
 	return kinds
 }
