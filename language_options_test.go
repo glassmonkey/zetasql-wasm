@@ -6,8 +6,10 @@ import (
 
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 // TestLanguageOptions_SetSupportedStatementKinds verifies that the kinds
@@ -199,78 +201,51 @@ func TestLanguageOptions_EnableReservableKeyword(t *testing.T) {
 	}
 }
 
-// TestLanguageOptions_toProto_ProductMode verifies that the ProductMode
-// field is serialized when non-zero and omitted when zero (the proto
-// default INTERNAL).
-func TestLanguageOptions_toProto_ProductMode(t *testing.T) {
+// TestLanguageOptions_toProto verifies the enum-field serialization rule:
+// non-zero values appear on the wire, zero values (the proto defaults) are
+// omitted. Cases triangulate across both enum fields with full-struct want
+// so that an accidental field add/drop also surfaces in the diff.
+func TestLanguageOptions_toProto(t *testing.T) {
 	external := generated.ProductMode_PRODUCT_EXTERNAL
-
-	tests := []struct {
-		name string
-		mode generated.ProductMode
-		want *generated.ProductMode
-	}{
-		{
-			name: "INTERNAL (zero) is omitted",
-			mode: generated.ProductMode_PRODUCT_INTERNAL,
-			want: nil,
-		},
-		{
-			name: "EXTERNAL is propagated",
-			mode: generated.ProductMode_PRODUCT_EXTERNAL,
-			want: &external,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			sut := NewLanguageOptions()
-			sut.ProductMode = tt.mode
-
-			// Act
-			got := sut.toProto().ProductMode
-
-			// Assert
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
-// TestLanguageOptions_toProto_NameResolutionMode verifies that the
-// NameResolutionMode field is serialized when non-zero and omitted when
-// zero (the proto default DEFAULT).
-func TestLanguageOptions_toProto_NameResolutionMode(t *testing.T) {
 	strict := generated.NameResolutionMode_NAME_RESOLUTION_STRICT
 
 	tests := []struct {
 		name string
-		mode generated.NameResolutionMode
-		want *generated.NameResolutionMode
+		opts *LanguageOptions
+		want *generated.LanguageOptionsProto
 	}{
 		{
-			name: "DEFAULT (zero) is omitted",
-			mode: generated.NameResolutionMode_NAME_RESOLUTION_DEFAULT,
-			want: nil,
+			name: "ProductMode INTERNAL (zero) is omitted",
+			opts: &LanguageOptions{ProductMode: generated.ProductMode_PRODUCT_INTERNAL},
+			want: &generated.LanguageOptionsProto{},
 		},
 		{
-			name: "STRICT is propagated",
-			mode: generated.NameResolutionMode_NAME_RESOLUTION_STRICT,
-			want: &strict,
+			name: "ProductMode EXTERNAL is propagated",
+			opts: &LanguageOptions{ProductMode: generated.ProductMode_PRODUCT_EXTERNAL},
+			want: &generated.LanguageOptionsProto{ProductMode: &external},
+		},
+		{
+			name: "NameResolutionMode DEFAULT (zero) is omitted",
+			opts: &LanguageOptions{NameResolutionMode: generated.NameResolutionMode_NAME_RESOLUTION_DEFAULT},
+			want: &generated.LanguageOptionsProto{},
+		},
+		{
+			name: "NameResolutionMode STRICT is propagated",
+			opts: &LanguageOptions{NameResolutionMode: generated.NameResolutionMode_NAME_RESOLUTION_STRICT},
+			want: &generated.LanguageOptionsProto{NameResolutionMode: &strict},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
-			sut := NewLanguageOptions()
-			sut.NameResolutionMode = tt.mode
+			sut := tt.opts
 
 			// Act
-			got := sut.toProto().NameResolutionMode
+			got := sut.toProto()
 
 			// Assert
-			assert.Equal(t, tt.want, got)
+			assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform()))
 		})
 	}
 }
