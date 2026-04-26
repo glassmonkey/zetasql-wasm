@@ -7,14 +7,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestParser_ParseStatement_AST verifies AST shape via the canonical
-// String() representation defined in package ast. Triangulated across
-// multiple SQL shapes.
-func TestParser_ParseStatement_AST(t *testing.T) {
+// TestParser_ParseStatement covers both the happy-path AST shape and the
+// invalid-SQL error type for ParseStatement. Cases share a single fixture
+// (newTestParser); errors are flagged in the table via wantErr (type
+// witness) — happy cases set want only, error cases set wantErr only.
+func TestParser_ParseStatement(t *testing.T) {
 	tests := []struct {
-		name string
-		sql  string
-		want string
+		name    string
+		sql     string
+		want    string  // happy-path expected AST string; empty when wantErr is set
+		wantErr error   // type witness for error cases; nil for happy path
 	}{
 		{
 			name: "literal",
@@ -647,33 +649,6 @@ func TestParser_ParseStatement_AST(t *testing.T) {
             KindIdentifier [users]
 `,
 		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			ctx := t.Context()
-			sut := newTestParser(t)
-
-			// Act
-			parsed, err := sut.ParseStatement(ctx, tt.sql)
-			require.NoError(t, err)
-			got := parsed.Root.String()
-
-			// Assert
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
-// TestParser_ParseStatement_Errors verifies that invalid SQL yields the
-// expected error type. wantErr is a type witness compared via assert.IsType.
-func TestParser_ParseStatement_Errors(t *testing.T) {
-	tests := []struct {
-		name    string
-		sql     string
-		wantErr error
-	}{
 		{name: "incomplete SELECT", sql: "SELECT", wantErr: &ParseError{}},
 		{name: "missing select list", sql: "SELECT FROM users", wantErr: &ParseError{}},
 		{name: "unmatched right paren", sql: "SELECT 1) FROM users", wantErr: &ParseError{}},
@@ -691,10 +666,15 @@ func TestParser_ParseStatement_Errors(t *testing.T) {
 			sut := newTestParser(t)
 
 			// Act
-			_, got := sut.ParseStatement(ctx, tt.sql)
+			parsed, err := sut.ParseStatement(ctx, tt.sql)
 
 			// Assert
-			assert.IsType(t, tt.wantErr, got)
+			if tt.wantErr != nil {
+				assert.IsType(t, tt.wantErr, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, parsed.Root.String())
 		})
 	}
 }
