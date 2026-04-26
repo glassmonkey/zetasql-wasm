@@ -11,7 +11,6 @@ import (
 )
 
 func TestNestedTypeToProto(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name string
 		typ  Type
@@ -63,14 +62,12 @@ func TestNestedTypeToProto(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			assert.Empty(t, cmp.Diff(tt.want, tt.typ.ToProto(), protocmp.Transform()), "ToProto() mismatch")
 		})
 	}
 }
 
 func TestNestedTypeRoundTrip(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name string
 		typ  Type
@@ -80,7 +77,6 @@ func TestNestedTypeRoundTrip(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			restored, err := typeFromProto(tt.typ.ToProto())
 			require.NoError(t, err)
 			assert.Empty(t, cmp.Diff(tt.typ.ToProto(), restored.ToProto(), protocmp.Transform()), "round-trip mismatch")

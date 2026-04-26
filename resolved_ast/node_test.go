@@ -10,7 +10,6 @@ import (
 )
 
 func TestStatementFromBytes(t *testing.T) {
-	t.Parallel()
 	// Build a simple QueryStmt proto: SELECT with 1 output column and a SingleRowScan
 	outputCol := &generated.ResolvedOutputColumnProto{
 		Name: proto.String("col1"),
@@ -55,7 +54,6 @@ func TestStatementFromBytes(t *testing.T) {
 }
 
 func TestStatementFromBytes_InvalidBytes(t *testing.T) {
-	t.Parallel()
 	_, err := StatementFromBytes([]byte{0xff, 0xff})
 	assert.Error(t, err)
 }

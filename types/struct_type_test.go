@@ -11,7 +11,6 @@ import (
 )
 
 func TestStructTypeNilFields(t *testing.T) {
-	t.Parallel()
 	st, err := NewStructType(nil)
 	require.NoError(t, err)
 	got := st.ToProto()
@@ -23,7 +22,6 @@ func TestStructTypeNilFields(t *testing.T) {
 }
 
 func TestStructTypeToProto(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name   string
 		fields []*StructField
@@ -62,7 +60,6 @@ func TestStructTypeToProto(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			st, _ := NewStructType(tt.fields)
 			assert.Empty(t, cmp.Diff(tt.want, st.ToProto(), protocmp.Transform()), "ToProto() mismatch")
 		})
@@ -70,7 +67,6 @@ func TestStructTypeToProto(t *testing.T) {
 }
 
 func TestStructTypeRoundTrip(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name   string
 		fields []*StructField
@@ -80,7 +76,6 @@ func TestStructTypeRoundTrip(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			original, _ := NewStructType(tt.fields)
 			restored, err := typeFromProto(original.ToProto())
 			require.NoError(t, err)

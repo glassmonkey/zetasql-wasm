@@ -10,7 +10,6 @@ import (
 )
 
 func TestAnalyzerOptions_toProto(t *testing.T) {
-	t.Parallel()
 	fullScope := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE
 	codeSearch := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_CODE_SEARCH
 	allowUndecl := true
@@ -61,7 +60,6 @@ func TestAnalyzerOptions_toProto(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			// Arrange
 			sut := tt.opts
 
@@ -78,7 +76,6 @@ func TestAnalyzerOptions_toProto(t *testing.T) {
 // fields equal the original by value. Pointer-independence is checked in a
 // separate test so each behaviour has a single observable assertion.
 func TestAnalyzerOptions_Clone(t *testing.T) {
-	t.Parallel()
 	fullScope := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE
 
 	tests := []struct {
@@ -120,7 +117,6 @@ func TestAnalyzerOptions_Clone(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			// Arrange
 			sut := tt.opts
 
@@ -138,7 +134,6 @@ func TestAnalyzerOptions_Clone(t *testing.T) {
 // pointer from the original — mutating the clone's Language must not leak
 // into the original.
 func TestAnalyzerOptions_Clone_doesNotShareLanguagePointer(t *testing.T) {
-	t.Parallel()
 	// Arrange
 	sut := &AnalyzerOptions{
 		Language: &LanguageOptions{

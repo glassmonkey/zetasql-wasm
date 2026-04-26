@@ -90,7 +90,6 @@ func findNode[T resolved_ast.Node](t *testing.T, root resolved_ast.Node) T {
 // by the analyzer for a variety of SQL inputs. Triangulated across multiple
 // query patterns (literal, table scan, join, filter, project, function call).
 func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name string
 		sql  string
@@ -426,7 +425,6 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			// Arrange
 			ctx := t.Context()
 			sut := newTestAnalyzer(t)
@@ -450,7 +448,6 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
 // a typed *AnalyzeError for invalid SQL. wantErr is a type witness checked
 // via assert.IsType.
 func TestAnalyzer_AnalyzeStatement_Errors(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name    string
 		sql     string
@@ -509,7 +506,6 @@ func TestAnalyzer_AnalyzeStatement_Errors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			// Arrange
 			ctx := t.Context()
 			sut := newTestAnalyzer(t)
@@ -527,7 +523,6 @@ func TestAnalyzer_AnalyzeStatement_Errors(t *testing.T) {
 // resolves each statement in a multi-statement SQL string. The got is a
 // slice of AST debug strings, one per statement.
 func TestAnalyzer_AnalyzeNextStatement_AST(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name string
 		sql  string
@@ -554,7 +549,6 @@ func TestAnalyzer_AnalyzeNextStatement_AST(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			// Arrange
 			ctx := t.Context()
 			sut := newTestAnalyzer(t)
@@ -581,7 +575,6 @@ func TestAnalyzer_AnalyzeNextStatement_AST(t *testing.T) {
 // TestAnalyzer_AnalyzeNextStatement_AdvancesLocation verifies that consuming
 // every statement leaves the ParseResumeLocation at the end of input.
 func TestAnalyzer_AnalyzeNextStatement_AdvancesLocation(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name string
 		sql  string
@@ -601,7 +594,6 @@ func TestAnalyzer_AnalyzeNextStatement_AdvancesLocation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			// Arrange
 			ctx := t.Context()
 			sut := newTestAnalyzer(t)
@@ -625,7 +617,6 @@ func TestAnalyzer_AnalyzeNextStatement_AdvancesLocation(t *testing.T) {
 // scalar function registered in the catalog is resolved to the expected
 // FunctionCall in the AST. Triangulated across function name and group.
 func TestAnalyzer_AnalyzeStatement_CustomFunction(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name     string
 		funcName string
@@ -669,7 +660,6 @@ func TestAnalyzer_AnalyzeStatement_CustomFunction(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			// Arrange
 			ctx := t.Context()
 			cat := types.NewSimpleCatalog("test")
@@ -706,7 +696,6 @@ func TestAnalyzer_AnalyzeStatement_CustomFunction(t *testing.T) {
 // (ARG_TYPE_ANY_1) function is resolved with concrete argument types
 // inferred from the call site.
 func TestAnalyzer_AnalyzeStatement_TemplatedFunction(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name     string
 		funcName string
@@ -746,7 +735,6 @@ func TestAnalyzer_AnalyzeStatement_TemplatedFunction(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			// Arrange
 			ctx := t.Context()
 			cat := types.NewSimpleCatalog("test")
