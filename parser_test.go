@@ -360,6 +360,11 @@ func TestParser_ParseStatement_AST(t *testing.T) {
 `,
 		},
 		{
+			// Smoke test only: the AST wrapper does not yet expose children
+			// of CreateTableStatement, so String() returns just the kind. This
+			// confirms the parser routes the DDL to the right node kind but
+			// does not validate the column list. Tighten when the wrapper
+			// gains child accessors for this kind.
 			name: "CREATE TABLE DDL",
 			sql:  "CREATE TABLE t1 (id INT64, name STRING)",
 			want: `KindCreateTableStatement

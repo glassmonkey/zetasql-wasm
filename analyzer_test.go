@@ -28,13 +28,9 @@ func TestAnalyzer_AnalyzeStatement_Errors(t *testing.T) {
 			wantErr: &AnalyzeError{},
 		},
 		{
-			name: "table not found",
-			sql:  "SELECT id FROM nonexistent",
-			cat: func() *catalog.SimpleCatalog {
-				c := catalog.NewSimpleCatalog("test")
-				c.AddZetaSQLBuiltinFunctions(nil)
-				return c
-			}(),
+			name:    "table not found",
+			sql:     "SELECT id FROM nonexistent",
+			cat:     newBuiltinsCatalog(),
 			wantErr: &AnalyzeError{},
 		},
 		{

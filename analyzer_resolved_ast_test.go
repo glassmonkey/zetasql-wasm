@@ -282,7 +282,7 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
   KindOutputColumn arr
   KindProjectScan
     KindComputedColumn
-      KindLiteral 0
+      KindLiteral <ARRAY>
     KindSingleRowScan
 `,
 		},
@@ -295,7 +295,7 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
   KindProjectScan
     KindComputedColumn
       KindFunctionCall ZetaSQL:$array_at_offset
-        KindLiteral 0
+        KindLiteral <ARRAY>
         KindLiteral 1
     KindSingleRowScan
 `,
@@ -308,7 +308,7 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
   KindOutputColumn s
   KindProjectScan
     KindComputedColumn
-      KindLiteral 0
+      KindLiteral <STRUCT>
     KindSingleRowScan
 `,
 		},
@@ -324,7 +324,7 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
         KindColumnRef s
     KindProjectScan
       KindComputedColumn
-        KindLiteral 0
+        KindLiteral <STRUCT>
       KindSingleRowScan
 `,
 		},
@@ -336,7 +336,7 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
   KindOutputColumn v
   KindProjectScan
     KindArrayScan
-      KindLiteral 0
+      KindLiteral <ARRAY>
 `,
 		},
 		{
@@ -392,8 +392,8 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
         KindFunctionCall ZetaSQL:$greater
           KindColumnRef id
           KindLiteral 0
-        KindLiteral 0
-        KindLiteral 0
+        KindLiteral "a"
+        KindLiteral "b"
     KindTableScan users
 `,
 		},
