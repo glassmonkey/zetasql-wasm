@@ -46,7 +46,7 @@ func (o *AnalyzerOptions) toProto() *generated.AnalyzerOptionsProto {
 		b := true
 		p.AllowUndeclaredParameters = &b
 	}
-	if o.ParameterMode != 0 {
+	if o.ParameterMode != generated.ParameterMode_PARAMETER_NAMED {
 		m := o.ParameterMode
 		p.ParameterMode = &m
 	}
