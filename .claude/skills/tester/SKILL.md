@@ -39,6 +39,8 @@ The other principle behind these rules — **separation of behavior and data** (
 
 Most rules below are concrete instances of named patterns and smells from Gerard Meszaros, *xUnit Test Patterns: Refactoring Test Code* (2007). The mapping below is the shared vocabulary for diagnosing test problems on this project.
 
+**Need a definition?** The full catalog of Smells / Patterns / Refactorings used here lives in [`references/xunit-patterns.md`](references/xunit-patterns.md) — about 70 entries with a one-line problem statement, the prescribed cure, and a link back to xunitpatterns.com. When a Smell or Pattern name comes up in review (e.g., "isn't this Mystery Guest?"), open that file rather than guessing — names matter precisely because they map to specific cures, and using them imprecisely sends future readers to the wrong fix.
+
 | Rule | xUnit pattern / smell | What the term means |
 |---|---|---|
 | R1 (testify) | Custom Assertion | The assertion library *is* the assertion implementation; tests don't reinvent `if/t.Errorf`. |
@@ -58,11 +60,15 @@ Most rules below are concrete instances of named patterns and smells from Gerard
 
 **Goals of Test Automation** (Chapter 3): a test must (a) help us understand the SUT, (b) reduce risk of defects, (c) survive refactoring, (d) be easy to write/maintain, (e) run fast enough to be run often. Every rule above serves one or more of these goals; if a proposed test or convention serves none, push back on it.
 
-**Other smells worth naming when reviewing**:
+**Other smells worth naming when reviewing** (full definitions in `references/xunit-patterns.md`):
 
-- *Obscure Test* (Eager Test, General Fixture, Irrelevant Information, Hard-Coded Test Data) — a test the reader cannot follow at a glance. Counter with R2 + R5 + minimal `Arrange`.
-- *Slow Test* — a test slow enough that it discourages running the suite. The WASM-backed integration tests already toe this line; do not add more unless the behavior cannot be exercised any other way.
-- *Tested Behavior* vs *Tested Outcome* — what the SUT does vs the externally visible result. R12 enforces "tested outcome must be observable"; both verification styles are valid as long as that holds.
+- *Obscure Test* (with sub-smells: Eager Test, General Fixture, Irrelevant Information, Hard-Coded Test Data, Mystery Guest, Verbose Test) — the reader cannot follow the test at a glance.
+- *Erratic Test* (Resource Leakage, Resource Optimism, Test Run War, Unrepeatable Test, Test Dependency, Interacting Tests, Non-Deterministic Test) — passes sometimes, fails sometimes; the suite loses signal value.
+- *Fragile Test* (Behavior Sensitivity, Interface Sensitivity, Data Sensitivity, Context Sensitivity, Overspecified Software) — breaks on harmless refactors instead of real regressions.
+- *Buggy Tests* — the test itself has a bug and hides production bugs (e.g., `assert.Equal(x, x)`).
+- *Slow Test* — slow enough that the suite stops getting run frequently.
+- *Test Code Duplication* — the same arrangement/assertion repeated across many tests; cure with Test Utility Method, Creation Method, Parameterized Test.
+- *Tested Behavior* vs *Tested Outcome* — what the SUT does vs the externally visible result. R12 enforces "the asserted outcome must be observable from outside the SUT"; both verification styles are valid as long as that holds.
 
 When pointing out a problem in review, name the smell. "This is a *Sensitive Equality* on the internal map" gives the author a vocabulary to fix it; "this test feels off" does not.
 
