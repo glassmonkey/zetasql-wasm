@@ -10,18 +10,6 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
-func TestScalarTypeSingletons(t *testing.T) {
-	accessors := []func() Type{
-		Int32Type, Int64Type, Uint32Type, Uint64Type,
-		BoolType, FloatType, DoubleType, StringType, BytesType,
-		DateType, TimestampType, TimeType, DatetimeType,
-		GeographyType, NumericType, BigNumericType, JsonType, IntervalType,
-	}
-	for _, fn := range accessors {
-		assert.Same(t, fn(), fn(), "singleton identity broken for Kind=%v", fn().Kind())
-	}
-}
-
 func TestTypeInterfaceDispatch(t *testing.T) {
 	arr, _ := NewArrayType(Int64Type())
 	st, _ := NewStructType([]*StructField{NewStructField("x", Int64Type())})

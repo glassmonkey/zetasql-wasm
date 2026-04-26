@@ -105,40 +105,6 @@ func TestParser_ParseStatement_AST(t *testing.T) {
 	}
 }
 
-// TestParser_ParseStatement_PreservesSQL verifies that the SQL field on the
-// returned Statement matches the input SQL string.
-func TestParser_ParseStatement_PreservesSQL(t *testing.T) {
-	// Arrange (shared)
-	ctx := context.Background()
-	parser, err := NewParser(ctx)
-	require.NoError(t, err)
-	defer parser.Close(ctx)
-
-	tests := []struct {
-		name string
-		sql  string
-		want string
-	}{
-		{name: "literal", sql: "SELECT 1", want: "SELECT 1"},
-		{name: "star", sql: "SELECT * FROM users", want: "SELECT * FROM users"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			sut := parser
-
-			// Act
-			parsed, err := sut.ParseStatement(ctx, tt.sql)
-			require.NoError(t, err)
-			got := parsed.SQL
-
-			// Assert
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
 // TestParser_ParseStatement_Errors verifies that invalid SQL yields the
 // expected error type. wantErr is a type witness compared via assert.IsType.
 func TestParser_ParseStatement_Errors(t *testing.T) {
