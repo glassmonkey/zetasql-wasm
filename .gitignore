@@ -1,3 +1,6 @@
 tmp
 
 .envrc
+
+# cmux/agent runtime worktrees — never commit
+.claude/worktrees/
