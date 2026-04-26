@@ -143,10 +143,8 @@ func (p *Parser) ParseStatement(ctx context.Context, sql string) (*Statement, er
 		return nil, fmt.Errorf("failed to read data from WASM memory")
 	}
 
-	// Check if result is an error string
-	dataStr := string(dataBytes)
-	if len(dataStr) > 6 && dataStr[:6] == "Error:" {
-		return nil, &ParseError{Message: dataStr[7:]}
+	if msg := wasm.ParseResultMessage(dataBytes); msg != "" {
+		return nil, &ParseError{Message: msg}
 	}
 
 	// Deserialize proto into AST
