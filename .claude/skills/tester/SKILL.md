@@ -25,10 +25,10 @@ Authors and reviews Go tests in zetasql-wasm. Tests follow a fixed shape (SUT/go
 
 This skill covers two modes:
 
-- **Author mode**: writing a new test from scratch (typically called from the `tdd` cycle).
-- **Review mode**: reading an existing test against the rules and producing a structured report with concrete fixes.
+- **Author mode**: writing a new test from scratch (typically called from the `tdd` cycle). Skeleton in this file; full procedure in [`references/modes.md`](references/modes.md).
+- **Review mode**: reading an existing test against the rules and producing a structured report with concrete fixes. Skeleton in this file; full procedure in [`references/modes.md`](references/modes.md).
 
-The same R1–R12 rule set governs both.
+The same R0–R12 rule set governs both. R0 is inline below (it sets the canonical shape that every other rule constrains). R1–R12 details are in [`references/rules.md`](references/rules.md). When a review names an anti-pattern (AP1–AP6), the code examples and rationale live in [`references/anti-patterns.md`](references/anti-patterns.md). The xUnit Test Patterns vocabulary (Smell / Pattern / Refactoring catalog from Meszaros) lives in [`references/xunit-patterns.md`](references/xunit-patterns.md) — open it when you need a definition or want to verify you're using a smell name precisely.
 
 ## Underlying principle: testify is the test implementation
 
@@ -43,8 +43,6 @@ The other principle behind these rules — **separation of behavior and data** (
 ## xUnit Test Patterns vocabulary (Meszaros)
 
 Most rules below are concrete instances of named patterns and smells from Gerard Meszaros, *xUnit Test Patterns: Refactoring Test Code* (2007). The mapping below is the shared vocabulary for diagnosing test problems on this project.
-
-**Need a definition?** The full catalog of Smells / Patterns / Refactorings used here lives in [`references/xunit-patterns.md`](references/xunit-patterns.md) — about 70 entries with a one-line problem statement, the prescribed cure, and a link back to xunitpatterns.com. When a Smell or Pattern name comes up in review (e.g., "isn't this Mystery Guest?"), open that file rather than guessing — names matter precisely because they map to specific cures, and using them imprecisely sends future readers to the wrong fix.
 
 | Rule | xUnit pattern / smell | What the term means |
 |---|---|---|
@@ -73,13 +71,10 @@ Most rules below are concrete instances of named patterns and smells from Gerard
 - *Buggy Tests* — the test itself has a bug and hides production bugs (e.g., `assert.Equal(x, x)`).
 - *Slow Test* — slow enough that the suite stops getting run frequently.
 - *Test Code Duplication* — the same arrangement/assertion repeated across many tests; cure with Test Utility Method, Creation Method, Parameterized Test.
-- *Tested Behavior* vs *Tested Outcome* — what the SUT does vs the externally visible result. R12 enforces "the asserted outcome must be observable from outside the SUT"; both verification styles are valid as long as that holds.
 
 When pointing out a problem in review, name the smell. "This is a *Sensitive Equality* on the internal map" gives the author a vocabulary to fix it; "this test feels off" does not.
 
-## Rules (R1–R12)
-
-### R0: Every test is `(SUT × behavior)`
+## R0: Every test is `(SUT × behavior)`
 
 Every test in this repo follows the same canonical shape:
 
@@ -97,170 +92,26 @@ If a test does not have this shape, **something is off**. The two recurring dege
 1. **No method is invoked** — `got := someStruct.SomeField` after a constructor call. Without a behavior probe, the test asserts only that Go assigned a value (R12 / *Sensitive Equality*).
 2. **The "method" is a trivial accessor** — `got := sut.GetX()` where `GetX` returns a single field (R7 / *Test Method Acne*).
 
-Subsequent rules R1–R12 are constraints on this shape: how to write the assert (R1, R8), how to structure the four phases (R4), how to build `want` (R2, R6), how to triangulate (R5), how to keep helpers thin (R9), how to keep tests independent (R10), and what behaviors are worth probing in the first place (R7, R11, R12).
+R1–R12 are constraints on this shape. Open `references/rules.md` for the full text; the table below is the in-context summary.
 
-### R1: Use testify
-- Don't use bare `t.Errorf` / `t.Fatalf` for assertions
-- Use `assert.Equal` for equality
-- Use `require` for setup-failure checks (`New*` constructors, etc.) where continuing is meaningless
-- Use `assert` for the main test body checks
+## Rules R1–R12 (one-liners)
 
-**Why**: Unifies diff display on failure and continue-vs-abort behavior.
-
-### R2: SUT / got / want pattern
-- **SUT** = the object/function under test (per R0)
-- **got** = the value returned by *invoking* the behavior on the SUT — `sut.Method(args)` or `sut(args)`. Field access on the return value (`sut.Method(args).Field`) is fine *as long as* the method itself has logic worth probing. Bare `sut.Field` (no method invocation) is not a test of the SUT.
-- **want** = the expected value
-- Building a fresh `payload` struct in the test by extracting multiple fields from the SUT's return is **NOT allowed**
-- `want` must be a complete struct so field add/remove surfaces in the diff
-
-**Bad**:
-```go
-type payload struct { Kind Kind; Name string }
-got := payload{Kind: stmt.Kind(), Name: stmt.Name()}
-```
-
-**Good**:
-```go
-got := sut.Method(args)
-want := &Statement{SQL: "SELECT 1"}
-assert.Equal(t, want, got)
-```
-
-### R3: One SUT call → one got → one assert.Equal
-- One `assert.Equal` per test case, as a rule
-- If multiple verification angles are needed, split into separate cases or separate test functions
-- `require` calls for setup are not counted as assertions (they are guards that abort if violated)
-
-**Why**: One pass/fail signal per test case. When something breaks, the failure points to a single behavior.
-
-### R4: Explicit AAA comments
-- Each test case carries `// Arrange`, `// Act`, `// Assert` markers
-- Shared setup outside the loop is labeled `// Arrange (shared)`
-
-**Why**: Makes the structural intent obvious. Reinforces TDD habits.
-
-### R5: Triangulation (table-driven)
-- At least two positive cases per behavior
-- Same behavior verified across different inputs is what locks down the spec
-- Use table-driven form: `tests := []struct{ name string; ...; want T; wantErr error }{...}`
-
-**Why**: A single case can be passed by an implementation that hard-codes the magic values. Two+ cases force generalization.
-
-### R6: Payload struct defined on the production side
-- Don't define a "for-test-only comparison struct" in the test file
-- Use the production code's struct directly to build `want`
-- If a comparable shape is needed, add a DTO struct to the production code (consult `developer`) and have the SUT return it
-
-**Why**: A test-only struct itself needs verification, doubling the surface area.
-
-### R7: No getters; public fields
-- Strip simple getters like `obj.GetX()` from production code (consult `developer`)
-- Make struct fields public and access them directly in tests (`obj.X`)
-- Derived computations (e.g., `AtEnd()` whose logic is non-trivial) are fine; pure getters are not
-
-**Why**: A getter is equivalent to a public field but adds boilerplate. The DTO style depends on direct field access.
-
-### R8: wantErr error as type witness
-- Error cases also live in the table; carry a `wantErr error` field
-- A typed witness like `wantErr: &ParseError{}` plus `assert.IsType(t, tt.wantErr, got)` verifies the type
-- If the error message is readable/deterministic, compare the value with `assert.Equal`
-
-**Why**: Typed error checking confirms the failure took the right path.
-
-### R9: Test helpers stay trivially correct
-This rule applies to **every test helper**, not just tree-comparison helpers. The intent: a helper that contains logic worth testing has crossed the line and now requires its own tests-of-tests, which compounds maintenance and dilutes the value of the test suite.
-
-**Discouraged patterns (each is a smell that invites silent bugs):**
-
-| Pattern | Smell | Why it invites bugs |
+| # | Name | One-liner |
 |---|---|---|
-| Branching (`if`/`else`, conditional return) | logic in helper | each branch is an untested path |
-| Multi-accessor compound (`a.B().C() + a.D().E()`) | composition logic | wrong field combinations are silent |
-| Numeric type conversions (`string(rune(int))`, `strconv.*`) | semantic conversion | linters cannot catch intent errors here |
-| "Default"/fallback returns (`return "[?]"`, `return ""`) | lossy fallback | masks real failures behind an opaque value |
-| Comparing values inside the helper | hidden assertion | the assertion's failure is invisible |
+| R1 | Use testify | `assert.*` / `require.*`, never bare `t.Errorf` |
+| R2 | SUT / got / want | `got := sut.Method(args)`; `want` is a complete struct |
+| R3 | One assert per case | One pass/fail signal per case (avoid Assertion Roulette) |
+| R4 | Explicit AAA | `// Arrange / // Act / // Assert` markers |
+| R5 | Triangulation | At least two positive cases per behavior |
+| R6 | Production-side payload | No test-only payload structs |
+| R7 | No getters | Public fields, direct access |
+| R8 | wantErr type witness | `wantErr error` carrying a typed `*FooError{}` |
+| R9 | Helpers trivially correct | No branching, no multi-accessor compounds, no fallback returns |
+| R10 | Test independence | Order-independent, parallel-safe, `t.Cleanup` for teardown |
+| R11 | No test-only production APIs | If only tests use a function, delete the function (or move to test code) |
+| R12 | Behavior, not state | The asserted outcome must be observable from outside the SUT |
 
-**Tree-comparison helpers specifically** (e.g., flattening AST to `<Kind> <single-accessor>\n`):
-- Each `case` in the type switch is a **single accessor call** — no compound formatting, no multi-field joins
-- The walker itself uses only the public Node interface (`Kind`, `NumChildren`, `Child`)
-
-**Good**:
-```go
-case *resolved_ast.TableScanNode:
-    return " " + v.Table().GetName()  // single accessor
-```
-
-**Bad** (the canonical "you needed tests for this helper" example):
-```go
-func formatNode(n resolved_ast.Node) string {
-    switch v := n.(type) {
-    case *resolved_ast.OutputColumnNode:
-        col := v.Column()
-        if col.GetTableName() != "" {  // ← branch
-            return "[" + col.GetTableName() + "." + col.GetName() + " as " + v.Name() + "]"
-            // ← multi-accessor compound; if the join order is wrong the test still passes silently
-        }
-        return "[" + col.GetName() + " as " + v.Name() + "]"
-    case *resolved_ast.LiteralNode:
-        val := v.Value().GetValue()
-        if val.GetInt64Value() != 0 {  // ← branch + value-check inside helper
-            return "[int64:" + string(rune(val.GetInt64Value())) + "]"
-            // ← `string(rune(int64))` is a semantic-conversion bug (linters do NOT flag it
-            //    because the explicit rune() suppresses go vet's stringintconv warning).
-            //    100 becomes "d" instead of "100". This is exactly the class of bug R9 prevents.
-        }
-        return "[unknown]"  // ← lossy fallback
-    }
-    return "[?]"  // ← another lossy fallback
-}
-```
-
-**The review heuristic**: if removing or rewriting the helper would force someone to verify it still works (i.e., it begs for unit tests), the helper is too complex — flag it under R9 and recommend collapsing each case to a single accessor.
-
-### R10: Test independence
-- Tests don't depend on execution order
-- No shared global state (use `t.Cleanup` for reliable teardown)
-- Must be safe to run in parallel
-
-### R11: No test-only production APIs
-- Adding a field/method to `package zetasql` purely to make testing easier is **NOT allowed**
-- If test access is needed, handle it via a test-side helper (in the `*_test.go` file)
-
-**Why**: Production code shouldn't carry weight that only tests use. Consult `developer` if a real production-side change would clean things up instead.
-
-### R12: Test behavior, not internal state or construction
-
-A test must assert on something **observable from outside the SUT** that the SUT is contractually responsible for producing. Tests that only assert on internal state with no behavioral consequence — or on the result of a constructor that merely assigns fields — are not earning their keep.
-
-**Reference**: Meszaros, *xUnit Test Patterns*, specifically:
-- *State Verification* vs *Behavior Verification* — both are valid, but each requires the asserted property to be **observable** (a return value, an effect on a collaborator, a serialized output). Asserting on a private/public field that the SUT just stored verbatim is neither.
-- *Sensitive Equality* (smell) — an assertion that compares more detail than the test cares about. Includes "comparing the entire internal state of the SUT" when only a subset is part of the contract.
-- *Fragile Test* (smell, caused by *Overspecified Software*) — a test that breaks on harmless refactors because it locked in an implementation detail.
-- *Goals of Test Automation* — tests must reduce risk and survive refactors. A test that breaks on every internal rename without flagging a real regression has negative value.
-
-**What is *not* worth testing on its own**:
-
-| Pattern | Why it's not behavior |
-|---|---|
-| `TestNewX` that asserts `&X{Field: v}` was set up | tests Go's struct-literal assignment, not the SUT |
-| `TestSetX` / `TestEnableX` for a method whose body is `o.Field = v` (or `m[k] = true`) | tests Go's `=` / map insertion |
-| A test that the package's internal lookup table contains entry "foo" | the higher-level methods that *use* the entry already exercise it; missing entries make those tests fail |
-| `assert.Equal(sql, stmt.SQL)` when `ParseStatement` does `&Statement{SQL: sql, Root: root}` | pure passthrough — no transformation, no validation, no logic |
-
-**What *is* behavior worth testing** (each has a logic surface that can break independently of "Go assigned a value"):
-
-- A method whose result depends on input transformation, filtering, validation, or aggregation
-- An invariant maintained across multiple fields (e.g., `SetSupportsAllStatementKinds` must clear `StatementKinds`)
-- ToProto / FromProto serialization (boundary cases: nil, empty, deeply nested)
-- Validation that returns an error for malformed input
-- Method side effects on collaborators (analyzer + options + catalog → analysis result)
-
-**Heuristic** (the "given/when/then" test):
-
-Phrase the test as "given <input>, when <SUT call>, then <observable result>". If `<observable result>` reduces to "the field I just set has the value I set" or "the lookup table I built has the entry I added", the test is verifying Go itself — delete it. The behavior, if any, is exercised by the next-level test that *uses* the field/entry.
-
-**Why**: Without this filter, the test suite grows to mirror the implementation rather than the contract. Every refactor (renaming a field, swapping `Features` from `map` to `[]LanguageFeature`, dropping a redundant export check) breaks tests that aren't flagging real regressions, which conditions everyone to either skip the failing tests or skip the refactor. Both outcomes are worse than not having the test.
+When citing a rule (e.g., "R12 violation"), open `references/rules.md` for the example code and full *why*.
 
 ## Code-level red flags (proactive scan)
 
@@ -284,7 +135,7 @@ The point is to catch issues on the first read, before any human pushback. Scan 
 | Test verifies a function that has zero production callers (only tests use it) | R11 | The function is dead code held alive by its test. Delete both unless it's about to gain a real caller. |
 | `t.Run(tt.name, func(t *testing.T) { ... })` body has 2+ unrelated `assert.*` calls | R3 / Assertion Roulette | Split into separate cases or build a complete `want` struct. |
 
-When in doubt about the smell name, look it up in [`references/xunit-patterns.md`](references/xunit-patterns.md). Naming the smell precisely makes the fix obvious.
+When in doubt about the smell name, look it up in `references/xunit-patterns.md`. Naming the smell precisely makes the fix obvious.
 
 ## Pre-completion sniff scan (mandatory)
 
@@ -304,141 +155,28 @@ The scan, in order:
 
 The bar: by the time you say "done", a reviewer reading the resulting test file should not need to point out any of the patterns above. If they do, it means this scan was skipped.
 
-## Author mode (writing a new test)
+## Author mode (skeleton)
 
-Use this when invoked from the `tdd` cycle (Step 2: red) or when the user asks "write a test for X".
+Use this when invoked from the `tdd` cycle (Step 2: red) or when the user asks "write a test for X". Full text in [`references/modes.md`](references/modes.md#author-mode-writing-a-new-test).
 
-### A1: Pick the SUT
-- A function → the function itself
-- A method → the receiver instance
-- A constructor (`New*`) → frequently the SUT
+1. **A1 — Pick the SUT**: function / method receiver / constructor.
+2. **A2 — Write a table-driven skeleton**: `tests := []struct{name, input, want, wantErr}{...}` with an inner `t.Run` that follows the R0 shape and labels the AAA phases.
+3. **A3 — `want` is a complete struct**: full population so field add/remove surfaces in the diff.
+4. **A4 — Tree comparison uses the minimal helper**: per R9 — single-accessor cases, no branches.
+5. **A5 — Reuse, don't reinvent**: `newTestAnalyzer`, `newUsersCatalog`, `findNode` already exist.
+6. **A6 — Aligning with existing tests**: existing tests are a style reference, not an oracle. The rules win, the example loses.
+7. **A7 — Run the pre-completion sniff scan**: before declaring done. Mandatory.
 
-### A2: Write a table-driven skeleton
+## Review mode (skeleton)
 
-```go
-func TestSUT_Behavior(t *testing.T) {
-    // Arrange (shared)
-    // ... shared setup, if any ...
+Use this when the user says "review my tests" or similar. Full text in [`references/modes.md`](references/modes.md#review-mode-reading-an-existing-test).
 
-    tests := []struct {
-        name    string
-        // input fields
-        input   InputType
-        // expected
-        want    OutputType
-        wantErr error  // type witness for error cases
-    }{
-        {name: "positive case 1", input: ..., want: ...},
-        {name: "positive case 2", input: ..., want: ...},  // triangulation
-        {name: "error: invalid input", input: ..., wantErr: &SomeError{}},
-    }
-
-    for _, tt := range tests {
-        t.Run(tt.name, func(t *testing.T) {
-            // Arrange
-            sut := ... // subject under test
-
-            // Act
-            got, err := sut.Method(tt.input)
-
-            // Assert
-            if tt.wantErr != nil {
-                assert.IsType(t, tt.wantErr, err)
-                return
-            }
-            require.NoError(t, err)
-            assert.Equal(t, tt.want, got)
-        })
-    }
-}
-```
-
-### A3: `want` is a complete struct
-For struct returns, build a fully populated `want` so any field add/remove appears in the diff. For scalar returns, the scalar type alone is fine.
-
-### A4: Tree comparison uses the minimal helper
-For AST-shaped output, use a helper that flattens to `<Kind> <single-accessor>\n`. Each switch `case` is a single accessor call. No compound formatting (R9).
-
-### A5: Reuse, don't reinvent
-Helpers like `newTestAnalyzer`, `newUsersCatalog`, `findNode`, `resolvedDebugString` already exist. Use them. If you need a helper that doesn't exist, prefer extending an existing one (keeping each case a single accessor) over creating a parallel one.
-
-### A6: Aligning with existing tests
-
-Existing tests are a **style reference**, not an oracle of correctness. Treat them as cues for the local idiom — but keep R1–R11 as the standard of truth. If you see a violation in existing code, do not propagate it.
-
-What to copy:
-- Reuse the helpers above
-- Imports from `github.com/stretchr/testify/assert` and `github.com/stretchr/testify/require`
-- Prefer adding to a related existing test file (e.g., `parser_test.go`, `analyzer_test.go`) over creating a new file
-
-What **not** to copy:
-- A leftover getter or setter — even if it's there, the new code uses public fields directly (R7)
-- A multi-assertion test — even if a neighbor has three `assert.Equal` calls, your new test still has one per case (R3)
-- A custom payload struct in the test — even if you find one nearby, don't add another (R2, R6); flag the existing one for a separate review pass
-
-When in doubt: the rules win, the example loses.
-
-### A7: Run the pre-completion sniff scan
-
-Before declaring the new test "done" (or before signalling that the TDD red phase is satisfied), execute the [Pre-completion sniff scan](#pre-completion-sniff-scan-mandatory). This is not optional — its purpose is to catch issues on the first pass instead of after user feedback. If the scan flags something, fix or delete it now; don't push it to a "follow-up".
-
-## Review mode (reading an existing test)
-
-Use this when the user says "review my tests" or similar.
-
-### Step 1: Identify the target
-Ask the user which file/directory to review. If unspecified:
-- Check `git status` / `git log` for recently modified `*_test.go` files
-- Confirm with the user before proceeding
-
-### Step 2: Read every test file
-Use the `Read` tool to load the target files completely. Include shared helper files within the same package.
-
-### Step 3: Check rule by rule
-Walk each test function through R1–R12. Record every violation.
-
-### Step 3b: Run the red-flag scan
-After the rule pass, sweep the same files against the [Code-level red flags](#code-level-red-flags-proactive-scan) table. The table targets surface patterns that the rule pass can miss when reading large files quickly — dead-code tests, internal-state assertions, conditional test logic, and the like. Add any new findings to the report.
-
-### Step 4: Output the report
-
-```
-## Test review: <file>
-
-### Finding 1: R<n> <rule name>
-- **Location**: foo_test.go:42
-- **Issue**: <what specifically is wrong>
-- **Fix**:
-```go
-// before
-<violating code>
-
-// after
-<corrected code>
-```
-- **Why this rule matters**: <one-line rationale>
-
-### Finding 2: ...
-```
-
-If multiple files are reviewed, separate by file. If a file has no violations, state "✓ Conforms to conventions."
-
-### Step 5: Suggest priority
-
-When violations are numerous, indicate fix order:
-1. **R12 (behavior, not internal state)**: deletes whole tests that should not exist — fix first so subsequent rules apply to the right surface
-2. **R3 (one assert per got)**: design-level
-3. **R6 (test-side payload struct)**: structural
-4. **R2 (SUT/got/want)**: clarifies structure
-5. Format-level (R1, R4) last
-
-### Review etiquette
-
-- **Avoid heavy-handed MUSTs**: communicate the *why*, not blind directives
-- **Concrete fixes only**: always show the corrected code; no vague "please fix"
-- **Acknowledge trade-offs**: e.g., when constructing a `want` tree is impractical, R9's minimal helper is the legitimate substitute
-- **Match existing patterns**: if neighboring tests in the same repo follow a particular style, anchor to it
-- **Production-side smells**: when a test-side issue (e.g., R7 getter use, R11 test-only API) points at a production-code problem, refer the user to `developer` for the production fix
+1. **Step 1 — Identify the target**: which file/directory? If unspecified, check `git status` / `git log` and confirm.
+2. **Step 2 — Read every test file**: load completely, including shared helpers in the same package.
+3. **Step 3 — Check rule by rule**: walk each function through R1–R12.
+4. **Step 3b — Run the red-flag scan**: sweep the table above for surface patterns the rule pass can miss.
+5. **Step 4 — Output the report**: structured findings with location / rule / before / after / why.
+6. **Step 5 — Suggest priority**: R12 first (deletes whole tests), then design (R3), then structure (R6, R2), then format (R1, R4).
 
 ## Allowed exceptions
 
@@ -448,71 +186,16 @@ When violations are numerous, indicate fix order:
 
 When applying an exception, leave a comment in the test explaining why.
 
-## Anti-pattern catalog
+## Anti-patterns (index)
 
-### AP1: Multiple assertions in sequence
-```go
-// bad
-assert.Equal(t, 1, len(cols))
-assert.Equal(t, "id", cols[0].Name)
-assert.Equal(t, "users", cols[0].TableName)
-```
-→ Violates R3. Either split into cases, or build a complete `want` struct comparison.
+The full code samples and rationale are in [`references/anti-patterns.md`](references/anti-patterns.md). One-line index:
 
-### AP2: Test-side payload construction
-```go
-// bad
-type payload struct { Name string; Kind Kind }
-got := payload{Name: stmt.Name(), Kind: stmt.Kind()}
-```
-→ Violates R2/R6. Use the production struct directly, or change the SUT to return a comparable shape (consult `developer`).
-
-### AP3: Elaborate format helper
-```go
-// bad
-func summary(n Node) string {
-    if n.HasFoo() && n.Foo().Bar() != "" {
-        return fmt.Sprintf("[%s/%s]", n.Foo().Bar(), n.Baz())
-    }
-    return n.Default()
-}
-```
-→ Violates R9. Helpers must not carry logic worth testing. Branches, multi-accessor compounds, numeric conversions, and fallback returns each invite silent bugs — and linters (`go vet`, `staticcheck`, `gocritic`) cannot catch the semantic-intent bugs in these helpers, so the review must.
-
-### AP4: Comparison via getter
-```go
-// bad
-assert.Equal(t, sql, stmt.SQL())
-```
-→ Violates R7. Use direct field access (`stmt.SQL`) and remove the getter (a `developer` concern).
-
-### AP5: Asserting on internal state with no behavioral consequence
-```go
-// bad — testing Go's map assignment
-sut := NewLanguageOptions()
-sut.EnableLanguageFeature(generated.LanguageFeature_FEATURE_TABLESAMPLE)
-assert.True(t, sut.Features[generated.LanguageFeature_FEATURE_TABLESAMPLE])
-
-// bad — testing that an export exists, when behavior tests already exercise it
-exports := compiledModule.ExportedFunctions()
-_, ok := exports["parse_statement_proto"]
-assert.True(t, ok)
-
-// bad — testing that &X{Field: v} assigned the field
-got := NewParseResumeLocation("SELECT 1")
-assert.Equal(t, &ParseResumeLocation{Input: "SELECT 1"}, got)
-```
-→ Violates R12. Each of these is *Sensitive Equality* + *Fragile Test* (Meszaros): the assertion locks in an implementation detail (storage layout, export-list shape, struct-literal mechanics) without verifying any contract that callers depend on. The behavior path — features take effect through the analyzer, exports are reachable through `Parser.ParseStatement`, the resume location is consumed by `AnalyzeNextStatement` — is what the test should target. Delete and rely on the integration/behavior test that exercises the same code path with an observable result.
-
-### AP6: Testing a constructor directly
-```go
-// bad
-func TestNewAnalyzerOptions(t *testing.T) {
-    got := NewAnalyzerOptions()
-    assert.Equal(t, &AnalyzerOptions{}, got)
-}
-```
-→ Violates R12. A constructor whose body is `return &X{...}` has no behavior beyond Go's struct literal. The constructor stays in production as ergonomic call-site sugar (`developer` AP2 distinguishes "useful constructor" from "noise constructor"), but the constructor itself is not the SUT — the SUT is whatever method consumes the constructed value. Test that method.
+- **AP1 — Multiple assertions in sequence** (violates R3)
+- **AP2 — Test-side payload construction** (violates R2/R6)
+- **AP3 — Elaborate format helper** (violates R9)
+- **AP4 — Comparison via getter** (violates R7)
+- **AP5 — Asserting on internal state with no behavioral consequence** (violates R12)
+- **AP6 — Testing a constructor directly** (violates R12)
 
 ## How this skill interacts with others
 
