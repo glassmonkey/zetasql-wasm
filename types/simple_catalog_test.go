@@ -194,6 +194,7 @@ func TestSimpleCatalog_FindTable_NotFound(t *testing.T) {
 		{name: "single segment miss", namePath: []string{"missing"}},
 		{name: "two segments miss in sub-catalog", namePath: []string{"schema1", "missing"}},
 		{name: "two segments miss on sub-catalog", namePath: []string{"missing_schema", "x"}},
+		{name: "empty namePath", namePath: []string{}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

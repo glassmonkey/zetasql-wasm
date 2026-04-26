@@ -37,9 +37,8 @@ func (c *SimpleCatalog) AddZetaSQLBuiltinFunctions(opts *generated.ZetaSQLBuilti
 	c.BuiltinOptions = opts
 }
 
-// FullName returns the catalog's name. (For now only the local Name; nested
-// fully-qualified paths are not tracked because SimpleCatalog has no parent
-// pointer - callers that need a path should track it on their side.)
+// FullName returns the catalog's local name. SimpleCatalog has no parent
+// pointer, so the returned string is the leaf name regardless of nesting.
 func (c *SimpleCatalog) FullName() string { return c.Name }
 
 // FindTable looks up a table by name path, descending through sub-catalogs
@@ -48,7 +47,7 @@ func (c *SimpleCatalog) FullName() string { return c.Name }
 // (ZetaSQL's convention). Returns ErrNotFound when no match exists.
 func (c *SimpleCatalog) FindTable(namePath []string) (*SimpleTable, error) {
 	if len(namePath) == 0 {
-		return nil, fmt.Errorf("FindTable: empty namePath")
+		return nil, fmt.Errorf("FindTable: empty namePath: %w", ErrNotFound)
 	}
 	cur, err := c.descend(namePath[:len(namePath)-1])
 	if err != nil {
