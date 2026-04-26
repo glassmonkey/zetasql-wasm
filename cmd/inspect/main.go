@@ -37,7 +37,7 @@ func main() {
 		fmt.Printf("Error: Failed to initialize ZetaSQL WASM parser: %v\n", err)
 		os.Exit(1)
 	}
-	defer parser.Close(ctx)
+	defer func() { _ = parser.Close(ctx) }()
 
 	// Parse the SQL statement using WASM
 	stmt, err := parser.ParseStatement(ctx, sql)

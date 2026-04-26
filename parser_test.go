@@ -12,6 +12,7 @@ import (
 // (newTestParser); errors are flagged in the table via wantErr (type
 // witness) — happy cases set want only, error cases set wantErr only.
 func TestParser_ParseStatement(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		sql     string
@@ -661,6 +662,7 @@ func TestParser_ParseStatement(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Arrange
 			ctx := t.Context()
 			sut := newTestParser(t)

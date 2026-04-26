@@ -13,6 +13,7 @@ func ptr[T any](v T) *T { return &v }
 // node shapes. The leaf cases pin down the per-kind scalar suffix (or lack
 // thereof); the composite case pins down indentation across child levels.
 func TestNode_String(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name string
 		node Node
@@ -104,6 +105,7 @@ func TestNode_String(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Arrange
 			sut := tt.node
 

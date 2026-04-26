@@ -37,18 +37,18 @@ type Statement struct {
 // NewParser creates a new ZetaSQL parser instance
 func NewParser(ctx context.Context) (*Parser, error) {
 	// Create a new WebAssembly runtime
-	runtime := wazero.NewRuntime(ctx)
+	runtime := wazero.NewRuntimeWithConfig(ctx, sharedRuntimeConfig())
 
 	// Instantiate WASI
 	if _, err := wasi_snapshot_preview1.Instantiate(ctx, runtime); err != nil {
-		runtime.Close(ctx)
+		_ = runtime.Close(ctx)
 		return nil, fmt.Errorf("failed to instantiate WASI: %w", err)
 	}
 
 	// Compile the WASM module
 	compiledModule, err := runtime.CompileModule(ctx, wasm.ZetaSQLWasm)
 	if err != nil {
-		runtime.Close(ctx)
+		_ = runtime.Close(ctx)
 		return nil, fmt.Errorf("failed to compile WASM module: %w", err)
 	}
 
@@ -58,7 +58,7 @@ func NewParser(ctx context.Context) (*Parser, error) {
 	// Add Emscripten functions
 	emscriptenExporter, err := emscripten.NewFunctionExporterForModule(compiledModule)
 	if err != nil {
-		runtime.Close(ctx)
+		_ = runtime.Close(ctx)
 		return nil, fmt.Errorf("failed to create Emscripten exporter: %w", err)
 	}
 	emscriptenExporter.ExportFunctions(builder)
@@ -71,7 +71,7 @@ func NewParser(ctx context.Context) (*Parser, error) {
 
 	// Instantiate env module
 	if _, err := builder.Instantiate(ctx); err != nil {
-		runtime.Close(ctx)
+		_ = runtime.Close(ctx)
 		return nil, fmt.Errorf("failed to instantiate env module: %w", err)
 	}
 
@@ -79,7 +79,7 @@ func NewParser(ctx context.Context) (*Parser, error) {
 	moduleConfig := wazero.NewModuleConfig().WithStartFunctions("_initialize")
 	module, err := runtime.InstantiateModule(ctx, compiledModule, moduleConfig)
 	if err != nil {
-		runtime.Close(ctx)
+		_ = runtime.Close(ctx)
 		return nil, fmt.Errorf("failed to instantiate WASM module: %w", err)
 	}
 
@@ -111,7 +111,7 @@ func (p *Parser) ParseStatement(ctx context.Context, sql string) (*Statement, er
 		return nil, fmt.Errorf("failed to allocate memory: %w", err)
 	}
 	sqlPtr := results[0]
-	defer free.Call(ctx, sqlPtr)
+	defer func() { _, _ = free.Call(ctx, sqlPtr) }()
 
 	// Write SQL string to WASM memory
 	if !p.module.Memory().Write(uint32(sqlPtr), append(sqlBytes, 0)) {
@@ -124,7 +124,7 @@ func (p *Parser) ParseStatement(ctx context.Context, sql string) (*Statement, er
 		return nil, fmt.Errorf("failed to call parse function: %w", err)
 	}
 	resultPtr := results[0]
-	defer freeProtoBuffer.Call(ctx, resultPtr)
+	defer func() { _, _ = freeProtoBuffer.Call(ctx, resultPtr) }()
 
 	// Read result from WASM memory
 	// Format: [uint32 size][data bytes]

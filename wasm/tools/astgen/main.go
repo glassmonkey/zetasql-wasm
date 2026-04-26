@@ -526,7 +526,7 @@ func generateFile(path, tmplFile string, data any) error {
 	formatted, err := format.Source(buf.Bytes())
 	if err != nil {
 		// Write unformatted for debugging
-		os.WriteFile(path, buf.Bytes(), 0644)
+		_ = os.WriteFile(path, buf.Bytes(), 0644)
 		return fmt.Errorf("gofmt %s: %w", path, err)
 	}
 

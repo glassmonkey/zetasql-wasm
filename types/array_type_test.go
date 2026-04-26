@@ -11,6 +11,7 @@ import (
 )
 
 func TestArrayTypeErrors(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		elem    Type
@@ -22,6 +23,7 @@ func TestArrayTypeErrors(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			_, err := NewArrayType(tt.elem)
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -33,6 +35,7 @@ func TestArrayTypeErrors(t *testing.T) {
 }
 
 func TestArrayTypeToProto(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name string
 		elem Type
@@ -61,6 +64,7 @@ func TestArrayTypeToProto(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			arr, _ := NewArrayType(tt.elem)
 			assert.Empty(t, cmp.Diff(tt.want, arr.ToProto(), protocmp.Transform()), "ToProto() mismatch")
 		})
@@ -68,6 +72,7 @@ func TestArrayTypeToProto(t *testing.T) {
 }
 
 func TestArrayTypeRoundTrip(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name string
 		elem Type
@@ -77,6 +82,7 @@ func TestArrayTypeRoundTrip(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			original, _ := NewArrayType(tt.elem)
 			restored, err := typeFromProto(original.ToProto())
 			require.NoError(t, err)

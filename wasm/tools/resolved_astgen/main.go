@@ -385,10 +385,6 @@ func (ctx *analysisContext) collectFieldsRecursive(md protoreflect.MessageDescri
 	return result
 }
 
-func (ctx *analysisContext) classifyField(fd protoreflect.FieldDescriptor) fieldInfo {
-	return ctx.classifyFieldWithPrefix(fd, "n.raw")
-}
-
 func (ctx *analysisContext) classifyFieldWithPrefix(fd protoreflect.FieldDescriptor, rawPrefix string) fieldInfo {
 	fname := string(fd.Name())
 	goName := snakeToPascal(fname)
@@ -552,7 +548,7 @@ func generateFile(path, tmplFile string, data any) error {
 	formatted, err := format.Source(buf.Bytes())
 	if err != nil {
 		// Write unformatted for debugging
-		os.WriteFile(path, buf.Bytes(), 0644)
+		_ = os.WriteFile(path, buf.Bytes(), 0644)
 		return fmt.Errorf("gofmt %s: %w", path, err)
 	}
 
