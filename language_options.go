@@ -120,12 +120,12 @@ func (o *LanguageOptions) toProto() *generated.LanguageOptionsProto {
 		p.ReservedKeywords = append(p.ReservedKeywords, kw)
 	}
 
-	if o.NameResolutionMode != 0 {
+	if o.NameResolutionMode != generated.NameResolutionMode_NAME_RESOLUTION_DEFAULT {
 		m := o.NameResolutionMode
 		p.NameResolutionMode = &m
 	}
 
-	if o.ProductMode != 0 {
+	if o.ProductMode != generated.ProductMode_PRODUCT_INTERNAL {
 		m := o.ProductMode
 		p.ProductMode = &m
 	}

@@ -26,7 +26,7 @@ type FunctionArgumentTypeOptions struct {
 
 func (o *FunctionArgumentTypeOptions) toProto() *generated.FunctionArgumentTypeOptionsProto {
 	p := &generated.FunctionArgumentTypeOptionsProto{}
-	if o.Cardinality != 0 {
+	if o.Cardinality != generated.FunctionEnums_REQUIRED {
 		c := o.Cardinality
 		p.Cardinality = &c
 	}
