@@ -22,7 +22,7 @@ func TestAnalyzer_AnalyzeStatement_Errors(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name:    "incomplete SELECT",
+			name:    "syntax error: incomplete SELECT",
 			sql:     "SELECT",
 			cat:     nil,
 			wantErr: &AnalyzeError{},
@@ -35,6 +35,42 @@ func TestAnalyzer_AnalyzeStatement_Errors(t *testing.T) {
 				c.AddZetaSQLBuiltinFunctions(nil)
 				return c
 			}(),
+			wantErr: &AnalyzeError{},
+		},
+		{
+			name:    "column not found in known table",
+			sql:     "SELECT nonexistent FROM users",
+			cat:     newUsersCatalog(),
+			wantErr: &AnalyzeError{},
+		},
+		{
+			name:    "function not found",
+			sql:     "SELECT my_undefined_fn(id) FROM users",
+			cat:     newUsersCatalog(),
+			wantErr: &AnalyzeError{},
+		},
+		{
+			name:    "type mismatch in arithmetic",
+			sql:     "SELECT id + name FROM users",
+			cat:     newUsersCatalog(),
+			wantErr: &AnalyzeError{},
+		},
+		{
+			name:    "wrong argument count",
+			sql:     "SELECT LENGTH() FROM users",
+			cat:     newUsersCatalog(),
+			wantErr: &AnalyzeError{},
+		},
+		{
+			name:    "ungrouped column with aggregate",
+			sql:     "SELECT id, COUNT(*) FROM users",
+			cat:     newUsersCatalog(),
+			wantErr: &AnalyzeError{},
+		},
+		{
+			name:    "syntax error reaching analyzer",
+			sql:     "SELECT * FROM",
+			cat:     nil,
 			wantErr: &AnalyzeError{},
 		},
 	}
