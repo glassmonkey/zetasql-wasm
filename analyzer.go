@@ -5,8 +5,8 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"github.com/glassmonkey/zetasql-wasm/catalog"
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
+	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/tetratelabs/wazero"
@@ -94,7 +94,7 @@ func NewAnalyzer(ctx context.Context) (*Analyzer, error) {
 func (a *Analyzer) AnalyzeStatement(
 	ctx context.Context,
 	sql string,
-	cat *catalog.SimpleCatalog,
+	cat *types.SimpleCatalog,
 	opts *AnalyzerOptions,
 ) (*AnalyzeOutput, error) {
 	request := &generated.AnalyzeRequest{
@@ -115,7 +115,7 @@ func (a *Analyzer) AnalyzeStatement(
 func (a *Analyzer) AnalyzeNextStatement(
 	ctx context.Context,
 	loc *ParseResumeLocation,
-	cat *catalog.SimpleCatalog,
+	cat *types.SimpleCatalog,
 	opts *AnalyzerOptions,
 ) (*AnalyzeOutput, bool, error) {
 	allowResume := true
@@ -153,7 +153,7 @@ func (a *Analyzer) AnalyzeNextStatement(
 func (a *Analyzer) callAnalyze(
 	ctx context.Context,
 	request *generated.AnalyzeRequest,
-	cat *catalog.SimpleCatalog,
+	cat *types.SimpleCatalog,
 	opts *AnalyzerOptions,
 ) (*generated.AnalyzeResponse, error) {
 	if a.module == nil {

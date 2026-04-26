@@ -1,9 +1,8 @@
-package catalog
+package types
 
 import (
 	"testing"
 
-	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
@@ -28,8 +27,8 @@ func TestSimpleCatalogToProto(t *testing.T) {
 			catalog: func() *SimpleCatalog {
 				cat := NewSimpleCatalog("main")
 				cat.Tables = append(cat.Tables, NewSimpleTable("users",
-					NewSimpleColumn("users", "id", types.Int64Type()),
-					NewSimpleColumn("users", "name", types.StringType()),
+					NewSimpleColumn("users", "id", Int64Type()),
+					NewSimpleColumn("users", "name", StringType()),
 				))
 				cat.AddZetaSQLBuiltinFunctions(nil)
 				return cat
@@ -65,7 +64,7 @@ func TestSimpleCatalogToProto(t *testing.T) {
 				root := NewSimpleCatalog("root")
 				sub := NewSimpleCatalog("schema1")
 				sub.Tables = append(sub.Tables, NewSimpleTable("t1",
-					NewSimpleColumn("t1", "col", types.DoubleType()),
+					NewSimpleColumn("t1", "col", DoubleType()),
 				))
 				root.SubCatalogs = append(root.SubCatalogs, sub)
 				return root

@@ -1,4 +1,4 @@
-package catalog
+package types
 
 import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 

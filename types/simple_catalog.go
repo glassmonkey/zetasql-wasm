@@ -1,15 +1,12 @@
-package catalog
+package types
 
-import (
-	"github.com/glassmonkey/zetasql-wasm/types"
-	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
-)
+import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 
 // SimpleCatalog represents a ZetaSQL catalog containing tables, functions, and sub-catalogs.
 type SimpleCatalog struct {
 	Name           string
 	Tables         []*SimpleTable
-	Functions      []*types.Function
+	Functions      []*Function
 	SubCatalogs    []*SimpleCatalog
 	BuiltinOptions *generated.ZetaSQLBuiltinFunctionOptionsProto
 }

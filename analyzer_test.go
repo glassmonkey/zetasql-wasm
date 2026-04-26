@@ -4,7 +4,6 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/glassmonkey/zetasql-wasm/catalog"
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
 	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
@@ -32,22 +31,22 @@ func newTestParser(t *testing.T) *Parser {
 	return p
 }
 
-func newUsersCatalog() *catalog.SimpleCatalog {
-	cat := catalog.NewSimpleCatalog("test")
+func newUsersCatalog() *types.SimpleCatalog {
+	cat := types.NewSimpleCatalog("test")
 	cat.AddZetaSQLBuiltinFunctions(nil)
-	cat.Tables = append(cat.Tables, catalog.NewSimpleTable("users",
-		catalog.NewSimpleColumn("users", "id", types.Int64Type()),
-		catalog.NewSimpleColumn("users", "name", types.StringType()),
+	cat.Tables = append(cat.Tables, types.NewSimpleTable("users",
+		types.NewSimpleColumn("users", "id", types.Int64Type()),
+		types.NewSimpleColumn("users", "name", types.StringType()),
 	))
 	return cat
 }
 
-func newUsersOrdersCatalog() *catalog.SimpleCatalog {
+func newUsersOrdersCatalog() *types.SimpleCatalog {
 	cat := newUsersCatalog()
-	cat.Tables = append(cat.Tables, catalog.NewSimpleTable("orders",
-		catalog.NewSimpleColumn("orders", "order_id", types.Int64Type()),
-		catalog.NewSimpleColumn("orders", "user_id", types.Int64Type()),
-		catalog.NewSimpleColumn("orders", "amount", types.Int64Type()),
+	cat.Tables = append(cat.Tables, types.NewSimpleTable("orders",
+		types.NewSimpleColumn("orders", "order_id", types.Int64Type()),
+		types.NewSimpleColumn("orders", "user_id", types.Int64Type()),
+		types.NewSimpleColumn("orders", "amount", types.Int64Type()),
 	))
 	return cat
 }
@@ -55,8 +54,8 @@ func newUsersOrdersCatalog() *catalog.SimpleCatalog {
 // newBuiltinsCatalog returns a catalog with only the ZetaSQL builtin
 // functions registered (no tables). Use this for SELECT queries that do not
 // reference any table but do use builtin functions like CAST, COUNT, etc.
-func newBuiltinsCatalog() *catalog.SimpleCatalog {
-	cat := catalog.NewSimpleCatalog("test")
+func newBuiltinsCatalog() *types.SimpleCatalog {
+	cat := types.NewSimpleCatalog("test")
 	cat.AddZetaSQLBuiltinFunctions(nil)
 	return cat
 }
@@ -94,7 +93,7 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
 	tests := []struct {
 		name string
 		sql  string
-		cat  *catalog.SimpleCatalog
+		cat  *types.SimpleCatalog
 		opts *AnalyzerOptions // nil → NewAnalyzerOptions()
 		want string
 	}{
@@ -452,7 +451,7 @@ func TestAnalyzer_AnalyzeStatement_Errors(t *testing.T) {
 	tests := []struct {
 		name    string
 		sql     string
-		cat     *catalog.SimpleCatalog
+		cat     *types.SimpleCatalog
 		wantErr error
 	}{
 		{
@@ -663,7 +662,7 @@ func TestAnalyzer_AnalyzeStatement_CustomFunction(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			cat := catalog.NewSimpleCatalog("test")
+			cat := types.NewSimpleCatalog("test")
 			cat.AddZetaSQLBuiltinFunctions(nil)
 			argTypes := make([]*types.FunctionArgumentType, tt.argCount)
 			for i := range argTypes {
@@ -738,7 +737,7 @@ func TestAnalyzer_AnalyzeStatement_TemplatedFunction(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			cat := catalog.NewSimpleCatalog("test")
+			cat := types.NewSimpleCatalog("test")
 			cat.AddZetaSQLBuiltinFunctions(nil)
 			cat.Functions = append(cat.Functions, types.NewFunction(
 				[]string{tt.funcName},
