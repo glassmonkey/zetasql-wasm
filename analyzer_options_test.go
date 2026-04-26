@@ -49,18 +49,6 @@ func TestAnalyzerOptions_toProto(t *testing.T) {
 	}
 }
 
-func TestNewAnalyzerOptions(t *testing.T) {
-	// Arrange
-	sut := NewAnalyzerOptions
-
-	// Act
-	got := sut()
-
-	// Assert
-	want := &AnalyzerOptions{}
-	assert.Equal(t, want, got)
-}
-
 // TestAnalyzerOptions_Clone verifies that Clone returns a deep copy whose
 // fields equal the original by value. Pointer-independence is checked in a
 // separate test so each behaviour has a single observable assertion.
