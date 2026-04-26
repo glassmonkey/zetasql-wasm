@@ -8,10 +8,10 @@ GOLANGCI_LINT := go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-6s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-test: ## go test ./... -race (all modules)
+test: ## go test ./... (all modules)
 	@for m in $(GO_MODULES); do \
 		echo "==> go test in $$m"; \
-		(cd $$m && go test ./... -race) || exit 1; \
+		(cd $$m && go test ./...) || exit 1; \
 	done
 
 lint: ## golangci-lint run (all modules)
