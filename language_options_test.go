@@ -190,6 +190,82 @@ func TestLanguageOptions_EnableReservableKeyword(t *testing.T) {
 	}
 }
 
+// TestLanguageOptions_toProto_ProductMode verifies that the ProductMode
+// field is serialized when non-zero and omitted when zero (the proto
+// default INTERNAL).
+func TestLanguageOptions_toProto_ProductMode(t *testing.T) {
+	external := generated.ProductMode_PRODUCT_EXTERNAL
+
+	tests := []struct {
+		name string
+		mode generated.ProductMode
+		want *generated.ProductMode
+	}{
+		{
+			name: "INTERNAL (zero) is omitted",
+			mode: generated.ProductMode_PRODUCT_INTERNAL,
+			want: nil,
+		},
+		{
+			name: "EXTERNAL is propagated",
+			mode: generated.ProductMode_PRODUCT_EXTERNAL,
+			want: &external,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := NewLanguageOptions()
+			sut.ProductMode = tt.mode
+
+			// Act
+			got := sut.toProto().ProductMode
+
+			// Assert
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+// TestLanguageOptions_toProto_NameResolutionMode verifies that the
+// NameResolutionMode field is serialized when non-zero and omitted when
+// zero (the proto default DEFAULT).
+func TestLanguageOptions_toProto_NameResolutionMode(t *testing.T) {
+	strict := generated.NameResolutionMode_NAME_RESOLUTION_STRICT
+
+	tests := []struct {
+		name string
+		mode generated.NameResolutionMode
+		want *generated.NameResolutionMode
+	}{
+		{
+			name: "DEFAULT (zero) is omitted",
+			mode: generated.NameResolutionMode_NAME_RESOLUTION_DEFAULT,
+			want: nil,
+		},
+		{
+			name: "STRICT is propagated",
+			mode: generated.NameResolutionMode_NAME_RESOLUTION_STRICT,
+			want: &strict,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := NewLanguageOptions()
+			sut.NameResolutionMode = tt.mode
+
+			// Act
+			got := sut.toProto().NameResolutionMode
+
+			// Assert
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 // TestLanguageOptions_AnalyzerIntegration verifies that LanguageOptions
 // set on AnalyzerOptions are honored by the analyzer. The got is the
 // resolved literal value extracted from the analysis output. Triangulated

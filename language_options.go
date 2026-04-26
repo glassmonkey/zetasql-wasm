@@ -8,10 +8,12 @@ import (
 
 // LanguageOptions controls which ZetaSQL language features are enabled.
 type LanguageOptions struct {
-	Features       map[generated.LanguageFeature]bool
-	StatementKinds []generated.ResolvedNodeKind
-	AllStatements  bool
-	Keywords       map[string]bool
+	Features           map[generated.LanguageFeature]bool
+	StatementKinds     []generated.ResolvedNodeKind
+	AllStatements      bool
+	Keywords           map[string]bool
+	NameResolutionMode generated.NameResolutionMode
+	ProductMode        generated.ProductMode
 }
 
 // NewLanguageOptions creates LanguageOptions with no features enabled.
@@ -75,7 +77,11 @@ func (o *LanguageOptions) EnableReservableKeyword(keyword string, enable bool) {
 // clone returns a deep copy of the LanguageOptions, including independent
 // copies of the Features map, StatementKinds slice, and Keywords map.
 func (o *LanguageOptions) clone() *LanguageOptions {
-	c := &LanguageOptions{AllStatements: o.AllStatements}
+	c := &LanguageOptions{
+		AllStatements:      o.AllStatements,
+		NameResolutionMode: o.NameResolutionMode,
+		ProductMode:        o.ProductMode,
+	}
 	if o.Features != nil {
 		c.Features = make(map[generated.LanguageFeature]bool, len(o.Features))
 		for k, v := range o.Features {
@@ -112,6 +118,16 @@ func (o *LanguageOptions) toProto() *generated.LanguageOptionsProto {
 
 	for kw := range o.Keywords {
 		p.ReservedKeywords = append(p.ReservedKeywords, kw)
+	}
+
+	if o.NameResolutionMode != 0 {
+		m := o.NameResolutionMode
+		p.NameResolutionMode = &m
+	}
+
+	if o.ProductMode != 0 {
+		m := o.ProductMode
+		p.ProductMode = &m
 	}
 
 	return p

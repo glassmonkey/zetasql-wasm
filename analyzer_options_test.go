@@ -12,6 +12,9 @@ import (
 func TestAnalyzerOptions_toProto(t *testing.T) {
 	fullScope := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE
 	codeSearch := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_CODE_SEARCH
+	allowUndecl := true
+	positional := generated.ParameterMode_PARAMETER_POSITIONAL
+	none := generated.ParameterMode_PARAMETER_NONE
 
 	tests := []struct {
 		name string
@@ -32,6 +35,26 @@ func TestAnalyzerOptions_toProto(t *testing.T) {
 			name: "ParseLocationRecordType CODE_SEARCH is propagated",
 			opts: &AnalyzerOptions{ParseLocationRecordType: &codeSearch},
 			want: &generated.AnalyzerOptionsProto{ParseLocationRecordType: &codeSearch},
+		},
+		{
+			name: "AllowUndeclaredParameters true is propagated",
+			opts: &AnalyzerOptions{AllowUndeclaredParameters: true},
+			want: &generated.AnalyzerOptionsProto{AllowUndeclaredParameters: &allowUndecl},
+		},
+		{
+			name: "ParameterMode POSITIONAL is propagated",
+			opts: &AnalyzerOptions{ParameterMode: generated.ParameterMode_PARAMETER_POSITIONAL},
+			want: &generated.AnalyzerOptionsProto{ParameterMode: &positional},
+		},
+		{
+			name: "ParameterMode NONE is propagated",
+			opts: &AnalyzerOptions{ParameterMode: generated.ParameterMode_PARAMETER_NONE},
+			want: &generated.AnalyzerOptionsProto{ParameterMode: &none},
+		},
+		{
+			name: "ParameterMode NAMED (zero) is omitted from proto",
+			opts: &AnalyzerOptions{ParameterMode: generated.ParameterMode_PARAMETER_NAMED},
+			want: &generated.AnalyzerOptionsProto{},
 		},
 	}
 
