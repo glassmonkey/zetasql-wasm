@@ -75,18 +75,68 @@ func TestNode_String(t *testing.T) {
 			want: "KindLiteral 3.14\n",
 		},
 		{
-			name: "Literal ARRAY prints tag without expanding",
+			name: "Literal empty ARRAY prints tag with no children",
 			node: newLiteralWith(&generated.ValueProto{
 				Value: &generated.ValueProto_ArrayValue{ArrayValue: &generated.ValueProto_Array{}},
 			}),
 			want: "KindLiteral <ARRAY>\n",
 		},
 		{
-			name: "Literal STRUCT prints tag without expanding",
+			name: "Literal ARRAY of int64 expands each element",
+			node: newLiteralWith(&generated.ValueProto{
+				Value: &generated.ValueProto_ArrayValue{ArrayValue: &generated.ValueProto_Array{
+					Element: []*generated.ValueProto{
+						{Value: &generated.ValueProto_Int64Value{Int64Value: 1}},
+						{Value: &generated.ValueProto_Int64Value{Int64Value: 2}},
+						{Value: &generated.ValueProto_Int64Value{Int64Value: 3}},
+					},
+				}},
+			}),
+			want: `KindLiteral <ARRAY>
+  KindLiteral 1
+  KindLiteral 2
+  KindLiteral 3
+`,
+		},
+		{
+			name: "Literal empty STRUCT prints tag with no children",
 			node: newLiteralWith(&generated.ValueProto{
 				Value: &generated.ValueProto_StructValue{StructValue: &generated.ValueProto_Struct{}},
 			}),
 			want: "KindLiteral <STRUCT>\n",
+		},
+		{
+			name: "Literal STRUCT expands each field",
+			node: newLiteralWith(&generated.ValueProto{
+				Value: &generated.ValueProto_StructValue{StructValue: &generated.ValueProto_Struct{
+					Field: []*generated.ValueProto{
+						{Value: &generated.ValueProto_Int64Value{Int64Value: 1}},
+						{Value: &generated.ValueProto_StringValue{StringValue: "x"}},
+					},
+				}},
+			}),
+			want: `KindLiteral <STRUCT>
+  KindLiteral 1
+  KindLiteral "x"
+`,
+		},
+		{
+			name: "Literal nested ARRAY of STRUCTs recurses both layers",
+			node: newLiteralWith(&generated.ValueProto{
+				Value: &generated.ValueProto_ArrayValue{ArrayValue: &generated.ValueProto_Array{
+					Element: []*generated.ValueProto{
+						{Value: &generated.ValueProto_StructValue{StructValue: &generated.ValueProto_Struct{
+							Field: []*generated.ValueProto{
+								{Value: &generated.ValueProto_Int64Value{Int64Value: 10}},
+							},
+						}}},
+					},
+				}},
+			}),
+			want: `KindLiteral <ARRAY>
+  KindLiteral <STRUCT>
+    KindLiteral 10
+`,
 		},
 		{
 			name: "Literal with no value oneof set prints NULL",

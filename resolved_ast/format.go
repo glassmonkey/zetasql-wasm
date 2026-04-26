@@ -26,6 +26,36 @@ func writeNode(b *strings.Builder, n Node, depth int) {
 	for i := range n.NumChildren() {
 		writeNode(b, n.Child(i), depth+1)
 	}
+	// LiteralNode is a leaf in the resolved-AST sense (NumChildren == 0), but
+	// its ValueProto carries nested values for ARRAY / STRUCT. Walk those as
+	// pseudo-children so the printout shows the actual contents instead of
+	// stopping at the "<ARRAY>" / "<STRUCT>" tag.
+	if lit, ok := n.(*LiteralNode); ok {
+		writeValueChildren(b, lit.Value().GetValue(), depth+1)
+	}
+}
+
+// writeValueChildren writes ARRAY elements / STRUCT fields one line each as
+// nested KindLiteral nodes, recursing for nested composites.
+func writeValueChildren(b *strings.Builder, v *generated.ValueProto, depth int) {
+	if v == nil {
+		return
+	}
+	switch x := v.GetValue().(type) {
+	case *generated.ValueProto_ArrayValue:
+		for _, elem := range x.ArrayValue.GetElement() {
+			writeValue(b, elem, depth)
+		}
+	case *generated.ValueProto_StructValue:
+		for _, f := range x.StructValue.GetField() {
+			writeValue(b, f, depth)
+		}
+	}
+}
+
+func writeValue(b *strings.Builder, v *generated.ValueProto, depth int) {
+	fmt.Fprintf(b, "%s%s%s\n", strings.Repeat("  ", depth), KindLiteral, literalScalar(v))
+	writeValueChildren(b, v, depth+1)
 }
 
 func nodeScalar(n Node) string {
@@ -48,9 +78,8 @@ func nodeScalar(n Node) string {
 
 // literalScalar formats a ValueProto into a printable token. Each scalar
 // kind prints its underlying Go value; composite kinds (ARRAY, STRUCT)
-// print a tag instead of expanding because the resolved-AST walker treats
-// a LiteralNode as a leaf — recursing into the proto would mix two
-// different traversal mechanisms in the same output.
+// print a tag (the elements are printed separately as pseudo-children by
+// writeValueChildren so the tree structure stays visible).
 //
 // A nil ValueProto, or a ValueProto with no oneof set, prints " NULL".
 // Unknown kinds fall through to "" so a future proto update is visible
