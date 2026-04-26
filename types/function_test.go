@@ -83,6 +83,61 @@ func TestFunction_MultipleSignatures(t *testing.T) {
 	assert.Len(t, fn.ToProto().GetSignature(), 2)
 }
 
+func TestFunctionArgumentType_OptionsCardinality(t *testing.T) {
+	repeated := generated.FunctionEnums_REPEATED
+	optional := generated.FunctionEnums_OPTIONAL
+
+	tests := []struct {
+		name        string
+		cardinality generated.FunctionEnums_ArgumentCardinality
+		want        *generated.FunctionEnums_ArgumentCardinality
+	}{
+		{
+			name:        "REQUIRED (zero) is omitted",
+			cardinality: generated.FunctionEnums_REQUIRED,
+			want:        nil,
+		},
+		{
+			name:        "REPEATED is propagated",
+			cardinality: generated.FunctionEnums_REPEATED,
+			want:        &repeated,
+		},
+		{
+			name:        "OPTIONAL is propagated",
+			cardinality: generated.FunctionEnums_OPTIONAL,
+			want:        &optional,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := &FunctionArgumentType{
+				Kind:    generated.SignatureArgumentKind_ARG_TYPE_FIXED,
+				Type:    Int64Type(),
+				Options: &FunctionArgumentTypeOptions{Cardinality: tt.cardinality},
+			}
+
+			// Act
+			got := sut.toProto().GetOptions().Cardinality
+
+			// Assert
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestFunctionArgumentType_NilOptionsOmitsProtoOptions(t *testing.T) {
+	// Arrange
+	sut := NewFunctionArgumentType(Int64Type())
+
+	// Act
+	got := sut.toProto().GetOptions()
+
+	// Assert
+	assert.Nil(t, got)
+}
+
 func TestFunction_AggregateMode(t *testing.T) {
 	fn := NewFunction(
 		[]string{"my_sum"},
