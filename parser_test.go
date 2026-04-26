@@ -365,6 +365,283 @@ func TestParser_ParseStatement_AST(t *testing.T) {
 			want: `KindCreateTableStatement
 `,
 		},
+		{
+			name: "CTE with single binding",
+			sql:  "WITH x AS (SELECT 1 AS a) SELECT * FROM x",
+			want: `KindQueryStatement
+  KindQuery
+    KindWithClause
+      KindWithClauseEntry
+        KindAliasedQuery
+          KindIdentifier [x]
+          KindQuery
+            KindSelect
+              KindSelectList
+                KindSelectColumn
+                  KindIntLiteral
+                  KindAlias
+                    KindIdentifier [a]
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindStar
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [x]
+`,
+		},
+		{
+			name: "CTE chain referencing previous binding",
+			sql:  "WITH a AS (SELECT 1 AS v), b AS (SELECT v * 2 AS v FROM a) SELECT * FROM b",
+			want: `KindQueryStatement
+  KindQuery
+    KindWithClause
+      KindWithClauseEntry
+        KindAliasedQuery
+          KindIdentifier [a]
+          KindQuery
+            KindSelect
+              KindSelectList
+                KindSelectColumn
+                  KindIntLiteral
+                  KindAlias
+                    KindIdentifier [v]
+      KindWithClauseEntry
+        KindAliasedQuery
+          KindIdentifier [b]
+          KindQuery
+            KindSelect
+              KindSelectList
+                KindSelectColumn
+                  KindBinaryExpression
+                    KindPathExpression
+                      KindIdentifier [v]
+                    KindIntLiteral
+                  KindAlias
+                    KindIdentifier [v]
+              KindFromClause
+                KindTablePathExpression
+                  KindPathExpression
+                    KindIdentifier [a]
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindStar
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [b]
+`,
+		},
+		{
+			name: "ARRAY literal",
+			sql:  "SELECT [1, 2, 3]",
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindArrayConstructor
+            KindIntLiteral
+            KindIntLiteral
+            KindIntLiteral
+`,
+		},
+		{
+			name: "ARRAY OFFSET access",
+			sql:  "SELECT [10, 20, 30][OFFSET(1)]",
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindArrayElement
+            KindArrayConstructor
+              KindIntLiteral
+              KindIntLiteral
+              KindIntLiteral
+            KindFunctionCall
+              KindPathExpression
+                KindIdentifier [OFFSET]
+              KindIntLiteral
+            KindLocation
+`,
+		},
+		{
+			name: "STRUCT with named fields",
+			sql:  "SELECT STRUCT(1 AS a, 'x' AS b)",
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindStructConstructorWithKeyword
+            KindStructConstructorArg
+              KindIntLiteral
+              KindAlias
+                KindIdentifier [a]
+            KindStructConstructorArg
+              KindStringLiteral [x]
+                KindStringLiteralComponent
+              KindAlias
+                KindIdentifier [b]
+`,
+		},
+		{
+			name: "STRUCT field access via path",
+			sql:  "SELECT s.a FROM (SELECT STRUCT(1 AS a) AS s) AS t",
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [s]
+            KindIdentifier [a]
+      KindFromClause
+        KindTableSubquery
+          KindQuery
+            KindSelect
+              KindSelectList
+                KindSelectColumn
+                  KindStructConstructorWithKeyword
+                    KindStructConstructorArg
+                      KindIntLiteral
+                      KindAlias
+                        KindIdentifier [a]
+                  KindAlias
+                    KindIdentifier [s]
+          KindAlias
+            KindIdentifier [t]
+`,
+		},
+		{
+			name: "EXISTS subquery",
+			sql:  "SELECT 1 WHERE EXISTS (SELECT 1)",
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral
+      KindWhereClause
+        KindExpressionSubquery
+          KindQuery
+            KindSelect
+              KindSelectList
+                KindSelectColumn
+                  KindIntLiteral
+`,
+		},
+		{
+			name: "UNNEST as table source",
+			sql:  "SELECT v FROM UNNEST([1, 2, 3]) AS v",
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [v]
+      KindFromClause
+        KindTablePathExpression
+          KindUnnestExpression
+            KindExpressionWithOptAlias
+              KindArrayConstructor
+                KindIntLiteral
+                KindIntLiteral
+                KindIntLiteral
+          KindAlias
+            KindIdentifier [v]
+`,
+		},
+		{
+			name: "CAST expression",
+			sql:  "SELECT CAST('1' AS INT64)",
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindCastExpression
+            KindStringLiteral [1]
+              KindStringLiteralComponent
+            KindSimpleType
+              KindPathExpression
+                KindIdentifier [INT64]
+`,
+		},
+		{
+			name: "NOT BETWEEN precedence",
+			sql:  "SELECT * FROM users WHERE NOT id BETWEEN 1 AND 10",
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindStar
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindWhereClause
+        KindUnaryExpression
+          KindBetweenExpression
+            KindPathExpression
+              KindIdentifier [id]
+            KindIntLiteral
+            KindIntLiteral
+            KindLocation
+`,
+		},
+		{
+			name: "window function with ORDER BY",
+			sql:  "SELECT ROW_NUMBER() OVER (ORDER BY id) FROM users",
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindAnalyticFunctionCall
+            KindFunctionCall
+              KindPathExpression
+                KindIdentifier [ROW_NUMBER]
+            KindWindowSpecification
+              KindOrderBy
+                KindOrderingExpression
+                  KindPathExpression
+                    KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+`,
+		},
+		{
+			name: "window function with PARTITION BY",
+			sql:  "SELECT SUM(x) OVER (PARTITION BY id) FROM users",
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindAnalyticFunctionCall
+            KindFunctionCall
+              KindPathExpression
+                KindIdentifier [SUM]
+              KindPathExpression
+                KindIdentifier [x]
+            KindWindowSpecification
+              KindPartitionBy
+                KindPathExpression
+                  KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+`,
+		},
 	}
 
 	for _, tt := range tests {
