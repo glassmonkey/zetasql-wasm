@@ -49,7 +49,7 @@ When deciding whether to put cases in the same `func TestX` or split into separa
 **Examples in this repo**:
 
 - `TestAnalyzer_AnalyzeStatement_Errors`, `TestAnalyzer_AnalyzeStatement_AST`, `TestAnalyzer_AnalyzeStatement_CustomFunction`, `TestAnalyzer_AnalyzeStatement_TemplatedFunction` are split because the catalog construction differs (no catalog vs `newUsersCatalog()` vs custom-function-registered vs templated-function-registered). The split is correct.
-- `TestParser_ParseStatement_AST` and `TestParser_ParseStatement_Errors` share the same fixture (just `newTestParser(t)`). They could be one function with `wantErr error` in the table — the current split is legacy and may merge in a cleanup pass.
+- `TestParser_ParseStatement` covers both happy AST cases and invalid-SQL error cases in a single table. The only fixture is `newTestParser(t)`, so there is no fixture axis to split along; cases set either `want` (happy) or `wantErr` (error), and the case body dispatches on `tt.wantErr != nil`. This is the canonical shape when the SUT method has a single Setup but produces both success and failure modes.
 
 **Why this axis**: a function-per-fixture keeps the table at function scope (read-only) describing one set of conditions. Splitting by error/success duplicates the for-loop scaffolding for no fixture reason and forces the reader to cross-reference two functions to see the contract for one method.
 
