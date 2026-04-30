@@ -26,16 +26,22 @@ const (
 	Interval   TypeKind = TypeKind(generated.TypeKind_TYPE_INTERVAL)
 	Array      TypeKind = TypeKind(generated.TypeKind_TYPE_ARRAY)
 	Struct     TypeKind = TypeKind(generated.TypeKind_TYPE_STRUCT)
+	Enum       TypeKind = TypeKind(generated.TypeKind_TYPE_ENUM)
+	Proto      TypeKind = TypeKind(generated.TypeKind_TYPE_PROTO)
+	Extended   TypeKind = TypeKind(generated.TypeKind_TYPE_EXTENDED)
 )
 
 func (k TypeKind) toProto() generated.TypeKind {
 	return generated.TypeKind(k)
 }
 
-// IsSimple returns true for scalar types (not Array, Struct, etc.).
+// IsSimple returns true for scalar types whose value can stand alone without
+// referencing an external descriptor or element schema. Composite kinds
+// (Array, Struct), reference kinds (Enum, Proto), and the open-ended Extended
+// kind all return false.
 func (k TypeKind) IsSimple() bool {
 	switch k {
-	case Array, Struct:
+	case Array, Struct, Enum, Proto, Extended:
 		return false
 	default:
 		return true

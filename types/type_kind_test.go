@@ -18,6 +18,9 @@ func TestTypeKindIsSimple(t *testing.T) {
 		{Double, true},
 		{Array, false},
 		{Struct, false},
+		{Enum, false},
+		{Proto, false},
+		{Extended, false},
 	}
 	for _, tt := range tests {
 		assert.Equal(t, tt.want, tt.kind.IsSimple(), "%v.IsSimple()", tt.kind)
