@@ -102,3 +102,48 @@ func typeFromKind(kind TypeKind) (Type, error) {
 	}
 	return nil, fmt.Errorf("typeFromKind: %d is not a simple type kind", kind)
 }
+
+// TypeFromKind returns the singleton Type for a scalar kind. Composite kinds
+// (Array, Struct) and reference kinds (Enum, Proto, Extended) return nil
+// since they require element / field information that the kind alone
+// cannot supply.
+func TypeFromKind(k TypeKind) Type {
+	if t, ok := scalarTypes[k]; ok {
+		return t
+	}
+	return nil
+}
+
+// TypeFromProto reconstructs a Type from its proto representation, walking
+// ArrayType / StructType recursively. Returns nil for nil input. Useful at
+// the seam where a resolved AST node hands you a *generated.TypeProto and
+// downstream code wants the typed Go interface.
+func TypeFromProto(p *generated.TypeProto) (Type, error) {
+	if p == nil {
+		return nil, nil
+	}
+	k := TypeKind(p.GetTypeKind())
+	switch k {
+	case Array:
+		elem, err := TypeFromProto(p.GetArrayType().GetElementType())
+		if err != nil {
+			return nil, err
+		}
+		return NewArrayType(elem)
+	case Struct:
+		raws := p.GetStructType().GetField()
+		fields := make([]*StructField, 0, len(raws))
+		for _, f := range raws {
+			ft, err := TypeFromProto(f.GetFieldType())
+			if err != nil {
+				return nil, err
+			}
+			fields = append(fields, &StructField{Name: f.GetFieldName(), Type: ft})
+		}
+		return NewStructType(fields)
+	}
+	if t, ok := scalarTypes[k]; ok {
+		return t, nil
+	}
+	return nil, fmt.Errorf("TypeFromProto: unsupported TypeKind %s", k)
+}

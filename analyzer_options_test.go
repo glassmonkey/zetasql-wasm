@@ -10,11 +10,13 @@ import (
 )
 
 func TestAnalyzerOptions_toProto(t *testing.T) {
-	fullScope := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE
-	codeSearch := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_CODE_SEARCH
+	fullScope := ParseLocationRecordFullNodeScope
+	codeSearch := ParseLocationRecordCodeSearch
 	allowUndecl := true
-	positional := generated.ParameterMode_PARAMETER_POSITIONAL
-	none := generated.ParameterMode_PARAMETER_NONE
+	fullScopeProto := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE
+	codeSearchProto := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_CODE_SEARCH
+	positionalProto := generated.ParameterMode_PARAMETER_POSITIONAL
+	noneProto := generated.ParameterMode_PARAMETER_NONE
 
 	tests := []struct {
 		name string
@@ -29,12 +31,12 @@ func TestAnalyzerOptions_toProto(t *testing.T) {
 		{
 			name: "ParseLocationRecordType FULL_NODE_SCOPE is propagated",
 			opts: &AnalyzerOptions{ParseLocationRecordType: &fullScope},
-			want: &generated.AnalyzerOptionsProto{ParseLocationRecordType: &fullScope},
+			want: &generated.AnalyzerOptionsProto{ParseLocationRecordType: &fullScopeProto},
 		},
 		{
 			name: "ParseLocationRecordType CODE_SEARCH is propagated",
 			opts: &AnalyzerOptions{ParseLocationRecordType: &codeSearch},
-			want: &generated.AnalyzerOptionsProto{ParseLocationRecordType: &codeSearch},
+			want: &generated.AnalyzerOptionsProto{ParseLocationRecordType: &codeSearchProto},
 		},
 		{
 			name: "AllowUndeclaredParameters true is propagated",
@@ -43,17 +45,17 @@ func TestAnalyzerOptions_toProto(t *testing.T) {
 		},
 		{
 			name: "ParameterMode POSITIONAL is propagated",
-			opts: &AnalyzerOptions{ParameterMode: generated.ParameterMode_PARAMETER_POSITIONAL},
-			want: &generated.AnalyzerOptionsProto{ParameterMode: &positional},
+			opts: &AnalyzerOptions{ParameterMode: ParameterPositional},
+			want: &generated.AnalyzerOptionsProto{ParameterMode: &positionalProto},
 		},
 		{
 			name: "ParameterMode NONE is propagated",
-			opts: &AnalyzerOptions{ParameterMode: generated.ParameterMode_PARAMETER_NONE},
-			want: &generated.AnalyzerOptionsProto{ParameterMode: &none},
+			opts: &AnalyzerOptions{ParameterMode: ParameterNone},
+			want: &generated.AnalyzerOptionsProto{ParameterMode: &noneProto},
 		},
 		{
 			name: "ParameterMode NAMED (zero) is omitted from proto",
-			opts: &AnalyzerOptions{ParameterMode: generated.ParameterMode_PARAMETER_NAMED},
+			opts: &AnalyzerOptions{ParameterMode: ParameterNamed},
 			want: &generated.AnalyzerOptionsProto{},
 		},
 	}
@@ -76,7 +78,7 @@ func TestAnalyzerOptions_toProto(t *testing.T) {
 // fields equal the original by value. Pointer-independence is checked in a
 // separate test so each behaviour has a single observable assertion.
 func TestAnalyzerOptions_Clone(t *testing.T) {
-	fullScope := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE
+	fullScope := ParseLocationRecordFullNodeScope
 
 	tests := []struct {
 		name string
@@ -92,8 +94,8 @@ func TestAnalyzerOptions_Clone(t *testing.T) {
 			name: "populated options clone equals original by value",
 			opts: &AnalyzerOptions{
 				Language: &LanguageOptions{
-					Features: map[generated.LanguageFeature]bool{
-						generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS: true,
+					Features: map[LanguageFeature]bool{
+						FeatureAnalyticFunctions: true,
 					},
 					StatementKinds: []generated.ResolvedNodeKind{generated.ResolvedNodeKind_RESOLVED_QUERY_STMT},
 					AllStatements:  false,
@@ -103,8 +105,8 @@ func TestAnalyzerOptions_Clone(t *testing.T) {
 			},
 			want: &AnalyzerOptions{
 				Language: &LanguageOptions{
-					Features: map[generated.LanguageFeature]bool{
-						generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS: true,
+					Features: map[LanguageFeature]bool{
+						FeatureAnalyticFunctions: true,
 					},
 					StatementKinds: []generated.ResolvedNodeKind{generated.ResolvedNodeKind_RESOLVED_QUERY_STMT},
 					AllStatements:  false,
@@ -137,8 +139,8 @@ func TestAnalyzerOptions_Clone_doesNotShareLanguagePointer(t *testing.T) {
 	// Arrange
 	sut := &AnalyzerOptions{
 		Language: &LanguageOptions{
-			Features: map[generated.LanguageFeature]bool{
-				generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS: true,
+			Features: map[LanguageFeature]bool{
+				FeatureAnalyticFunctions: true,
 			},
 			Keywords: map[string]bool{"QUALIFY": true},
 		},
@@ -146,14 +148,14 @@ func TestAnalyzerOptions_Clone_doesNotShareLanguagePointer(t *testing.T) {
 
 	// Act
 	clone := sut.Clone()
-	clone.Language.Features[generated.LanguageFeature_FEATURE_TABLESAMPLE] = true
+	clone.Language.Features[FeatureTablesample] = true
 	clone.Language.Keywords["OFFSET"] = true
 	got := sut.Language
 
 	// Assert
 	want := &LanguageOptions{
-		Features: map[generated.LanguageFeature]bool{
-			generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS: true,
+		Features: map[LanguageFeature]bool{
+			FeatureAnalyticFunctions: true,
 		},
 		Keywords: map[string]bool{"QUALIFY": true},
 	}

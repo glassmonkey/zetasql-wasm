@@ -77,22 +77,22 @@ func TestLanguageOptions_SetSupportsAllStatementKinds(t *testing.T) {
 func TestLanguageOptions_EnableMaximumLanguageFeatures(t *testing.T) {
 	tests := []struct {
 		name    string
-		feature generated.LanguageFeature
+		feature LanguageFeature
 		want    bool
 	}{
 		{
 			name:    "released feature is enabled",
-			feature: generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS,
+			feature: FeatureAnalyticFunctions,
 			want:    true,
 		},
 		{
 			name:    "another released feature is enabled",
-			feature: generated.LanguageFeature_FEATURE_TABLESAMPLE,
+			feature: FeatureTablesample,
 			want:    true,
 		},
 		{
 			name:    "test-only feature is not enabled",
-			feature: generated.LanguageFeature_FEATURE_TEST_IDEALLY_ENABLED_BUT_IN_DEVELOPMENT,
+			feature: LanguageFeature(generated.LanguageFeature_FEATURE_TEST_IDEALLY_ENABLED_BUT_IN_DEVELOPMENT),
 			want:    false,
 		},
 	}
@@ -119,17 +119,17 @@ func TestLanguageOptions_EnableMaximumLanguageFeatures(t *testing.T) {
 func TestLanguageOptions_EnableMaximumLanguageFeaturesForDevelopment(t *testing.T) {
 	tests := []struct {
 		name    string
-		feature generated.LanguageFeature
+		feature LanguageFeature
 		want    bool
 	}{
 		{
 			name:    "released feature is enabled",
-			feature: generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS,
+			feature: FeatureAnalyticFunctions,
 			want:    true,
 		},
 		{
 			name:    "another released feature is enabled",
-			feature: generated.LanguageFeature_FEATURE_TABLESAMPLE,
+			feature: FeatureTablesample,
 			want:    true,
 		},
 	}
@@ -207,22 +207,22 @@ func TestLanguageOptions_toProto(t *testing.T) {
 	}{
 		{
 			name: "ProductMode INTERNAL (zero) is omitted",
-			opts: &LanguageOptions{ProductMode: generated.ProductMode_PRODUCT_INTERNAL},
+			opts: &LanguageOptions{ProductMode: ProductInternal},
 			want: &generated.LanguageOptionsProto{},
 		},
 		{
 			name: "ProductMode EXTERNAL is propagated",
-			opts: &LanguageOptions{ProductMode: generated.ProductMode_PRODUCT_EXTERNAL},
+			opts: &LanguageOptions{ProductMode: ProductExternal},
 			want: &generated.LanguageOptionsProto{ProductMode: &external},
 		},
 		{
 			name: "NameResolutionMode DEFAULT (zero) is omitted",
-			opts: &LanguageOptions{NameResolutionMode: generated.NameResolutionMode_NAME_RESOLUTION_DEFAULT},
+			opts: &LanguageOptions{NameResolutionMode: NameResolutionDefault},
 			want: &generated.LanguageOptionsProto{},
 		},
 		{
 			name: "NameResolutionMode STRICT is propagated",
-			opts: &LanguageOptions{NameResolutionMode: generated.NameResolutionMode_NAME_RESOLUTION_STRICT},
+			opts: &LanguageOptions{NameResolutionMode: NameResolutionStrict},
 			want: &generated.LanguageOptionsProto{NameResolutionMode: &strict},
 		},
 	}
@@ -261,7 +261,7 @@ func TestLanguageOptions_AnalyzerIntegration(t *testing.T) {
 			ctx := t.Context()
 			a := newTestAnalyzer(t)
 			lang := NewLanguageOptions()
-			lang.EnableLanguageFeature(generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS)
+			lang.EnableLanguageFeature(FeatureAnalyticFunctions)
 			lang.SetSupportedStatementKinds([]generated.ResolvedNodeKind{
 				generated.ResolvedNodeKind_RESOLVED_QUERY_STMT,
 			})

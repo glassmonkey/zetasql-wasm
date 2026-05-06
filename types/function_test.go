@@ -50,9 +50,9 @@ func TestFunction_TemplatedArgument(t *testing.T) {
 		ScalarMode,
 		[]*FunctionSignature{
 			NewFunctionSignature(
-				NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1),
+				NewTemplatedFunctionArgumentType(ArgTypeAny1),
 				[]*FunctionArgumentType{
-					NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1),
+					NewTemplatedFunctionArgumentType(ArgTypeAny1),
 				},
 			),
 		},
@@ -106,17 +106,17 @@ func TestFunctionArgumentType_toProto_Options(t *testing.T) {
 		},
 		{
 			name:    "REQUIRED (zero) yields empty Options proto",
-			options: &FunctionArgumentTypeOptions{Cardinality: generated.FunctionEnums_REQUIRED},
+			options: &FunctionArgumentTypeOptions{Cardinality: RequiredCardinality},
 			want:    &generated.FunctionArgumentTypeOptionsProto{},
 		},
 		{
 			name:    "REPEATED is propagated",
-			options: &FunctionArgumentTypeOptions{Cardinality: generated.FunctionEnums_REPEATED},
+			options: &FunctionArgumentTypeOptions{Cardinality: RepeatedCardinality},
 			want:    &generated.FunctionArgumentTypeOptionsProto{Cardinality: &repeated},
 		},
 		{
 			name:    "OPTIONAL is propagated",
-			options: &FunctionArgumentTypeOptions{Cardinality: generated.FunctionEnums_OPTIONAL},
+			options: &FunctionArgumentTypeOptions{Cardinality: OptionalCardinality},
 			want:    &generated.FunctionArgumentTypeOptionsProto{Cardinality: &optional},
 		},
 	}
@@ -125,7 +125,7 @@ func TestFunctionArgumentType_toProto_Options(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			sut := &FunctionArgumentType{
-				Kind:    generated.SignatureArgumentKind_ARG_TYPE_FIXED,
+				Kind:    ArgTypeFixed,
 				Type:    Int64Type(),
 				Options: tt.options,
 			}

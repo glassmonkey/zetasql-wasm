@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
-	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -13,7 +12,7 @@ import (
 func analyzeWithLocations(t *testing.T, a *Analyzer, sql string) *AnalyzeOutput {
 	t.Helper()
 	opts := &AnalyzerOptions{}
-	pt := generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE
+	pt := ParseLocationRecordFullNodeScope
 	opts.ParseLocationRecordType = &pt
 	out, err := a.AnalyzeStatement(t.Context(), sql, nil, opts)
 	require.NoError(t, err, "AnalyzeStatement(%q)", sql)
