@@ -94,6 +94,7 @@ func TestFunction_MultipleSignatures(t *testing.T) {
 func TestFunctionArgumentType_toProto_Options(t *testing.T) {
 	repeated := generated.FunctionEnums_REPEATED
 	optional := generated.FunctionEnums_OPTIONAL
+	argName := "x"
 
 	tests := []struct {
 		name    string
@@ -119,6 +120,16 @@ func TestFunctionArgumentType_toProto_Options(t *testing.T) {
 			name:    "OPTIONAL is propagated",
 			options: &FunctionArgumentTypeOptions{Cardinality: OptionalCardinality},
 			want:    &generated.FunctionArgumentTypeOptionsProto{Cardinality: &optional},
+		},
+		{
+			name:    "ArgumentName is propagated",
+			options: &FunctionArgumentTypeOptions{ArgumentName: "x"},
+			want:    &generated.FunctionArgumentTypeOptionsProto{ArgumentName: &argName},
+		},
+		{
+			name:    "empty ArgumentName is omitted",
+			options: &FunctionArgumentTypeOptions{ArgumentName: ""},
+			want:    &generated.FunctionArgumentTypeOptionsProto{},
 		},
 	}
 
@@ -174,6 +185,17 @@ func TestWrapFunctionArgumentType(t *testing.T) {
 			want: &FunctionArgumentType{
 				Kind:    ArgTypeFixed,
 				Options: &FunctionArgumentTypeOptions{Cardinality: RepeatedCardinality},
+			},
+		},
+		{
+			name: "options.ArgumentName propagates",
+			in: &generated.FunctionArgumentTypeProto{
+				Kind:    &fixedKind,
+				Options: &generated.FunctionArgumentTypeOptionsProto{ArgumentName: ptr("x")},
+			},
+			want: &FunctionArgumentType{
+				Kind:    ArgTypeFixed,
+				Options: &FunctionArgumentTypeOptions{ArgumentName: "x"},
 			},
 		},
 		{

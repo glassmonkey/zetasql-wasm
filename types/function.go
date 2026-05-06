@@ -68,10 +68,12 @@ func (c Cardinality) toProto() generated.FunctionEnums_ArgumentCardinality {
 }
 
 // FunctionArgumentTypeOptions holds optional per-argument metadata such as
-// cardinality (REQUIRED / REPEATED / OPTIONAL). Zero values map to the proto
-// defaults and are omitted from the wire representation.
+// cardinality (REQUIRED / REPEATED / OPTIONAL) and the declared argument
+// name. Zero values map to the proto defaults and are omitted from the
+// wire representation.
 type FunctionArgumentTypeOptions struct {
-	Cardinality Cardinality
+	Cardinality  Cardinality
+	ArgumentName string
 }
 
 func (o *FunctionArgumentTypeOptions) toProto() *generated.FunctionArgumentTypeOptionsProto {
@@ -79,6 +81,10 @@ func (o *FunctionArgumentTypeOptions) toProto() *generated.FunctionArgumentTypeO
 	if o.Cardinality != RequiredCardinality {
 		c := o.Cardinality.toProto()
 		p.Cardinality = &c
+	}
+	if o.ArgumentName != "" {
+		n := o.ArgumentName
+		p.ArgumentName = &n
 	}
 	return p
 }
@@ -155,7 +161,7 @@ func (s *FunctionSignature) toProto() *generated.FunctionSignatureProto {
 // recursive (compound types) and tracked separately. Callers that need
 // the concrete argument type read the proto directly until WrapType lands.
 // Options is wrapped only for fields the input-side struct already models
-// (Cardinality); other proto-only fields are dropped.
+// (Cardinality, ArgumentName); other proto-only fields are dropped.
 func WrapFunctionArgumentType(p *generated.FunctionArgumentTypeProto) *FunctionArgumentType {
 	if p == nil {
 		return nil
@@ -165,7 +171,8 @@ func WrapFunctionArgumentType(p *generated.FunctionArgumentTypeProto) *FunctionA
 	}
 	if opts := p.GetOptions(); opts != nil {
 		a.Options = &FunctionArgumentTypeOptions{
-			Cardinality: Cardinality(opts.GetCardinality()),
+			Cardinality:  Cardinality(opts.GetCardinality()),
+			ArgumentName: opts.GetArgumentName(),
 		}
 	}
 	return a
