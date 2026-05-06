@@ -35,6 +35,14 @@ func (k TypeKind) toProto() generated.TypeKind {
 	return generated.TypeKind(k)
 }
 
+// String returns the proto enum name for the kind (e.g. "TYPE_INT64",
+// "TYPE_ARRAY"). It satisfies fmt.Stringer so TypeKind can flow through
+// %s / %v formatting without manual conversion. Returns "TYPE_UNKNOWN" for
+// values outside the known enum range.
+func (k TypeKind) String() string {
+	return generated.TypeKind(k).String()
+}
+
 // IsSimple returns true for scalar types whose value can stand alone without
 // referencing an external descriptor or element schema. Composite kinds
 // (Array, Struct), reference kinds (Enum, Proto), and the open-ended Extended
