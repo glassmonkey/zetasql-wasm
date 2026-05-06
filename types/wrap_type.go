@@ -14,6 +14,8 @@ import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 //   - STRUCT — recurses field-by-field. A field whose Type is not
 //     wrappable becomes a *StructField with Type=nil; the field name is
 //     still preserved so callers iterating field names get full coverage.
+//     When the result is a *StructType, Fields is non-nil (possibly
+//     empty) so callers can range without a nil-check.
 //
 // ENUM, PROTO, and EXTENDED return nil today: those kinds reference an
 // external descriptor or extension type that types.Type does not model
@@ -24,8 +26,8 @@ func WrapType(p *generated.TypeProto) Type {
 		return nil
 	}
 	kind := TypeKind(p.GetTypeKind())
-	if t := TypeFromKind(kind); t != nil {
-		return t
+	if kind.IsSimple() {
+		return TypeFromKind(kind)
 	}
 	switch kind {
 	case Array:

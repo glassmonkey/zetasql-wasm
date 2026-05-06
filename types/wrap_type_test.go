@@ -74,6 +74,14 @@ func TestWrapType(t *testing.T) {
 			}},
 		},
 		{
+			name: "empty STRUCT yields non-nil empty Fields",
+			in: &generated.TypeProto{
+				TypeKind:   &structKind,
+				StructType: &generated.StructTypeProto{},
+			},
+			want: &StructType{Fields: []*StructField{}},
+		},
+		{
 			name: "ENUM returns nil (documented gap)",
 			in:   &generated.TypeProto{TypeKind: &enumKind},
 			want: nil,
@@ -109,10 +117,10 @@ func TestWrapType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
-			in := tt.in
+			sut := tt.in
 
 			// Act
-			got := WrapType(in)
+			got := WrapType(sut)
 
 			// Assert
 			assert.Equal(t, tt.want, got)

@@ -3,6 +3,11 @@ package types
 import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 
 // StructField represents a single field in a ZetaSQL STRUCT type.
+//
+// Type may be nil only when the StructType was produced by WrapType from
+// a proto whose field used a kind WrapType does not yet model (ENUM,
+// PROTO, EXTENDED). StructType built via NewStructType always carries a
+// non-nil Type per that constructor's contract.
 type StructField struct {
 	Name string
 	Type Type
