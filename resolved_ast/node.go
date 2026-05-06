@@ -3,6 +3,7 @@ package resolved_ast
 import (
 	"fmt"
 
+	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"google.golang.org/protobuf/proto"
 )
@@ -61,8 +62,8 @@ type ArgumentNode interface {
 type BaseFunctionCall interface {
 	Node
 	ArgumentList() []ExprNode
-	Function() *generated.FunctionRefProto
-	Signature() *generated.FunctionSignatureProto
+	Function() *FunctionRef
+	Signature() *types.FunctionSignature
 	ErrorMode() ErrorMode
 }
 
@@ -85,9 +86,9 @@ func ExprType(e ExprNode) *generated.TypeProto {
 // generated *XxxScanNode implements ColumnList directly, but the
 // ScanNode interface itself does not — this helper does the type
 // assertion once so callers don't repeat it.
-func ScanColumnList(s ScanNode) []*generated.ResolvedColumnProto {
+func ScanColumnList(s ScanNode) []*Column {
 	if c, ok := s.(interface {
-		ColumnList() []*generated.ResolvedColumnProto
+		ColumnList() []*Column
 	}); ok {
 		return c.ColumnList()
 	}

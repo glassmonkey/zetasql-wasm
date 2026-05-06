@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
@@ -135,6 +136,133 @@ func TestFunctionArgumentType_toProto_Options(t *testing.T) {
 
 			// Assert
 			assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform()))
+		})
+	}
+}
+
+// TestWrapFunctionArgumentType pins the read-side wrap contract:
+// nil-on-nil, Kind round-trips, and Options.Cardinality propagates only
+// when the proto Options field is present. The Type field is asserted
+// nil even when a proto Type is supplied, locking in the documented
+// "WrapType not implemented yet" gap so regressions are loud.
+func TestWrapFunctionArgumentType(t *testing.T) {
+	fixedKind := generated.SignatureArgumentKind_ARG_TYPE_FIXED
+	repeated := generated.FunctionEnums_REPEATED
+	int64Kind := generated.TypeKind_TYPE_INT64
+
+	tests := []struct {
+		name string
+		in   *generated.FunctionArgumentTypeProto
+		want *FunctionArgumentType
+	}{
+		{
+			name: "nil proto returns nil",
+			in:   nil,
+			want: nil,
+		},
+		{
+			name: "kind only, no options",
+			in:   &generated.FunctionArgumentTypeProto{Kind: &fixedKind},
+			want: &FunctionArgumentType{Kind: ArgTypeFixed},
+		},
+		{
+			name: "options.Cardinality propagates",
+			in: &generated.FunctionArgumentTypeProto{
+				Kind:    &fixedKind,
+				Options: &generated.FunctionArgumentTypeOptionsProto{Cardinality: &repeated},
+			},
+			want: &FunctionArgumentType{
+				Kind:    ArgTypeFixed,
+				Options: &FunctionArgumentTypeOptions{Cardinality: RepeatedCardinality},
+			},
+		},
+		{
+			name: "proto Type is dropped (documented gap, no WrapType yet)",
+			in: &generated.FunctionArgumentTypeProto{
+				Kind: &fixedKind,
+				Type: &generated.TypeProto{TypeKind: &int64Kind},
+			},
+			want: &FunctionArgumentType{Kind: ArgTypeFixed},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := tt.in
+
+			// Act
+			got := WrapFunctionArgumentType(sut)
+
+			// Assert
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+// TestWrapFunctionSignature verifies that arguments are wrapped
+// element-wise, ContextID propagates, and FunctionSignatureOptions is
+// dropped on read (documented gap — input-side struct doesn't model it).
+func TestWrapFunctionSignature(t *testing.T) {
+	fixedKind := generated.SignatureArgumentKind_ARG_TYPE_FIXED
+
+	tests := []struct {
+		name string
+		in   *generated.FunctionSignatureProto
+		want *FunctionSignature
+	}{
+		{
+			name: "nil proto returns nil",
+			in:   nil,
+			want: nil,
+		},
+		{
+			name: "empty proto yields zero-valued signature with empty Arguments slice",
+			in:   &generated.FunctionSignatureProto{},
+			want: &FunctionSignature{Arguments: []*FunctionArgumentType{}},
+		},
+		{
+			name: "return type, args, and ContextID round-trip",
+			in: &generated.FunctionSignatureProto{
+				ReturnType: &generated.FunctionArgumentTypeProto{Kind: &fixedKind},
+				Argument: []*generated.FunctionArgumentTypeProto{
+					{Kind: &fixedKind},
+					{Kind: &fixedKind},
+				},
+				ContextId: proto.Int64(42),
+			},
+			want: &FunctionSignature{
+				ReturnType: &FunctionArgumentType{Kind: ArgTypeFixed},
+				Arguments: []*FunctionArgumentType{
+					{Kind: ArgTypeFixed},
+					{Kind: ArgTypeFixed},
+				},
+				ContextID: 42,
+			},
+		},
+		{
+			name: "Options is dropped (documented gap)",
+			in: &generated.FunctionSignatureProto{
+				ReturnType: &generated.FunctionArgumentTypeProto{Kind: &fixedKind},
+				Options:    &generated.FunctionSignatureOptionsProto{},
+			},
+			want: &FunctionSignature{
+				ReturnType: &FunctionArgumentType{Kind: ArgTypeFixed},
+				Arguments:  []*FunctionArgumentType{},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := tt.in
+
+			// Act
+			got := WrapFunctionSignature(sut)
+
+			// Assert
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

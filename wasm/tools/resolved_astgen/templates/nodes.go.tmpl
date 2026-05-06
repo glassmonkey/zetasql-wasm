@@ -3,10 +3,12 @@
 package resolved_ast
 
 import (
-	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+{{- range $imp := .Imports}}
+	"{{$imp}}"
+{{- end}}
 )
 
-{{range $node := .}}
+{{range $node := .Nodes}}
 // {{$node.GoName}} represents a {{$node.ProtoName}} resolved AST node.
 type {{$node.GoName}} struct {
 	raw *generated.{{$node.ProtoName}}
