@@ -52,6 +52,48 @@ type ArgumentNode interface {
 	argumentNode()
 }
 
+// BaseFunctionCall is the common surface that ZetaSQL's
+// ResolvedBaseFunctionCall pseudo-base exposes. zetasql-wasm flattens that
+// hierarchy: FunctionCallNode / AggregateFunctionCallNode /
+// AnalyticFunctionCallNode each declare these four methods directly. The
+// interface lets callers share helpers across all three without a
+// type-switch on every call.
+type BaseFunctionCall interface {
+	Node
+	ArgumentList() []ExprNode
+	Function() *generated.FunctionRefProto
+	Signature() *generated.FunctionSignatureProto
+	ErrorMode() generated.ResolvedFunctionCallBaseEnums_ErrorMode
+}
+
+// ExprType returns the *generated.TypeProto carried by a resolved
+// expression node, or nil if the node has no type. Most concrete
+// ExprNode implementations expose a Type() *generated.TypeProto method
+// that the ExprNode interface itself doesn't surface; this helper does
+// the type assertion once so callers don't repeat it.
+func ExprType(e ExprNode) *generated.TypeProto {
+	if t, ok := e.(interface {
+		Type() *generated.TypeProto
+	}); ok {
+		return t.Type()
+	}
+	return nil
+}
+
+// ScanColumnList returns the column list emitted by a resolved scan
+// node, or nil if the concrete type happens not to expose one. Every
+// generated *XxxScanNode implements ColumnList directly, but the
+// ScanNode interface itself does not — this helper does the type
+// assertion once so callers don't repeat it.
+func ScanColumnList(s ScanNode) []*generated.ResolvedColumnProto {
+	if c, ok := s.(interface {
+		ColumnList() []*generated.ResolvedColumnProto
+	}); ok {
+		return c.ColumnList()
+	}
+	return nil
+}
+
 // WrapExpr converts a serialized AnyResolvedExprProto oneof into the
 // matching concrete ExprNode wrapper. Returns nil if the input is nil
 // or the oneof is empty / unrecognised. Useful when a parent node
