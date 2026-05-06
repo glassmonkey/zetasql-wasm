@@ -5,6 +5,12 @@ import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 // LanguageFeature constants. These are the most commonly enabled features
 // when configuring the analyzer; for the full list of values supported by
 // the underlying proto, see generated.LanguageFeature.
+//
+// V_1_x flags are marked deprecated in the underlying proto once their
+// language version becomes part of the released baseline; we still
+// re-export them by name here so downstream code has a stable Go-side
+// reference. The corresponding staticcheck SA1019 warnings are suppressed
+// in .golangci.yml.
 
 // Plain (non-versioned) features.
 const (

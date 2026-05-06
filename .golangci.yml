@@ -8,3 +8,12 @@ linters:
       - path: wasm/generated/
         linters:
           - all
+      # V_1_x feature flags are marked deprecated upstream once their
+      # language version is part of the released baseline. The constants
+      # in language_features.go are kept because downstream code references
+      # them by name and we want a stable migration path; deprecation is
+      # upstream's concern, not the call-site's.
+      - path: language_features\.go
+        text: "SA1019.*FEATURE_V_"
+        linters:
+          - staticcheck
