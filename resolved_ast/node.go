@@ -63,7 +63,7 @@ type BaseFunctionCall interface {
 	ArgumentList() []ExprNode
 	Function() *generated.FunctionRefProto
 	Signature() *generated.FunctionSignatureProto
-	ErrorMode() generated.ResolvedFunctionCallBaseEnums_ErrorMode
+	ErrorMode() ErrorMode
 }
 
 // ExprType returns the *generated.TypeProto carried by a resolved

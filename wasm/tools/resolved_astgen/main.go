@@ -34,6 +34,27 @@ var reservedMethodNames = map[string]bool{
 	"Child":       true,
 }
 
+// wrapEnums maps a generated proto enum Go name (like
+// "ResolvedJoinScanEnums_JoinType") to the resolved_ast-package named type
+// declared by hand in resolved_ast/enums.go. Accessor methods on generated
+// nodes return the named type instead of the bare proto enum so callers
+// don't need to import wasm/generated. Add a new entry here when a fork
+// case grows around an enum that's still proto-typed today.
+var wrapEnums = map[string]string{
+	"ResolvedJoinScanEnums_JoinType":                              "JoinType",
+	"ResolvedWindowFrameEnums_FrameUnit":                          "FrameUnit",
+	"ResolvedCreateStatementEnums_CreateMode":                     "CreateMode",
+	"ResolvedCreateStatementEnums_CreateScope":                    "CreateScope",
+	"ResolvedMergeWhenEnums_MatchType":                            "MatchType",
+	"ResolvedMergeWhenEnums_ActionType":                           "ActionType",
+	"ResolvedSubqueryExprEnums_SubqueryType":                      "SubqueryType",
+	"ResolvedOrderByItemEnums_NullOrderMode":                      "NullOrderMode",
+	"ResolvedSetOperationScanEnums_SetOperationType":              "SetOperationType",
+	"ResolvedWindowFrameExprEnums_BoundaryType":                   "BoundaryType",
+	"ResolvedNonScalarFunctionCallBaseEnums_NullHandlingModifier": "NullHandlingModifier",
+	"ResolvedFunctionCallBaseEnums_ErrorMode":                     "ErrorMode",
+}
+
 func main() {
 	fd := generated.File_zetasql_resolved_ast_resolved_ast_proto
 	messages := collectMessages(fd)
@@ -427,12 +448,22 @@ func (ctx *analysisContext) classifyFieldWithPrefix(fd protoreflect.FieldDescrip
 		}
 	case protoreflect.EnumKind:
 		enumGoName := resolveEnumGoName(fd.Enum())
-		if isSlice {
+		// For singular fields whose enum has a hand-written resolved_ast
+		// named-type wrapper (see wrapEnums), return the named type so
+		// callers don't need to import wasm/generated to recognise enum
+		// values. Wire identity is preserved (both are int32). Slice
+		// fields keep the proto type — slice enum returns are rare and
+		// not worth a slice-conversion helper for each.
+		if named, ok := wrapEnums[enumGoName]; ok && !isSlice {
+			fi.GoType = named
+			fi.WrapCall = fmt.Sprintf("%s(%s)", named, rawGetter)
+		} else if isSlice {
 			fi.GoType = "[]generated." + enumGoName
+			fi.WrapCall = rawGetter
 		} else {
 			fi.GoType = "generated." + enumGoName
+			fi.WrapCall = rawGetter
 		}
-		fi.WrapCall = rawGetter
 	case protoreflect.MessageKind:
 		msgName := string(fd.Message().Name())
 		if ctx.wrapperSet[msgName] {

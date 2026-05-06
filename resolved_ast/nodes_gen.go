@@ -415,8 +415,8 @@ func (n *AggregateFunctionCallNode) GenericArgumentList() []*generated.ResolvedF
 	return n.raw.GetParent().GetParent().GetGenericArgumentList()
 }
 
-func (n *AggregateFunctionCallNode) ErrorMode() generated.ResolvedFunctionCallBaseEnums_ErrorMode {
-	return n.raw.GetParent().GetParent().GetErrorMode()
+func (n *AggregateFunctionCallNode) ErrorMode() ErrorMode {
+	return ErrorMode(n.raw.GetParent().GetParent().GetErrorMode())
 }
 
 func (n *AggregateFunctionCallNode) HintList() []*generated.ResolvedOptionProto {
@@ -431,8 +431,8 @@ func (n *AggregateFunctionCallNode) Distinct() bool {
 	return n.raw.GetParent().GetDistinct()
 }
 
-func (n *AggregateFunctionCallNode) NullHandlingModifier() generated.ResolvedNonScalarFunctionCallBaseEnums_NullHandlingModifier {
-	return n.raw.GetParent().GetNullHandlingModifier()
+func (n *AggregateFunctionCallNode) NullHandlingModifier() NullHandlingModifier {
+	return NullHandlingModifier(n.raw.GetParent().GetNullHandlingModifier())
 }
 
 func (n *AggregateFunctionCallNode) WhereExpr() ExprNode {
@@ -2627,8 +2627,8 @@ func (n *AnalyticFunctionCallNode) GenericArgumentList() []*generated.ResolvedFu
 	return n.raw.GetParent().GetParent().GetGenericArgumentList()
 }
 
-func (n *AnalyticFunctionCallNode) ErrorMode() generated.ResolvedFunctionCallBaseEnums_ErrorMode {
-	return n.raw.GetParent().GetParent().GetErrorMode()
+func (n *AnalyticFunctionCallNode) ErrorMode() ErrorMode {
+	return ErrorMode(n.raw.GetParent().GetParent().GetErrorMode())
 }
 
 func (n *AnalyticFunctionCallNode) HintList() []*generated.ResolvedOptionProto {
@@ -2643,8 +2643,8 @@ func (n *AnalyticFunctionCallNode) Distinct() bool {
 	return n.raw.GetParent().GetDistinct()
 }
 
-func (n *AnalyticFunctionCallNode) NullHandlingModifier() generated.ResolvedNonScalarFunctionCallBaseEnums_NullHandlingModifier {
-	return n.raw.GetParent().GetNullHandlingModifier()
+func (n *AnalyticFunctionCallNode) NullHandlingModifier() NullHandlingModifier {
+	return NullHandlingModifier(n.raw.GetParent().GetNullHandlingModifier())
 }
 
 func (n *AnalyticFunctionCallNode) WhereExpr() ExprNode {
@@ -5119,12 +5119,12 @@ func (n *CreateApproxViewStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetParent().GetNamePath()
 }
 
-func (n *CreateApproxViewStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetParent().GetCreateScope()
+func (n *CreateApproxViewStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetParent().GetCreateScope())
 }
 
-func (n *CreateApproxViewStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetParent().GetCreateMode()
+func (n *CreateApproxViewStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetParent().GetCreateMode())
 }
 
 func (n *CreateApproxViewStmtNode) OptionList() []*OptionNode {
@@ -5254,12 +5254,12 @@ func (n *CreateConnectionStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetNamePath()
 }
 
-func (n *CreateConnectionStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetCreateScope()
+func (n *CreateConnectionStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetCreateScope())
 }
 
-func (n *CreateConnectionStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetCreateMode()
+func (n *CreateConnectionStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetCreateMode())
 }
 
 func (n *CreateConnectionStmtNode) OptionList() []*OptionNode {
@@ -5332,12 +5332,12 @@ func (n *CreateConstantStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetNamePath()
 }
 
-func (n *CreateConstantStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetCreateScope()
+func (n *CreateConstantStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetCreateScope())
 }
 
-func (n *CreateConstantStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetCreateMode()
+func (n *CreateConstantStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetCreateMode())
 }
 
 func (n *CreateConstantStmtNode) Expr() ExprNode {
@@ -5464,12 +5464,12 @@ func (n *CreateEntityStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetNamePath()
 }
 
-func (n *CreateEntityStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetCreateScope()
+func (n *CreateEntityStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetCreateScope())
 }
 
-func (n *CreateEntityStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetCreateMode()
+func (n *CreateEntityStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetCreateMode())
 }
 
 func (n *CreateEntityStmtNode) EntityType() string {
@@ -5554,12 +5554,12 @@ func (n *CreateExternalSchemaStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetParent().GetNamePath()
 }
 
-func (n *CreateExternalSchemaStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetParent().GetCreateScope()
+func (n *CreateExternalSchemaStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetParent().GetCreateScope())
 }
 
-func (n *CreateExternalSchemaStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetParent().GetCreateMode()
+func (n *CreateExternalSchemaStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetParent().GetCreateMode())
 }
 
 func (n *CreateExternalSchemaStmtNode) OptionList() []*generated.ResolvedOptionProto {
@@ -5629,12 +5629,12 @@ func (n *CreateExternalTableStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetParent().GetNamePath()
 }
 
-func (n *CreateExternalTableStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetParent().GetCreateScope()
+func (n *CreateExternalTableStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetParent().GetCreateScope())
 }
 
-func (n *CreateExternalTableStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetParent().GetCreateMode()
+func (n *CreateExternalTableStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetParent().GetCreateMode())
 }
 
 func (n *CreateExternalTableStmtNode) OptionList() []*generated.ResolvedOptionProto {
@@ -5791,12 +5791,12 @@ func (n *CreateFunctionStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetNamePath()
 }
 
-func (n *CreateFunctionStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetCreateScope()
+func (n *CreateFunctionStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetCreateScope())
 }
 
-func (n *CreateFunctionStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetCreateMode()
+func (n *CreateFunctionStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetCreateMode())
 }
 
 func (n *CreateFunctionStmtNode) HasExplicitReturnType() bool {
@@ -5947,12 +5947,12 @@ func (n *CreateIndexStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetNamePath()
 }
 
-func (n *CreateIndexStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetCreateScope()
+func (n *CreateIndexStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetCreateScope())
 }
 
-func (n *CreateIndexStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetCreateMode()
+func (n *CreateIndexStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetCreateMode())
 }
 
 func (n *CreateIndexStmtNode) TableNamePath() []string {
@@ -6102,12 +6102,12 @@ func (n *CreateMaterializedViewStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetParent().GetNamePath()
 }
 
-func (n *CreateMaterializedViewStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetParent().GetCreateScope()
+func (n *CreateMaterializedViewStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetParent().GetCreateScope())
 }
 
-func (n *CreateMaterializedViewStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetParent().GetCreateMode()
+func (n *CreateMaterializedViewStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetParent().GetCreateMode())
 }
 
 func (n *CreateMaterializedViewStmtNode) OptionList() []*OptionNode {
@@ -6345,12 +6345,12 @@ func (n *CreateModelStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetNamePath()
 }
 
-func (n *CreateModelStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetCreateScope()
+func (n *CreateModelStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetCreateScope())
 }
 
-func (n *CreateModelStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetCreateMode()
+func (n *CreateModelStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetCreateMode())
 }
 
 func (n *CreateModelStmtNode) OptionList() []*generated.ResolvedOptionProto {
@@ -6525,12 +6525,12 @@ func (n *CreatePrivilegeRestrictionStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetNamePath()
 }
 
-func (n *CreatePrivilegeRestrictionStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetCreateScope()
+func (n *CreatePrivilegeRestrictionStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetCreateScope())
 }
 
-func (n *CreatePrivilegeRestrictionStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetCreateMode()
+func (n *CreatePrivilegeRestrictionStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetCreateMode())
 }
 
 func (n *CreatePrivilegeRestrictionStmtNode) ColumnPrivilegeList() []*PrivilegeNode {
@@ -6619,12 +6619,12 @@ func (n *CreateProcedureStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetNamePath()
 }
 
-func (n *CreateProcedureStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetCreateScope()
+func (n *CreateProcedureStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetCreateScope())
 }
 
-func (n *CreateProcedureStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetCreateMode()
+func (n *CreateProcedureStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetCreateMode())
 }
 
 func (n *CreateProcedureStmtNode) ArgumentNameList() []string {
@@ -6734,12 +6734,12 @@ func (n *CreatePropertyGraphStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetNamePath()
 }
 
-func (n *CreatePropertyGraphStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetCreateScope()
+func (n *CreatePropertyGraphStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetCreateScope())
 }
 
-func (n *CreatePropertyGraphStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetCreateMode()
+func (n *CreatePropertyGraphStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetCreateMode())
 }
 
 func (n *CreatePropertyGraphStmtNode) NodeTableList() []*generated.ResolvedGraphElementTableProto {
@@ -6824,8 +6824,8 @@ func (n *CreateRowAccessPolicyStmtNode) HintList() []*OptionNode {
 	return newOptionNodeSlice(n.raw.GetParent().GetHintList())
 }
 
-func (n *CreateRowAccessPolicyStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetCreateMode()
+func (n *CreateRowAccessPolicyStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetCreateMode())
 }
 
 func (n *CreateRowAccessPolicyStmtNode) Name() string {
@@ -6940,12 +6940,12 @@ func (n *CreateSchemaStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetParent().GetNamePath()
 }
 
-func (n *CreateSchemaStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetParent().GetCreateScope()
+func (n *CreateSchemaStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetParent().GetCreateScope())
 }
 
-func (n *CreateSchemaStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetParent().GetCreateMode()
+func (n *CreateSchemaStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetParent().GetCreateMode())
 }
 
 func (n *CreateSchemaStmtNode) OptionList() []*generated.ResolvedOptionProto {
@@ -7015,12 +7015,12 @@ func (n *CreateSequenceStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetNamePath()
 }
 
-func (n *CreateSequenceStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetCreateScope()
+func (n *CreateSequenceStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetCreateScope())
 }
 
-func (n *CreateSequenceStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetCreateMode()
+func (n *CreateSequenceStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetCreateMode())
 }
 
 func (n *CreateSequenceStmtNode) OptionList() []*OptionNode {
@@ -7093,12 +7093,12 @@ func (n *CreateSnapshotTableStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetNamePath()
 }
 
-func (n *CreateSnapshotTableStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetCreateScope()
+func (n *CreateSnapshotTableStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetCreateScope())
 }
 
-func (n *CreateSnapshotTableStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetCreateMode()
+func (n *CreateSnapshotTableStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetCreateMode())
 }
 
 func (n *CreateSnapshotTableStmtNode) CloneFrom() ScanNode {
@@ -7168,12 +7168,12 @@ func (n *CreateTableAsSelectStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetParent().GetNamePath()
 }
 
-func (n *CreateTableAsSelectStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetParent().GetCreateScope()
+func (n *CreateTableAsSelectStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetParent().GetCreateScope())
 }
 
-func (n *CreateTableAsSelectStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetParent().GetCreateMode()
+func (n *CreateTableAsSelectStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetParent().GetCreateMode())
 }
 
 func (n *CreateTableAsSelectStmtNode) OptionList() []*generated.ResolvedOptionProto {
@@ -7366,12 +7366,12 @@ func (n *CreateTableFunctionStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetNamePath()
 }
 
-func (n *CreateTableFunctionStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetCreateScope()
+func (n *CreateTableFunctionStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetCreateScope())
 }
 
-func (n *CreateTableFunctionStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetCreateMode()
+func (n *CreateTableFunctionStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetCreateMode())
 }
 
 func (n *CreateTableFunctionStmtNode) ArgumentNameList() []string {
@@ -7497,12 +7497,12 @@ func (n *CreateTableStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetParent().GetNamePath()
 }
 
-func (n *CreateTableStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetParent().GetCreateScope()
+func (n *CreateTableStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetParent().GetCreateScope())
 }
 
-func (n *CreateTableStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetParent().GetCreateMode()
+func (n *CreateTableStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetParent().GetCreateMode())
 }
 
 func (n *CreateTableStmtNode) OptionList() []*generated.ResolvedOptionProto {
@@ -7696,12 +7696,12 @@ func (n *CreateViewStmtNode) NamePath() []string {
 	return n.raw.GetParent().GetParent().GetNamePath()
 }
 
-func (n *CreateViewStmtNode) CreateScope() generated.ResolvedCreateStatementEnums_CreateScope {
-	return n.raw.GetParent().GetParent().GetCreateScope()
+func (n *CreateViewStmtNode) CreateScope() CreateScope {
+	return CreateScope(n.raw.GetParent().GetParent().GetCreateScope())
 }
 
-func (n *CreateViewStmtNode) CreateMode() generated.ResolvedCreateStatementEnums_CreateMode {
-	return n.raw.GetParent().GetParent().GetCreateMode()
+func (n *CreateViewStmtNode) CreateMode() CreateMode {
+	return CreateMode(n.raw.GetParent().GetParent().GetCreateMode())
 }
 
 func (n *CreateViewStmtNode) OptionList() []*generated.ResolvedOptionProto {
@@ -10634,8 +10634,8 @@ func (n *FunctionCallNode) GenericArgumentList() []*generated.ResolvedFunctionAr
 	return n.raw.GetParent().GetGenericArgumentList()
 }
 
-func (n *FunctionCallNode) ErrorMode() generated.ResolvedFunctionCallBaseEnums_ErrorMode {
-	return n.raw.GetParent().GetErrorMode()
+func (n *FunctionCallNode) ErrorMode() ErrorMode {
+	return ErrorMode(n.raw.GetParent().GetErrorMode())
 }
 
 func (n *FunctionCallNode) HintList() []*generated.ResolvedOptionProto {
@@ -14480,8 +14480,8 @@ func (n *JoinScanNode) NodeSource() string {
 	return n.raw.GetParent().GetNodeSource()
 }
 
-func (n *JoinScanNode) JoinType() generated.ResolvedJoinScanEnums_JoinType {
-	return n.raw.GetJoinType()
+func (n *JoinScanNode) JoinType() JoinType {
+	return JoinType(n.raw.GetJoinType())
 }
 
 func (n *JoinScanNode) LeftScan() ScanNode {
@@ -15712,16 +15712,16 @@ func (n *MergeWhenNode) ParseLocationRange() *generated.ParseLocationRangeProto 
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
 }
 
-func (n *MergeWhenNode) MatchType() generated.ResolvedMergeWhenEnums_MatchType {
-	return n.raw.GetMatchType()
+func (n *MergeWhenNode) MatchType() MatchType {
+	return MatchType(n.raw.GetMatchType())
 }
 
 func (n *MergeWhenNode) MatchExpr() ExprNode {
 	return wrapExpr(n.raw.GetMatchExpr())
 }
 
-func (n *MergeWhenNode) ActionType() generated.ResolvedMergeWhenEnums_ActionType {
-	return n.raw.GetActionType()
+func (n *MergeWhenNode) ActionType() ActionType {
+	return ActionType(n.raw.GetActionType())
 }
 
 func (n *MergeWhenNode) InsertColumnList() []*generated.ResolvedColumnProto {
@@ -16185,8 +16185,8 @@ func (n *OrderByItemNode) IsDescending() bool {
 	return n.raw.GetIsDescending()
 }
 
-func (n *OrderByItemNode) NullOrder() generated.ResolvedOrderByItemEnums_NullOrderMode {
-	return n.raw.GetNullOrder()
+func (n *OrderByItemNode) NullOrder() NullOrderMode {
+	return NullOrderMode(n.raw.GetNullOrder())
 }
 
 func (n *OrderByItemNode) Collation() *generated.ResolvedCollationProto {
@@ -19012,8 +19012,8 @@ func (n *SetOperationScanNode) NodeSource() string {
 	return n.raw.GetParent().GetNodeSource()
 }
 
-func (n *SetOperationScanNode) OpType() generated.ResolvedSetOperationScanEnums_SetOperationType {
-	return n.raw.GetOpType()
+func (n *SetOperationScanNode) OpType() SetOperationType {
+	return SetOperationType(n.raw.GetOpType())
 }
 
 func (n *SetOperationScanNode) InputItemList() []*SetOperationItemNode {
@@ -19726,8 +19726,8 @@ func (n *SubqueryExprNode) TypeAnnotationMap() *generated.AnnotationMapProto {
 	return n.raw.GetParent().GetTypeAnnotationMap()
 }
 
-func (n *SubqueryExprNode) SubqueryType() generated.ResolvedSubqueryExprEnums_SubqueryType {
-	return n.raw.GetSubqueryType()
+func (n *SubqueryExprNode) SubqueryType() SubqueryType {
+	return SubqueryType(n.raw.GetSubqueryType())
 }
 
 func (n *SubqueryExprNode) ParameterList() []*ColumnRefNode {
@@ -21055,8 +21055,8 @@ func (n *WindowFrameExprNode) ParseLocationRange() *generated.ParseLocationRange
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
 }
 
-func (n *WindowFrameExprNode) BoundaryType() generated.ResolvedWindowFrameExprEnums_BoundaryType {
-	return n.raw.GetBoundaryType()
+func (n *WindowFrameExprNode) BoundaryType() BoundaryType {
+	return BoundaryType(n.raw.GetBoundaryType())
 }
 
 func (n *WindowFrameExprNode) Expression() ExprNode {
@@ -21114,8 +21114,8 @@ func (n *WindowFrameNode) ParseLocationRange() *generated.ParseLocationRangeProt
 	return n.raw.GetParent().GetParent().GetParseLocationRange()
 }
 
-func (n *WindowFrameNode) FrameUnit() generated.ResolvedWindowFrameEnums_FrameUnit {
-	return n.raw.GetFrameUnit()
+func (n *WindowFrameNode) FrameUnit() FrameUnit {
+	return FrameUnit(n.raw.GetFrameUnit())
 }
 
 func (n *WindowFrameNode) StartExpr() *generated.ResolvedWindowFrameExprProto {
