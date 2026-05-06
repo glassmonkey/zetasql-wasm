@@ -1,0 +1,97 @@
+name: Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump type
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - name: Read current version
+        id: current
+        run: echo "version=$(go tool gobump show -r .)" >> "$GITHUB_OUTPUT"
+
+      - name: Bump version
+        id: bump
+        run: |
+          go tool gobump "${{ inputs.bump }}" -w .
+          echo "version=$(go tool gobump show -r .)" >> "$GITHUB_OUTPUT"
+
+      - name: Determine commit range
+        id: range
+        run: |
+          set -euo pipefail
+          prev_tag=$(git tag --list 'v*' --sort=-v:refname | head -n1 || true)
+          if [ -z "$prev_tag" ]; then
+            prev_ref=$(git rev-list --max-parents=0 HEAD | head -n1)
+          else
+            prev_ref="$prev_tag"
+          fi
+          {
+            echo "prev_ref=${prev_ref}"
+            echo "range=${prev_ref}..HEAD"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build PR body
+        run: |
+          set -euo pipefail
+          new_version="v${{ steps.bump.outputs.version }}"
+          prev_ref="${{ steps.range.outputs.prev_ref }}"
+          range="${{ steps.range.outputs.range }}"
+          repo_url="${{ github.server_url }}/${{ github.repository }}"
+          {
+            echo "## Release ${new_version}"
+            echo
+            echo "Bump version: \`${{ steps.current.outputs.version }}\` → \`${{ steps.bump.outputs.version }}\`"
+            echo
+            echo "### Commit range"
+            echo
+            echo "\`${range}\` ([compare](${repo_url}/compare/${prev_ref}...main))"
+            echo
+            echo "### Release notes"
+            echo
+            git log --no-merges --pretty=format:'- %s (%h)' "${range}"
+            echo
+          } > pr_body.md
+
+      - name: Create release branch and PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          new_version="v${{ steps.bump.outputs.version }}"
+          branch="release/${new_version}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "${branch}"
+          git add version.go
+          git commit -m "chore(release): ${new_version}"
+          git push origin "${branch}"
+          gh pr create \
+            --title "release: ${new_version}" \
+            --body-file pr_body.md \
+            --base main \
+            --head "${branch}" \
+            --label release
