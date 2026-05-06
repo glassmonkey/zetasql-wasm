@@ -1,6 +1,6 @@
 module github.com/glassmonkey/zetasql-wasm/wasm
 
-go 1.25
+go 1.26.2
 
 require (
 	github.com/urfave/cli/v3 v3.6.1
