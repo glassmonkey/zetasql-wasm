@@ -13,19 +13,18 @@ import (
 )
 
 // TestLanguageOptions_SetSupportedStatementKinds verifies that the kinds
-// passed to SetSupportedStatementKinds are reflected in ToProto output.
+// passed to SetSupportedStatementKinds are reflected in toProto output.
+// The got is the proto-typed wire form so a bug in the StatementKind →
+// generated.ResolvedNodeKind conversion would surface.
 func TestLanguageOptions_SetSupportedStatementKinds(t *testing.T) {
 	tests := []struct {
 		name  string
-		kinds []generated.ResolvedNodeKind
+		kinds []StatementKind
 		want  []generated.ResolvedNodeKind
 	}{
 		{
-			name: "query and insert",
-			kinds: []generated.ResolvedNodeKind{
-				generated.ResolvedNodeKind_RESOLVED_QUERY_STMT,
-				generated.ResolvedNodeKind_RESOLVED_INSERT_STMT,
-			},
+			name:  "query and insert",
+			kinds: []StatementKind{StatementKindQuery, StatementKindInsert},
 			want: []generated.ResolvedNodeKind{
 				generated.ResolvedNodeKind_RESOLVED_QUERY_STMT,
 				generated.ResolvedNodeKind_RESOLVED_INSERT_STMT,
@@ -33,7 +32,7 @@ func TestLanguageOptions_SetSupportedStatementKinds(t *testing.T) {
 		},
 		{
 			name:  "query only",
-			kinds: []generated.ResolvedNodeKind{generated.ResolvedNodeKind_RESOLVED_QUERY_STMT},
+			kinds: []StatementKind{StatementKindQuery},
 			want:  []generated.ResolvedNodeKind{generated.ResolvedNodeKind_RESOLVED_QUERY_STMT},
 		},
 	}
@@ -54,13 +53,11 @@ func TestLanguageOptions_SetSupportedStatementKinds(t *testing.T) {
 }
 
 // TestLanguageOptions_SetSupportsAllStatementKinds verifies that the
-// "all kinds supported" signal is an empty slice in ToProto output.
+// "all kinds supported" signal is an empty slice in toProto output.
 func TestLanguageOptions_SetSupportsAllStatementKinds(t *testing.T) {
 	// Arrange
 	sut := NewLanguageOptions()
-	sut.SetSupportedStatementKinds([]generated.ResolvedNodeKind{
-		generated.ResolvedNodeKind_RESOLVED_QUERY_STMT,
-	})
+	sut.SetSupportedStatementKinds([]StatementKind{StatementKindQuery})
 	sut.SetSupportsAllStatementKinds()
 
 	// Act
@@ -262,9 +259,7 @@ func TestLanguageOptions_AnalyzerIntegration(t *testing.T) {
 			a := newTestAnalyzer(t)
 			lang := NewLanguageOptions()
 			lang.EnableLanguageFeature(FeatureAnalyticFunctions)
-			lang.SetSupportedStatementKinds([]generated.ResolvedNodeKind{
-				generated.ResolvedNodeKind_RESOLVED_QUERY_STMT,
-			})
+			lang.SetSupportedStatementKinds([]StatementKind{StatementKindQuery})
 			opts := &AnalyzerOptions{Language: lang}
 
 			// Act
@@ -286,19 +281,19 @@ func TestLanguageOptions_AnalyzerIntegration(t *testing.T) {
 func TestLanguageOptions_RejectsUnsupportedStatementKind(t *testing.T) {
 	tests := []struct {
 		name         string
-		allowedKinds []generated.ResolvedNodeKind
+		allowedKinds []StatementKind
 		sql          string
 		wantErr      error
 	}{
 		{
 			name:         "INSERT-only rejects SELECT",
-			allowedKinds: []generated.ResolvedNodeKind{generated.ResolvedNodeKind_RESOLVED_INSERT_STMT},
+			allowedKinds: []StatementKind{StatementKindInsert},
 			sql:          "SELECT 1",
 			wantErr:      &AnalyzeError{},
 		},
 		{
 			name:         "DELETE-only rejects SELECT",
-			allowedKinds: []generated.ResolvedNodeKind{generated.ResolvedNodeKind_RESOLVED_DELETE_STMT},
+			allowedKinds: []StatementKind{StatementKindDelete},
 			sql:          "SELECT 1",
 			wantErr:      &AnalyzeError{},
 		},

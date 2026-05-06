@@ -97,7 +97,7 @@ func TestAnalyzerOptions_Clone(t *testing.T) {
 					Features: map[LanguageFeature]bool{
 						FeatureAnalyticFunctions: true,
 					},
-					StatementKinds: []generated.ResolvedNodeKind{generated.ResolvedNodeKind_RESOLVED_QUERY_STMT},
+					StatementKinds: []StatementKind{StatementKindQuery},
 					AllStatements:  false,
 					Keywords:       map[string]bool{"QUALIFY": true},
 				},
@@ -108,7 +108,7 @@ func TestAnalyzerOptions_Clone(t *testing.T) {
 					Features: map[LanguageFeature]bool{
 						FeatureAnalyticFunctions: true,
 					},
-					StatementKinds: []generated.ResolvedNodeKind{generated.ResolvedNodeKind_RESOLVED_QUERY_STMT},
+					StatementKinds: []StatementKind{StatementKindQuery},
 					AllStatements:  false,
 					Keywords:       map[string]bool{"QUALIFY": true},
 				},
