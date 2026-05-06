@@ -16,6 +16,11 @@ func main() {
 
 	// Get SQL from command line arguments or stdin
 	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "-version", "--version", "version":
+			fmt.Println(zetasql.Version)
+			return
+		}
 		// Use command line argument
 		sql = strings.Join(os.Args[1:], " ")
 	} else {
