@@ -58,14 +58,9 @@ func (m ProductMode) toProto() generated.ProductMode {
 }
 
 // LanguageOptions controls which ZetaSQL language features are enabled.
-//
-// StatementKinds intentionally retains the proto type
-// generated.ResolvedNodeKind: the enum has 287 members and a parallel
-// named-type wrapper is not worth the cost. Callers pass values from the
-// generated package directly.
 type LanguageOptions struct {
 	Features           map[LanguageFeature]bool
-	StatementKinds     []generated.ResolvedNodeKind
+	StatementKinds     []StatementKind
 	AllStatements      bool
 	Keywords           map[string]bool
 	NameResolutionMode NameResolutionMode
@@ -91,7 +86,7 @@ func (o *LanguageOptions) DisableAllLanguageFeatures() {
 }
 
 // SetSupportedStatementKinds sets the allowed statement kinds.
-func (o *LanguageOptions) SetSupportedStatementKinds(kinds []generated.ResolvedNodeKind) {
+func (o *LanguageOptions) SetSupportedStatementKinds(kinds []StatementKind) {
 	o.StatementKinds = kinds
 	o.AllStatements = false
 }
@@ -145,7 +140,7 @@ func (o *LanguageOptions) clone() *LanguageOptions {
 		}
 	}
 	if o.StatementKinds != nil {
-		c.StatementKinds = make([]generated.ResolvedNodeKind, len(o.StatementKinds))
+		c.StatementKinds = make([]StatementKind, len(o.StatementKinds))
 		copy(c.StatementKinds, o.StatementKinds)
 	}
 	if o.Keywords != nil {
@@ -169,7 +164,10 @@ func (o *LanguageOptions) toProto() *generated.LanguageOptionsProto {
 		// Empty list signals "all supported" to the C++ side
 		p.SupportedStatementKinds = nil
 	} else if len(o.StatementKinds) > 0 {
-		p.SupportedStatementKinds = o.StatementKinds
+		p.SupportedStatementKinds = make([]generated.ResolvedNodeKind, len(o.StatementKinds))
+		for i, k := range o.StatementKinds {
+			p.SupportedStatementKinds[i] = k.toProto()
+		}
 	}
 
 	for kw := range o.Keywords {
