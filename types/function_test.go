@@ -152,10 +152,11 @@ func TestFunctionArgumentType_toProto_Options(t *testing.T) {
 }
 
 // TestWrapFunctionArgumentType pins the read-side wrap contract:
-// nil-on-nil, Kind round-trips, and Options.Cardinality propagates only
-// when the proto Options field is present. The Type field is asserted
-// nil even when a proto Type is supplied, locking in the documented
-// "WrapType not implemented yet" gap so regressions are loud.
+// nil-on-nil, Kind round-trips, Type is delegated to WrapType (so
+// scalar / ARRAY / STRUCT come back typed), and Options propagates the
+// fields the input-side struct models. Triangulation across nil,
+// kind-only, options.Cardinality, options.ArgumentName, and a typed
+// Type catches regressions in any single wiring.
 func TestWrapFunctionArgumentType(t *testing.T) {
 	fixedKind := generated.SignatureArgumentKind_ARG_TYPE_FIXED
 	repeated := generated.FunctionEnums_REPEATED
@@ -199,12 +200,12 @@ func TestWrapFunctionArgumentType(t *testing.T) {
 			},
 		},
 		{
-			name: "proto Type is dropped (documented gap, no WrapType yet)",
+			name: "proto Type wraps to typed value via WrapType",
 			in: &generated.FunctionArgumentTypeProto{
 				Kind: &fixedKind,
 				Type: &generated.TypeProto{TypeKind: &int64Kind},
 			},
-			want: &FunctionArgumentType{Kind: ArgTypeFixed},
+			want: &FunctionArgumentType{Kind: ArgTypeFixed, Type: Int64Type()},
 		},
 	}
 

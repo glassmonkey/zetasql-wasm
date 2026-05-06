@@ -157,17 +157,18 @@ func (s *FunctionSignature) toProto() *generated.FunctionSignatureProto {
 // WrapFunctionArgumentType lifts a *generated.FunctionArgumentTypeProto
 // into the typed FunctionArgumentType view. Returns nil for nil input.
 //
-// The Type field is left nil: a read-side wrap of *generated.TypeProto is
-// recursive (compound types) and tracked separately. Callers that need
-// the concrete argument type read the proto directly until WrapType lands.
-// Options is wrapped only for fields the input-side struct already models
-// (Cardinality, ArgumentName); other proto-only fields are dropped.
+// Type is wrapped through WrapType, so scalar / ARRAY / STRUCT round-trip
+// to a typed Go value; ENUM / PROTO / EXTENDED still come back as nil
+// (see WrapType for the current coverage). Options is wrapped only for
+// fields the input-side struct models (Cardinality, ArgumentName); other
+// proto-only fields are dropped.
 func WrapFunctionArgumentType(p *generated.FunctionArgumentTypeProto) *FunctionArgumentType {
 	if p == nil {
 		return nil
 	}
 	a := &FunctionArgumentType{
 		Kind: SignatureArgumentKind(p.GetKind()),
+		Type: WrapType(p.GetType()),
 	}
 	if opts := p.GetOptions(); opts != nil {
 		a.Options = &FunctionArgumentTypeOptions{
