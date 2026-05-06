@@ -174,6 +174,9 @@ func WrapFunctionArgumentType(p *generated.FunctionArgumentTypeProto) *FunctionA
 // WrapFunctionSignature lifts a *generated.FunctionSignatureProto into the
 // typed FunctionSignature view. Returns nil for nil input.
 //
+// When the result is non-nil, Arguments is itself non-nil (possibly empty)
+// so callers can iterate without a nil-check.
+//
 // FunctionSignatureOptions is dropped: the input-side FunctionSignature
 // struct does not model it today. Per-argument Type is also nil — see
 // WrapFunctionArgumentType.

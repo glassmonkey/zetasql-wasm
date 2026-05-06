@@ -10,14 +10,11 @@ import (
 
 // TestWrapColumn covers the contract of wrapColumn / WrapColumn:
 // scalar fields are populated from the proto getters (which themselves
-// are nil-safe), Type and AnnotationMap pointer fields are forwarded
-// without copying, and a nil input maps to a nil output. Triangulated
-// across nil, an unset proto, and a populated proto so that a future
-// regression in any field's wiring shows up in the diff.
+// are nil-safe), Type and AnnotationMap fields round-trip by value, and
+// a nil input maps to a nil output. Triangulated across nil, an unset
+// proto, and a populated proto so a future regression in any field's
+// wiring shows up in the diff.
 func TestWrapColumn(t *testing.T) {
-	typ := &generated.TypeProto{TypeKind: ptr(generated.TypeKind_TYPE_INT64)}
-	annot := &generated.AnnotationMapProto{}
-
 	tests := []struct {
 		name string
 		in   *generated.ResolvedColumnProto
@@ -39,15 +36,15 @@ func TestWrapColumn(t *testing.T) {
 				ColumnId:      proto.Int64(7),
 				TableName:     proto.String("orders"),
 				Name:          proto.String("total"),
-				Type:          typ,
-				AnnotationMap: annot,
+				Type:          &generated.TypeProto{TypeKind: ptr(generated.TypeKind_TYPE_INT64)},
+				AnnotationMap: &generated.AnnotationMapProto{},
 			},
 			want: &Column{
 				ID:            7,
 				TableName:     "orders",
 				Name:          "total",
-				Type:          typ,
-				AnnotationMap: annot,
+				Type:          &generated.TypeProto{TypeKind: ptr(generated.TypeKind_TYPE_INT64)},
+				AnnotationMap: &generated.AnnotationMapProto{},
 			},
 		},
 	}

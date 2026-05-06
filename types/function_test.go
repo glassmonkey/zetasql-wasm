@@ -149,7 +149,6 @@ func TestWrapFunctionArgumentType(t *testing.T) {
 	fixedKind := generated.SignatureArgumentKind_ARG_TYPE_FIXED
 	repeated := generated.FunctionEnums_REPEATED
 	int64Kind := generated.TypeKind_TYPE_INT64
-	int64Type := &generated.TypeProto{TypeKind: &int64Kind}
 
 	tests := []struct {
 		name string
@@ -181,7 +180,7 @@ func TestWrapFunctionArgumentType(t *testing.T) {
 			name: "proto Type is dropped (documented gap, no WrapType yet)",
 			in: &generated.FunctionArgumentTypeProto{
 				Kind: &fixedKind,
-				Type: int64Type,
+				Type: &generated.TypeProto{TypeKind: &int64Kind},
 			},
 			want: &FunctionArgumentType{Kind: ArgTypeFixed},
 		},
