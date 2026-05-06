@@ -78,7 +78,7 @@ func TestArrayTypeRoundTrip(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			original, _ := NewArrayType(tt.elem)
-			restored, err := typeFromProto(original.ToProto())
+			restored, err := TypeFromProto(original.ToProto())
 			require.NoError(t, err)
 			assert.Empty(t, cmp.Diff(original.ToProto(), restored.ToProto(), protocmp.Transform()), "round-trip mismatch")
 		})

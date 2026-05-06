@@ -2,12 +2,49 @@ package zetasql
 
 import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 
+// ParameterMode selects how query parameters are referenced in the SQL text.
+type ParameterMode int32
+
+const (
+	ParameterNamed      ParameterMode = ParameterMode(generated.ParameterMode_PARAMETER_NAMED)
+	ParameterPositional ParameterMode = ParameterMode(generated.ParameterMode_PARAMETER_POSITIONAL)
+	ParameterNone       ParameterMode = ParameterMode(generated.ParameterMode_PARAMETER_NONE)
+)
+
+// String returns the canonical proto enum name (e.g. "PARAMETER_NAMED").
+func (m ParameterMode) String() string {
+	return generated.ParameterMode(m).String()
+}
+
+func (m ParameterMode) toProto() generated.ParameterMode {
+	return generated.ParameterMode(m)
+}
+
+// ParseLocationRecordType controls how the analyzer attaches source-location
+// information to resolved AST nodes.
+type ParseLocationRecordType int32
+
+const (
+	ParseLocationRecordNone          ParseLocationRecordType = ParseLocationRecordType(generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_NONE)
+	ParseLocationRecordFullNodeScope ParseLocationRecordType = ParseLocationRecordType(generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_FULL_NODE_SCOPE)
+	ParseLocationRecordCodeSearch    ParseLocationRecordType = ParseLocationRecordType(generated.ParseLocationRecordType_PARSE_LOCATION_RECORD_CODE_SEARCH)
+)
+
+// String returns the canonical proto enum name (e.g. "PARSE_LOCATION_RECORD_FULL_NODE_SCOPE").
+func (t ParseLocationRecordType) String() string {
+	return generated.ParseLocationRecordType(t).String()
+}
+
+func (t ParseLocationRecordType) toProto() generated.ParseLocationRecordType {
+	return generated.ParseLocationRecordType(t)
+}
+
 // AnalyzerOptions configures the behavior of the ZetaSQL analyzer.
 type AnalyzerOptions struct {
 	Language                  *LanguageOptions
-	ParseLocationRecordType   *generated.ParseLocationRecordType
+	ParseLocationRecordType   *ParseLocationRecordType
 	AllowUndeclaredParameters bool
-	ParameterMode             generated.ParameterMode
+	ParameterMode             ParameterMode
 }
 
 // NewAnalyzerOptions creates AnalyzerOptions with default settings.
@@ -40,14 +77,15 @@ func (o *AnalyzerOptions) toProto() *generated.AnalyzerOptionsProto {
 		p.LanguageOptions = o.Language.toProto()
 	}
 	if o.ParseLocationRecordType != nil {
-		p.ParseLocationRecordType = o.ParseLocationRecordType
+		v := o.ParseLocationRecordType.toProto()
+		p.ParseLocationRecordType = &v
 	}
 	if o.AllowUndeclaredParameters {
 		b := true
 		p.AllowUndeclaredParameters = &b
 	}
-	if o.ParameterMode != generated.ParameterMode_PARAMETER_NAMED {
-		m := o.ParameterMode
+	if o.ParameterMode != ParameterNamed {
+		m := o.ParameterMode.toProto()
 		p.ParameterMode = &m
 	}
 	return p

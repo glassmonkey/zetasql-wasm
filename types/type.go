@@ -1,8 +1,6 @@
 package types
 
 import (
-	"fmt"
-
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 )
 
@@ -21,11 +19,11 @@ type scalarType struct {
 	kind TypeKind
 }
 
-func (t *scalarType) Kind() TypeKind                { return t.kind }
-func (t *scalarType) IsArray() bool                 { return false }
-func (t *scalarType) IsStruct() bool                { return false }
-func (t *scalarType) AsArray() *ArrayType            { return nil }
-func (t *scalarType) AsStruct() *StructType          { return nil }
+func (t *scalarType) Kind() TypeKind        { return t.kind }
+func (t *scalarType) IsArray() bool         { return false }
+func (t *scalarType) IsStruct() bool        { return false }
+func (t *scalarType) AsArray() *ArrayType   { return nil }
+func (t *scalarType) AsStruct() *StructType { return nil }
 func (t *scalarType) ToProto() *generated.TypeProto {
 	k := t.kind.toProto()
 	return &generated.TypeProto{TypeKind: &k}
@@ -94,11 +92,11 @@ var scalarTypes = map[TypeKind]Type{
 	Interval:   intervalType,
 }
 
-// typeFromKind returns the singleton Type for the given scalar TypeKind.
-// Returns an error for compound kinds (Array, Struct, etc.).
-func typeFromKind(kind TypeKind) (Type, error) {
-	if t, ok := scalarTypes[kind]; ok {
-		return t, nil
-	}
-	return nil, fmt.Errorf("typeFromKind: %d is not a simple type kind", kind)
+// TypeFromKind returns the singleton Type for a scalar kind. Composite kinds
+// (Array, Struct) and reference kinds (Enum, Proto, Extended) return nil
+// since they require element / field information that the kind alone
+// cannot supply. Callers can distinguish "scalar with this kind" from
+// "compound or unknown" via a nil-check.
+func TypeFromKind(k TypeKind) Type {
+	return scalarTypes[k]
 }

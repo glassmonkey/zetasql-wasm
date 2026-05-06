@@ -6,32 +6,88 @@ import (
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 )
 
+// LanguageFeature is a single ZetaSQL language feature flag.
+//
+// Use the Feature* constants in this package (or zetasql-wasm/wasm/generated
+// for ones not yet exposed by name) to set values; LanguageOptions tracks the
+// enabled set as a map.
+type LanguageFeature int32
+
+// String returns the canonical proto enum name (e.g. "FEATURE_ANALYTIC_FUNCTIONS").
+func (f LanguageFeature) String() string {
+	return generated.LanguageFeature(f).String()
+}
+
+func (f LanguageFeature) toProto() generated.LanguageFeature {
+	return generated.LanguageFeature(f)
+}
+
+// NameResolutionMode controls how the analyzer resolves unqualified names.
+type NameResolutionMode int32
+
+const (
+	NameResolutionDefault NameResolutionMode = NameResolutionMode(generated.NameResolutionMode_NAME_RESOLUTION_DEFAULT)
+	NameResolutionStrict  NameResolutionMode = NameResolutionMode(generated.NameResolutionMode_NAME_RESOLUTION_STRICT)
+)
+
+// String returns the canonical proto enum name (e.g. "NAME_RESOLUTION_DEFAULT").
+func (m NameResolutionMode) String() string {
+	return generated.NameResolutionMode(m).String()
+}
+
+func (m NameResolutionMode) toProto() generated.NameResolutionMode {
+	return generated.NameResolutionMode(m)
+}
+
+// ProductMode selects between INTERNAL (Google internal) and EXTERNAL
+// (open-source / customer-facing) ZetaSQL behaviour.
+type ProductMode int32
+
+const (
+	ProductInternal ProductMode = ProductMode(generated.ProductMode_PRODUCT_INTERNAL)
+	ProductExternal ProductMode = ProductMode(generated.ProductMode_PRODUCT_EXTERNAL)
+)
+
+// String returns the canonical proto enum name (e.g. "PRODUCT_INTERNAL").
+func (m ProductMode) String() string {
+	return generated.ProductMode(m).String()
+}
+
+func (m ProductMode) toProto() generated.ProductMode {
+	return generated.ProductMode(m)
+}
+
 // LanguageOptions controls which ZetaSQL language features are enabled.
+//
+// StatementKinds intentionally retains the proto type
+// generated.ResolvedNodeKind: the enum has 287 members and a parallel
+// named-type wrapper is not worth the cost. Callers pass values from the
+// generated package directly.
 type LanguageOptions struct {
-	Features           map[generated.LanguageFeature]bool
+	Features           map[LanguageFeature]bool
 	StatementKinds     []generated.ResolvedNodeKind
 	AllStatements      bool
 	Keywords           map[string]bool
-	NameResolutionMode generated.NameResolutionMode
-	ProductMode        generated.ProductMode
+	NameResolutionMode NameResolutionMode
+	ProductMode        ProductMode
 }
 
 // NewLanguageOptions creates LanguageOptions with no features enabled.
 func NewLanguageOptions() *LanguageOptions {
 	return &LanguageOptions{
-		Features: map[generated.LanguageFeature]bool{},
+		Features: map[LanguageFeature]bool{},
 		Keywords: map[string]bool{},
 	}
 }
 
 // EnableLanguageFeature enables the given language feature.
-func (o *LanguageOptions) EnableLanguageFeature(f generated.LanguageFeature) {
+func (o *LanguageOptions) EnableLanguageFeature(f LanguageFeature) {
 	o.Features[f] = true
 }
 
 // DisableAllLanguageFeatures disables all language features.
 func (o *LanguageOptions) DisableAllLanguageFeatures() {
-	o.Features = map[generated.LanguageFeature]bool{}
+	o.Features = map[LanguageFeature]bool{}
 }
 
 // SetSupportedStatementKinds sets the allowed statement kinds.
@@ -50,7 +106,7 @@ func (o *LanguageOptions) SetSupportsAllStatementKinds() {
 func (o *LanguageOptions) EnableMaximumLanguageFeatures() {
 	for id, name := range generated.LanguageFeature_name {
 		if isReleasedFeature(id, name) {
-			o.Features[generated.LanguageFeature(id)] = true
+			o.Features[LanguageFeature(id)] = true
 		}
 	}
 }
@@ -60,7 +116,7 @@ func (o *LanguageOptions) EnableMaximumLanguageFeatures() {
 func (o *LanguageOptions) EnableMaximumLanguageFeaturesForDevelopment() {
 	for id, name := range generated.LanguageFeature_name {
 		if !isTestFeature(name) {
-			o.Features[generated.LanguageFeature(id)] = true
+			o.Features[LanguageFeature(id)] = true
 		}
 	}
 }
@@ -83,7 +139,7 @@ func (o *LanguageOptions) clone() *LanguageOptions {
 		ProductMode:        o.ProductMode,
 	}
 	if o.Features != nil {
-		c.Features = make(map[generated.LanguageFeature]bool, len(o.Features))
+		c.Features = make(map[LanguageFeature]bool, len(o.Features))
 		for k, v := range o.Features {
 			c.Features[k] = v
 		}
@@ -106,7 +162,7 @@ func (o *LanguageOptions) toProto() *generated.LanguageOptionsProto {
 	p := &generated.LanguageOptionsProto{}
 
 	for f := range o.Features {
-		p.EnabledLanguageFeatures = append(p.EnabledLanguageFeatures, f)
+		p.EnabledLanguageFeatures = append(p.EnabledLanguageFeatures, f.toProto())
 	}
 
 	if o.AllStatements {
@@ -120,13 +176,13 @@ func (o *LanguageOptions) toProto() *generated.LanguageOptionsProto {
 		p.ReservedKeywords = append(p.ReservedKeywords, kw)
 	}
 
-	if o.NameResolutionMode != generated.NameResolutionMode_NAME_RESOLUTION_DEFAULT {
-		m := o.NameResolutionMode
+	if o.NameResolutionMode != NameResolutionDefault {
+		m := o.NameResolutionMode.toProto()
 		p.NameResolutionMode = &m
 	}
 
-	if o.ProductMode != generated.ProductMode_PRODUCT_INTERNAL {
-		m := o.ProductMode
+	if o.ProductMode != ProductInternal {
+		m := o.ProductMode.toProto()
 		p.ProductMode = &m
 	}
 

@@ -5,29 +5,79 @@ import (
 )
 
 // Mode represents the function mode (scalar, aggregate, analytic).
-type Mode = generated.FunctionEnums_Mode
+type Mode int32
 
 // Function mode constants.
 const (
-	ScalarMode    Mode = generated.FunctionEnums_SCALAR
-	AggregateMode Mode = generated.FunctionEnums_AGGREGATE
-	AnalyticMode  Mode = generated.FunctionEnums_ANALYTIC
+	ScalarMode    Mode = Mode(generated.FunctionEnums_SCALAR)
+	AggregateMode Mode = Mode(generated.FunctionEnums_AGGREGATE)
+	AnalyticMode  Mode = Mode(generated.FunctionEnums_ANALYTIC)
 )
 
-// SignatureArgumentKind represents the kind of a function argument.
-type SignatureArgumentKind = generated.SignatureArgumentKind
+// String returns the canonical proto enum name (e.g. "SCALAR").
+func (m Mode) String() string {
+	return generated.FunctionEnums_Mode(m).String()
+}
+
+func (m Mode) toProto() generated.FunctionEnums_Mode {
+	return generated.FunctionEnums_Mode(m)
+}
+
+// SignatureArgumentKind represents the kind of a function argument
+// (fixed-type vs templated, with several templated variants).
+type SignatureArgumentKind int32
+
+// SignatureArgumentKind constants. ARG_TYPE_FIXED is the value used for
+// concrete-type arguments; the ARG_*_ANY_N variants describe templated
+// arguments whose concrete type is unified across multiple positions.
+const (
+	ArgTypeFixed     SignatureArgumentKind = SignatureArgumentKind(generated.SignatureArgumentKind_ARG_TYPE_FIXED)
+	ArgTypeAny1      SignatureArgumentKind = SignatureArgumentKind(generated.SignatureArgumentKind_ARG_TYPE_ANY_1)
+	ArgTypeAny2      SignatureArgumentKind = SignatureArgumentKind(generated.SignatureArgumentKind_ARG_TYPE_ANY_2)
+	ArgArrayTypeAny1 SignatureArgumentKind = SignatureArgumentKind(generated.SignatureArgumentKind_ARG_ARRAY_TYPE_ANY_1)
+	ArgArrayTypeAny2 SignatureArgumentKind = SignatureArgumentKind(generated.SignatureArgumentKind_ARG_ARRAY_TYPE_ANY_2)
+)
+
+// String returns the canonical proto enum name (e.g. "ARG_TYPE_FIXED").
+func (k SignatureArgumentKind) String() string {
+	return generated.SignatureArgumentKind(k).String()
+}
+
+func (k SignatureArgumentKind) toProto() generated.SignatureArgumentKind {
+	return generated.SignatureArgumentKind(k)
+}
+
+// Cardinality describes whether a function argument is required, optional,
+// or repeated (zero-or-more).
+type Cardinality int32
+
+// Cardinality constants.
+const (
+	RequiredCardinality Cardinality = Cardinality(generated.FunctionEnums_REQUIRED)
+	OptionalCardinality Cardinality = Cardinality(generated.FunctionEnums_OPTIONAL)
+	RepeatedCardinality Cardinality = Cardinality(generated.FunctionEnums_REPEATED)
+)
+
+// String returns the canonical proto enum name (e.g. "REQUIRED").
+func (c Cardinality) String() string {
+	return generated.FunctionEnums_ArgumentCardinality(c).String()
+}
+
+func (c Cardinality) toProto() generated.FunctionEnums_ArgumentCardinality {
+	return generated.FunctionEnums_ArgumentCardinality(c)
+}
 
 // FunctionArgumentTypeOptions holds optional per-argument metadata such as
 // cardinality (REQUIRED / REPEATED / OPTIONAL). Zero values map to the proto
 // defaults and are omitted from the wire representation.
 type FunctionArgumentTypeOptions struct {
-	Cardinality generated.FunctionEnums_ArgumentCardinality
+	Cardinality Cardinality
 }
 
 func (o *FunctionArgumentTypeOptions) toProto() *generated.FunctionArgumentTypeOptionsProto {
 	p := &generated.FunctionArgumentTypeOptionsProto{}
-	if o.Cardinality != generated.FunctionEnums_REQUIRED {
-		c := o.Cardinality
+	if o.Cardinality != RequiredCardinality {
+		c := o.Cardinality.toProto()
 		p.Cardinality = &c
 	}
 	return p
@@ -36,7 +86,7 @@ func (o *FunctionArgumentTypeOptions) toProto() *generated.FunctionArgumentTypeO
 // FunctionArgumentType represents a single function argument type.
 // Type is nil for templated arguments.
 type FunctionArgumentType struct {
-	Kind    generated.SignatureArgumentKind
+	Kind    SignatureArgumentKind
 	Type    Type
 	Options *FunctionArgumentTypeOptions
 }
@@ -44,18 +94,18 @@ type FunctionArgumentType struct {
 // NewFunctionArgumentType creates a fixed-type function argument.
 func NewFunctionArgumentType(typ Type) *FunctionArgumentType {
 	return &FunctionArgumentType{
-		Kind: generated.SignatureArgumentKind_ARG_TYPE_FIXED,
+		Kind: ArgTypeFixed,
 		Type: typ,
 	}
 }
 
 // NewTemplatedFunctionArgumentType creates a templated function argument.
-func NewTemplatedFunctionArgumentType(kind generated.SignatureArgumentKind) *FunctionArgumentType {
+func NewTemplatedFunctionArgumentType(kind SignatureArgumentKind) *FunctionArgumentType {
 	return &FunctionArgumentType{Kind: kind}
 }
 
 func (a *FunctionArgumentType) toProto() *generated.FunctionArgumentTypeProto {
-	kind := a.Kind
+	kind := a.Kind.toProto()
 	p := &generated.FunctionArgumentTypeProto{
 		Kind: &kind,
 	}
@@ -118,7 +168,7 @@ func NewFunction(namePath []string, group string, mode Mode, sigs []*FunctionSig
 
 // ToProto converts the function to its protobuf representation.
 func (f *Function) ToProto() *generated.FunctionProto {
-	mode := f.Mode
+	mode := f.Mode.toProto()
 	p := &generated.FunctionProto{
 		NamePath: f.NamePath,
 		Mode:     &mode,

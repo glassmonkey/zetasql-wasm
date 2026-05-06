@@ -6,7 +6,6 @@ import (
 
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
 	"github.com/glassmonkey/zetasql-wasm/types"
-	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -64,7 +63,7 @@ func newBuiltinsCatalog() *types.SimpleCatalog {
 // language feature enabled. Required for OVER (...) window expressions.
 func newAnalyticOpts() *AnalyzerOptions {
 	lang := NewLanguageOptions()
-	lang.EnableLanguageFeature(generated.LanguageFeature_FEATURE_ANALYTIC_FUNCTIONS)
+	lang.EnableLanguageFeature(FeatureAnalyticFunctions)
 	return &AnalyzerOptions{Language: lang}
 }
 
@@ -745,9 +744,9 @@ func TestAnalyzer_AnalyzeStatement_TemplatedFunction(t *testing.T) {
 				types.ScalarMode,
 				[]*types.FunctionSignature{
 					types.NewFunctionSignature(
-						types.NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1),
+						types.NewTemplatedFunctionArgumentType(types.ArgTypeAny1),
 						[]*types.FunctionArgumentType{
-							types.NewTemplatedFunctionArgumentType(generated.SignatureArgumentKind_ARG_TYPE_ANY_1),
+							types.NewTemplatedFunctionArgumentType(types.ArgTypeAny1),
 						},
 					),
 				},

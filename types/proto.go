@@ -6,8 +6,11 @@ import (
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 )
 
-// typeFromProto deserializes a TypeProto into a Type.
-func typeFromProto(p *generated.TypeProto) (Type, error) {
+// TypeFromProto reconstructs a Type from its proto representation, walking
+// ArrayType / StructType recursively. nil input is treated as a malformed
+// proto and produces an error so the call chain (often itself recursive)
+// surfaces the location instead of silently propagating a nil Type.
+func TypeFromProto(p *generated.TypeProto) (Type, error) {
 	if p == nil {
 		return nil, fmt.Errorf("nil TypeProto")
 	}
@@ -18,7 +21,7 @@ func typeFromProto(p *generated.TypeProto) (Type, error) {
 		if at == nil {
 			return nil, fmt.Errorf("TypeProto has ARRAY kind but no ArrayType field")
 		}
-		elemType, err := typeFromProto(at.GetElementType())
+		elemType, err := TypeFromProto(at.GetElementType())
 		if err != nil {
 			return nil, fmt.Errorf("array element type: %w", err)
 		}
@@ -30,7 +33,7 @@ func typeFromProto(p *generated.TypeProto) (Type, error) {
 		}
 		fields := make([]*StructField, len(st.GetField()))
 		for i, pf := range st.GetField() {
-			ft, err := typeFromProto(pf.GetFieldType())
+			ft, err := TypeFromProto(pf.GetFieldType())
 			if err != nil {
 				return nil, fmt.Errorf("struct field %d type: %w", i, err)
 			}
@@ -38,6 +41,9 @@ func typeFromProto(p *generated.TypeProto) (Type, error) {
 		}
 		return NewStructType(fields)
 	default:
-		return typeFromKind(kind)
+		if t := TypeFromKind(kind); t != nil {
+			return t, nil
+		}
+		return nil, fmt.Errorf("TypeFromProto: unsupported TypeKind %s", kind)
 	}
 }
