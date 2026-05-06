@@ -65,11 +65,15 @@ func nodeScalar(n Node) string {
 	case *TableScanNode:
 		return " " + v.Table().GetName()
 	case *FunctionCallNode:
-		return " " + v.Function().GetName()
+		if fr := v.Function(); fr != nil {
+			return " " + fr.Name
+		}
 	case *LiteralNode:
 		return literalScalar(v.Value().GetValue())
 	case *ColumnRefNode:
-		return " " + v.Column().GetName()
+		if col := v.Column(); col != nil {
+			return " " + col.Name
+		}
 	case *JoinScanNode:
 		return " " + v.JoinType().String()
 	}

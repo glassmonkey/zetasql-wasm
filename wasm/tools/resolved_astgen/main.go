@@ -55,6 +55,42 @@ var wrapEnums = map[string]string{
 	"ResolvedFunctionCallBaseEnums_ErrorMode":                     "ErrorMode",
 }
 
+// wrapMessage describes how to lift one proto message type into a typed
+// Go value. GoType is the singular return type (e.g. "*Column"); WrapFn
+// is the singular wrap call (e.g. "wrapColumn"). SliceGoType / SliceWrapFn
+// describe the slice form; leaving them empty causes slice fields to fall
+// back to the leaked-proto path so callers see a build error pointing at
+// the missing helper.
+//
+// Hand-written wrap functions back each entry: see resolved_ast/column.go,
+// resolved_ast/function_ref.go, types/function.go.
+type wrapMessage struct {
+	GoType      string
+	WrapFn      string
+	SliceGoType string
+	SliceWrapFn string
+}
+
+// wrapMessages maps a proto message Go name to its read-side wrap target.
+// Add a new entry when a downstream caller no longer wants to import
+// wasm/generated for a particular leaked proto message.
+var wrapMessages = map[string]wrapMessage{
+	"FunctionRefProto":          {GoType: "*FunctionRef", WrapFn: "wrapFunctionRef"},
+	"FunctionSignatureProto":    {GoType: "*types.FunctionSignature", WrapFn: "types.WrapFunctionSignature"},
+	"FunctionArgumentTypeProto": {GoType: "*types.FunctionArgumentType", WrapFn: "types.WrapFunctionArgumentType"},
+	"ResolvedColumnProto": {
+		GoType: "*Column", WrapFn: "wrapColumn",
+		SliceGoType: "[]*Column", SliceWrapFn: "wrapColumnSlice",
+	},
+}
+
+// wrapMessageImports maps the package-prefix used in wrapMessages above
+// to its import path. The generator only emits an import when at least
+// one accessor actually returns a value with that prefix.
+var wrapMessageImports = map[string]string{
+	"types.": "github.com/glassmonkey/zetasql-wasm/types",
+}
+
 func main() {
 	fd := generated.File_zetasql_resolved_ast_resolved_ast_proto
 	messages := collectMessages(fd)
@@ -64,6 +100,14 @@ func main() {
 	fmt.Printf("Found %d concrete nodes, %d oneof wrappers, %d abstract types\n",
 		len(ctx.concreteNodes), len(ctx.oneofWrappers), len(ctx.abstractSet))
 
+	nodesData := struct {
+		Imports []string
+		Nodes   []nodeInfo
+	}{
+		Imports: nodesFileImports(ctx.concreteNodes),
+		Nodes:   ctx.concreteNodes,
+	}
+
 	outputDir := resolveOutputDir()
 	for _, g := range []struct {
 		file string
@@ -71,7 +115,7 @@ func main() {
 		data any
 	}{
 		{"kind_gen.go", "templates/kind.go.tmpl", ctx.concreteNodes},
-		{"nodes_gen.go", "templates/nodes.go.tmpl", ctx.concreteNodes},
+		{"nodes_gen.go", "templates/nodes.go.tmpl", nodesData},
 		{"wrap_gen.go", "templates/wrap.go.tmpl", ctx.oneofWrappers},
 	} {
 		if err := generateFile(filepath.Join(outputDir, g.file), g.tmpl, g.data); err != nil {
@@ -81,6 +125,29 @@ func main() {
 	}
 
 	fmt.Println("Done!")
+}
+
+// nodesFileImports collects the import paths that nodes_gen.go needs.
+// "wasm/generated" is always present (every node embeds the proto).
+// Additional imports are pulled from wrapMessageImports based on which
+// package-prefixes ("types.", etc.) actually appear in accessor return
+// types — so the file doesn't carry an unused import when no field uses
+// that wrap target.
+func nodesFileImports(nodes []nodeInfo) []string {
+	imports := []string{"github.com/glassmonkey/zetasql-wasm/wasm/generated"}
+	seen := map[string]bool{}
+	for _, n := range nodes {
+		for _, f := range n.Fields {
+			for prefix, path := range wrapMessageImports {
+				if strings.Contains(f.GoType, prefix) && !seen[path] {
+					seen[path] = true
+					imports = append(imports, path)
+				}
+			}
+		}
+	}
+	slices.Sort(imports)
+	return imports
 }
 
 // --- Analysis context ---
@@ -490,6 +557,18 @@ func (ctx *analysisContext) classifyFieldWithPrefix(fd protoreflect.FieldDescrip
 			} else {
 				fi.GoType = "*" + nodeName
 				fi.WrapCall = fmt.Sprintf("new%s(%s)", nodeName, rawGetter)
+			}
+		} else if w, ok := wrapMessages[msgName]; ok && (!isSlice || w.SliceWrapFn != "") {
+			// External proto message we choose to expose as a typed Go
+			// value (see wrapMessages above). Slice form falls back to
+			// the leak path when no slice helper is registered, so the
+			// build fails loudly rather than silently dropping data.
+			if isSlice {
+				fi.GoType = w.SliceGoType
+				fi.WrapCall = fmt.Sprintf("%s(%s)", w.SliceWrapFn, rawGetter)
+			} else {
+				fi.GoType = w.GoType
+				fi.WrapCall = fmt.Sprintf("%s(%s)", w.WrapFn, rawGetter)
 			}
 		} else {
 			// External helper type (from serialization.proto, etc.)

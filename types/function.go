@@ -148,6 +148,50 @@ func (s *FunctionSignature) toProto() *generated.FunctionSignatureProto {
 	return p
 }
 
+// WrapFunctionArgumentType lifts a *generated.FunctionArgumentTypeProto
+// into the typed FunctionArgumentType view. Returns nil for nil input.
+//
+// The Type field is left nil: a read-side wrap of *generated.TypeProto is
+// recursive (compound types) and tracked separately. Callers that need
+// the concrete argument type read the proto directly until WrapType lands.
+// Options is wrapped only for fields the input-side struct already models
+// (Cardinality); other proto-only fields are dropped.
+func WrapFunctionArgumentType(p *generated.FunctionArgumentTypeProto) *FunctionArgumentType {
+	if p == nil {
+		return nil
+	}
+	a := &FunctionArgumentType{
+		Kind: SignatureArgumentKind(p.GetKind()),
+	}
+	if opts := p.GetOptions(); opts != nil {
+		a.Options = &FunctionArgumentTypeOptions{
+			Cardinality: Cardinality(opts.GetCardinality()),
+		}
+	}
+	return a
+}
+
+// WrapFunctionSignature lifts a *generated.FunctionSignatureProto into the
+// typed FunctionSignature view. Returns nil for nil input.
+//
+// FunctionSignatureOptions is dropped: the input-side FunctionSignature
+// struct does not model it today. Per-argument Type is also nil — see
+// WrapFunctionArgumentType.
+func WrapFunctionSignature(p *generated.FunctionSignatureProto) *FunctionSignature {
+	if p == nil {
+		return nil
+	}
+	args := make([]*FunctionArgumentType, len(p.GetArgument()))
+	for i, a := range p.GetArgument() {
+		args[i] = WrapFunctionArgumentType(a)
+	}
+	return &FunctionSignature{
+		ReturnType: WrapFunctionArgumentType(p.GetReturnType()),
+		Arguments:  args,
+		ContextID:  p.GetContextId(),
+	}
+}
+
 // Function represents a ZetaSQL function with one or more signatures.
 type Function struct {
 	NamePath   []string

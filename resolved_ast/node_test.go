@@ -138,7 +138,7 @@ func TestExprType(t *testing.T) {
 // TestScanColumnList verifies that ScanColumnList pulls the column list
 // off concrete scan nodes.
 func TestScanColumnList(t *testing.T) {
-	col := &generated.ResolvedColumnProto{
+	colProto := &generated.ResolvedColumnProto{
 		ColumnId:  proto.Int64(1),
 		TableName: proto.String("t"),
 		Name:      proto.String("c"),
@@ -147,18 +147,18 @@ func TestScanColumnList(t *testing.T) {
 	tests := []struct {
 		name string
 		scan ScanNode
-		want []*generated.ResolvedColumnProto
+		want []*Column
 	}{
 		{
 			name: "TableScanNode with one column",
 			scan: &TableScanNode{
 				raw: &generated.ResolvedTableScanProto{
 					Parent: &generated.ResolvedScanProto{
-						ColumnList: []*generated.ResolvedColumnProto{col},
+						ColumnList: []*generated.ResolvedColumnProto{colProto},
 					},
 				},
 			},
-			want: []*generated.ResolvedColumnProto{col},
+			want: []*Column{{ID: 1, TableName: "t", Name: "c"}},
 		},
 		{
 			name: "SingleRowScanNode has no columns",
