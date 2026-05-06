@@ -26,3 +26,20 @@ func TestTypeKindIsSimple(t *testing.T) {
 		assert.Equal(t, tt.want, tt.kind.IsSimple(), "%v.IsSimple()", tt.kind)
 	}
 }
+
+func TestTypeKindString(t *testing.T) {
+	tests := []struct {
+		kind TypeKind
+		want string
+	}{
+		{Int64, "TYPE_INT64"},
+		{String, "TYPE_STRING"},
+		{Array, "TYPE_ARRAY"},
+		{Struct, "TYPE_STRUCT"},
+		{Enum, "TYPE_ENUM"},
+		{Extended, "TYPE_EXTENDED"},
+	}
+	for _, tt := range tests {
+		assert.Equal(t, tt.want, tt.kind.String(), "TypeKind(%d).String()", tt.kind)
+	}
+}
