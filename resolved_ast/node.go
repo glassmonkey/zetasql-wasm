@@ -51,3 +51,50 @@ type ArgumentNode interface {
 	Node
 	argumentNode()
 }
+
+// WrapExpr converts a serialized AnyResolvedExprProto oneof into the
+// matching concrete ExprNode wrapper. Returns nil if the input is nil
+// or the oneof is empty / unrecognised. Useful when a parent node
+// surfaces an expression as proto (e.g. ResolvedComputedColumnProto.Expr)
+// and downstream code needs the typed Go view.
+func WrapExpr(p *generated.AnyResolvedExprProto) ExprNode {
+	return wrapExpr(p)
+}
+
+// WrapScan converts a serialized AnyResolvedScanProto oneof into the
+// matching concrete ScanNode wrapper. Returns nil for nil / empty input.
+func WrapScan(p *generated.AnyResolvedScanProto) ScanNode {
+	return wrapScan(p)
+}
+
+// WrapStatement converts a serialized AnyResolvedStatementProto oneof
+// into the matching concrete StatementNode wrapper. Returns nil for
+// nil / empty input.
+func WrapStatement(p *generated.AnyResolvedStatementProto) StatementNode {
+	return wrapStatement(p)
+}
+
+// WrapArgument converts a serialized AnyResolvedArgumentProto oneof
+// into the matching concrete ArgumentNode wrapper. Returns nil for
+// nil / empty input.
+func WrapArgument(p *generated.AnyResolvedArgumentProto) ArgumentNode {
+	return wrapArgument(p)
+}
+
+// NewComputedColumnNode wraps a ResolvedComputedColumnProto as a
+// ComputedColumnNode. Some parent nodes (AggregateScan.GroupByList etc.)
+// expose the underlying proto directly because the proto schema doesn't
+// model it as a oneof; this helper lets callers reach the typed wrapper.
+func NewComputedColumnNode(raw *generated.ResolvedComputedColumnProto) *ComputedColumnNode {
+	return newComputedColumnNode(raw)
+}
+
+// NewAnalyticFunctionGroupNode wraps a ResolvedAnalyticFunctionGroupProto.
+func NewAnalyticFunctionGroupNode(raw *generated.ResolvedAnalyticFunctionGroupProto) *AnalyticFunctionGroupNode {
+	return newAnalyticFunctionGroupNode(raw)
+}
+
+// NewWithEntryNode wraps a ResolvedWithEntryProto.
+func NewWithEntryNode(raw *generated.ResolvedWithEntryProto) *WithEntryNode {
+	return newWithEntryNode(raw)
+}
