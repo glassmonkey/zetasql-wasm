@@ -11,6 +11,8 @@ import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 // separately. Most callers use only ID / TableName / Name; those that need
 // the typed shape can read the proto directly until WrapType lands.
 type Column struct {
+	// ID mirrors proto field column_id, Go-cased per the golint
+	// initialism rule (Id → ID).
 	ID            int64
 	TableName     string
 	Name          string

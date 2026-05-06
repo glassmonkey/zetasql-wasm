@@ -60,7 +60,8 @@ var wrapEnums = map[string]string{
 // is the singular wrap call (e.g. "wrapColumn"). SliceGoType / SliceWrapFn
 // describe the slice form; leaving them empty causes slice fields to fall
 // back to the leaked-proto path so callers see a build error pointing at
-// the missing helper.
+// the missing helper. ImportPath, when non-empty, is added to the imports
+// of any generated file that ends up referencing this entry.
 //
 // Hand-written wrap functions back each entry: see resolved_ast/column.go,
 // resolved_ast/function_ref.go, types/function.go.
@@ -69,26 +70,29 @@ type wrapMessage struct {
 	WrapFn      string
 	SliceGoType string
 	SliceWrapFn string
+	ImportPath  string
 }
 
 // wrapMessages maps a proto message Go name to its read-side wrap target.
 // Add a new entry when a downstream caller no longer wants to import
-// wasm/generated for a particular leaked proto message.
+// wasm/generated for a particular leaked proto message — and add
+// ImportPath if the wrap target lives outside resolved_ast.
 var wrapMessages = map[string]wrapMessage{
-	"FunctionRefProto":          {GoType: "*FunctionRef", WrapFn: "wrapFunctionRef"},
-	"FunctionSignatureProto":    {GoType: "*types.FunctionSignature", WrapFn: "types.WrapFunctionSignature"},
-	"FunctionArgumentTypeProto": {GoType: "*types.FunctionArgumentType", WrapFn: "types.WrapFunctionArgumentType"},
+	"FunctionRefProto": {GoType: "*FunctionRef", WrapFn: "wrapFunctionRef"},
+	"FunctionSignatureProto": {
+		GoType:     "*types.FunctionSignature",
+		WrapFn:     "types.WrapFunctionSignature",
+		ImportPath: "github.com/glassmonkey/zetasql-wasm/types",
+	},
+	"FunctionArgumentTypeProto": {
+		GoType:     "*types.FunctionArgumentType",
+		WrapFn:     "types.WrapFunctionArgumentType",
+		ImportPath: "github.com/glassmonkey/zetasql-wasm/types",
+	},
 	"ResolvedColumnProto": {
 		GoType: "*Column", WrapFn: "wrapColumn",
 		SliceGoType: "[]*Column", SliceWrapFn: "wrapColumnSlice",
 	},
-}
-
-// wrapMessageImports maps the package-prefix used in wrapMessages above
-// to its import path. The generator only emits an import when at least
-// one accessor actually returns a value with that prefix.
-var wrapMessageImports = map[string]string{
-	"types.": "github.com/glassmonkey/zetasql-wasm/types",
 }
 
 func main() {
@@ -104,7 +108,7 @@ func main() {
 		Imports []string
 		Nodes   []nodeInfo
 	}{
-		Imports: nodesFileImports(ctx.concreteNodes),
+		Imports: ctx.nodesFileImports(),
 		Nodes:   ctx.concreteNodes,
 	}
 
@@ -127,24 +131,15 @@ func main() {
 	fmt.Println("Done!")
 }
 
-// nodesFileImports collects the import paths that nodes_gen.go needs.
+// nodesFileImports returns the import paths that nodes_gen.go needs.
 // "wasm/generated" is always present (every node embeds the proto).
-// Additional imports are pulled from wrapMessageImports based on which
-// package-prefixes ("types.", etc.) actually appear in accessor return
-// types — so the file doesn't carry an unused import when no field uses
-// that wrap target.
-func nodesFileImports(nodes []nodeInfo) []string {
+// Additional imports come from wrapMessages entries that were actually
+// emitted into an accessor — recorded in ctx.extraImports during field
+// classification — so the file never carries an unused import.
+func (ctx *analysisContext) nodesFileImports() []string {
 	imports := []string{"github.com/glassmonkey/zetasql-wasm/wasm/generated"}
-	seen := map[string]bool{}
-	for _, n := range nodes {
-		for _, f := range n.Fields {
-			for prefix, path := range wrapMessageImports {
-				if strings.Contains(f.GoType, prefix) && !seen[path] {
-					seen[path] = true
-					imports = append(imports, path)
-				}
-			}
-		}
+	for path := range ctx.extraImports {
+		imports = append(imports, path)
 	}
 	slices.Sort(imports)
 	return imports
@@ -159,13 +154,19 @@ type analysisContext struct {
 	interfaceMap  map[string]string // wrapper base name → Go interface type
 	concreteNodes []nodeInfo
 	oneofWrappers []wrapperInfo
+
+	// extraImports collects ImportPath values from wrapMessages entries
+	// that were actually emitted into nodes_gen.go. Filled in during
+	// classifyFieldWithPrefix; consumed by nodesFileImports.
+	extraImports map[string]bool
 }
 
 func newAnalysisContext(messages []protoreflect.MessageDescriptor) *analysisContext {
 	ctx := &analysisContext{
-		wrapperSet:  map[string]bool{},
-		abstractSet: map[string]bool{},
-		concreteSet: map[string]bool{},
+		wrapperSet:   map[string]bool{},
+		abstractSet:  map[string]bool{},
+		concreteSet:  map[string]bool{},
+		extraImports: map[string]bool{},
 	}
 
 	// Step 1: detect oneof wrappers structurally
@@ -569,6 +570,9 @@ func (ctx *analysisContext) classifyFieldWithPrefix(fd protoreflect.FieldDescrip
 			} else {
 				fi.GoType = w.GoType
 				fi.WrapCall = fmt.Sprintf("%s(%s)", w.WrapFn, rawGetter)
+			}
+			if w.ImportPath != "" {
+				ctx.extraImports[w.ImportPath] = true
 			}
 		} else {
 			// External helper type (from serialization.proto, etc.)
