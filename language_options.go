@@ -58,6 +58,11 @@ func (m ProductMode) toProto() generated.ProductMode {
 }
 
 // LanguageOptions controls which ZetaSQL language features are enabled.
+//
+// StatementKinds intentionally retains the proto type
+// generated.ResolvedNodeKind: the enum has 287 members and a parallel
+// named-type wrapper is not worth the cost. Callers pass values from the
+// generated package directly.
 type LanguageOptions struct {
 	Features           map[LanguageFeature]bool
 	StatementKinds     []generated.ResolvedNodeKind

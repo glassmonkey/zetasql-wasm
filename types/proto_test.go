@@ -77,7 +77,7 @@ func TestNestedTypeRoundTrip(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			restored, err := typeFromProto(tt.typ.ToProto())
+			restored, err := TypeFromProto(tt.typ.ToProto())
 			require.NoError(t, err)
 			assert.Empty(t, cmp.Diff(tt.typ.ToProto(), restored.ToProto(), protocmp.Transform()), "round-trip mismatch")
 		})

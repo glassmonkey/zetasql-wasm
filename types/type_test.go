@@ -39,8 +39,8 @@ func TestScalarTypeToProtoRoundTrip(t *testing.T) {
 		got := typ.ToProto()
 		want := &generated.TypeProto{TypeKind: generated.TypeKind(kind).Enum()}
 		assert.Empty(t, cmp.Diff(want, got, protocmp.Transform()), "ToProto() mismatch for %v", kind)
-		restored, err := typeFromProto(got)
-		require.NoError(t, err, "typeFromProto failed for %v", kind)
+		restored, err := TypeFromProto(got)
+		require.NoError(t, err, "TypeFromProto failed for %v", kind)
 		assert.Equal(t, typ, restored, "round-trip for %v did not return same singleton", kind)
 	}
 }

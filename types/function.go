@@ -74,13 +74,6 @@ type FunctionArgumentTypeOptions struct {
 	Cardinality Cardinality
 }
 
-// NewFunctionArgumentTypeOptions creates a FunctionArgumentTypeOptions with
-// the given cardinality. Equivalent to a struct literal — kept for
-// readability when only cardinality is set.
-func NewFunctionArgumentTypeOptions(c Cardinality) *FunctionArgumentTypeOptions {
-	return &FunctionArgumentTypeOptions{Cardinality: c}
-}
-
 func (o *FunctionArgumentTypeOptions) toProto() *generated.FunctionArgumentTypeOptionsProto {
 	p := &generated.FunctionArgumentTypeOptionsProto{}
 	if o.Cardinality != RequiredCardinality {
