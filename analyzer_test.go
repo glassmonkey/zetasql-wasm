@@ -6,6 +6,7 @@ import (
 
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
 	"github.com/glassmonkey/zetasql-wasm/types"
+	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -65,6 +66,32 @@ func newAnalyticOpts() *AnalyzerOptions {
 	lang := NewLanguageOptions()
 	lang.EnableLanguageFeature(FeatureAnalyticFunctions)
 	return &AnalyzerOptions{Language: lang}
+}
+
+// newQueryStmtAnalyzerOptions builds AnalyzerOptions configured to
+// accept top-level QUERY statements — the only statement kind the
+// parameter-flow integration tests need. Returns a fresh instance per
+// call so per-case Arrange stays independent.
+func newQueryStmtAnalyzerOptions() *AnalyzerOptions {
+	lang := NewLanguageOptions()
+	lang.SetSupportedStatementKinds([]StatementKind{StatementKindQuery})
+	return &AnalyzerOptions{Language: lang}
+}
+
+// observedParam is the projection of *resolved_ast.ParameterNode the
+// parameter-flow integration tests assert on — the resolved type kind
+// and whether the analyzer marked the parameter untyped. Combining
+// both into one tuple keeps each happy case to a single assert.Equal.
+type observedParam struct {
+	TypeKind  generated.TypeKind
+	IsUntyped bool
+}
+
+func observeParam(p *resolved_ast.ParameterNode) observedParam {
+	return observedParam{
+		TypeKind:  p.Type().GetTypeKind(),
+		IsUntyped: p.IsUntyped(),
+	}
 }
 
 // findNode walks the tree and returns the first node matching the type T.
@@ -421,37 +448,43 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
 `,
 		},
 		{
-			name: "named query parameter",
-			sql:  "SELECT @id",
-			cat:  nil,
+			name: "named query parameter in WHERE",
+			sql:  "SELECT id FROM users WHERE id = @id",
+			cat:  newUsersCatalog(),
 			opts: &AnalyzerOptions{
 				ParameterMode:   ParameterNamed,
 				QueryParameters: map[string]types.Type{"id": types.Int64Type()},
 			},
 			want: `KindQueryStmt
-  KindOutputColumn $col1
+  KindOutputColumn id
   KindProjectScan
-    KindComputedColumn
-      KindParameter
-    KindSingleRowScan
+    KindFilterScan
+      KindTableScan users
+      KindFunctionCall ZetaSQL:$equal
+        KindColumnRef id
+        KindParameter
 `,
 		},
 		{
-			name: "named query parameter in arithmetic",
-			sql:  "SELECT @id + 1",
-			cat:  nil,
+			name: "named query parameters in BETWEEN",
+			sql:  "SELECT id FROM users WHERE id BETWEEN @lo AND @hi",
+			cat:  newUsersCatalog(),
 			opts: &AnalyzerOptions{
-				ParameterMode:   ParameterNamed,
-				QueryParameters: map[string]types.Type{"id": types.Int64Type()},
+				ParameterMode: ParameterNamed,
+				QueryParameters: map[string]types.Type{
+					"lo": types.Int64Type(),
+					"hi": types.Int64Type(),
+				},
 			},
 			want: `KindQueryStmt
-  KindOutputColumn $col1
+  KindOutputColumn id
   KindProjectScan
-    KindComputedColumn
-      KindFunctionCall ZetaSQL:$add
+    KindFilterScan
+      KindTableScan users
+      KindFunctionCall ZetaSQL:$between
+        KindColumnRef id
         KindParameter
-        KindLiteral 1
-    KindSingleRowScan
+        KindParameter
 `,
 		},
 	}
@@ -794,6 +827,86 @@ func TestAnalyzer_AnalyzeStatement_TemplatedFunction(t *testing.T) {
 
 			// Assert
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+// TestAnalyzer_AnalyzeStatement_PositionalParameter covers the
+// positional-parameter analyzer path end to end: the wire fields
+// PositionalQueryParameters / ParameterMode round-trip through the
+// WASM bridge and the declared count is consulted by the analyzer.
+//
+// SQL inputs follow real-world shapes (`WHERE id = ?`,
+// `WHERE name = ? AND id = ?`) rather than synthetic `SELECT ?` so a
+// regression that only affects nested-position `?` usage surfaces.
+//
+// Triangulated across:
+//   - declared 1 INT64 / 2 (STRING, INT64) resolve cleanly,
+//   - count mismatches (no positionals declared / one declared but
+//     two `?` used) reject.
+//
+// (got, err) is checked in both halves: an error case carries a nil
+// output, a happy case carries a non-nil output whose first
+// ParameterNode payload (TypeKind + IsUntyped) is observed via
+// observeParam.
+func TestAnalyzer_AnalyzeStatement_PositionalParameter(t *testing.T) {
+	tests := []struct {
+		name      string
+		params    []types.Type
+		sql       string
+		wantParam observedParam
+		wantErr   error
+	}{
+		{
+			name:      "single INT64 positional in WHERE",
+			params:    []types.Type{types.Int64Type()},
+			sql:       "SELECT id FROM users WHERE id = ?",
+			wantParam: observedParam{TypeKind: generated.TypeKind_TYPE_INT64},
+		},
+		{
+			name:      "two positionals (STRING, INT64) in WHERE — first resolves to STRING",
+			params:    []types.Type{types.StringType(), types.Int64Type()},
+			sql:       "SELECT id FROM users WHERE name = ? AND id = ?",
+			wantParam: observedParam{TypeKind: generated.TypeKind_TYPE_STRING},
+		},
+		{
+			name:    "no positionals declared but SQL uses one",
+			sql:     "SELECT id FROM users WHERE id = ?",
+			wantErr: &AnalyzeError{},
+		},
+		{
+			name:    "one positional declared but SQL uses two",
+			params:  []types.Type{types.Int64Type()},
+			sql:     "SELECT id FROM users WHERE name = ? AND id = ?",
+			wantErr: &AnalyzeError{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			ctx := t.Context()
+			a := newTestAnalyzer(t)
+			cat := newUsersCatalog()
+			opts := newQueryStmtAnalyzerOptions()
+			opts.ParameterMode = ParameterPositional
+			opts.PositionalQueryParameters = tt.params
+
+			// Act
+			got, err := a.AnalyzeStatement(ctx, tt.sql, cat, opts)
+
+			// Assert
+			if tt.wantErr != nil {
+				assert.IsType(t, tt.wantErr, err)
+				assert.Nil(t, got)
+				return
+			}
+			require.NoError(t, err)
+			require.NotNil(t, got)
+			stmt, ok := got.Statement.(*resolved_ast.QueryStmtNode)
+			require.True(t, ok, "Statement is %T, want *resolved_ast.QueryStmtNode", got.Statement)
+			param := findNode[*resolved_ast.ParameterNode](t, stmt)
+			assert.Equal(t, tt.wantParam, observeParam(param))
 		})
 	}
 }

@@ -290,32 +290,6 @@ func TestAnalyzerOptions_Clone_doesNotShareLanguagePointer(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
-// newQueryStmtAnalyzerOptions builds AnalyzerOptions configured to
-// accept top-level QUERY statements — the only statement kind the
-// parameter-flow integration tests below need. Returns a fresh
-// instance per call so per-case Arrange stays independent.
-func newQueryStmtAnalyzerOptions() *AnalyzerOptions {
-	lang := NewLanguageOptions()
-	lang.SetSupportedStatementKinds([]StatementKind{StatementKindQuery})
-	return &AnalyzerOptions{Language: lang}
-}
-
-// observedParam is the projection of *resolved_ast.ParameterNode the
-// integration tests below assert on — the resolved type kind and
-// whether the analyzer marked the parameter untyped. Combining both
-// into one tuple keeps each happy case to a single assert.Equal.
-type observedParam struct {
-	TypeKind  generated.TypeKind
-	IsUntyped bool
-}
-
-func observeParam(p *resolved_ast.ParameterNode) observedParam {
-	return observedParam{
-		TypeKind:  p.Type().GetTypeKind(),
-		IsUntyped: p.IsUntyped(),
-	}
-}
-
 // TestAnalyzerOptions_NamedQueryParameters_AnalyzerIntegration covers
 // the named-parameter analyzer path end to end: the wire fields
 // QueryParameters / ParameterMode / AllowUndeclaredParameters all
@@ -395,81 +369,6 @@ func TestAnalyzerOptions_NamedQueryParameters_AnalyzerIntegration(t *testing.T) 
 			opts.ParameterMode = ParameterNamed
 			opts.QueryParameters = tt.params
 			opts.AllowUndeclaredParameters = tt.allowUndeclaredParameters
-
-			// Act
-			got, err := a.AnalyzeStatement(ctx, tt.sql, nil, opts)
-
-			// Assert
-			if tt.wantErr != nil {
-				assert.IsType(t, tt.wantErr, err)
-				assert.Nil(t, got)
-				return
-			}
-			require.NoError(t, err)
-			require.NotNil(t, got)
-			stmt, ok := got.Statement.(*resolved_ast.QueryStmtNode)
-			require.True(t, ok, "Statement is %T, want *resolved_ast.QueryStmtNode", got.Statement)
-			param := findNode[*resolved_ast.ParameterNode](t, stmt)
-			assert.Equal(t, tt.wantParam, observeParam(param))
-		})
-	}
-}
-
-// TestAnalyzerOptions_PositionalQueryParameters_AnalyzerIntegration
-// covers the positional-parameter path end to end: the wire fields
-// PositionalQueryParameters / ParameterMode round-trip through the
-// bridge and the declared count is consulted by the analyzer.
-//
-// Triangulated across:
-//   - declared 1 INT64 / 2 (INT64, STRING) resolve cleanly,
-//   - count mismatches (no positionals declared / one declared but
-//     two `?` used) reject.
-//
-// Same (got, err) dual-assertion shape as the named counterpart.
-func TestAnalyzerOptions_PositionalQueryParameters_AnalyzerIntegration(t *testing.T) {
-	tests := []struct {
-		name   string
-		params []types.Type
-		sql    string
-		// wantParam is the observable shape of the resolved tree's
-		// first ParameterNode (positional 1). Ignored when wantErr
-		// is non-nil.
-		wantParam observedParam
-		wantErr   error
-	}{
-		{
-			name:      "single INT64 positional resolves to INT64",
-			params:    []types.Type{types.Int64Type()},
-			sql:       "SELECT ?",
-			wantParam: observedParam{TypeKind: generated.TypeKind_TYPE_INT64},
-		},
-		{
-			name:      "two positionals (STRING, INT64) — first resolves to STRING",
-			params:    []types.Type{types.StringType(), types.Int64Type()},
-			sql:       "SELECT ?, ?",
-			wantParam: observedParam{TypeKind: generated.TypeKind_TYPE_STRING},
-		},
-		{
-			name:    "no positionals declared but SQL uses one",
-			sql:     "SELECT ?",
-			wantErr: &AnalyzeError{},
-		},
-		{
-			name:    "one positional declared but SQL uses two",
-			params:  []types.Type{types.Int64Type()},
-			sql:     "SELECT ?, ?",
-			wantErr: &AnalyzeError{},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			ctx := t.Context()
-			a := newTestAnalyzer(t)
-			opts := newQueryStmtAnalyzerOptions()
-			opts.ParameterMode = ParameterPositional
-			opts.PositionalQueryParameters = tt.params
 
 			// Act
 			got, err := a.AnalyzeStatement(ctx, tt.sql, nil, opts)
