@@ -340,6 +340,148 @@ func TestAnalyzerOptions_QueryParameters_AnalyzerIntegration(t *testing.T) {
 	}
 }
 
+// TestAnalyzerOptions_QueryParameters_RejectsUndeclared verifies that
+// the analyzer rejects a referenced parameter that was not declared in
+// QueryParameters (the strict default behaviour). wantErr is a type
+// witness compared via assert.IsType.
+//
+// This indirectly verifies that the proto's parameter_mode and the
+// (empty) QueryParameters list both reach the C++ analyzer — if the
+// bridge dropped them, the analyzer would default to permissive mode
+// and the @nope reference would silently succeed.
+func TestAnalyzerOptions_QueryParameters_RejectsUndeclared(t *testing.T) {
+	tests := []struct {
+		name    string
+		params  map[string]types.Type
+		sql     string
+		wantErr error
+	}{
+		{
+			name:    "no parameters declared, SQL references @nope",
+			params:  nil,
+			sql:     "SELECT @nope",
+			wantErr: &AnalyzeError{},
+		},
+		{
+			name:    "@id declared but SQL references @other",
+			params:  map[string]types.Type{"id": types.Int64Type()},
+			sql:     "SELECT @other",
+			wantErr: &AnalyzeError{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			ctx := t.Context()
+			a := newTestAnalyzer(t)
+			lang := NewLanguageOptions()
+			lang.SetSupportedStatementKinds([]StatementKind{StatementKindQuery})
+			opts := &AnalyzerOptions{
+				Language:        lang,
+				ParameterMode:   ParameterNamed,
+				QueryParameters: tt.params,
+			}
+
+			// Act
+			_, got := a.AnalyzeStatement(ctx, tt.sql, nil, opts)
+
+			// Assert
+			assert.IsType(t, tt.wantErr, got)
+		})
+	}
+}
+
+// TestAnalyzerOptions_AllowUndeclaredParameters_Accepts verifies that
+// AllowUndeclaredParameters=true reaches the C++ side and toggles the
+// analyzer into permissive mode: undeclared `@nope` references resolve
+// without error.
+//
+// The complementary strict-mode rejection is in
+// TestAnalyzerOptions_QueryParameters_RejectsUndeclared. Together they
+// pin the allow_undeclared_parameters wire path in both polarities.
+func TestAnalyzerOptions_AllowUndeclaredParameters_Accepts(t *testing.T) {
+	tests := []struct {
+		name string
+		sql  string
+	}{
+		{name: "undeclared @nope under permissive mode", sql: "SELECT @nope"},
+		{name: "undeclared @label under permissive mode", sql: "SELECT @label"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			ctx := t.Context()
+			a := newTestAnalyzer(t)
+			lang := NewLanguageOptions()
+			lang.SetSupportedStatementKinds([]StatementKind{StatementKindQuery})
+			opts := &AnalyzerOptions{
+				Language:                  lang,
+				ParameterMode:             ParameterNamed,
+				AllowUndeclaredParameters: true,
+			}
+
+			// Act
+			_, err := a.AnalyzeStatement(ctx, tt.sql, nil, opts)
+
+			// Assert
+			require.NoError(t, err)
+		})
+	}
+}
+
+// TestAnalyzerOptions_PositionalQueryParameters_RejectsCountMismatch
+// verifies that the analyzer rejects SQL whose `?` placeholders exceed
+// the declared positional-parameter count. wantErr is a type witness.
+//
+// This pins that PositionalQueryParameters' length is consulted by the
+// analyzer, not just round-tripped on the wire — a regression that
+// dropped the slice or its length would let the under-supplied case
+// silently pass.
+func TestAnalyzerOptions_PositionalQueryParameters_RejectsCountMismatch(t *testing.T) {
+	tests := []struct {
+		name    string
+		params  []types.Type
+		sql     string
+		wantErr error
+	}{
+		{
+			name:    "no positionals declared but SQL uses one",
+			params:  nil,
+			sql:     "SELECT ?",
+			wantErr: &AnalyzeError{},
+		},
+		{
+			name:    "one positional declared but SQL uses two",
+			params:  []types.Type{types.Int64Type()},
+			sql:     "SELECT ?, ?",
+			wantErr: &AnalyzeError{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			ctx := t.Context()
+			a := newTestAnalyzer(t)
+			lang := NewLanguageOptions()
+			lang.SetSupportedStatementKinds([]StatementKind{StatementKindQuery})
+			opts := &AnalyzerOptions{
+				Language:                  lang,
+				ParameterMode:             ParameterPositional,
+				PositionalQueryParameters: tt.params,
+			}
+
+			// Act
+			_, got := a.AnalyzeStatement(ctx, tt.sql, nil, opts)
+
+			// Assert
+			assert.IsType(t, tt.wantErr, got)
+		})
+	}
+}
+
 // TestAnalyzerOptions_PositionalQueryParameters_AnalyzerIntegration is
 // the positional counterpart: `SELECT ?` referencing the first
 // positional parameter resolves to its declared type after both wrap
