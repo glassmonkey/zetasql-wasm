@@ -21,10 +21,15 @@ func TestWrapWindowFrameExpr(t *testing.T) {
 	offsetPreceding := generated.ResolvedWindowFrameExprEnums_OFFSET_PRECEDING
 	currentRow := generated.ResolvedWindowFrameExprEnums_CURRENT_ROW
 
-	literalExpr := &generated.AnyResolvedExprProto{
-		Node: &generated.AnyResolvedExprProto_ResolvedLiteralNode{
-			ResolvedLiteralNode: &generated.ResolvedLiteralProto{},
-		},
+	// mkLiteralExpr returns a fresh empty-literal AnyResolvedExprProto on
+	// each call. A factory (rather than a function-scope pointer) keeps
+	// per-case Arrange independent — no shared mutable proto across cases.
+	mkLiteralExpr := func() *generated.AnyResolvedExprProto {
+		return &generated.AnyResolvedExprProto{
+			Node: &generated.AnyResolvedExprProto_ResolvedLiteralNode{
+				ResolvedLiteralNode: &generated.ResolvedLiteralProto{},
+			},
+		}
 	}
 
 	tests := []struct {
@@ -53,11 +58,11 @@ func TestWrapWindowFrameExpr(t *testing.T) {
 			name: "OFFSET_PRECEDING with offset expression",
 			in: &generated.ResolvedWindowFrameExprProto{
 				BoundaryType: &offsetPreceding,
-				Expression:   literalExpr,
+				Expression:   mkLiteralExpr(),
 			},
 			want: &WindowFrameExpr{
 				BoundaryType: OffsetPrecedingType,
-				Expression:   wrapExpr(literalExpr),
+				Expression:   wrapExpr(mkLiteralExpr()),
 			},
 		},
 	}
