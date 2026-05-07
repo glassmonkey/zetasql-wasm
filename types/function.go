@@ -68,10 +68,12 @@ func (c Cardinality) toProto() generated.FunctionEnums_ArgumentCardinality {
 }
 
 // FunctionArgumentTypeOptions holds optional per-argument metadata such as
-// cardinality (REQUIRED / REPEATED / OPTIONAL). Zero values map to the proto
-// defaults and are omitted from the wire representation.
+// cardinality (REQUIRED / REPEATED / OPTIONAL) and the declared argument
+// name. Zero values map to the proto defaults and are omitted from the
+// wire representation.
 type FunctionArgumentTypeOptions struct {
-	Cardinality Cardinality
+	Cardinality  Cardinality
+	ArgumentName string
 }
 
 func (o *FunctionArgumentTypeOptions) toProto() *generated.FunctionArgumentTypeOptionsProto {
@@ -79,6 +81,10 @@ func (o *FunctionArgumentTypeOptions) toProto() *generated.FunctionArgumentTypeO
 	if o.Cardinality != RequiredCardinality {
 		c := o.Cardinality.toProto()
 		p.Cardinality = &c
+	}
+	if o.ArgumentName != "" {
+		n := o.ArgumentName
+		p.ArgumentName = &n
 	}
 	return p
 }
@@ -151,21 +157,23 @@ func (s *FunctionSignature) toProto() *generated.FunctionSignatureProto {
 // WrapFunctionArgumentType lifts a *generated.FunctionArgumentTypeProto
 // into the typed FunctionArgumentType view. Returns nil for nil input.
 //
-// The Type field is left nil: a read-side wrap of *generated.TypeProto is
-// recursive (compound types) and tracked separately. Callers that need
-// the concrete argument type read the proto directly until WrapType lands.
-// Options is wrapped only for fields the input-side struct already models
-// (Cardinality); other proto-only fields are dropped.
+// Type is wrapped through WrapType, so scalar / ARRAY / STRUCT round-trip
+// to a typed Go value; ENUM / PROTO / EXTENDED still come back as nil
+// (see WrapType for the current coverage). Options is wrapped only for
+// fields the input-side struct models (Cardinality, ArgumentName); other
+// proto-only fields are dropped.
 func WrapFunctionArgumentType(p *generated.FunctionArgumentTypeProto) *FunctionArgumentType {
 	if p == nil {
 		return nil
 	}
 	a := &FunctionArgumentType{
 		Kind: SignatureArgumentKind(p.GetKind()),
+		Type: WrapType(p.GetType()),
 	}
 	if opts := p.GetOptions(); opts != nil {
 		a.Options = &FunctionArgumentTypeOptions{
-			Cardinality: Cardinality(opts.GetCardinality()),
+			Cardinality:  Cardinality(opts.GetCardinality()),
+			ArgumentName: opts.GetArgumentName(),
 		}
 	}
 	return a
