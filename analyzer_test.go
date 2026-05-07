@@ -487,6 +487,32 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
         KindParameter
 `,
 		},
+		// IN UNNEST(@ids) is the literal SQL shape that triggered the
+		// v0.5.0 emulator boot bug — bigquery-emulator's
+		// internal/metadata/repository.go runs `WHERE id IN UNNEST(@ids)`
+		// during server startup. Pinning it here exercises the actual
+		// front door: an ARRAY<INT64> parameter resolved into a
+		// FunctionCall ZetaSQL:$in_array against a TableScan.
+		{
+			name: "named array parameter in IN UNNEST (emulator boot pattern)",
+			sql:  "SELECT id FROM users WHERE id IN UNNEST(@ids)",
+			cat:  newUsersCatalog(),
+			opts: &AnalyzerOptions{
+				ParameterMode:   ParameterNamed,
+				QueryParameters: map[string]types.Type{
+					"ids": &types.ArrayType{ElementType: types.Int64Type()},
+				},
+			},
+			want: `KindQueryStmt
+  KindOutputColumn id
+  KindProjectScan
+    KindFilterScan
+      KindTableScan users
+      KindFunctionCall ZetaSQL:$in_array
+        KindColumnRef id
+        KindParameter
+`,
+		},
 	}
 
 	for _, tt := range tests {
