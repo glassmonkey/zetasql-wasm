@@ -1,4 +1,4 @@
-GO_MODULES := . wasm
+GO_MODULES := . wasm/tools
 GOLANGCI_LINT := go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.5.0
 
 .PHONY: help test lint fix

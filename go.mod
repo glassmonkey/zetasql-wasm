@@ -3,7 +3,6 @@ module github.com/glassmonkey/zetasql-wasm
 go 1.26.2
 
 require (
-	github.com/glassmonkey/zetasql-wasm/wasm v0.0.0
 	github.com/google/go-cmp v0.7.0
 	github.com/tetratelabs/wazero v1.8.2
 	google.golang.org/protobuf v1.36.11
@@ -25,7 +24,5 @@ require (
 	github.com/stretchr/testify v1.11.1
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/glassmonkey/zetasql-wasm/wasm => ./wasm
 
 tool github.com/x-motemen/gobump/cmd/gobump
