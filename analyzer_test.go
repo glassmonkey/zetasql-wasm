@@ -420,6 +420,40 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
       KindTableScan users
 `,
 		},
+		{
+			name: "named query parameter",
+			sql:  "SELECT @id",
+			cat:  nil,
+			opts: &AnalyzerOptions{
+				ParameterMode:   ParameterNamed,
+				QueryParameters: map[string]types.Type{"id": types.Int64Type()},
+			},
+			want: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindParameter
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "named query parameter in arithmetic",
+			sql:  "SELECT @id + 1",
+			cat:  nil,
+			opts: &AnalyzerOptions{
+				ParameterMode:   ParameterNamed,
+				QueryParameters: map[string]types.Type{"id": types.Int64Type()},
+			},
+			want: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:$add
+        KindParameter
+        KindLiteral 1
+    KindSingleRowScan
+`,
+		},
 	}
 
 	for _, tt := range tests {
