@@ -18,15 +18,15 @@ import (
 // gap / one defensive case so a regression in any single dispatch
 // branch shows up in the diff.
 func TestWrapLiteralValue(t *testing.T) {
-	int64Kind := generated.TypeKind_TYPE_INT64
-	stringKind := generated.TypeKind_TYPE_STRING
 	arrayKind := generated.TypeKind_TYPE_ARRAY
 	structKind := generated.TypeKind_TYPE_STRUCT
-	datetimeKind := generated.TypeKind_TYPE_DATETIME
 
-	int64Type := &generated.TypeProto{TypeKind: &int64Kind}
-	stringType := &generated.TypeProto{TypeKind: &stringKind}
-
+	// typeOf returns a fresh *generated.TypeProto for the given scalar
+	// kind on each call. A factory (rather than function-scope shared
+	// pointers) keeps per-case Arrange independent.
+	typeOf := func(k generated.TypeKind) *generated.TypeProto {
+		return &generated.TypeProto{TypeKind: &k}
+	}
 	int64Lit := func(n int64) *generated.ValueProto {
 		return &generated.ValueProto{Value: &generated.ValueProto_Int64Value{Int64Value: n}}
 	}
@@ -47,7 +47,7 @@ func TestWrapLiteralValue(t *testing.T) {
 		{
 			name: "NULL of INT64 (Value oneof unset) yields Value=nil",
 			in: &generated.ValueWithTypeProto{
-				Type:  int64Type,
+				Type:  typeOf(generated.TypeKind_TYPE_INT64),
 				Value: &generated.ValueProto{},
 			},
 			want: &LiteralValue{Type: Int64Type(), Value: nil},
@@ -55,7 +55,7 @@ func TestWrapLiteralValue(t *testing.T) {
 		{
 			name: "INT64 = 42",
 			in: &generated.ValueWithTypeProto{
-				Type:  int64Type,
+				Type:  typeOf(generated.TypeKind_TYPE_INT64),
 				Value: int64Lit(42),
 			},
 			want: &LiteralValue{Type: Int64Type(), Value: int64(42)},
@@ -63,7 +63,7 @@ func TestWrapLiteralValue(t *testing.T) {
 		{
 			name: "STRING = \"hello\"",
 			in: &generated.ValueWithTypeProto{
-				Type:  stringType,
+				Type:  typeOf(generated.TypeKind_TYPE_STRING),
 				Value: stringLit("hello"),
 			},
 			want: &LiteralValue{Type: StringType(), Value: "hello"},
@@ -74,7 +74,7 @@ func TestWrapLiteralValue(t *testing.T) {
 				Type: &generated.TypeProto{
 					TypeKind: &arrayKind,
 					ArrayType: &generated.ArrayTypeProto{
-						ElementType: int64Type,
+						ElementType: typeOf(generated.TypeKind_TYPE_INT64),
 					},
 				},
 				Value: &generated.ValueProto{
@@ -100,8 +100,8 @@ func TestWrapLiteralValue(t *testing.T) {
 					TypeKind: &structKind,
 					StructType: &generated.StructTypeProto{
 						Field: []*generated.StructFieldProto{
-							{FieldName: ptr("a"), FieldType: int64Type},
-							{FieldName: ptr("b"), FieldType: stringType},
+							{FieldName: ptr("a"), FieldType: typeOf(generated.TypeKind_TYPE_INT64)},
+							{FieldName: ptr("b"), FieldType: typeOf(generated.TypeKind_TYPE_STRING)},
 						},
 					},
 				},
@@ -127,14 +127,14 @@ func TestWrapLiteralValue(t *testing.T) {
 		{
 			name: "DATETIME has a Type but Value is nil (nested-proto kind not yet wrapped)",
 			in: &generated.ValueWithTypeProto{
-				Type: &generated.TypeProto{TypeKind: &datetimeKind},
+				Type: typeOf(generated.TypeKind_TYPE_DATETIME),
 				Value: &generated.ValueProto{
 					Value: &generated.ValueProto_DatetimeValue{
 						DatetimeValue: &generated.ValueProto_Datetime{},
 					},
 				},
 			},
-			want: &LiteralValue{Type: TypeFromKind(Datetime), Value: nil},
+			want: &LiteralValue{Type: DatetimeType(), Value: nil},
 		},
 		{
 			name: "STRUCT with mismatched field count yields Value=nil (defensive)",
@@ -143,8 +143,8 @@ func TestWrapLiteralValue(t *testing.T) {
 					TypeKind: &structKind,
 					StructType: &generated.StructTypeProto{
 						Field: []*generated.StructFieldProto{
-							{FieldName: ptr("a"), FieldType: int64Type},
-							{FieldName: ptr("b"), FieldType: stringType},
+							{FieldName: ptr("a"), FieldType: typeOf(generated.TypeKind_TYPE_INT64)},
+							{FieldName: ptr("b"), FieldType: typeOf(generated.TypeKind_TYPE_STRING)},
 						},
 					},
 				},
