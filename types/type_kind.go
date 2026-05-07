@@ -1,6 +1,10 @@
 package types
 
-import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
+import (
+	"strings"
+
+	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+)
 
 // TypeKind identifies the kind of a ZetaSQL type.
 type TypeKind int32
@@ -35,12 +39,14 @@ func (k TypeKind) toProto() generated.TypeKind {
 	return generated.TypeKind(k)
 }
 
-// String returns the proto enum name for the kind (e.g. "TYPE_INT64",
-// "TYPE_ARRAY"). It satisfies fmt.Stringer so TypeKind can flow through
-// %s / %v formatting without manual conversion. Returns "TYPE_UNKNOWN" for
-// values outside the known enum range.
+// String returns the SQL name of the kind (e.g. "INT64", "ARRAY"). The
+// underlying proto enum name carries a "TYPE_" prefix that is a wire-format
+// implementation detail; this method strips it so callers can use the result
+// directly in SQL contexts (DDL column types, error messages) without having
+// to know about the proto layer. Returns "UNKNOWN" for the zero value and
+// the decimal string of the kind for values outside the known enum range.
 func (k TypeKind) String() string {
-	return generated.TypeKind(k).String()
+	return strings.TrimPrefix(generated.TypeKind(k).String(), "TYPE_")
 }
 
 // IsSimple returns true for scalar types whose value can stand alone without

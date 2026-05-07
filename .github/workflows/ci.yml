@@ -25,7 +25,55 @@ jobs:
           go-version-file: go.mod
           cache-dependency-path: ${{ matrix.module }}/go.sum
       - run: go build ./...
-      - run: go test ./...
+      - name: Show environment (diag)
+        if: matrix.module == '.'
+        run: |
+          go env
+          uname -a
+          ulimit -a
+      - name: Run tests with diagnostics (root)
+        if: matrix.module == '.'
+        env:
+          GOTRACEBACK: all
+        shell: bash
+        run: |
+          set +e
+          fail_count=0
+          for attempt in 1 2 3; do
+            echo "::group::Attempt $attempt"
+            extra_env=""
+            label="default"
+            if [ "$attempt" = "2" ]; then
+              extra_env="GODEBUG=asyncpreemptoff=1"
+              label="GODEBUG=asyncpreemptoff=1 (async-preempt hypothesis)"
+            fi
+            env $extra_env go test -v -count=1 -timeout 5m ./... 2>&1 | tee attempt${attempt}.log
+            status=${PIPESTATUS[0]}
+            echo "::endgroup::"
+            echo "attempt $attempt ($label) exit: $status"
+            if [ "$status" -ne 0 ]; then
+              fail_count=$((fail_count + 1))
+              echo "=== last 60 RUN/PASS/FAIL lines from attempt $attempt ==="
+              grep -E '^(=== RUN|--- (PASS|FAIL))' attempt${attempt}.log | tail -60
+              echo "=== last 10 lines of attempt $attempt ==="
+              tail -10 attempt${attempt}.log
+            fi
+          done
+          echo "summary: $fail_count of 3 attempts failed"
+          if [ "$fail_count" -gt 0 ]; then
+            exit 1
+          fi
+      - name: Upload root test logs (diag)
+        if: matrix.module == '.' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: root-test-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: attempt*.log
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Run tests (other modules)
+        if: matrix.module != '.'
+        run: go test ./...
 
   lint:
     runs-on: ubuntu-latest

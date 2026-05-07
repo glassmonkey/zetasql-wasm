@@ -32,12 +32,27 @@ func TestTypeKindString(t *testing.T) {
 		kind TypeKind
 		want string
 	}{
-		{Int64, "TYPE_INT64"},
-		{String, "TYPE_STRING"},
-		{Array, "TYPE_ARRAY"},
-		{Struct, "TYPE_STRUCT"},
-		{Enum, "TYPE_ENUM"},
-		{Extended, "TYPE_EXTENDED"},
+		{Int64, "INT64"},
+		{String, "STRING"},
+		{Array, "ARRAY"},
+		{Struct, "STRUCT"},
+		{Enum, "ENUM"},
+		{Extended, "EXTENDED"},
+		{TypeKind(0), "UNKNOWN"},
+		// Proto values not yet exposed as named constants. Locked in to guard
+		// the strip logic against future regressions and to document SQL
+		// names for kinds that callers may still encounter from the wire.
+		{TypeKind(28), "TOKENLIST"},
+		{TypeKind(29), "RANGE"},
+		{TypeKind(30), "GRAPH_ELEMENT"},
+		{TypeKind(31), "MAP"},
+		{TypeKind(32), "UUID"},
+		{TypeKind(33), "GRAPH_PATH"},
+		{TypeKind(34), "MEASURE"},
+		{TypeKind(36), "ROW"},
+		// Outside the proto-known range: proto returns the decimal string and
+		// strip leaves it unchanged.
+		{TypeKind(99), "99"},
 	}
 	for _, tt := range tests {
 		assert.Equal(t, tt.want, tt.kind.String(), "TypeKind(%d).String()", tt.kind)
