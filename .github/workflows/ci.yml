@@ -63,6 +63,14 @@ jobs:
           if [ "$fail_count" -gt 0 ]; then
             exit 1
           fi
+      - name: Upload root test logs (diag)
+        if: matrix.module == '.' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: root-test-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: attempt*.log
+          retention-days: 90
+          if-no-files-found: warn
       - name: Run tests (other modules)
         if: matrix.module != '.'
         run: go test ./...
