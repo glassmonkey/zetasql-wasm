@@ -1,6 +1,9 @@
 package zetasql
 
-import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
+import (
+	"github.com/glassmonkey/zetasql-wasm/types"
+	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+)
 
 // ParameterMode selects how query parameters are referenced in the SQL text.
 type ParameterMode int32
@@ -40,11 +43,22 @@ func (t ParseLocationRecordType) toProto() generated.ParseLocationRecordType {
 }
 
 // AnalyzerOptions configures the behavior of the ZetaSQL analyzer.
+//
+// QueryParameters and PositionalQueryParameters tell the analyzer the
+// type of each `@name` / positional `?` parameter that may appear in
+// the SQL text. The analyzer needs only the type — values are bound at
+// execution time by the caller's runtime. Entries with a nil Type are
+// skipped on toProto so a partially-populated table does not poison
+// the wire form; for positional parameters that means a nil entry will
+// cause its successors to shift down, so callers building the slice
+// should treat nil as a programming error rather than a placeholder.
 type AnalyzerOptions struct {
 	Language                  *LanguageOptions
 	ParseLocationRecordType   *ParseLocationRecordType
 	AllowUndeclaredParameters bool
 	ParameterMode             ParameterMode
+	QueryParameters           map[string]types.Type
+	PositionalQueryParameters []types.Type
 }
 
 // NewAnalyzerOptions creates AnalyzerOptions with default settings.
@@ -53,9 +67,10 @@ func NewAnalyzerOptions() *AnalyzerOptions {
 }
 
 // Clone returns a deep copy of the AnalyzerOptions. The returned value
-// shares no pointer state with the receiver: Language is deep-copied, and
-// ParseLocationRecordType is duplicated so that mutations of either side
-// do not leak across.
+// shares no pointer state with the receiver: Language is deep-copied,
+// ParseLocationRecordType is duplicated, and QueryParameters /
+// PositionalQueryParameters get fresh container backing arrays.
+// types.Type values are themselves immutable, so the elements alias.
 func (o *AnalyzerOptions) Clone() *AnalyzerOptions {
 	clone := &AnalyzerOptions{
 		AllowUndeclaredParameters: o.AllowUndeclaredParameters,
@@ -67,6 +82,16 @@ func (o *AnalyzerOptions) Clone() *AnalyzerOptions {
 	if o.ParseLocationRecordType != nil {
 		v := *o.ParseLocationRecordType
 		clone.ParseLocationRecordType = &v
+	}
+	if o.QueryParameters != nil {
+		clone.QueryParameters = make(map[string]types.Type, len(o.QueryParameters))
+		for k, v := range o.QueryParameters {
+			clone.QueryParameters[k] = v
+		}
+	}
+	if o.PositionalQueryParameters != nil {
+		clone.PositionalQueryParameters = make([]types.Type, len(o.PositionalQueryParameters))
+		copy(clone.PositionalQueryParameters, o.PositionalQueryParameters)
 	}
 	return clone
 }
@@ -87,6 +112,22 @@ func (o *AnalyzerOptions) toProto() *generated.AnalyzerOptionsProto {
 	if o.ParameterMode != ParameterNamed {
 		m := o.ParameterMode.toProto()
 		p.ParameterMode = &m
+	}
+	for name, t := range o.QueryParameters {
+		if t == nil {
+			continue
+		}
+		n := name
+		p.QueryParameters = append(p.QueryParameters, &generated.AnalyzerOptionsProto_QueryParameterProto{
+			Name: &n,
+			Type: t.ToProto(),
+		})
+	}
+	for _, t := range o.PositionalQueryParameters {
+		if t == nil {
+			continue
+		}
+		p.PositionalQueryParameters = append(p.PositionalQueryParameters, t.ToProto())
 	}
 	return p
 }

@@ -369,6 +369,66 @@ void* analyze_statement_proto(const void* request_ptr, uint32_t request_size) {
                 request.options().parse_location_record_type()));
     }
 
+    // Set parameter mode (NAMED / POSITIONAL / NONE)
+    if (request.has_options() && request.options().has_parameter_mode()) {
+        options.set_parameter_mode(
+            static_cast<zetasql::ParameterMode>(
+                request.options().parameter_mode()));
+    }
+
+    // Set allow_undeclared_parameters
+    if (request.has_options() && request.options().has_allow_undeclared_parameters()) {
+        options.set_allow_undeclared_parameters(
+            request.options().allow_undeclared_parameters());
+    }
+
+    // Add named query parameters: each entry carries a name and a TypeProto.
+    // Without this loop the analyzer cannot resolve `@name` references and
+    // returns "Query parameter 'X' not found" even though the Go-side
+    // AnalyzerOptions populated the proto.
+    if (request.has_options()) {
+        for (const auto& param : request.options().query_parameters()) {
+            if (!param.has_type()) continue;
+            const zetasql::Type* type = nullptr;
+            google::protobuf::DescriptorPool pool(
+                google::protobuf::DescriptorPool::generated_pool());
+            absl::Status type_status = type_factory.DeserializeFromSelfContainedProto(
+                param.type(), &pool, &type);
+            if (!type_status.ok()) {
+                return pack_error(
+                    "Failed to deserialize query parameter type: " +
+                    type_status.ToString());
+            }
+            absl::Status add_status = options.AddQueryParameter(
+                param.has_name() ? param.name() : "", type);
+            if (!add_status.ok()) {
+                return pack_error(
+                    "Failed to add query parameter: " + add_status.ToString());
+            }
+        }
+
+        // Add positional query parameters in order.
+        for (const auto& type_proto :
+             request.options().positional_query_parameters()) {
+            const zetasql::Type* type = nullptr;
+            google::protobuf::DescriptorPool pool(
+                google::protobuf::DescriptorPool::generated_pool());
+            absl::Status type_status = type_factory.DeserializeFromSelfContainedProto(
+                type_proto, &pool, &type);
+            if (!type_status.ok()) {
+                return pack_error(
+                    "Failed to deserialize positional query parameter type: " +
+                    type_status.ToString());
+            }
+            absl::Status add_status = options.AddPositionalQueryParameter(type);
+            if (!add_status.ok()) {
+                return pack_error(
+                    "Failed to add positional query parameter: " +
+                    add_status.ToString());
+            }
+        }
+    }
+
     // Run analysis
     std::unique_ptr<const zetasql::AnalyzerOutput> output;
     absl::Status status;
