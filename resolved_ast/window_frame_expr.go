@@ -16,7 +16,9 @@ type WindowFrameExpr struct {
 	Expression   ExprNode
 }
 
-func wrapWindowFrameExpr(p *generated.ResolvedWindowFrameExprProto) *WindowFrameExpr {
+// WrapWindowFrameExpr lifts a *generated.ResolvedWindowFrameExprProto
+// into the typed WindowFrameExpr DTO. Returns nil for nil input.
+func WrapWindowFrameExpr(p *generated.ResolvedWindowFrameExprProto) *WindowFrameExpr {
 	if p == nil {
 		return nil
 	}
@@ -24,10 +26,4 @@ func wrapWindowFrameExpr(p *generated.ResolvedWindowFrameExprProto) *WindowFrame
 		BoundaryType: BoundaryType(p.GetBoundaryType()),
 		Expression:   wrapExpr(p.GetExpression()),
 	}
-}
-
-// WrapWindowFrameExpr lifts a *generated.ResolvedWindowFrameExprProto
-// into the typed WindowFrameExpr DTO. Returns nil for nil input.
-func WrapWindowFrameExpr(p *generated.ResolvedWindowFrameExprProto) *WindowFrameExpr {
-	return wrapWindowFrameExpr(p)
 }
