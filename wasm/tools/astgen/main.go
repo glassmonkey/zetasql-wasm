@@ -242,14 +242,13 @@ func markerMethodsForCategory(category string) []string {
 // --- Message classification ---
 
 type nodeInfo struct {
-	ProtoName              string
-	GoName                 string
-	KindName               string
-	Fields                 []fieldInfo
-	Category               string
-	HasChildNode           bool
-	MarkerMethods          []string
-	ParseLocationRangeExpr string
+	ProtoName     string
+	GoName        string
+	KindName      string
+	Fields        []fieldInfo
+	Category      string
+	HasChildNode  bool
+	MarkerMethods []string
 }
 
 type fieldInfo struct {
@@ -363,12 +362,11 @@ func (ctx *analysisContext) classifyNode(md protoreflect.MessageDescriptor) *nod
 	category := ctx.determineCategory(md)
 
 	n := &nodeInfo{
-		ProtoName:              protoName,
-		GoName:                 nodeName,
-		KindName:               kindName,
-		Category:               category,
-		MarkerMethods:          markerMethodsForCategory(category),
-		ParseLocationRangeExpr: buildParseLocationRangeExpr(md),
+		ProtoName:     protoName,
+		GoName:        nodeName,
+		KindName:      kindName,
+		Category:      category,
+		MarkerMethods: markerMethodsForCategory(category),
 	}
 
 	fields := md.Fields()
@@ -461,27 +459,6 @@ func (ctx *analysisContext) classifyField(fd protoreflect.FieldDescriptor) field
 }
 
 // --- Helpers ---
-
-// buildParseLocationRangeExpr returns a Go expression that retrieves the
-// ParseLocationRange of a node by walking the proto Parent chain up to
-// ASTNodeProto. Concrete proto messages inherit by carrying a `parent`
-// field pointing to their abstract supertype, ultimately rooting at
-// ASTNodeProto where parse_location_range lives. Returns "" when the
-// chain does not reach ASTNodeProto, in which case codegen skips the
-// method for that node.
-func buildParseLocationRangeExpr(md protoreflect.MessageDescriptor) string {
-	expr := "n.raw"
-	cur := md
-	for string(cur.Name()) != "ASTNodeProto" {
-		parentField := cur.Fields().ByName("parent")
-		if parentField == nil || parentField.Message() == nil {
-			return ""
-		}
-		expr += ".GetParent()"
-		cur = parentField.Message()
-	}
-	return expr + ".GetParseLocationRange()"
-}
 
 func resolveEnumGoName(ed protoreflect.EnumDescriptor) string {
 	name := string(ed.Name())

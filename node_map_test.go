@@ -158,16 +158,14 @@ func TestNodeMap_NonExistentPosition(t *testing.T) {
 	}
 }
 
-// TestNodeMap_FindParsedNodes_TableScan exercises the resolved → parsed
-// reverse lookup that emulator-style callers rely on for table identifier
-// reconstruction. Got is the set of parser-AST kinds returned for the
-// resolved TableScan node; want is the kinds we expect at the same byte
-// range. The TablePathExpression case is the one that carries the
-// user-typed identifier path emulators need; siblings sharing the same
-// range (PathExpression, Identifier) are an artifact of the parser tree
-// and reflect emulator's existing "type-assert through the slice"
-// strategy.
-func TestNodeMap_FindParsedNodes_TableScan(t *testing.T) {
+// TestNodeMap_FindParsedNodes_RecoversTablePath demonstrates the value
+// emulator-style callers gain: from a resolved TableScan, recover the
+// identifier path the user actually typed in the FROM clause. Without
+// this round-trip the caller would have to re-walk the catalog to guess
+// at the original path. Got is the slice of identifier strings extracted
+// from the parser TablePathExpression sharing the resolved TableScan's
+// range; want is the literal SQL text.
+func TestNodeMap_FindParsedNodes_RecoversTablePath(t *testing.T) {
 	// Arrange
 	a := newTestAnalyzer(t)
 	cat := newUsersCatalog()
@@ -182,18 +180,27 @@ func TestNodeMap_FindParsedNodes_TableScan(t *testing.T) {
 	sut := NewNodeMap(out.Statement, out.Parsed)
 
 	// Act
-	got := parsedKinds(sut.FindParsedNodes(tableScan))
+	var tablePath *ast.TablePathExpressionNode
+	for _, n := range sut.FindParsedNodes(tableScan) {
+		if tp, ok := n.(*ast.TablePathExpressionNode); ok {
+			tablePath = tp
+			break
+		}
+	}
+	require.NotNil(t, tablePath, "expected a TablePathExpression among parsed nodes")
+	require.NotNil(t, tablePath.PathExpr())
+	got := identifierStrings(tablePath.PathExpr().Names())
 
 	// Assert
-	assert.Contains(t, got, ast.KindTablePathExpression)
+	assert.Equal(t, []string{"users"}, got)
 }
 
-// TestNodeMap_FindParsedNodes_FunctionCall mirrors emulator's getFuncName
-// pattern: a resolved FunctionCall must surface the parser
-// FunctionCallNode that carries the user-typed function name path. Got
-// is the kinds returned at the resolved range; want is that the slice
-// contains FunctionCall (the type-asserted pick the emulator selects).
-func TestNodeMap_FindParsedNodes_FunctionCall(t *testing.T) {
+// TestNodeMap_FindParsedNodes_RecoversFunctionPath mirrors the table-path
+// case for resolved FunctionCall nodes: the user-typed function name path
+// (single-segment for builtins, multi-segment for namespaced UDFs) is
+// recoverable through the parser FunctionCall. Got is the identifier
+// path; want is the function name as the user typed it.
+func TestNodeMap_FindParsedNodes_RecoversFunctionPath(t *testing.T) {
 	// Arrange
 	a := newTestAnalyzer(t)
 	cat := newBuiltinsCatalog()
@@ -208,10 +215,69 @@ func TestNodeMap_FindParsedNodes_FunctionCall(t *testing.T) {
 	sut := NewNodeMap(out.Statement, out.Parsed)
 
 	// Act
-	got := parsedKinds(sut.FindParsedNodes(fnCall))
+	var parsedCall *ast.FunctionCallNode
+	for _, n := range sut.FindParsedNodes(fnCall) {
+		if c, ok := n.(*ast.FunctionCallNode); ok {
+			parsedCall = c
+			break
+		}
+	}
+	require.NotNil(t, parsedCall, "expected a FunctionCall among parsed nodes")
+	require.NotNil(t, parsedCall.Function())
+	got := identifierStrings(parsedCall.Function().Names())
 
 	// Assert
-	assert.Contains(t, got, ast.KindFunctionCall)
+	assert.Equal(t, []string{"UPPER"}, got)
+}
+
+// TestNodeMap_FindParsedNodes_AnalyzeNextStatement covers the multi-statement
+// bridge path. The single-statement path was rewritten to feed parser
+// output into AnalyzeStatementFromParserOutputUnowned; the multi-statement
+// path got the same rewrite using ParseNextStatement. Without this case a
+// regression that nils out.Parsed only on the AnalyzeNextStatement branch
+// would slip past the other tests because resolved-AST checks would still
+// pass. Got is the recovered table path from the first of two statements.
+func TestNodeMap_FindParsedNodes_AnalyzeNextStatement(t *testing.T) {
+	// Arrange
+	a := newTestAnalyzer(t)
+	cat := newUsersCatalog()
+	opts := &AnalyzerOptions{}
+	pt := ParseLocationRecordFullNodeScope
+	opts.ParseLocationRecordType = &pt
+	loc := NewParseResumeLocation("SELECT id FROM users; SELECT name FROM users")
+	out, more, err := a.AnalyzeNextStatement(t.Context(), loc, cat, opts)
+	require.NoError(t, err)
+	require.True(t, more, "expected a second statement to remain")
+	require.NotNil(t, out.Parsed, "Parsed must be populated on multi-statement path")
+	tableScan := findFirstResolved(out.Statement, resolved_ast.KindTableScan)
+	require.NotNil(t, tableScan)
+	sut := NewNodeMap(out.Statement, out.Parsed)
+
+	// Act
+	var tablePath *ast.TablePathExpressionNode
+	for _, n := range sut.FindParsedNodes(tableScan) {
+		if tp, ok := n.(*ast.TablePathExpressionNode); ok {
+			tablePath = tp
+			break
+		}
+	}
+	require.NotNil(t, tablePath)
+	require.NotNil(t, tablePath.PathExpr())
+	got := identifierStrings(tablePath.PathExpr().Names())
+
+	// Assert
+	assert.Equal(t, []string{"users"}, got)
+}
+
+// identifierStrings projects a parser identifier slice down to the typed
+// strings each node reports. Used by the FindParsedNodes tests so the
+// final assertion compares two []string values.
+func identifierStrings(ids []*ast.IdentifierNode) []string {
+	out := make([]string, len(ids))
+	for i, id := range ids {
+		out[i] = id.IdString()
+	}
+	return out
 }
 
 // findFirstResolved returns the first resolved node of the given kind by
@@ -227,20 +293,6 @@ func findFirstResolved(root resolved_ast.StatementNode, kind resolved_ast.Kind) 
 		return nil
 	})
 	return found
-}
-
-// parsedKinds projects a parsed-AST node slice down to the kinds the
-// caller cares about — kinds are stable identifiers, easier to compare
-// than full nodes in a test assertion.
-func parsedKinds(nodes []ast.Node) []ast.Kind {
-	if len(nodes) == 0 {
-		return nil
-	}
-	kinds := make([]ast.Kind, len(nodes))
-	for i, n := range nodes {
-		kinds[i] = n.Kind()
-	}
-	return kinds
 }
 
 // errStopWalk is a sentinel returned from a Walk callback to terminate
