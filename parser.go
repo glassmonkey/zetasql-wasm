@@ -7,17 +7,7 @@ import (
 
 	"github.com/glassmonkey/zetasql-wasm/ast"
 	"github.com/glassmonkey/zetasql-wasm/wasm"
-	"github.com/tetratelabs/wazero"
-	"github.com/tetratelabs/wazero/api"
-	"github.com/tetratelabs/wazero/imports/emscripten"
-	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 )
-
-// Parser represents a ZetaSQL parser instance
-type Parser struct {
-	runtime wazero.Runtime
-	module  api.Module
-}
 
 // ParseError represents a SQL parse error returned by ZetaSQL.
 type ParseError struct {
@@ -34,77 +24,20 @@ type Statement struct {
 	Root ast.StatementNode
 }
 
-// NewParser creates a new ZetaSQL parser instance
-func NewParser(ctx context.Context) (*Parser, error) {
-	// Create a new WebAssembly runtime
-	runtime := wazero.NewRuntimeWithConfig(ctx, sharedRuntimeConfig())
-
-	// Instantiate WASI
-	if _, err := wasi_snapshot_preview1.Instantiate(ctx, runtime); err != nil {
-		_ = runtime.Close(ctx)
-		return nil, fmt.Errorf("failed to instantiate WASI: %w", err)
+// Parse parses a SQL statement and returns the AST. Returns a
+// *ParseError if the SQL is syntactically invalid.
+func (e *Engine) Parse(ctx context.Context, sql string) (*Statement, error) {
+	if e.module == nil {
+		return nil, fmt.Errorf("engine is not initialized")
 	}
 
-	// Compile the WASM module
-	compiledModule, err := runtime.CompileModule(ctx, wasm.ZetaSQLWasm)
-	if err != nil {
-		_ = runtime.Close(ctx)
-		return nil, fmt.Errorf("failed to compile WASM module: %w", err)
-	}
+	malloc := e.module.ExportedFunction("malloc")
+	free := e.module.ExportedFunction("free")
+	parseProtoFunc := e.module.ExportedFunction("parse_statement_proto")
+	freeProtoBuffer := e.module.ExportedFunction("free_proto_buffer")
 
-	// Create env module builder
-	builder := runtime.NewHostModuleBuilder("env")
-
-	// Add Emscripten functions
-	emscriptenExporter, err := emscripten.NewFunctionExporterForModule(compiledModule)
-	if err != nil {
-		_ = runtime.Close(ctx)
-		return nil, fmt.Errorf("failed to create Emscripten exporter: %w", err)
-	}
-	emscriptenExporter.ExportFunctions(builder)
-
-	// Add missing Emscripten functions that wazero doesn't provide
-	builder.NewFunctionBuilder().WithFunc(func(int32, int32, int32) int32 { return 0 }).Export("emscripten_asm_const_int")
-
-	// Add ZetaSQL-specific functions
-	builder.NewFunctionBuilder().WithFunc(func() int32 { return 0 }).Export("HaveOffsetConverter")
-
-	// Instantiate env module
-	if _, err := builder.Instantiate(ctx); err != nil {
-		_ = runtime.Close(ctx)
-		return nil, fmt.Errorf("failed to instantiate env module: %w", err)
-	}
-
-	// Instantiate the WASM module
-	moduleConfig := wazero.NewModuleConfig().WithStartFunctions("_initialize")
-	module, err := runtime.InstantiateModule(ctx, compiledModule, moduleConfig)
-	if err != nil {
-		_ = runtime.Close(ctx)
-		return nil, fmt.Errorf("failed to instantiate WASM module: %w", err)
-	}
-
-	return &Parser{
-		runtime: runtime,
-		module:  module,
-	}, nil
-}
-
-// ParseStatement parses a SQL statement and returns the AST.
-// Returns a *ParseError if the SQL is syntactically invalid.
-func (p *Parser) ParseStatement(ctx context.Context, sql string) (*Statement, error) {
-	if p.module == nil {
-		return nil, fmt.Errorf("parser is not initialized")
-	}
-
-	// Get exported functions
-	malloc := p.module.ExportedFunction("malloc")
-	free := p.module.ExportedFunction("free")
-	parseProtoFunc := p.module.ExportedFunction("parse_statement_proto")
-	freeProtoBuffer := p.module.ExportedFunction("free_proto_buffer")
-
-	// Allocate memory for SQL string in WASM
 	sqlBytes := []byte(sql)
-	sqlLen := uint64(len(sqlBytes) + 1) // +1 for null terminator
+	sqlLen := uint64(len(sqlBytes) + 1)
 
 	results, err := malloc.Call(ctx, sqlLen)
 	if err != nil {
@@ -113,12 +46,10 @@ func (p *Parser) ParseStatement(ctx context.Context, sql string) (*Statement, er
 	sqlPtr := results[0]
 	defer func() { _, _ = free.Call(ctx, sqlPtr) }()
 
-	// Write SQL string to WASM memory
-	if !p.module.Memory().Write(uint32(sqlPtr), append(sqlBytes, 0)) {
+	if !e.module.Memory().Write(uint32(sqlPtr), append(sqlBytes, 0)) {
 		return nil, fmt.Errorf("failed to write SQL to WASM memory")
 	}
 
-	// Call parse_statement_proto
 	results, err = parseProtoFunc.Call(ctx, sqlPtr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to call parse function: %w", err)
@@ -126,18 +57,14 @@ func (p *Parser) ParseStatement(ctx context.Context, sql string) (*Statement, er
 	resultPtr := results[0]
 	defer func() { _, _ = freeProtoBuffer.Call(ctx, resultPtr) }()
 
-	// Read result from WASM memory
-	// Format: [uint32 size][data bytes]
-	mem := p.module.Memory()
+	mem := e.module.Memory()
 
-	// Read size (first 4 bytes)
 	sizeBytes, ok := mem.Read(uint32(resultPtr), 4)
 	if !ok {
 		return nil, fmt.Errorf("failed to read size from WASM memory")
 	}
 	size := binary.LittleEndian.Uint32(sizeBytes)
 
-	// Read data bytes
 	dataBytes, ok := mem.Read(uint32(resultPtr)+4, size)
 	if !ok {
 		return nil, fmt.Errorf("failed to read data from WASM memory")
@@ -147,23 +74,10 @@ func (p *Parser) ParseStatement(ctx context.Context, sql string) (*Statement, er
 		return nil, &ParseError{Message: msg}
 	}
 
-	// Deserialize proto into AST
 	root, err := ast.StatementFromBytes(dataBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Statement{
-		SQL:  sql,
-		Root: root,
-	}, nil
+	return &Statement{SQL: sql, Root: root}, nil
 }
-
-// Close releases resources used by the parser
-func (p *Parser) Close(ctx context.Context) error {
-	if p.runtime != nil {
-		return p.runtime.Close(ctx)
-	}
-	return nil
-}
-

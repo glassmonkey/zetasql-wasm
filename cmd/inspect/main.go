@@ -36,16 +36,16 @@ func main() {
 		}
 	}
 
-	// Create parser with WASM backend
-	parser, err := zetasql.NewParser(ctx)
+	// Create engine with WASM backend
+	engine, err := zetasql.New(ctx)
 	if err != nil {
-		fmt.Printf("Error: Failed to initialize ZetaSQL WASM parser: %v\n", err)
+		fmt.Printf("Error: Failed to initialize ZetaSQL WASM engine: %v\n", err)
 		os.Exit(1)
 	}
-	defer func() { _ = parser.Close(ctx) }()
+	defer func() { _ = engine.Close(ctx) }()
 
 	// Parse the SQL statement using WASM
-	stmt, err := parser.ParseStatement(ctx, sql)
+	stmt, err := engine.Parse(ctx, sql)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)

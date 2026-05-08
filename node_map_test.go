@@ -11,13 +11,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func analyzeWithLocations(t *testing.T, a *Analyzer, sql string) *AnalyzeOutput {
+func analyzeWithLocations(t *testing.T, a *Engine, sql string) *AnalyzeOutput {
 	t.Helper()
 	opts := &AnalyzerOptions{}
 	pt := ParseLocationRecordFullNodeScope
 	opts.ParseLocationRecordType = &pt
-	out, err := a.AnalyzeStatement(t.Context(), sql, nil, opts)
-	require.NoError(t, err, "AnalyzeStatement(%q)", sql)
+	out, err := a.Analyze(t.Context(), sql, nil, opts)
+	require.NoError(t, err, "Analyze(%q)", sql)
 	return out
 }
 
@@ -42,7 +42,7 @@ func TestNodeMap_NodeAt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
-			a := newTestAnalyzer(t)
+			a := newTestEngine(t)
 			out := analyzeWithLocations(t, a, tt.sql)
 			sut := NewNodeMap(out.Statement, out.Parsed)
 
@@ -85,7 +85,7 @@ func TestNodeMap_NodesInRange_Containment(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
-			a := newTestAnalyzer(t)
+			a := newTestEngine(t)
 			out := analyzeWithLocations(t, a, tt.sql)
 			sut := NewNodeMap(out.Statement, out.Parsed)
 
@@ -103,9 +103,9 @@ func TestNodeMap_NodesInRange_Containment(t *testing.T) {
 // PARSE_LOCATION_RECORD_FULL_NODE_SCOPE, the NodeMap is empty.
 func TestNodeMap_RequiresParseLocationRecordType(t *testing.T) {
 	// Arrange
-	a := newTestAnalyzer(t)
+	a := newTestEngine(t)
 	opts := &AnalyzerOptions{} // deliberately omit ParseLocationRecordType
-	out, err := a.AnalyzeStatement(t.Context(), "SELECT 1", nil, opts)
+	out, err := a.Analyze(t.Context(), "SELECT 1", nil, opts)
 	require.NoError(t, err)
 	sut := NewNodeMap(out.Statement, out.Parsed)
 
@@ -145,7 +145,7 @@ func TestNodeMap_NonExistentPosition(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
-			a := newTestAnalyzer(t)
+			a := newTestEngine(t)
 			out := analyzeWithLocations(t, a, "SELECT 1")
 			sut := NewNodeMap(out.Statement, out.Parsed)
 
@@ -167,12 +167,12 @@ func TestNodeMap_NonExistentPosition(t *testing.T) {
 // range; want is the literal SQL text.
 func TestNodeMap_FindParsedNodes_RecoversTablePath(t *testing.T) {
 	// Arrange
-	a := newTestAnalyzer(t)
+	a := newTestEngine(t)
 	cat := newUsersCatalog()
 	opts := &AnalyzerOptions{}
 	pt := ParseLocationRecordFullNodeScope
 	opts.ParseLocationRecordType = &pt
-	out, err := a.AnalyzeStatement(t.Context(), "SELECT id FROM users", cat, opts)
+	out, err := a.Analyze(t.Context(), "SELECT id FROM users", cat, opts)
 	require.NoError(t, err)
 	require.NotNil(t, out.Parsed, "AnalyzeOutput.Parsed must be populated")
 	tableScan := findFirstResolved(out.Statement, resolved_ast.KindTableScan)
@@ -202,12 +202,12 @@ func TestNodeMap_FindParsedNodes_RecoversTablePath(t *testing.T) {
 // path; want is the function name as the user typed it.
 func TestNodeMap_FindParsedNodes_RecoversFunctionPath(t *testing.T) {
 	// Arrange
-	a := newTestAnalyzer(t)
+	a := newTestEngine(t)
 	cat := newBuiltinsCatalog()
 	opts := &AnalyzerOptions{}
 	pt := ParseLocationRecordFullNodeScope
 	opts.ParseLocationRecordType = &pt
-	out, err := a.AnalyzeStatement(t.Context(), "SELECT UPPER('x')", cat, opts)
+	out, err := a.Analyze(t.Context(), "SELECT UPPER('x')", cat, opts)
 	require.NoError(t, err)
 	require.NotNil(t, out.Parsed)
 	fnCall := findFirstResolved(out.Statement, resolved_ast.KindFunctionCall)
@@ -239,13 +239,13 @@ func TestNodeMap_FindParsedNodes_RecoversFunctionPath(t *testing.T) {
 // pass. Got is the recovered table path from the first of two statements.
 func TestNodeMap_FindParsedNodes_AnalyzeNextStatement(t *testing.T) {
 	// Arrange
-	a := newTestAnalyzer(t)
+	a := newTestEngine(t)
 	cat := newUsersCatalog()
 	opts := &AnalyzerOptions{}
 	pt := ParseLocationRecordFullNodeScope
 	opts.ParseLocationRecordType = &pt
 	loc := NewParseResumeLocation("SELECT id FROM users; SELECT name FROM users")
-	out, more, err := a.AnalyzeNextStatement(t.Context(), loc, cat, opts)
+	out, more, err := a.AnalyzeNext(t.Context(), loc, cat, opts)
 	require.NoError(t, err)
 	require.True(t, more, "expected a second statement to remain")
 	require.NotNil(t, out.Parsed, "Parsed must be populated on multi-statement path")

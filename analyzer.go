@@ -10,10 +10,6 @@ import (
 	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
-	"github.com/tetratelabs/wazero"
-	"github.com/tetratelabs/wazero/api"
-	"github.com/tetratelabs/wazero/imports/emscripten"
-	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -34,68 +30,9 @@ type AnalyzeOutput struct {
 	Parsed    ast.StatementNode
 }
 
-// Analyzer represents a ZetaSQL analyzer instance backed by WASM.
-type Analyzer struct {
-	runtime wazero.Runtime
-	module  api.Module
-}
-
-// NewAnalyzer creates a new ZetaSQL analyzer instance.
-func NewAnalyzer(ctx context.Context) (*Analyzer, error) {
-	runtime := wazero.NewRuntimeWithConfig(ctx, sharedRuntimeConfig())
-
-	if _, err := wasi_snapshot_preview1.Instantiate(ctx, runtime); err != nil {
-		_ = runtime.Close(ctx)
-		return nil, fmt.Errorf("failed to instantiate WASI: %w", err)
-	}
-
-	compiledModule, err := runtime.CompileModule(ctx, wasm.ZetaSQLWasm)
-	if err != nil {
-		_ = runtime.Close(ctx)
-		return nil, fmt.Errorf("failed to compile WASM module: %w", err)
-	}
-
-	builder := runtime.NewHostModuleBuilder("env")
-
-	emscriptenExporter, err := emscripten.NewFunctionExporterForModule(compiledModule)
-	if err != nil {
-		_ = runtime.Close(ctx)
-		return nil, fmt.Errorf("failed to create Emscripten exporter: %w", err)
-	}
-	emscriptenExporter.ExportFunctions(builder)
-
-	builder.NewFunctionBuilder().WithFunc(func(int32, int32, int32) int32 { return 0 }).Export("emscripten_asm_const_int")
-	builder.NewFunctionBuilder().WithFunc(func() int32 { return 0 }).Export("HaveOffsetConverter")
-
-	if _, err := builder.Instantiate(ctx); err != nil {
-		_ = runtime.Close(ctx)
-		return nil, fmt.Errorf("failed to instantiate env module: %w", err)
-	}
-
-	moduleConfig := wazero.NewModuleConfig()
-	module, err := runtime.InstantiateModule(ctx, compiledModule, moduleConfig)
-	if err != nil {
-		_ = runtime.Close(ctx)
-		return nil, fmt.Errorf("failed to instantiate WASM module: %w", err)
-	}
-
-	// Run C++ global constructors via init_module (equivalent to _initialize in reactor mode).
-	// Required before using AnalyzerOptions or any code that depends on abseil global state.
-	initFn := module.ExportedFunction("init_module")
-	if _, err := initFn.Call(ctx); err != nil {
-		_ = runtime.Close(ctx)
-		return nil, fmt.Errorf("failed to initialize WASM module: %w", err)
-	}
-
-	return &Analyzer{
-		runtime: runtime,
-		module:  module,
-	}, nil
-}
-
-// AnalyzeStatement performs semantic analysis on a SQL statement.
-// Returns an *AnalyzeError if the SQL is semantically invalid.
-func (a *Analyzer) AnalyzeStatement(
+// Analyze performs semantic analysis on a SQL statement. Returns an
+// *AnalyzeError if the SQL is semantically invalid.
+func (e *Engine) Analyze(
 	ctx context.Context,
 	sql string,
 	cat *types.SimpleCatalog,
@@ -106,17 +43,18 @@ func (a *Analyzer) AnalyzeStatement(
 			SqlStatement: sql,
 		},
 	}
-	response, parsedProto, err := a.callAnalyze(ctx, request, cat, opts)
+	response, parsedProto, err := e.callAnalyze(ctx, request, cat, opts)
 	if err != nil {
 		return nil, err
 	}
 	return buildOutput(response, parsedProto)
 }
 
-// AnalyzeNextStatement analyzes the next statement from a multi-statement SQL string.
-// Returns the analysis output, whether more statements remain, and any error.
-// Call repeatedly with the same ParseResumeLocation until it returns false.
-func (a *Analyzer) AnalyzeNextStatement(
+// AnalyzeNext analyzes the next statement from a multi-statement SQL
+// string. Returns the analysis output, whether more statements remain,
+// and any error. Call repeatedly with the same ParseResumeLocation until
+// it returns false.
+func (e *Engine) AnalyzeNext(
 	ctx context.Context,
 	loc *ParseResumeLocation,
 	cat *types.SimpleCatalog,
@@ -132,16 +70,14 @@ func (a *Analyzer) AnalyzeNextStatement(
 			},
 		},
 	}
-	response, parsedProto, err := a.callAnalyze(ctx, request, cat, opts)
+	response, parsedProto, err := e.callAnalyze(ctx, request, cat, opts)
 	if err != nil {
 		return nil, false, err
 	}
 
-	// Update resume position
 	if response.ResumeBytePosition != nil {
 		loc.BytePosition = response.GetResumeBytePosition()
 	} else {
-		// No resume position means we consumed everything
 		loc.BytePosition = int32(len(loc.Input))
 	}
 
@@ -162,14 +98,14 @@ func (a *Analyzer) AnalyzeNextStatement(
 //
 // parsed_size is zero (and parsedProto returns nil) for analyzer paths
 // that do not yield a statement-level parser AST, e.g. expression analysis.
-func (a *Analyzer) callAnalyze(
+func (e *Engine) callAnalyze(
 	ctx context.Context,
 	request *generated.AnalyzeRequest,
 	cat *types.SimpleCatalog,
 	opts *AnalyzerOptions,
 ) (*generated.AnalyzeResponse, *generated.AnyASTStatementProto, error) {
-	if a.module == nil {
-		return nil, nil, fmt.Errorf("analyzer is not initialized")
+	if e.module == nil {
+		return nil, nil, fmt.Errorf("engine is not initialized")
 	}
 
 	if cat != nil {
@@ -184,10 +120,10 @@ func (a *Analyzer) callAnalyze(
 		return nil, nil, fmt.Errorf("failed to marshal AnalyzeRequest: %w", err)
 	}
 
-	mallocFn := a.module.ExportedFunction("malloc")
-	freeFn := a.module.ExportedFunction("free")
-	analyzeFn := a.module.ExportedFunction("analyze_statement_proto")
-	freeProtoBuffer := a.module.ExportedFunction("free_proto_buffer")
+	mallocFn := e.module.ExportedFunction("malloc")
+	freeFn := e.module.ExportedFunction("free")
+	analyzeFn := e.module.ExportedFunction("analyze_statement_proto")
+	freeProtoBuffer := e.module.ExportedFunction("free_proto_buffer")
 
 	reqSize := uint64(len(requestBytes))
 	results, err := mallocFn.Call(ctx, reqSize)
@@ -197,7 +133,7 @@ func (a *Analyzer) callAnalyze(
 	reqPtr := results[0]
 	defer func() { _, _ = freeFn.Call(ctx, reqPtr) }()
 
-	if !a.module.Memory().Write(uint32(reqPtr), requestBytes) {
+	if !e.module.Memory().Write(uint32(reqPtr), requestBytes) {
 		return nil, nil, fmt.Errorf("failed to write request to WASM memory")
 	}
 
@@ -208,7 +144,7 @@ func (a *Analyzer) callAnalyze(
 	resultPtr := results[0]
 	defer func() { _, _ = freeProtoBuffer.Call(ctx, resultPtr) }()
 
-	mem := a.module.Memory()
+	mem := e.module.Memory()
 	sizeBytes, ok := mem.Read(uint32(resultPtr), 4)
 	if !ok {
 		return nil, nil, fmt.Errorf("failed to read size from WASM memory")
@@ -301,12 +237,4 @@ func buildOutput(response *generated.AnalyzeResponse, parsedProto *generated.Any
 		out.Parsed = parsed
 	}
 	return out, nil
-}
-
-// Close releases resources used by the analyzer.
-func (a *Analyzer) Close(ctx context.Context) error {
-	if a.runtime != nil {
-		return a.runtime.Close(ctx)
-	}
-	return nil
 }

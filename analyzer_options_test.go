@@ -364,14 +364,14 @@ func TestAnalyzerOptions_NamedQueryParameters_AnalyzerIntegration(t *testing.T) 
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			a := newTestAnalyzer(t)
+			a := newTestEngine(t)
 			opts := newQueryStmtAnalyzerOptions()
 			opts.ParameterMode = ParameterNamed
 			opts.QueryParameters = tt.params
 			opts.AllowUndeclaredParameters = tt.allowUndeclaredParameters
 
 			// Act
-			got, err := a.AnalyzeStatement(ctx, tt.sql, nil, opts)
+			got, err := a.Analyze(ctx, tt.sql, nil, opts)
 
 			// Assert
 			if tt.wantErr != nil {

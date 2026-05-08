@@ -7,11 +7,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestParser_ParseStatement covers both the happy-path AST shape and the
+// TestEngine_Parse covers both the happy-path AST shape and the
 // invalid-SQL error type for ParseStatement. Cases share a single fixture
-// (newTestParser); errors are flagged in the table via wantErr (type
+// (newTestEngine); errors are flagged in the table via wantErr (type
 // witness) — happy cases set want only, error cases set wantErr only.
-func TestParser_ParseStatement(t *testing.T) {
+func TestEngine_Parse(t *testing.T) {
 	tests := []struct {
 		name    string
 		sql     string
@@ -663,10 +663,10 @@ func TestParser_ParseStatement(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			sut := newTestParser(t)
+			sut := newTestEngine(t)
 
 			// Act
-			parsed, err := sut.ParseStatement(ctx, tt.sql)
+			parsed, err := sut.Parse(ctx, tt.sql)
 
 			// Assert
 			if tt.wantErr != nil {

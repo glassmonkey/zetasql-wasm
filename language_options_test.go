@@ -256,14 +256,14 @@ func TestLanguageOptions_AnalyzerIntegration(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			a := newTestAnalyzer(t)
+			a := newTestEngine(t)
 			lang := NewLanguageOptions()
 			lang.EnableLanguageFeature(FeatureAnalyticFunctions)
 			lang.SetSupportedStatementKinds([]StatementKind{StatementKindQuery})
 			opts := &AnalyzerOptions{Language: lang}
 
 			// Act
-			out, err := a.AnalyzeStatement(ctx, tt.sql, nil, opts)
+			out, err := a.Analyze(ctx, tt.sql, nil, opts)
 			require.NoError(t, err)
 			stmt := out.Statement.(*resolved_ast.QueryStmtNode)
 			literal := findNode[*resolved_ast.LiteralNode](t, stmt)
@@ -303,13 +303,13 @@ func TestLanguageOptions_RejectsUnsupportedStatementKind(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			a := newTestAnalyzer(t)
+			a := newTestEngine(t)
 			lang := NewLanguageOptions()
 			lang.SetSupportedStatementKinds(tt.allowedKinds)
 			opts := &AnalyzerOptions{Language: lang}
 
 			// Act
-			_, got := a.AnalyzeStatement(ctx, tt.sql, nil, opts)
+			_, got := a.Analyze(ctx, tt.sql, nil, opts)
 
 			// Assert
 			assert.IsType(t, tt.wantErr, got)

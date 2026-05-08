@@ -13,22 +13,13 @@ import (
 
 // ----- Test helpers (shared across the package's _test.go files) -----
 
-func newTestAnalyzer(t *testing.T) *Analyzer {
+func newTestEngine(t *testing.T) *Engine {
 	t.Helper()
 	ctx := t.Context()
-	a, err := NewAnalyzer(ctx)
+	e, err := New(ctx)
 	require.NoError(t, err)
-	t.Cleanup(func() { _ = a.Close(ctx) })
-	return a
-}
-
-func newTestParser(t *testing.T) *Parser {
-	t.Helper()
-	ctx := t.Context()
-	p, err := NewParser(ctx)
-	require.NoError(t, err)
-	t.Cleanup(func() { _ = p.Close(ctx) })
-	return p
+	t.Cleanup(func() { _ = e.Close(ctx) })
+	return e
 }
 
 func newUsersCatalog() *types.SimpleCatalog {
@@ -112,14 +103,14 @@ func findNode[T resolved_ast.Node](t *testing.T, root resolved_ast.Node) T {
 
 // ----- Tests -----
 
-// TestAnalyzer_AnalyzeStatement covers both the happy-path resolved-AST
-// shape and invalid-SQL error type for AnalyzeStatement. Cases share a
-// single fixture (newTestAnalyzer); errors are flagged in the table via
-// wantErr (type witness) — happy cases set want only, error cases set
-// wantErr only. The error path also asserts that the AnalyzeOutput is
-// nil so a regression that returned a partial output alongside an error
-// would surface (R13 Width).
-func TestAnalyzer_AnalyzeStatement(t *testing.T) {
+// TestEngine_Analyze covers both the happy-path resolved-AST shape and
+// invalid-SQL error type for Engine.Analyze. Cases share a single fixture
+// (newTestEngine); errors are flagged in the table via wantErr (type
+// witness) — happy cases set want only, error cases set wantErr only. The
+// error path also asserts that the AnalyzeOutput is nil so a regression
+// that returned a partial output alongside an error would surface
+// (R13 Width).
+func TestEngine_Analyze(t *testing.T) {
 	tests := []struct {
 		name    string
 		sql     string
@@ -535,14 +526,14 @@ func TestAnalyzer_AnalyzeStatement(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			sut := newTestAnalyzer(t)
+			sut := newTestEngine(t)
 			opts := tt.opts
 			if opts == nil {
 				opts = NewAnalyzerOptions()
 			}
 
 			// Act
-			out, err := sut.AnalyzeStatement(ctx, tt.sql, tt.cat, opts)
+			out, err := sut.Analyze(ctx, tt.sql, tt.cat, opts)
 
 			// Assert
 			if tt.wantErr != nil {
@@ -556,14 +547,14 @@ func TestAnalyzer_AnalyzeStatement(t *testing.T) {
 	}
 }
 
-// TestAnalyzer_AnalyzeStatement_ParsedAST verifies that AnalyzeStatement
+// TestEngine_Analyze_ParsedAST verifies that AnalyzeStatement
 // surfaces the parser AST alongside the resolved Statement. The expected
-// strings mirror the shape TestParser_ParseStatement asserts for the same
+// strings mirror the shape TestEngine_Parse asserts for the same
 // SQL — the contract being locked is "AnalyzeOutput.Parsed is the parser
 // AST for the input, not nil and not an unrelated tree". Triangulated
 // across SQL families (literal, table scan, function call) so a regression
 // that nils Parsed for one family but not another surfaces.
-func TestAnalyzer_AnalyzeStatement_ParsedAST(t *testing.T) {
+func TestEngine_Analyze_ParsedAST(t *testing.T) {
 	tests := []struct {
 		name string
 		sql  string
@@ -621,10 +612,10 @@ func TestAnalyzer_AnalyzeStatement_ParsedAST(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			sut := newTestAnalyzer(t)
+			sut := newTestEngine(t)
 
 			// Act
-			out, err := sut.AnalyzeStatement(ctx, tt.sql, tt.cat, NewAnalyzerOptions())
+			out, err := sut.Analyze(ctx, tt.sql, tt.cat, NewAnalyzerOptions())
 			require.NoError(t, err)
 			require.NotNil(t, out.Parsed, "AnalyzeOutput.Parsed must be populated")
 			got := out.Parsed.String()
@@ -635,22 +626,22 @@ func TestAnalyzer_AnalyzeStatement_ParsedAST(t *testing.T) {
 	}
 }
 
-// TestAnalyzer_AnalyzeNextStatement_ParsedAST locks the same parser-AST
+// TestEngine_AnalyzeNext_ParsedAST locks the same parser-AST
 // contract for the multi-statement bridge path. A regression that nils
 // Parsed only on AnalyzeNextStatement (because the path uses a separate
 // ParseNextStatement + AnalyzeStatementFromParserOutputUnowned wiring)
 // would slip past the single-statement test above without this case.
-func TestAnalyzer_AnalyzeNextStatement_ParsedAST(t *testing.T) {
+func TestEngine_AnalyzeNext_ParsedAST(t *testing.T) {
 	// Arrange
 	ctx := t.Context()
-	sut := newTestAnalyzer(t)
+	sut := newTestEngine(t)
 	loc := NewParseResumeLocation("SELECT 1; SELECT 2")
 	opts := NewAnalyzerOptions()
 
 	// Act
 	var got []string
 	for {
-		out, more, err := sut.AnalyzeNextStatement(ctx, loc, nil, opts)
+		out, more, err := sut.AnalyzeNext(ctx, loc, nil, opts)
 		require.NoError(t, err)
 		require.NotNil(t, out.Parsed, "Parsed must be populated on each AnalyzeNextStatement call")
 		got = append(got, out.Parsed.String())
@@ -679,10 +670,10 @@ func TestAnalyzer_AnalyzeNextStatement_ParsedAST(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
-// TestAnalyzer_AnalyzeNextStatement_AST verifies that AnalyzeNextStatement
+// TestEngine_AnalyzeNext_AST verifies that AnalyzeNextStatement
 // resolves each statement in a multi-statement SQL string. The got is a
 // slice of AST debug strings, one per statement.
-func TestAnalyzer_AnalyzeNextStatement_AST(t *testing.T) {
+func TestEngine_AnalyzeNext_AST(t *testing.T) {
 	tests := []struct {
 		name string
 		sql  string
@@ -711,14 +702,14 @@ func TestAnalyzer_AnalyzeNextStatement_AST(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			sut := newTestAnalyzer(t)
+			sut := newTestEngine(t)
 			loc := NewParseResumeLocation(tt.sql)
 			opts := NewAnalyzerOptions()
 
 			// Act
 			var got []string
 			for {
-				out, more, err := sut.AnalyzeNextStatement(ctx, loc, nil, opts)
+				out, more, err := sut.AnalyzeNext(ctx, loc, nil, opts)
 				require.NoError(t, err)
 				got = append(got, out.Statement.String())
 				if !more {
@@ -732,9 +723,9 @@ func TestAnalyzer_AnalyzeNextStatement_AST(t *testing.T) {
 	}
 }
 
-// TestAnalyzer_AnalyzeNextStatement_AdvancesLocation verifies that consuming
+// TestEngine_AnalyzeNext_AdvancesLocation verifies that consuming
 // every statement leaves the ParseResumeLocation at the end of input.
-func TestAnalyzer_AnalyzeNextStatement_AdvancesLocation(t *testing.T) {
+func TestEngine_AnalyzeNext_AdvancesLocation(t *testing.T) {
 	tests := []struct {
 		name string
 		sql  string
@@ -756,13 +747,13 @@ func TestAnalyzer_AnalyzeNextStatement_AdvancesLocation(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			sut := newTestAnalyzer(t)
+			sut := newTestEngine(t)
 			got := NewParseResumeLocation(tt.sql)
 			opts := NewAnalyzerOptions()
 
 			// Act
 			for more := true; more; {
-				_, m, err := sut.AnalyzeNextStatement(ctx, got, nil, opts)
+				_, m, err := sut.AnalyzeNext(ctx, got, nil, opts)
 				require.NoError(t, err)
 				more = m
 			}
@@ -773,10 +764,10 @@ func TestAnalyzer_AnalyzeNextStatement_AdvancesLocation(t *testing.T) {
 	}
 }
 
-// TestAnalyzer_AnalyzeStatement_CustomFunction verifies that a user-defined
+// TestEngine_Analyze_CustomFunction verifies that a user-defined
 // scalar function registered in the catalog is resolved to the expected
 // FunctionCall in the AST. Triangulated across function name and group.
-func TestAnalyzer_AnalyzeStatement_CustomFunction(t *testing.T) {
+func TestEngine_Analyze_CustomFunction(t *testing.T) {
 	tests := []struct {
 		name     string
 		funcName string
@@ -839,10 +830,10 @@ func TestAnalyzer_AnalyzeStatement_CustomFunction(t *testing.T) {
 					),
 				},
 			))
-			sut := newTestAnalyzer(t)
+			sut := newTestEngine(t)
 
 			// Act
-			out, err := sut.AnalyzeStatement(ctx, tt.sql, cat, NewAnalyzerOptions())
+			out, err := sut.Analyze(ctx, tt.sql, cat, NewAnalyzerOptions())
 			require.NoError(t, err)
 			got := out.Statement.String()
 
@@ -852,10 +843,10 @@ func TestAnalyzer_AnalyzeStatement_CustomFunction(t *testing.T) {
 	}
 }
 
-// TestAnalyzer_AnalyzeStatement_TemplatedFunction verifies that a templated
+// TestEngine_Analyze_TemplatedFunction verifies that a templated
 // (ARG_TYPE_ANY_1) function is resolved with concrete argument types
 // inferred from the call site.
-func TestAnalyzer_AnalyzeStatement_TemplatedFunction(t *testing.T) {
+func TestEngine_Analyze_TemplatedFunction(t *testing.T) {
 	tests := []struct {
 		name     string
 		funcName string
@@ -912,10 +903,10 @@ func TestAnalyzer_AnalyzeStatement_TemplatedFunction(t *testing.T) {
 					),
 				},
 			))
-			sut := newTestAnalyzer(t)
+			sut := newTestEngine(t)
 
 			// Act
-			out, err := sut.AnalyzeStatement(ctx, tt.sql, cat, NewAnalyzerOptions())
+			out, err := sut.Analyze(ctx, tt.sql, cat, NewAnalyzerOptions())
 			require.NoError(t, err)
 			got := out.Statement.String()
 
@@ -925,7 +916,7 @@ func TestAnalyzer_AnalyzeStatement_TemplatedFunction(t *testing.T) {
 	}
 }
 
-// TestAnalyzer_AnalyzeStatement_PositionalParameter covers the
+// TestEngine_Analyze_PositionalParameter covers the
 // positional-parameter analyzer path end to end: the wire fields
 // PositionalQueryParameters / ParameterMode round-trip through the
 // WASM bridge and the declared count is consulted by the analyzer.
@@ -943,7 +934,7 @@ func TestAnalyzer_AnalyzeStatement_TemplatedFunction(t *testing.T) {
 // output, a happy case carries a non-nil output whose first
 // ParameterNode payload (TypeKind + IsUntyped) is observed via
 // observeParam.
-func TestAnalyzer_AnalyzeStatement_PositionalParameter(t *testing.T) {
+func TestEngine_Analyze_PositionalParameter(t *testing.T) {
 	tests := []struct {
 		name      string
 		params    []types.Type
@@ -980,14 +971,14 @@ func TestAnalyzer_AnalyzeStatement_PositionalParameter(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			a := newTestAnalyzer(t)
+			a := newTestEngine(t)
 			cat := newUsersCatalog()
 			opts := newQueryStmtAnalyzerOptions()
 			opts.ParameterMode = ParameterPositional
 			opts.PositionalQueryParameters = tt.params
 
 			// Act
-			got, err := a.AnalyzeStatement(ctx, tt.sql, cat, opts)
+			got, err := a.Analyze(ctx, tt.sql, cat, opts)
 
 			// Assert
 			if tt.wantErr != nil {
