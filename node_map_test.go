@@ -168,23 +168,23 @@ func TestNodeMap_NonExistentPosition(t *testing.T) {
 // and reflect emulator's existing "type-assert through the slice"
 // strategy.
 func TestNodeMap_FindParsedNodes_TableScan(t *testing.T) {
+	// Arrange
 	a := newTestAnalyzer(t)
 	cat := newUsersCatalog()
 	opts := &AnalyzerOptions{}
 	pt := ParseLocationRecordFullNodeScope
 	opts.ParseLocationRecordType = &pt
-
 	out, err := a.AnalyzeStatement(t.Context(), "SELECT id FROM users", cat, opts)
 	require.NoError(t, err)
 	require.NotNil(t, out.Parsed, "AnalyzeOutput.Parsed must be populated")
-
 	tableScan := findFirstResolved(out.Statement, resolved_ast.KindTableScan)
 	require.NotNil(t, tableScan, "expected a TableScan node in resolved tree")
-
 	sut := NewNodeMap(out.Statement, out.Parsed)
 
+	// Act
 	got := parsedKinds(sut.FindParsedNodes(tableScan))
 
+	// Assert
 	assert.Contains(t, got, ast.KindTablePathExpression)
 }
 
@@ -194,23 +194,23 @@ func TestNodeMap_FindParsedNodes_TableScan(t *testing.T) {
 // is the kinds returned at the resolved range; want is that the slice
 // contains FunctionCall (the type-asserted pick the emulator selects).
 func TestNodeMap_FindParsedNodes_FunctionCall(t *testing.T) {
+	// Arrange
 	a := newTestAnalyzer(t)
 	cat := newBuiltinsCatalog()
 	opts := &AnalyzerOptions{}
 	pt := ParseLocationRecordFullNodeScope
 	opts.ParseLocationRecordType = &pt
-
 	out, err := a.AnalyzeStatement(t.Context(), "SELECT UPPER('x')", cat, opts)
 	require.NoError(t, err)
 	require.NotNil(t, out.Parsed)
-
 	fnCall := findFirstResolved(out.Statement, resolved_ast.KindFunctionCall)
 	require.NotNil(t, fnCall, "expected a FunctionCall node in resolved tree")
-
 	sut := NewNodeMap(out.Statement, out.Parsed)
 
+	// Act
 	got := parsedKinds(sut.FindParsedNodes(fnCall))
 
+	// Assert
 	assert.Contains(t, got, ast.KindFunctionCall)
 }
 
