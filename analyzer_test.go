@@ -112,16 +112,21 @@ func findNode[T resolved_ast.Node](t *testing.T, root resolved_ast.Node) T {
 
 // ----- Tests -----
 
-// TestAnalyzer_AnalyzeStatement_AST verifies the resolved-AST shape produced
-// by the analyzer for a variety of SQL inputs. Triangulated across multiple
-// query patterns (literal, table scan, join, filter, project, function call).
-func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
+// TestAnalyzer_AnalyzeStatement covers both the happy-path resolved-AST
+// shape and invalid-SQL error type for AnalyzeStatement. Cases share a
+// single fixture (newTestAnalyzer); errors are flagged in the table via
+// wantErr (type witness) — happy cases set want only, error cases set
+// wantErr only. The error path also asserts that the AnalyzeOutput is
+// nil so a regression that returned a partial output alongside an error
+// would surface (R13 Width).
+func TestAnalyzer_AnalyzeStatement(t *testing.T) {
 	tests := []struct {
-		name string
-		sql  string
-		cat  *types.SimpleCatalog
-		opts *AnalyzerOptions // nil → NewAnalyzerOptions()
-		want string
+		name    string
+		sql     string
+		cat     *types.SimpleCatalog
+		opts    *AnalyzerOptions // nil → NewAnalyzerOptions()
+		want    string           // happy-path expected AST string; empty when wantErr is set
+		wantErr error            // type witness for error cases; nil for happy path
 	}{
 		{
 			name: "literal",
@@ -513,6 +518,17 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
         KindParameter
 `,
 		},
+		// Error cases — SQL the analyzer must reject. The contract is
+		// (output == nil, err is *AnalyzeError); both halves are
+		// asserted in the loop body.
+		{name: "syntax error: incomplete SELECT", sql: "SELECT", wantErr: &AnalyzeError{}},
+		{name: "table not found", sql: "SELECT id FROM nonexistent", cat: newBuiltinsCatalog(), wantErr: &AnalyzeError{}},
+		{name: "column not found in known table", sql: "SELECT nonexistent FROM users", cat: newUsersCatalog(), wantErr: &AnalyzeError{}},
+		{name: "function not found", sql: "SELECT my_undefined_fn(id) FROM users", cat: newUsersCatalog(), wantErr: &AnalyzeError{}},
+		{name: "type mismatch in arithmetic", sql: "SELECT id + name FROM users", cat: newUsersCatalog(), wantErr: &AnalyzeError{}},
+		{name: "wrong argument count", sql: "SELECT LENGTH() FROM users", cat: newUsersCatalog(), wantErr: &AnalyzeError{}},
+		{name: "ungrouped column with aggregate", sql: "SELECT id, COUNT(*) FROM users", cat: newUsersCatalog(), wantErr: &AnalyzeError{}},
+		{name: "syntax error reaching analyzer", sql: "SELECT * FROM", wantErr: &AnalyzeError{}},
 	}
 
 	for _, tt := range tests {
@@ -527,11 +543,15 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
 
 			// Act
 			out, err := sut.AnalyzeStatement(ctx, tt.sql, tt.cat, opts)
-			require.NoError(t, err)
-			got := out.Statement.String()
 
 			// Assert
-			assert.Equal(t, tt.want, got)
+			if tt.wantErr != nil {
+				assert.IsType(t, tt.wantErr, err)
+				assert.Nil(t, out)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, out.Statement.String())
 		})
 	}
 }
@@ -625,7 +645,6 @@ func TestAnalyzer_AnalyzeNextStatement_ParsedAST(t *testing.T) {
 	ctx := t.Context()
 	sut := newTestAnalyzer(t)
 	loc := NewParseResumeLocation("SELECT 1; SELECT 2")
-	want := []string{literalParsedAST(1), literalParsedAST(2)}
 	opts := NewAnalyzerOptions()
 
 	// Act
@@ -641,92 +660,23 @@ func TestAnalyzer_AnalyzeNextStatement_ParsedAST(t *testing.T) {
 	}
 
 	// Assert
+	want := []string{
+		`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [1]
+`,
+		`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [2]
+`,
+	}
 	assert.Equal(t, want, got)
-}
-
-// literalParsedAST returns the expected parser AST string for "SELECT <n>".
-func literalParsedAST(n int64) string {
-	return "KindQueryStatement\n" +
-		"  KindQuery\n" +
-		"    KindSelect\n" +
-		"      KindSelectList\n" +
-		"        KindSelectColumn\n" +
-		"          KindIntLiteral [" + strconv.FormatInt(n, 10) + "]\n"
-}
-
-// TestAnalyzer_AnalyzeStatement_Errors verifies that the analyzer returns
-// a typed *AnalyzeError for invalid SQL. wantErr is a type witness checked
-// via assert.IsType.
-func TestAnalyzer_AnalyzeStatement_Errors(t *testing.T) {
-	tests := []struct {
-		name    string
-		sql     string
-		cat     *types.SimpleCatalog
-		wantErr error
-	}{
-		{
-			name:    "syntax error: incomplete SELECT",
-			sql:     "SELECT",
-			cat:     nil,
-			wantErr: &AnalyzeError{},
-		},
-		{
-			name:    "table not found",
-			sql:     "SELECT id FROM nonexistent",
-			cat:     newBuiltinsCatalog(),
-			wantErr: &AnalyzeError{},
-		},
-		{
-			name:    "column not found in known table",
-			sql:     "SELECT nonexistent FROM users",
-			cat:     newUsersCatalog(),
-			wantErr: &AnalyzeError{},
-		},
-		{
-			name:    "function not found",
-			sql:     "SELECT my_undefined_fn(id) FROM users",
-			cat:     newUsersCatalog(),
-			wantErr: &AnalyzeError{},
-		},
-		{
-			name:    "type mismatch in arithmetic",
-			sql:     "SELECT id + name FROM users",
-			cat:     newUsersCatalog(),
-			wantErr: &AnalyzeError{},
-		},
-		{
-			name:    "wrong argument count",
-			sql:     "SELECT LENGTH() FROM users",
-			cat:     newUsersCatalog(),
-			wantErr: &AnalyzeError{},
-		},
-		{
-			name:    "ungrouped column with aggregate",
-			sql:     "SELECT id, COUNT(*) FROM users",
-			cat:     newUsersCatalog(),
-			wantErr: &AnalyzeError{},
-		},
-		{
-			name:    "syntax error reaching analyzer",
-			sql:     "SELECT * FROM",
-			cat:     nil,
-			wantErr: &AnalyzeError{},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			ctx := t.Context()
-			sut := newTestAnalyzer(t)
-
-			// Act
-			_, got := sut.AnalyzeStatement(ctx, tt.sql, tt.cat, NewAnalyzerOptions())
-
-			// Assert
-			assert.IsType(t, tt.wantErr, got)
-		})
-	}
 }
 
 // TestAnalyzer_AnalyzeNextStatement_AST verifies that AnalyzeNextStatement
