@@ -1,7 +1,6 @@
 package zetasql
 
 import (
-	"strconv"
 	"strings"
 	"testing"
 
@@ -621,32 +620,20 @@ func TestEngine_AnalyzeNext_ParsedAST(t *testing.T) {
 	}
 }
 
-// TestEngine_AnalyzeNext_AST verifies that AnalyzeNextStatement
-// resolves each statement in a multi-statement SQL string. The got is a
-// slice of AST debug strings, one per statement.
+// TestEngine_AnalyzeNext_AST verifies that AnalyzeNext resolves each
+// statement in a multi-statement SQL string. The contract being locked is
+// "AnalyzeNext per statement equals Engine.Analyze of that statement",
+// expressed by deriving the want trees from single-statement Analyze
+// calls rather than hand-written AST format strings — a resolved-AST
+// format change then breaks one place (TestEngine_Analyze) instead of
+// two.
 func TestEngine_AnalyzeNext_AST(t *testing.T) {
 	tests := []struct {
-		name string
-		sql  string
-		want []string
+		name       string
+		statements []string
 	}{
-		{
-			name: "two literals",
-			sql:  "SELECT 100; SELECT 200",
-			want: []string{
-				literalQueryAST(100),
-				literalQueryAST(200),
-			},
-		},
-		{
-			name: "three literals",
-			sql:  "SELECT 1; SELECT 2; SELECT 3",
-			want: []string{
-				literalQueryAST(1),
-				literalQueryAST(2),
-				literalQueryAST(3),
-			},
-		},
+		{name: "two literals", statements: []string{"SELECT 100", "SELECT 200"}},
+		{name: "three literals", statements: []string{"SELECT 1", "SELECT 2", "SELECT 3"}},
 	}
 
 	for _, tt := range tests {
@@ -654,8 +641,14 @@ func TestEngine_AnalyzeNext_AST(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
 			sut := newTestEngine(t)
-			loc := NewParseResumeLocation(tt.sql)
 			opts := NewAnalyzerOptions()
+			want := make([]string, len(tt.statements))
+			for i, s := range tt.statements {
+				out, err := sut.Analyze(ctx, s, nil, opts)
+				require.NoError(t, err)
+				want[i] = out.Resolved.String()
+			}
+			loc := NewParseResumeLocation(strings.Join(tt.statements, "; "))
 
 			// Act
 			var got []string
@@ -669,7 +662,7 @@ func TestEngine_AnalyzeNext_AST(t *testing.T) {
 			}
 
 			// Assert
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, want, got)
 		})
 	}
 }
@@ -952,16 +945,6 @@ func TestEngine_Analyze_PositionalParameter(t *testing.T) {
 			assert.Equal(t, tt.wantParam, observeParam(param))
 		})
 	}
-}
-
-// literalQueryAST returns the expected AST debug string for "SELECT <n>".
-func literalQueryAST(n int64) string {
-	return "KindQueryStmt\n" +
-		"  KindOutputColumn $col1\n" +
-		"  KindProjectScan\n" +
-		"    KindComputedColumn\n" +
-		"      KindLiteral " + strconv.FormatInt(n, 10) + "\n" +
-		"    KindSingleRowScan\n"
 }
 
 // TestEngine_Parse covers both the happy-path AST shape and the

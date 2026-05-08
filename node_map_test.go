@@ -7,16 +7,20 @@ import (
 
 	"github.com/glassmonkey/zetasql-wasm/ast"
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
+	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func analyzeWithLocations(t *testing.T, a *Engine, sql string) *AnalyzeOutput {
+// analyzeWithLocations runs a.Analyze with PARSE_LOCATION_RECORD_FULL_NODE_SCOPE
+// enabled, the precondition every NodeMap test shares. The caller supplies
+// the catalog so each test names its own table set inline.
+func analyzeWithLocations(t *testing.T, a *Engine, sql string, cat *types.SimpleCatalog) *AnalyzeOutput {
 	t.Helper()
 	opts := &AnalyzerOptions{}
 	pt := ParseLocationRecordFullNodeScope
 	opts.ParseLocationRecordType = &pt
-	out, err := a.Analyze(t.Context(), sql, nil, opts)
+	out, err := a.Analyze(t.Context(), sql, cat, opts)
 	require.NoError(t, err, "Analyze(%q)", sql)
 	return out
 }
@@ -43,7 +47,7 @@ func TestNodeMap_NodeAt(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			a := newTestEngine(t)
-			out := analyzeWithLocations(t, a, tt.sql)
+			out := analyzeWithLocations(t, a, tt.sql, nil)
 			sut := NewNodeMap(out.Resolved, out.Parsed)
 
 			// Act
@@ -86,7 +90,7 @@ func TestNodeMap_NodesInRange_Containment(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			a := newTestEngine(t)
-			out := analyzeWithLocations(t, a, tt.sql)
+			out := analyzeWithLocations(t, a, tt.sql, nil)
 			sut := NewNodeMap(out.Resolved, out.Parsed)
 
 			// Act
@@ -146,7 +150,7 @@ func TestNodeMap_NonExistentPosition(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			a := newTestEngine(t)
-			out := analyzeWithLocations(t, a, "SELECT 1")
+			out := analyzeWithLocations(t, a, "SELECT 1", nil)
 			sut := NewNodeMap(out.Resolved, out.Parsed)
 
 			// Act
@@ -168,12 +172,7 @@ func TestNodeMap_NonExistentPosition(t *testing.T) {
 func TestNodeMap_FindParsedNodes_RecoversTablePath(t *testing.T) {
 	// Arrange
 	a := newTestEngine(t)
-	cat := newUsersCatalog()
-	opts := &AnalyzerOptions{}
-	pt := ParseLocationRecordFullNodeScope
-	opts.ParseLocationRecordType = &pt
-	out, err := a.Analyze(t.Context(), "SELECT id FROM users", cat, opts)
-	require.NoError(t, err)
+	out := analyzeWithLocations(t, a, "SELECT id FROM users", newUsersCatalog())
 	require.NotNil(t, out.Parsed, "AnalyzeOutput.Parsed must be populated")
 	tableScan := findFirstResolved(out.Resolved, resolved_ast.KindTableScan)
 	require.NotNil(t, tableScan, "expected a TableScan node in resolved tree")
@@ -203,12 +202,7 @@ func TestNodeMap_FindParsedNodes_RecoversTablePath(t *testing.T) {
 func TestNodeMap_FindParsedNodes_RecoversFunctionPath(t *testing.T) {
 	// Arrange
 	a := newTestEngine(t)
-	cat := newBuiltinsCatalog()
-	opts := &AnalyzerOptions{}
-	pt := ParseLocationRecordFullNodeScope
-	opts.ParseLocationRecordType = &pt
-	out, err := a.Analyze(t.Context(), "SELECT UPPER('x')", cat, opts)
-	require.NoError(t, err)
+	out := analyzeWithLocations(t, a, "SELECT UPPER('x')", newBuiltinsCatalog())
 	require.NotNil(t, out.Parsed)
 	fnCall := findFirstResolved(out.Resolved, resolved_ast.KindFunctionCall)
 	require.NotNil(t, fnCall, "expected a FunctionCall node in resolved tree")
@@ -282,7 +276,10 @@ func identifierStrings(ids []*ast.IdentifierNode) []string {
 
 // findFirstResolved returns the first resolved node of the given kind by
 // pre-order traversal, or nil if none. Used by tests to locate a specific
-// node without hard-coding byte ranges.
+// node without hard-coding byte ranges. The closure has one trivially
+// correct branch (kind comparison + early stop via errStopWalk); inlining
+// it at three callsites would duplicate the same Walk + condition pattern
+// without making any individual test clearer, so the helper stays.
 func findFirstResolved(root resolved_ast.StatementNode, kind resolved_ast.Kind) resolved_ast.Node {
 	var found resolved_ast.Node
 	_ = resolved_ast.Walk(root, func(n resolved_ast.Node) error {
