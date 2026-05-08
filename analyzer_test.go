@@ -536,6 +536,124 @@ func TestAnalyzer_AnalyzeStatement_AST(t *testing.T) {
 	}
 }
 
+// TestAnalyzer_AnalyzeStatement_ParsedAST verifies that AnalyzeStatement
+// surfaces the parser AST alongside the resolved Statement. The expected
+// strings mirror the shape TestParser_ParseStatement asserts for the same
+// SQL — the contract being locked is "AnalyzeOutput.Parsed is the parser
+// AST for the input, not nil and not an unrelated tree". Triangulated
+// across SQL families (literal, table scan, function call) so a regression
+// that nils Parsed for one family but not another surfaces.
+func TestAnalyzer_AnalyzeStatement_ParsedAST(t *testing.T) {
+	tests := []struct {
+		name string
+		sql  string
+		cat  *types.SimpleCatalog
+		want string
+	}{
+		{
+			name: "literal",
+			sql:  "SELECT 1",
+			cat:  newBuiltinsCatalog(),
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [1]
+`,
+		},
+		{
+			name: "table scan with column reference",
+			sql:  "SELECT id FROM users",
+			cat:  newUsersCatalog(),
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+`,
+		},
+		{
+			name: "function call",
+			sql:  "SELECT UPPER('x')",
+			cat:  newBuiltinsCatalog(),
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [UPPER]
+            KindStringLiteral [x]
+              KindStringLiteralComponent
+`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			ctx := t.Context()
+			sut := newTestAnalyzer(t)
+
+			// Act
+			out, err := sut.AnalyzeStatement(ctx, tt.sql, tt.cat, NewAnalyzerOptions())
+			require.NoError(t, err)
+			require.NotNil(t, out.Parsed, "AnalyzeOutput.Parsed must be populated")
+			got := out.Parsed.String()
+
+			// Assert
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+// TestAnalyzer_AnalyzeNextStatement_ParsedAST locks the same parser-AST
+// contract for the multi-statement bridge path. A regression that nils
+// Parsed only on AnalyzeNextStatement (because the path uses a separate
+// ParseNextStatement + AnalyzeStatementFromParserOutputUnowned wiring)
+// would slip past the single-statement test above without this case.
+func TestAnalyzer_AnalyzeNextStatement_ParsedAST(t *testing.T) {
+	// Arrange
+	ctx := t.Context()
+	sut := newTestAnalyzer(t)
+	loc := NewParseResumeLocation("SELECT 1; SELECT 2")
+	want := []string{literalParsedAST(1), literalParsedAST(2)}
+	opts := NewAnalyzerOptions()
+
+	// Act
+	var got []string
+	for {
+		out, more, err := sut.AnalyzeNextStatement(ctx, loc, nil, opts)
+		require.NoError(t, err)
+		require.NotNil(t, out.Parsed, "Parsed must be populated on each AnalyzeNextStatement call")
+		got = append(got, out.Parsed.String())
+		if !more {
+			break
+		}
+	}
+
+	// Assert
+	assert.Equal(t, want, got)
+}
+
+// literalParsedAST returns the expected parser AST string for "SELECT <n>".
+func literalParsedAST(n int64) string {
+	return "KindQueryStatement\n" +
+		"  KindQuery\n" +
+		"    KindSelect\n" +
+		"      KindSelectList\n" +
+		"        KindSelectColumn\n" +
+		"          KindIntLiteral [" + strconv.FormatInt(n, 10) + "]\n"
+}
+
 // TestAnalyzer_AnalyzeStatement_Errors verifies that the analyzer returns
 // a typed *AnalyzeError for invalid SQL. wantErr is a type witness checked
 // via assert.IsType.
