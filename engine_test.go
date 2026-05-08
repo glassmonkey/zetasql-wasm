@@ -2,6 +2,7 @@ package zetasql
 
 import (
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
@@ -83,22 +84,6 @@ func observeParam(p *resolved_ast.ParameterNode) observedParam {
 		TypeKind:  p.Type().GetTypeKind(),
 		IsUntyped: p.IsUntyped(),
 	}
-}
-
-// findNode walks the tree and returns the first node matching the type T.
-func findNode[T resolved_ast.Node](t *testing.T, root resolved_ast.Node) T {
-	t.Helper()
-	var result T
-	var found bool
-	_ = resolved_ast.Walk(root, func(n resolved_ast.Node) error {
-		if v, ok := n.(T); ok && !found {
-			result = v
-			found = true
-		}
-		return nil
-	})
-	require.True(t, found, "node of type %T not found", result)
-	return result
 }
 
 // ----- Tests -----
@@ -547,65 +532,24 @@ func TestEngine_Analyze(t *testing.T) {
 	}
 }
 
-// TestEngine_Analyze_ParsedAST verifies that AnalyzeStatement
-// surfaces the parser AST alongside the resolved Statement. The expected
-// strings mirror the shape TestEngine_Parse asserts for the same
-// SQL — the contract being locked is "AnalyzeOutput.Parsed is the parser
-// AST for the input, not nil and not an unrelated tree". Triangulated
-// across SQL families (literal, table scan, function call) so a regression
-// that nils Parsed for one family but not another surfaces.
+// TestEngine_Analyze_ParsedAST locks the contract this PR introduces at
+// the engine front door: Engine.Analyze returns, in AnalyzeOutput.Parsed,
+// the same parser AST that Engine.Parse would produce for the same SQL.
+// The reference tree comes from Engine.Parse rather than a hand-written
+// string so the parser format itself stays a single source of truth in
+// TestEngine_Parse — a parser format change breaks one place, not two.
+// Triangulated across SQL families (literal, table scan, function call)
+// so a regression that nils Parsed for one family but not another
+// surfaces.
 func TestEngine_Analyze_ParsedAST(t *testing.T) {
 	tests := []struct {
 		name string
 		sql  string
 		cat  *types.SimpleCatalog
-		want string
 	}{
-		{
-			name: "literal",
-			sql:  "SELECT 1",
-			cat:  newBuiltinsCatalog(),
-			want: `KindQueryStatement
-  KindQuery
-    KindSelect
-      KindSelectList
-        KindSelectColumn
-          KindIntLiteral [1]
-`,
-		},
-		{
-			name: "table scan with column reference",
-			sql:  "SELECT id FROM users",
-			cat:  newUsersCatalog(),
-			want: `KindQueryStatement
-  KindQuery
-    KindSelect
-      KindSelectList
-        KindSelectColumn
-          KindPathExpression
-            KindIdentifier [id]
-      KindFromClause
-        KindTablePathExpression
-          KindPathExpression
-            KindIdentifier [users]
-`,
-		},
-		{
-			name: "function call",
-			sql:  "SELECT UPPER('x')",
-			cat:  newBuiltinsCatalog(),
-			want: `KindQueryStatement
-  KindQuery
-    KindSelect
-      KindSelectList
-        KindSelectColumn
-          KindFunctionCall
-            KindPathExpression
-              KindIdentifier [UPPER]
-            KindStringLiteral [x]
-              KindStringLiteralComponent
-`,
-		},
+		{name: "literal", sql: "SELECT 1", cat: newBuiltinsCatalog()},
+		{name: "table scan with column reference", sql: "SELECT id FROM users", cat: newUsersCatalog()},
+		{name: "function call", sql: "SELECT UPPER('x')", cat: newBuiltinsCatalog()},
 	}
 
 	for _, tt := range tests {
@@ -613,6 +557,9 @@ func TestEngine_Analyze_ParsedAST(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
 			sut := newTestEngine(t)
+			parsed, err := sut.Parse(ctx, tt.sql)
+			require.NoError(t, err)
+			want := parsed.Root.String()
 
 			// Act
 			out, err := sut.Analyze(ctx, tt.sql, tt.cat, NewAnalyzerOptions())
@@ -621,53 +568,57 @@ func TestEngine_Analyze_ParsedAST(t *testing.T) {
 			got := out.Parsed.String()
 
 			// Assert
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, want, got)
 		})
 	}
 }
 
-// TestEngine_AnalyzeNext_ParsedAST locks the same parser-AST
-// contract for the multi-statement bridge path. A regression that nils
-// Parsed only on AnalyzeNextStatement (because the path uses a separate
-// ParseNextStatement + AnalyzeStatementFromParserOutputUnowned wiring)
-// would slip past the single-statement test above without this case.
+// TestEngine_AnalyzeNext_ParsedAST locks the same parser-AST contract on
+// the multi-statement bridge path. The path uses ParseNextStatement +
+// AnalyzeStatementFromParserOutputUnowned in C++, separate wiring from
+// the single-statement path, so a regression that nils Parsed only here
+// would slip past the single-statement case above. Reference trees come
+// from Engine.Parse on each statement substring rather than hand-written
+// strings, for the same single-source-of-truth reason as above.
 func TestEngine_AnalyzeNext_ParsedAST(t *testing.T) {
-	// Arrange
-	ctx := t.Context()
-	sut := newTestEngine(t)
-	loc := NewParseResumeLocation("SELECT 1; SELECT 2")
-	opts := NewAnalyzerOptions()
-
-	// Act
-	var got []string
-	for {
-		out, more, err := sut.AnalyzeNext(ctx, loc, nil, opts)
-		require.NoError(t, err)
-		require.NotNil(t, out.Parsed, "Parsed must be populated on each AnalyzeNextStatement call")
-		got = append(got, out.Parsed.String())
-		if !more {
-			break
-		}
+	tests := []struct {
+		name       string
+		statements []string
+	}{
+		{name: "two literals", statements: []string{"SELECT 1", "SELECT 2"}},
+		{name: "three literals", statements: []string{"SELECT 1", "SELECT 2", "SELECT 3"}},
 	}
 
-	// Assert
-	want := []string{
-		`KindQueryStatement
-  KindQuery
-    KindSelect
-      KindSelectList
-        KindSelectColumn
-          KindIntLiteral [1]
-`,
-		`KindQueryStatement
-  KindQuery
-    KindSelect
-      KindSelectList
-        KindSelectColumn
-          KindIntLiteral [2]
-`,
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			ctx := t.Context()
+			sut := newTestEngine(t)
+			want := make([]string, len(tt.statements))
+			for i, s := range tt.statements {
+				parsed, err := sut.Parse(ctx, s)
+				require.NoError(t, err)
+				want[i] = parsed.Root.String()
+			}
+			loc := NewParseResumeLocation(strings.Join(tt.statements, "; "))
+			opts := NewAnalyzerOptions()
+
+			// Act
+			var got []string
+			for {
+				out, more, err := sut.AnalyzeNext(ctx, loc, nil, opts)
+				require.NoError(t, err)
+				require.NotNil(t, out.Parsed, "Parsed must be populated on each AnalyzeNext call")
+				got = append(got, out.Parsed.String())
+				if !more {
+					break
+				}
+			}
+
+			// Assert
+			assert.Equal(t, want, got)
+		})
 	}
-	assert.Equal(t, want, got)
 }
 
 // TestEngine_AnalyzeNext_AST verifies that AnalyzeNextStatement
@@ -990,7 +941,14 @@ func TestEngine_Analyze_PositionalParameter(t *testing.T) {
 			require.NotNil(t, got)
 			stmt, ok := got.Statement.(*resolved_ast.QueryStmtNode)
 			require.True(t, ok, "Statement is %T, want *resolved_ast.QueryStmtNode", got.Statement)
-			param := findNode[*resolved_ast.ParameterNode](t, stmt)
+			var param *resolved_ast.ParameterNode
+			_ = resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
+				if p, ok := n.(*resolved_ast.ParameterNode); ok && param == nil {
+					param = p
+				}
+				return nil
+			})
+			require.NotNil(t, param, "expected a ParameterNode in resolved tree")
 			assert.Equal(t, tt.wantParam, observeParam(param))
 		})
 	}

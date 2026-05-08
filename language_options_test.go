@@ -266,7 +266,14 @@ func TestLanguageOptions_AnalyzerIntegration(t *testing.T) {
 			out, err := a.Analyze(ctx, tt.sql, nil, opts)
 			require.NoError(t, err)
 			stmt := out.Statement.(*resolved_ast.QueryStmtNode)
-			literal := findNode[*resolved_ast.LiteralNode](t, stmt)
+			var literal *resolved_ast.LiteralNode
+			_ = resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
+				if l, ok := n.(*resolved_ast.LiteralNode); ok && literal == nil {
+					literal = l
+				}
+				return nil
+			})
+			require.NotNil(t, literal, "expected a LiteralNode in resolved tree")
 			got := literal.Value().GetValue().GetInt64Value()
 
 			// Assert
