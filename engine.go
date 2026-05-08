@@ -53,11 +53,12 @@ type Statement struct {
 }
 
 // AnalyzeOutput holds the result of a successful semantic analysis.
-// Parsed is the parser AST that produced the resolved Statement; pair the
-// two via NewNodeMap to look up parser-side nodes from a resolved node.
+// Resolved is the resolved (semantically analyzed) AST; Parsed is the
+// parser AST that produced it. Pair the two via NewNodeMap to look up
+// parser-side nodes from a resolved node.
 type AnalyzeOutput struct {
-	Statement resolved_ast.StatementNode
-	Parsed    ast.StatementNode
+	Resolved resolved_ast.StatementNode
+	Parsed   ast.StatementNode
 }
 
 // New compiles and instantiates the ZetaSQL WASM module, runs its C++
@@ -122,10 +123,6 @@ func (e *Engine) Close(ctx context.Context) error {
 // Parse parses a SQL statement and returns the AST. Returns a
 // *ParseError if the SQL is syntactically invalid.
 func (e *Engine) Parse(ctx context.Context, sql string) (*Statement, error) {
-	if e.module == nil {
-		return nil, fmt.Errorf("engine is not initialized")
-	}
-
 	malloc := e.module.ExportedFunction("malloc")
 	free := e.module.ExportedFunction("free")
 	parseProtoFunc := e.module.ExportedFunction("parse_statement_proto")
@@ -251,10 +248,6 @@ func (e *Engine) callAnalyze(
 	cat *types.SimpleCatalog,
 	opts *AnalyzerOptions,
 ) (*generated.AnalyzeResponse, *generated.AnyASTStatementProto, error) {
-	if e.module == nil {
-		return nil, nil, fmt.Errorf("engine is not initialized")
-	}
-
 	if cat != nil {
 		request.SimpleCatalog = cat.ToProto()
 	}
@@ -371,7 +364,7 @@ func buildOutput(response *generated.AnalyzeResponse, parsedProto *generated.Any
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert resolved statement: %w", err)
 	}
-	out := &AnalyzeOutput{Statement: stmt}
+	out := &AnalyzeOutput{Resolved: stmt}
 	if parsedProto != nil {
 		parsedBytes, err := proto.Marshal(parsedProto)
 		if err != nil {

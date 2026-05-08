@@ -44,7 +44,7 @@ func TestNodeMap_NodeAt(t *testing.T) {
 			// Arrange
 			a := newTestEngine(t)
 			out := analyzeWithLocations(t, a, tt.sql)
-			sut := NewNodeMap(out.Statement, out.Parsed)
+			sut := NewNodeMap(out.Resolved, out.Parsed)
 
 			// Act
 			node := sut.NodeAt(tt.start, tt.end)
@@ -87,7 +87,7 @@ func TestNodeMap_NodesInRange_Containment(t *testing.T) {
 			// Arrange
 			a := newTestEngine(t)
 			out := analyzeWithLocations(t, a, tt.sql)
-			sut := NewNodeMap(out.Statement, out.Parsed)
+			sut := NewNodeMap(out.Resolved, out.Parsed)
 
 			// Act
 			nodes := sut.NodesInRange(tt.start, tt.end)
@@ -107,7 +107,7 @@ func TestNodeMap_RequiresParseLocationRecordType(t *testing.T) {
 	opts := &AnalyzerOptions{} // deliberately omit ParseLocationRecordType
 	out, err := a.Analyze(t.Context(), "SELECT 1", nil, opts)
 	require.NoError(t, err)
-	sut := NewNodeMap(out.Statement, out.Parsed)
+	sut := NewNodeMap(out.Resolved, out.Parsed)
 
 	// Act
 	got := sut.NodesInRange(0, 8)
@@ -147,7 +147,7 @@ func TestNodeMap_NonExistentPosition(t *testing.T) {
 			// Arrange
 			a := newTestEngine(t)
 			out := analyzeWithLocations(t, a, "SELECT 1")
-			sut := NewNodeMap(out.Statement, out.Parsed)
+			sut := NewNodeMap(out.Resolved, out.Parsed)
 
 			// Act
 			got := tt.check(sut)
@@ -175,9 +175,9 @@ func TestNodeMap_FindParsedNodes_RecoversTablePath(t *testing.T) {
 	out, err := a.Analyze(t.Context(), "SELECT id FROM users", cat, opts)
 	require.NoError(t, err)
 	require.NotNil(t, out.Parsed, "AnalyzeOutput.Parsed must be populated")
-	tableScan := findFirstResolved(out.Statement, resolved_ast.KindTableScan)
+	tableScan := findFirstResolved(out.Resolved, resolved_ast.KindTableScan)
 	require.NotNil(t, tableScan, "expected a TableScan node in resolved tree")
-	sut := NewNodeMap(out.Statement, out.Parsed)
+	sut := NewNodeMap(out.Resolved, out.Parsed)
 
 	// Act
 	var tablePath *ast.TablePathExpressionNode
@@ -210,9 +210,9 @@ func TestNodeMap_FindParsedNodes_RecoversFunctionPath(t *testing.T) {
 	out, err := a.Analyze(t.Context(), "SELECT UPPER('x')", cat, opts)
 	require.NoError(t, err)
 	require.NotNil(t, out.Parsed)
-	fnCall := findFirstResolved(out.Statement, resolved_ast.KindFunctionCall)
+	fnCall := findFirstResolved(out.Resolved, resolved_ast.KindFunctionCall)
 	require.NotNil(t, fnCall, "expected a FunctionCall node in resolved tree")
-	sut := NewNodeMap(out.Statement, out.Parsed)
+	sut := NewNodeMap(out.Resolved, out.Parsed)
 
 	// Act
 	var parsedCall *ast.FunctionCallNode
@@ -249,9 +249,9 @@ func TestNodeMap_FindParsedNodes_AnalyzeNextStatement(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, more, "expected a second statement to remain")
 	require.NotNil(t, out.Parsed, "Parsed must be populated on multi-statement path")
-	tableScan := findFirstResolved(out.Statement, resolved_ast.KindTableScan)
+	tableScan := findFirstResolved(out.Resolved, resolved_ast.KindTableScan)
 	require.NotNil(t, tableScan)
-	sut := NewNodeMap(out.Statement, out.Parsed)
+	sut := NewNodeMap(out.Resolved, out.Parsed)
 
 	// Act
 	var tablePath *ast.TablePathExpressionNode

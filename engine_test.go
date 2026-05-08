@@ -527,7 +527,7 @@ func TestEngine_Analyze(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			assert.Equal(t, tt.want, out.Statement.String())
+			assert.Equal(t, tt.want, out.Resolved.String())
 		})
 	}
 }
@@ -662,7 +662,7 @@ func TestEngine_AnalyzeNext_AST(t *testing.T) {
 			for {
 				out, more, err := sut.AnalyzeNext(ctx, loc, nil, opts)
 				require.NoError(t, err)
-				got = append(got, out.Statement.String())
+				got = append(got, out.Resolved.String())
 				if !more {
 					break
 				}
@@ -786,7 +786,7 @@ func TestEngine_Analyze_CustomFunction(t *testing.T) {
 			// Act
 			out, err := sut.Analyze(ctx, tt.sql, cat, NewAnalyzerOptions())
 			require.NoError(t, err)
-			got := out.Statement.String()
+			got := out.Resolved.String()
 
 			// Assert
 			assert.Equal(t, tt.want, got)
@@ -859,7 +859,7 @@ func TestEngine_Analyze_TemplatedFunction(t *testing.T) {
 			// Act
 			out, err := sut.Analyze(ctx, tt.sql, cat, NewAnalyzerOptions())
 			require.NoError(t, err)
-			got := out.Statement.String()
+			got := out.Resolved.String()
 
 			// Assert
 			assert.Equal(t, tt.want, got)
@@ -939,8 +939,8 @@ func TestEngine_Analyze_PositionalParameter(t *testing.T) {
 			}
 			require.NoError(t, err)
 			require.NotNil(t, got)
-			stmt, ok := got.Statement.(*resolved_ast.QueryStmtNode)
-			require.True(t, ok, "Statement is %T, want *resolved_ast.QueryStmtNode", got.Statement)
+			stmt, ok := got.Resolved.(*resolved_ast.QueryStmtNode)
+			require.True(t, ok, "Resolved is %T, want *resolved_ast.QueryStmtNode", got.Resolved)
 			var param *resolved_ast.ParameterNode
 			_ = resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
 				if p, ok := n.(*resolved_ast.ParameterNode); ok && param == nil {

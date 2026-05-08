@@ -381,8 +381,8 @@ func TestAnalyzerOptions_NamedQueryParameters_AnalyzerIntegration(t *testing.T) 
 			}
 			require.NoError(t, err)
 			require.NotNil(t, got)
-			stmt, ok := got.Statement.(*resolved_ast.QueryStmtNode)
-			require.True(t, ok, "Statement is %T, want *resolved_ast.QueryStmtNode", got.Statement)
+			stmt, ok := got.Resolved.(*resolved_ast.QueryStmtNode)
+			require.True(t, ok, "Resolved is %T, want *resolved_ast.QueryStmtNode", got.Resolved)
 			var param *resolved_ast.ParameterNode
 			_ = resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
 				if p, ok := n.(*resolved_ast.ParameterNode); ok && param == nil {
