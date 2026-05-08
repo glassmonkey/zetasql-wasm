@@ -364,14 +364,14 @@ func TestAnalyzerOptions_NamedQueryParameters_AnalyzerIntegration(t *testing.T) 
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			a := newTestAnalyzer(t)
+			a := newTestEngine(t)
 			opts := newQueryStmtAnalyzerOptions()
 			opts.ParameterMode = ParameterNamed
 			opts.QueryParameters = tt.params
 			opts.AllowUndeclaredParameters = tt.allowUndeclaredParameters
 
 			// Act
-			got, err := a.AnalyzeStatement(ctx, tt.sql, nil, opts)
+			got, err := a.Analyze(ctx, tt.sql, nil, opts)
 
 			// Assert
 			if tt.wantErr != nil {
@@ -381,9 +381,16 @@ func TestAnalyzerOptions_NamedQueryParameters_AnalyzerIntegration(t *testing.T) 
 			}
 			require.NoError(t, err)
 			require.NotNil(t, got)
-			stmt, ok := got.Statement.(*resolved_ast.QueryStmtNode)
-			require.True(t, ok, "Statement is %T, want *resolved_ast.QueryStmtNode", got.Statement)
-			param := findNode[*resolved_ast.ParameterNode](t, stmt)
+			stmt, ok := got.Resolved.(*resolved_ast.QueryStmtNode)
+			require.True(t, ok, "Resolved is %T, want *resolved_ast.QueryStmtNode", got.Resolved)
+			var param *resolved_ast.ParameterNode
+			_ = resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
+				if p, ok := n.(*resolved_ast.ParameterNode); ok && param == nil {
+					param = p
+				}
+				return nil
+			})
+			require.NotNil(t, param, "expected a ParameterNode in resolved tree")
 			assert.Equal(t, tt.wantParam, observeParam(param))
 		})
 	}

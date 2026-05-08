@@ -34,6 +34,10 @@ func (n *{{$node.GoName}}) Kind() Kind { return {{$node.KindName}} }
 
 func (n *{{$node.GoName}}) String() string { return formatNode(n) }
 
+func (n *{{$node.GoName}}) ParseLocationRange() *generated.ParseLocationRangeProto {
+	return parseLocationRangeOf(n.raw)
+}
+
 {{- range $m := $node.MarkerMethods}}
 func (n *{{$node.GoName}}) {{$m}}() {}
 {{- end}}
