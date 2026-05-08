@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
+	"github.com/glassmonkey/zetasql-wasm/ast"
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
 	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm"
@@ -26,8 +27,11 @@ func (e *AnalyzeError) Error() string {
 }
 
 // AnalyzeOutput holds the result of a successful semantic analysis.
+// Parsed is the parser AST that produced the resolved Statement; pair the
+// two via NewNodeMap to look up parser-side nodes from a resolved node.
 type AnalyzeOutput struct {
 	Statement resolved_ast.StatementNode
+	Parsed    ast.StatementNode
 }
 
 // Analyzer represents a ZetaSQL analyzer instance backed by WASM.
@@ -102,11 +106,11 @@ func (a *Analyzer) AnalyzeStatement(
 			SqlStatement: sql,
 		},
 	}
-	response, err := a.callAnalyze(ctx, request, cat, opts)
+	response, parsedProto, err := a.callAnalyze(ctx, request, cat, opts)
 	if err != nil {
 		return nil, err
 	}
-	return buildOutput(response)
+	return buildOutput(response, parsedProto)
 }
 
 // AnalyzeNextStatement analyzes the next statement from a multi-statement SQL string.
@@ -128,7 +132,7 @@ func (a *Analyzer) AnalyzeNextStatement(
 			},
 		},
 	}
-	response, err := a.callAnalyze(ctx, request, cat, opts)
+	response, parsedProto, err := a.callAnalyze(ctx, request, cat, opts)
 	if err != nil {
 		return nil, false, err
 	}
@@ -141,7 +145,7 @@ func (a *Analyzer) AnalyzeNextStatement(
 		loc.BytePosition = int32(len(loc.Input))
 	}
 
-	output, err := buildOutput(response)
+	output, err := buildOutput(response, parsedProto)
 	if err != nil {
 		return nil, false, err
 	}
@@ -149,15 +153,23 @@ func (a *Analyzer) AnalyzeNextStatement(
 	return output, more, nil
 }
 
-// callAnalyze sends an AnalyzeRequest to the WASM bridge and returns the response.
+// callAnalyze sends an AnalyzeRequest to the WASM bridge and returns the
+// resolved response together with the parser AST proto. The bridge frames
+// the success payload as
+//
+//	[uint32 LE: parsed_size][parsed_bytes: AnyASTStatementProto]
+//	[uint32 LE: response_size][response_bytes: AnalyzeResponse]
+//
+// parsed_size is zero (and parsedProto returns nil) for analyzer paths
+// that do not yield a statement-level parser AST, e.g. expression analysis.
 func (a *Analyzer) callAnalyze(
 	ctx context.Context,
 	request *generated.AnalyzeRequest,
 	cat *types.SimpleCatalog,
 	opts *AnalyzerOptions,
-) (*generated.AnalyzeResponse, error) {
+) (*generated.AnalyzeResponse, *generated.AnyASTStatementProto, error) {
 	if a.module == nil {
-		return nil, fmt.Errorf("analyzer is not initialized")
+		return nil, nil, fmt.Errorf("analyzer is not initialized")
 	}
 
 	if cat != nil {
@@ -169,7 +181,7 @@ func (a *Analyzer) callAnalyze(
 
 	requestBytes, err := proto.Marshal(request)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal AnalyzeRequest: %w", err)
+		return nil, nil, fmt.Errorf("failed to marshal AnalyzeRequest: %w", err)
 	}
 
 	mallocFn := a.module.ExportedFunction("malloc")
@@ -180,18 +192,18 @@ func (a *Analyzer) callAnalyze(
 	reqSize := uint64(len(requestBytes))
 	results, err := mallocFn.Call(ctx, reqSize)
 	if err != nil {
-		return nil, fmt.Errorf("failed to allocate memory: %w", err)
+		return nil, nil, fmt.Errorf("failed to allocate memory: %w", err)
 	}
 	reqPtr := results[0]
 	defer func() { _, _ = freeFn.Call(ctx, reqPtr) }()
 
 	if !a.module.Memory().Write(uint32(reqPtr), requestBytes) {
-		return nil, fmt.Errorf("failed to write request to WASM memory")
+		return nil, nil, fmt.Errorf("failed to write request to WASM memory")
 	}
 
 	results, err = analyzeFn.Call(ctx, reqPtr, reqSize)
 	if err != nil {
-		return nil, fmt.Errorf("failed to call analyze function: %w", err)
+		return nil, nil, fmt.Errorf("failed to call analyze function: %w", err)
 	}
 	resultPtr := results[0]
 	defer func() { _, _ = freeProtoBuffer.Call(ctx, resultPtr) }()
@@ -199,28 +211,71 @@ func (a *Analyzer) callAnalyze(
 	mem := a.module.Memory()
 	sizeBytes, ok := mem.Read(uint32(resultPtr), 4)
 	if !ok {
-		return nil, fmt.Errorf("failed to read size from WASM memory")
+		return nil, nil, fmt.Errorf("failed to read size from WASM memory")
 	}
 	size := binary.LittleEndian.Uint32(sizeBytes)
 
 	dataBytes, ok := mem.Read(uint32(resultPtr)+4, size)
 	if !ok {
-		return nil, fmt.Errorf("failed to read data from WASM memory")
+		return nil, nil, fmt.Errorf("failed to read data from WASM memory")
 	}
 
 	if msg := wasm.ParseResultMessage(dataBytes); msg != "" {
-		return nil, &AnalyzeError{Message: msg}
+		return nil, nil, &AnalyzeError{Message: msg}
+	}
+
+	parsedBytes, respBytes, err := splitAnalyzePayload(dataBytes)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var parsedProto *generated.AnyASTStatementProto
+	if len(parsedBytes) > 0 {
+		parsedProto = &generated.AnyASTStatementProto{}
+		if err := proto.Unmarshal(parsedBytes, parsedProto); err != nil {
+			return nil, nil, fmt.Errorf("failed to unmarshal parsed statement: %w", err)
+		}
 	}
 
 	response := &generated.AnalyzeResponse{}
-	if err := proto.Unmarshal(dataBytes, response); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal AnalyzeResponse: %w", err)
+	if err := proto.Unmarshal(respBytes, response); err != nil {
+		return nil, nil, fmt.Errorf("failed to unmarshal AnalyzeResponse: %w", err)
 	}
-	return response, nil
+	return response, parsedProto, nil
 }
 
-// buildOutput converts an AnalyzeResponse to a type-safe AnalyzeOutput.
-func buildOutput(response *generated.AnalyzeResponse) (*AnalyzeOutput, error) {
+// splitAnalyzePayload parses the bridge framing
+// [uint32 parsed_size][parsed_bytes][uint32 response_size][response_bytes]
+// and returns the two slices in payload order. Each section is validated
+// against the remaining buffer length so a truncated frame surfaces as a
+// clear error rather than a slice panic.
+func splitAnalyzePayload(payload []byte) (parsed, response []byte, err error) {
+	if len(payload) < 4 {
+		return nil, nil, fmt.Errorf("analyze payload too short for parsed length: %d bytes", len(payload))
+	}
+	parsedSize := binary.LittleEndian.Uint32(payload[:4])
+	rest := payload[4:]
+	if uint32(len(rest)) < parsedSize {
+		return nil, nil, fmt.Errorf("analyze payload truncated: parsed_size=%d remaining=%d", parsedSize, len(rest))
+	}
+	parsed = rest[:parsedSize]
+	rest = rest[parsedSize:]
+	if len(rest) < 4 {
+		return nil, nil, fmt.Errorf("analyze payload too short for response length: %d bytes remaining", len(rest))
+	}
+	respSize := binary.LittleEndian.Uint32(rest[:4])
+	rest = rest[4:]
+	if uint32(len(rest)) < respSize {
+		return nil, nil, fmt.Errorf("analyze payload truncated: response_size=%d remaining=%d", respSize, len(rest))
+	}
+	response = rest[:respSize]
+	return parsed, response, nil
+}
+
+// buildOutput converts an AnalyzeResponse and an optional parser AST proto
+// into a type-safe AnalyzeOutput. parsedProto is nil when the bridge
+// returned only the resolved AST (e.g. expression analysis paths).
+func buildOutput(response *generated.AnalyzeResponse, parsedProto *generated.AnyASTStatementProto) (*AnalyzeOutput, error) {
 	stmtProto := response.GetResolvedStatement()
 	if stmtProto == nil {
 		return nil, fmt.Errorf("AnalyzeResponse contains no resolved statement")
@@ -233,7 +288,19 @@ func buildOutput(response *generated.AnalyzeResponse) (*AnalyzeOutput, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert resolved statement: %w", err)
 	}
-	return &AnalyzeOutput{Statement: stmt}, nil
+	out := &AnalyzeOutput{Statement: stmt}
+	if parsedProto != nil {
+		parsedBytes, err := proto.Marshal(parsedProto)
+		if err != nil {
+			return nil, fmt.Errorf("failed to re-marshal parsed statement: %w", err)
+		}
+		parsed, err := ast.StatementFromBytes(parsedBytes)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert parsed statement: %w", err)
+		}
+		out.Parsed = parsed
+	}
+	return out, nil
 }
 
 // Close releases resources used by the analyzer.

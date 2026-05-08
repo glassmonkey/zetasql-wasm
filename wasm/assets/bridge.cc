@@ -201,6 +201,35 @@ static void* pack_proto(const std::string& serialized) {
     return result;
 }
 
+// Helper: pack the analyzer payload as
+//   [uint32 LE: parsed_size][parsed_bytes]
+//   [uint32 LE: response_size][response_bytes]
+// inside the outer [size][data] envelope. Bundling the parser AST next to
+// the resolved AST avoids leaking it through the upstream zetasql proto;
+// the framing is a private wire contract between this bridge and the Go
+// analyzer wrapper.
+static void* pack_analyze_payload(
+    const std::string& parsed_bytes,
+    const std::string& response_bytes) {
+    uint32_t parsed_size = parsed_bytes.size();
+    uint32_t response_size = response_bytes.size();
+    uint32_t inner_size =
+        sizeof(uint32_t) + parsed_size +
+        sizeof(uint32_t) + response_size;
+    void* result = malloc(sizeof(uint32_t) + inner_size);
+    char* p = (char*)result;
+    memcpy(p, &inner_size, sizeof(uint32_t));
+    p += sizeof(uint32_t);
+    memcpy(p, &parsed_size, sizeof(uint32_t));
+    p += sizeof(uint32_t);
+    memcpy(p, parsed_bytes.data(), parsed_size);
+    p += parsed_size;
+    memcpy(p, &response_size, sizeof(uint32_t));
+    p += sizeof(uint32_t);
+    memcpy(p, response_bytes.data(), response_size);
+    return result;
+}
+
 // Helper: build FunctionArgumentType from proto
 static zetasql::FunctionArgumentType build_function_arg_type(
     const zetasql::FunctionArgumentTypeProto& proto,
@@ -429,75 +458,91 @@ void* analyze_statement_proto(const void* request_ptr, uint32_t request_size) {
         }
     }
 
-    // Run analysis
+    // Parser options track the analyzer's language settings so the parser
+    // accepts every construct the analyzer is configured to resolve.
+    zetasql::ParserOptions parser_options;
+
+    // Run parser then analyzer. Doing so explicitly (instead of letting
+    // AnalyzeStatement parse internally) keeps the ParserOutput alive past
+    // analysis so we can serialize the parser AST alongside the resolved
+    // AST. Both single- and multi-statement paths share this two-step
+    // shape; the differences are which Parse/Analyze entry points are
+    // used and whether a resume position rides along in the response.
+    std::unique_ptr<zetasql::ParserOutput> parser_output;
     std::unique_ptr<const zetasql::AnalyzerOutput> output;
     absl::Status status;
+    int32_t resume_byte_position = -1;
 
     if (is_next_statement) {
-        // Multi-statement: use AnalyzeNextStatement
         zetasql::ParseResumeLocation resume_location =
             zetasql::ParseResumeLocation::FromStringView(sql);
         resume_location.set_byte_position(
             request.parse_resume_location().byte_position());
 
         bool at_end_of_input = false;
-        status = zetasql::AnalyzeNextStatement(
-            &resume_location, options, catalog.get(), &type_factory,
-            &output, &at_end_of_input);
-
+        status = zetasql::ParseNextStatement(
+            &resume_location, parser_options, &parser_output,
+            &at_end_of_input);
         if (!status.ok()) {
             return pack_error(status.ToString());
         }
 
-        // Serialize resolved AST to proto
-        zetasql::FileDescriptorSetMap file_descriptor_set_map;
-        zetasql::AnyResolvedStatementProto resolved_proto;
-        absl::Status save_status = output->resolved_statement()->SaveTo(
-            &file_descriptor_set_map, &resolved_proto);
-        if (!save_status.ok()) {
-            return pack_error("Failed to serialize resolved AST: " + save_status.ToString());
+        status = zetasql::AnalyzeStatementFromParserOutputUnowned(
+            &parser_output, options, sql, catalog.get(), &type_factory,
+            &output);
+        if (!status.ok()) {
+            return pack_error(status.ToString());
+        }
+        resume_byte_position = resume_location.byte_position();
+    } else {
+        status = zetasql::ParseStatement(sql, parser_options, &parser_output);
+        if (!status.ok()) {
+            return pack_error(status.ToString());
         }
 
-        // Build AnalyzeResponse with resume position
-        zetasql::local_service::AnalyzeResponse response;
-        *response.mutable_resolved_statement() = resolved_proto;
-        response.set_resume_byte_position(resume_location.byte_position());
-
-        std::string serialized;
-        if (!response.SerializeToString(&serialized)) {
-            return pack_error("Failed to serialize AnalyzeResponse");
+        status = zetasql::AnalyzeStatementFromParserOutputUnowned(
+            &parser_output, options, sql, catalog.get(), &type_factory,
+            &output);
+        if (!status.ok()) {
+            return pack_error(status.ToString());
         }
-        return pack_proto(serialized);
     }
 
-    // Single statement: use AnalyzeStatement
-    status = zetasql::AnalyzeStatement(
-        sql, options, catalog.get(), &type_factory, &output);
-
-    if (!status.ok()) {
-        return pack_error(status.ToString());
+    // Serialize parser AST.
+    zetasql::AnyASTStatementProto parsed_proto;
+    absl::Status parsed_status = zetasql::ParseTreeSerializer::Serialize(
+        parser_output->statement(), &parsed_proto);
+    if (!parsed_status.ok()) {
+        return pack_error("Failed to serialize parsed AST: " +
+                          parsed_status.ToString());
+    }
+    std::string parsed_bytes;
+    if (!parsed_proto.SerializeToString(&parsed_bytes)) {
+        return pack_error("Failed to serialize parsed AST proto");
     }
 
-    // Serialize resolved AST to proto
+    // Serialize resolved AST and assemble AnalyzeResponse.
     zetasql::FileDescriptorSetMap file_descriptor_set_map;
     zetasql::AnyResolvedStatementProto resolved_proto;
     absl::Status save_status = output->resolved_statement()->SaveTo(
         &file_descriptor_set_map, &resolved_proto);
     if (!save_status.ok()) {
-        return pack_error("Failed to serialize resolved AST: " + save_status.ToString());
+        return pack_error("Failed to serialize resolved AST: " +
+                          save_status.ToString());
     }
 
-    // Build AnalyzeResponse
     zetasql::local_service::AnalyzeResponse response;
     *response.mutable_resolved_statement() = resolved_proto;
+    if (is_next_statement) {
+        response.set_resume_byte_position(resume_byte_position);
+    }
 
-    // Serialize response to bytes
-    std::string serialized;
-    if (!response.SerializeToString(&serialized)) {
+    std::string response_bytes;
+    if (!response.SerializeToString(&response_bytes)) {
         return pack_error("Failed to serialize AnalyzeResponse");
     }
 
-    return pack_proto(serialized);
+    return pack_analyze_payload(parsed_bytes, response_bytes);
 }
 
 // Free memory
