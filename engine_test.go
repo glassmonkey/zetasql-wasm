@@ -1532,59 +1532,125 @@ func TestEngine_Analyze_TemplatedFunction(t *testing.T) {
 	}
 }
 
-// TestEngine_Analyze_PositionalParameter covers the
-// positional-parameter analyzer path end to end: the wire fields
-// PositionalQueryParameters / ParameterMode round-trip through the
-// WASM bridge and the declared count is consulted by the analyzer.
-//
-// SQL inputs follow real-world shapes (`WHERE id = ?`,
-// `WHERE name = ? AND id = ?`) rather than synthetic `SELECT ?` so a
-// regression that only affects nested-position `?` usage surfaces.
+// TestEngine_Analyze_Parameters covers Engine.Analyze parameter
+// resolution end to end across both ParameterMode values. Positional
+// and named parameter cases share the same fixture (newTestEngine +
+// newQueryStmtAnalyzerOptions) and the same observation (the
+// ParameterNode sequence in the resolved tree, projected via
+// observeParams) — the only differences are which mode-specific
+// fields on AnalyzerOptions get populated and which catalog the SQL
+// references. Combining them in one table preserves the fixture-axis
+// split rule: same SUT method on the same fixture lives in one test.
 //
 // Triangulated across:
-//   - declared 1 INT64 / 2 (STRING, INT64) resolve cleanly,
-//   - count mismatches (no positionals declared / one declared but
-//     two `?` used) reject.
+//   - Positional: declared 1 INT64 / 2 (STRING, INT64) resolve
+//     cleanly; count mismatches (none declared but SQL uses one /
+//     one declared but SQL uses two) reject.
+//   - Named: declared @id (INT64) / @label (STRING) resolve cleanly;
+//     undeclared @nope rejects under the strict default; same @nope
+//     and @label are accepted as untyped INT64 when
+//     AllowUndeclaredParameters is true.
 //
-// (got, err) is checked in both halves: an error case carries a nil
-// output, a happy case carries a non-nil output whose full
-// ParameterNode sequence (one entry per `?`, in tree-walk order) is
-// observed via observeParams. Asserting on the entire sequence
-// rather than only the first match guards against a regression that
-// would mistype a non-first positional parameter.
-func TestEngine_Analyze_PositionalParameter(t *testing.T) {
+// SQL inputs follow real-world shapes (`WHERE id = ?`, `SELECT @id`)
+// so a regression that only affects nested-position `?` usage or
+// drops named parameter wiring surfaces.
+//
+// allowUndeclared is meaningful only when paramMode is
+// ParameterNamed; positional cases leave it false. The named branch
+// guards against the v0.5.0 emulator boot bug where the Go wrap had
+// no QueryParameters field and the WASM bridge dropped the proto
+// fields even when populated.
+func TestEngine_Analyze_Parameters(t *testing.T) {
 	tests := []struct {
-		name       string
-		params     []types.Type
-		sql        string
-		wantParams []observedParam
-		wantErr    error
+		name             string
+		sql              string
+		cat              *types.SimpleCatalog
+		paramMode        ParameterMode
+		namedParams      map[string]types.Type // populated when paramMode is ParameterNamed
+		positionalParams []types.Type          // populated when paramMode is ParameterPositional
+		allowUndeclared  bool                  // meaningful only for ParameterNamed
+		wantParams       []observedParam
+		wantErr          error
 	}{
+		// Positional cases.
 		{
-			name:       "single INT64 positional in WHERE",
-			params:     []types.Type{types.Int64Type()},
-			sql:        "SELECT id FROM users WHERE id = ?",
-			wantParams: []observedParam{{TypeKind: generated.TypeKind_TYPE_INT64}},
+			name:             "Positional: single INT64 in WHERE",
+			sql:              "SELECT id FROM users WHERE id = ?",
+			cat:              newUsersCatalog(),
+			paramMode:        ParameterPositional,
+			positionalParams: []types.Type{types.Int64Type()},
+			wantParams:       []observedParam{{TypeKind: generated.TypeKind_TYPE_INT64}},
 		},
 		{
-			name:   "two positionals (STRING, INT64) in WHERE",
-			params: []types.Type{types.StringType(), types.Int64Type()},
-			sql:    "SELECT id FROM users WHERE name = ? AND id = ?",
+			name:             "Positional: two (STRING, INT64) in WHERE",
+			sql:              "SELECT id FROM users WHERE name = ? AND id = ?",
+			cat:              newUsersCatalog(),
+			paramMode:        ParameterPositional,
+			positionalParams: []types.Type{types.StringType(), types.Int64Type()},
 			wantParams: []observedParam{
 				{TypeKind: generated.TypeKind_TYPE_STRING},
 				{TypeKind: generated.TypeKind_TYPE_INT64},
 			},
 		},
 		{
-			name:    "no positionals declared but SQL uses one",
-			sql:     "SELECT id FROM users WHERE id = ?",
-			wantErr: &AnalyzeError{},
+			name:      "Positional: none declared but SQL uses one",
+			sql:       "SELECT id FROM users WHERE id = ?",
+			cat:       newUsersCatalog(),
+			paramMode: ParameterPositional,
+			wantErr:   &AnalyzeError{},
 		},
 		{
-			name:    "one positional declared but SQL uses two",
-			params:  []types.Type{types.Int64Type()},
-			sql:     "SELECT id FROM users WHERE name = ? AND id = ?",
-			wantErr: &AnalyzeError{},
+			name:             "Positional: one declared but SQL uses two",
+			sql:              "SELECT id FROM users WHERE name = ? AND id = ?",
+			cat:              newUsersCatalog(),
+			paramMode:        ParameterPositional,
+			positionalParams: []types.Type{types.Int64Type()},
+			wantErr:          &AnalyzeError{},
+		},
+		// Named cases.
+		{
+			name:        "Named: @id resolves to declared INT64",
+			sql:         "SELECT @id",
+			paramMode:   ParameterNamed,
+			namedParams: map[string]types.Type{"id": types.Int64Type()},
+			wantParams:  []observedParam{{TypeKind: generated.TypeKind_TYPE_INT64}},
+		},
+		{
+			name:        "Named: @label resolves to declared STRING",
+			sql:         "SELECT @label",
+			paramMode:   ParameterNamed,
+			namedParams: map[string]types.Type{"label": types.StringType()},
+			wantParams:  []observedParam{{TypeKind: generated.TypeKind_TYPE_STRING}},
+		},
+		{
+			name:      "Named: undeclared @nope rejected under strict mode",
+			sql:       "SELECT @nope",
+			paramMode: ParameterNamed,
+			wantErr:   &AnalyzeError{},
+		},
+		{
+			name:        "Named: @id declared but @other referenced",
+			sql:         "SELECT @other",
+			paramMode:   ParameterNamed,
+			namedParams: map[string]types.Type{"id": types.Int64Type()},
+			wantErr:     &AnalyzeError{},
+		},
+		// Analyzer assigns the default INT64 to undeclared params in
+		// permissive mode but flags IsUntyped so callers can tell it
+		// apart from a declared INT64.
+		{
+			name:            "Named: AllowUndeclared resolves @nope as untyped INT64",
+			sql:             "SELECT @nope",
+			paramMode:       ParameterNamed,
+			allowUndeclared: true,
+			wantParams:      []observedParam{{TypeKind: generated.TypeKind_TYPE_INT64, IsUntyped: true}},
+		},
+		{
+			name:            "Named: AllowUndeclared resolves @label as untyped INT64",
+			sql:             "SELECT @label",
+			paramMode:       ParameterNamed,
+			allowUndeclared: true,
+			wantParams:      []observedParam{{TypeKind: generated.TypeKind_TYPE_INT64, IsUntyped: true}},
 		},
 	}
 
@@ -1593,13 +1659,14 @@ func TestEngine_Analyze_PositionalParameter(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
 			sut := newTestEngine(t)
-			cat := newUsersCatalog()
 			opts := newQueryStmtAnalyzerOptions()
-			opts.ParameterMode = ParameterPositional
-			opts.PositionalQueryParameters = tt.params
+			opts.ParameterMode = tt.paramMode
+			opts.QueryParameters = tt.namedParams
+			opts.PositionalQueryParameters = tt.positionalParams
+			opts.AllowUndeclaredParameters = tt.allowUndeclared
 
 			// Act
-			got, err := sut.Analyze(ctx, tt.sql, cat, opts)
+			got, err := sut.Analyze(ctx, tt.sql, tt.cat, opts)
 
 			// Assert
 			if tt.wantErr != nil {
