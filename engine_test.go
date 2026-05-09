@@ -1089,6 +1089,326 @@ func TestEngine_Analyze(t *testing.T) {
     KindSingleRowScan
 `,
 		},
+		// BigQuery extension scalar functions resolved through the
+		// auto-loaded catalog without caller opt-in. Engine.Analyze
+		// always layers the BigQuery LanguageFeature set on top of
+		// whatever the caller passed, so opts stays nil and the
+		// builtins-only catalog is enough. wantResolved spells out the
+		// alias resolution (SUBSTRING -> substr, REGEXP_SUBSTR ->
+		// regexp_extract) and analyzer-injected arguments
+		// (FLOAT64(json) gets a trailing "round" wide_number_mode
+		// literal) so a regression in either layer surfaces here.
+		{
+			name: "BigQuery LAST_DAY",
+			sql:  "SELECT LAST_DAY(DATE '2025-01-01')",
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [LAST_DAY]
+            KindDateOrTimeLiteral
+              KindStringLiteral [2025-01-01]
+                KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:last_day
+        KindLiteral
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "BigQuery INITCAP",
+			sql:  "SELECT INITCAP('hello world')",
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [INITCAP]
+            KindStringLiteral [hello world]
+              KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:initcap
+        KindLiteral "hello world"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "BigQuery INSTR",
+			sql:  "SELECT INSTR('hello', 'l')",
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [INSTR]
+            KindStringLiteral [hello]
+              KindStringLiteralComponent
+            KindStringLiteral [l]
+              KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:instr
+        KindLiteral "hello"
+        KindLiteral "l"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "BigQuery SUBSTRING resolves to substr",
+			sql:  "SELECT SUBSTRING('hello', 1, 3)",
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [SUBSTRING]
+            KindStringLiteral [hello]
+              KindStringLiteralComponent
+            KindIntLiteral [1]
+            KindIntLiteral [3]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:substr
+        KindLiteral "hello"
+        KindLiteral 1
+        KindLiteral 3
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "BigQuery SOUNDEX",
+			sql:  "SELECT SOUNDEX('hello')",
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [SOUNDEX]
+            KindStringLiteral [hello]
+              KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:soundex
+        KindLiteral "hello"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "BigQuery REGEXP_SUBSTR resolves to regexp_extract",
+			sql:  "SELECT REGEXP_SUBSTR('hello', 'l+')",
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [REGEXP_SUBSTR]
+            KindStringLiteral [hello]
+              KindStringLiteralComponent
+            KindStringLiteral [l+]
+              KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:regexp_extract
+        KindLiteral "hello"
+        KindLiteral "l+"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "BigQuery TRANSLATE",
+			sql:  "SELECT TRANSLATE('hello', 'el', 'ip')",
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [TRANSLATE]
+            KindStringLiteral [hello]
+              KindStringLiteralComponent
+            KindStringLiteral [el]
+              KindStringLiteralComponent
+            KindStringLiteral [ip]
+              KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:translate
+        KindLiteral "hello"
+        KindLiteral "el"
+        KindLiteral "ip"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "BigQuery JSON_TYPE",
+			sql:  `SELECT JSON_TYPE(JSON '{"a":1}')`,
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [JSON_TYPE]
+            KindJSONLiteral
+              KindStringLiteral [{"a":1}]
+                KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:json_type
+        KindLiteral
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "BigQuery INT64 from JSON",
+			sql:  `SELECT INT64(JSON '1')`,
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [INT64]
+            KindJSONLiteral
+              KindStringLiteral [1]
+                KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:int64
+        KindLiteral
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "BigQuery FLOAT64 from JSON",
+			sql:  `SELECT FLOAT64(JSON '1.5')`,
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [FLOAT64]
+            KindJSONLiteral
+              KindStringLiteral [1.5]
+                KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:float64
+        KindLiteral
+        KindLiteral "round"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "BigQuery BOOL from JSON",
+			sql:  `SELECT BOOL(JSON 'true')`,
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [BOOL]
+            KindJSONLiteral
+              KindStringLiteral [true]
+                KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:bool
+        KindLiteral
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "BigQuery STRING from JSON",
+			sql:  `SELECT STRING(JSON '"x"')`,
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [STRING]
+            KindJSONLiteral
+              KindStringLiteral ["x"]
+                KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:string
+        KindLiteral
+    KindSingleRowScan
+`,
+		},
 		// Error cases — SQL the analyzer must reject. The contract is
 		// (output == nil, err is *AnalyzeError); both halves are
 		// asserted in the loop body. wantParsed/wantResolved are left
@@ -1541,17 +1861,23 @@ func TestEngine_Analyze_CustomFunctions(t *testing.T) {
 `,
 		},
 		{
+			// Function name "double" is reserved by the auto-applied
+			// BigQuery extension feature set: FEATURE_JSON_VALUE_EXTRACTION_FUNCTIONS
+			// registers DOUBLE(json) as the FLOAT64-from-json alias.
+			// Picking a non-overlapping name keeps this case focused on
+			// "single int64 arg in a non-default group" without colliding
+			// with the analyzer's BigQuery-extension surface.
 			name:       "single int64 arg in math group",
-			funcName:   "double",
+			funcName:   "twice",
 			group:      "math",
 			returnType: int64Arg,
 			argTypes:   []*types.FunctionArgumentType{int64Arg},
-			sql:        "SELECT double(7)",
+			sql:        "SELECT twice(7)",
 			want: `KindQueryStmt
   KindOutputColumn $col1
   KindProjectScan
     KindComputedColumn
-      KindFunctionCall math:double
+      KindFunctionCall math:twice
         KindLiteral 7
     KindSingleRowScan
 `,
@@ -2530,4 +2856,3 @@ func TestEngine_Parse(t *testing.T) {
 		})
 	}
 }
-

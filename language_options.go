@@ -116,6 +116,41 @@ func (o *LanguageOptions) EnableMaximumLanguageFeaturesForDevelopment() {
 	}
 }
 
+// enableBigQueryFunctionExtensions enables the language features that gate
+// the BigQuery-only scalar functions ZetaSQL ships behind feature flags.
+// Engine.Analyze applies this to every call so callers do not need to opt
+// in: zetasql-wasm targets BigQuery compatibility, so the BigQuery surface
+// is part of the default contract, not an opt-in extension.
+//
+// With these features set, the auto-loaded SimpleCatalog resolves at least:
+//
+//	LAST_DAY, INITCAP, INSTR, SUBSTRING (alias of SUBSTR), SOUNDEX,
+//	REGEXP_SUBSTR (alias of REGEXP_EXTRACT), TRANSLATE,
+//	JSON_TYPE, INT64(json), FLOAT64(json), BOOL(json), STRING(json),
+//	plus the V_1_4 string/date aliases and JSON-extraction extensions.
+//
+// The minimum-load-bearing five (CIVIL_TIME, ADDITIONAL_STRING_FUNCTIONS,
+// ALLOW_REGEXP_EXTRACT_OPTIONALS, JSON_TYPE, JSON_VALUE_EXTRACTION_FUNCTIONS)
+// were identified by dropping each in turn and checking which SQL above
+// stopped resolving. The two V_1_4 features (ALIASES_FOR_STRING_AND_DATE_FUNCTIONS,
+// JSON_MORE_VALUE_EXTRACTION_FUNCTIONS) were added on the recommendation of the
+// downstream bigquery-emulator: they cover BigQuery surfaces beyond the
+// twelve listed functions and the emulator does not enable them itself.
+//
+// Other commonly-needed BigQuery features (NUMERIC, BIGNUMERIC, INTERVAL,
+// TIMESTAMP_NANOS, NAMED_ARGUMENTS, V_1_3 date constructors / arithmetics
+// / extended signatures, IS_DISTINCT, QUALIFY, ...) stay opt-in: callers that
+// want them set them via LanguageOptions.EnableLanguageFeature explicitly.
+func (o *LanguageOptions) enableBigQueryFunctionExtensions() {
+	o.EnableLanguageFeature(FeatureV12CivilTime)
+	o.EnableLanguageFeature(FeatureV13AdditionalStringFunctions)
+	o.EnableLanguageFeature(FeatureV13AllowRegexpExtractOptionals)
+	o.EnableLanguageFeature(FeatureJsonType)
+	o.EnableLanguageFeature(FeatureJsonValueExtractionFunctions)
+	o.EnableLanguageFeature(FeatureV14AliasesForStringAndDateFunctions)
+	o.EnableLanguageFeature(FeatureV14JsonMoreValueExtractionFunctions)
+}
+
 // EnableReservableKeyword sets whether a keyword is reserved.
 func (o *LanguageOptions) EnableReservableKeyword(keyword string, enable bool) {
 	if enable {
