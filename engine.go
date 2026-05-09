@@ -339,23 +339,28 @@ func (e *Engine) callAnalyze(
 	cat *types.SimpleCatalog,
 	opts *AnalyzerOptions,
 ) (*generated.AnalyzeResponse, *generated.AnyASTStatementProto, error) {
-	if cat != nil {
-		// Attach ZetaSQL built-in functions (+, =, COUNT, CAST, ...) to the
-		// caller's catalog. LanguageOptions is shared with the analyzer so
-		// the loaded builtin set matches the SQL dialect (PRODUCT_INTERNAL
-		// vs PRODUCT_EXTERNAL, feature flags, ...).
-		catProto := cat.ToProto()
-		builtinOpts := &generated.ZetaSQLBuiltinFunctionOptionsProto{}
-		if opts != nil && opts.Language != nil {
-			builtinOpts.LanguageOptions = opts.Language.toProto()
-		}
-		catProto.BuiltinFunctionOptions = builtinOpts
-		request.SimpleCatalog = catProto
+	// Synthesize a default catalog when the caller passes nil so the rest
+	// of the pipeline always sees a real *types.SimpleCatalog and the WASM
+	// bridge takes a single proto-driven path.
+	if cat == nil {
+		cat = types.NewSimpleCatalog("default")
 	}
-	// When cat == nil the WASM bridge falls back to a default catalog with
-	// all ZetaSQL builtins loaded; do not synthesize an empty SimpleCatalog
-	// here, as the proto-driven path produced different WASM behaviour on
-	// Linux that the in-bridge fallback does not.
+	// Attach ZetaSQL built-in functions (+, =, COUNT, CAST, ...) to the
+	// catalog. LanguageOptions is shared with the analyzer so the loaded
+	// builtin set matches the SQL dialect (PRODUCT_INTERNAL vs
+	// PRODUCT_EXTERNAL, feature flags, ...). The field is populated even
+	// when the caller did not supply one — sending BuiltinFunctionOptions
+	// with language_options unset previously triggered a deterministic WASM
+	// memory fault on Linux x64 wazero.
+	catProto := cat.ToProto()
+	builtinOpts := &generated.ZetaSQLBuiltinFunctionOptionsProto{}
+	if opts != nil && opts.Language != nil {
+		builtinOpts.LanguageOptions = opts.Language.toProto()
+	} else {
+		builtinOpts.LanguageOptions = &generated.LanguageOptionsProto{}
+	}
+	catProto.BuiltinFunctionOptions = builtinOpts
+	request.SimpleCatalog = catProto
 	if opts != nil {
 		request.Options = opts.toProto()
 	}
