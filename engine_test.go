@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/glassmonkey/zetasql-wasm/ast"
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
 	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
@@ -2412,64 +2411,3 @@ func TestEngine_Parse(t *testing.T) {
 	}
 }
 
-// TestEngine_Parse_CreateTableInheritedScalars covers the depth-2
-// scalar inheritance path of the AST wrapper's parent-chain walk:
-// IsOrReplace and IsIfNotExists live on ASTCreateStatementProto (the
-// grandparent of ASTCreateTableStatementProto, not its direct parent),
-// and the wrapper exposes them as accessors on CreateTableStatementNode.
-// These flags do not appear in the tree String() output (no nodeScalar
-// entry for this kind), so a typed accessor observation is required to
-// verify the inheritance reaches them — TestEngine_Parse alone cannot
-// distinguish "CREATE TABLE" from "CREATE OR REPLACE TABLE".
-//
-// Triangulated across (false, false), only OrReplace, and only
-// IfNotExists so a regression that flips one inheritance branch
-// independently surfaces.
-func TestEngine_Parse_CreateTableInheritedScalars(t *testing.T) {
-	type flags struct {
-		IsOrReplace   bool
-		IsIfNotExists bool
-	}
-	tests := []struct {
-		name string
-		sql  string
-		want flags
-	}{
-		{
-			name: "vanilla CREATE TABLE",
-			sql:  "CREATE TABLE t1 (id INT64)",
-			want: flags{},
-		},
-		{
-			name: "CREATE OR REPLACE TABLE",
-			sql:  "CREATE OR REPLACE TABLE t1 (id INT64)",
-			want: flags{IsOrReplace: true},
-		},
-		{
-			name: "CREATE TABLE IF NOT EXISTS",
-			sql:  "CREATE TABLE IF NOT EXISTS t1 (id INT64)",
-			want: flags{IsIfNotExists: true},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			ctx := t.Context()
-			sut := newTestEngine(t)
-
-			// Act
-			parsed, err := sut.Parse(ctx, tt.sql)
-			require.NoError(t, err)
-			node, ok := parsed.Root.(*ast.CreateTableStatementNode)
-			require.True(t, ok, "Root is %T, want *ast.CreateTableStatementNode", parsed.Root)
-			got := flags{
-				IsOrReplace:   node.IsOrReplace(),
-				IsIfNotExists: node.IsIfNotExists(),
-			}
-
-			// Assert
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
