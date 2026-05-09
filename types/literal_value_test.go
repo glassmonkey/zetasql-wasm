@@ -182,147 +182,167 @@ func TestWrapLiteralValue(t *testing.T) {
 	}
 }
 
-// accessorCase couples a typed accessor under test with the kind it
-// dispatches on and a value of the wrong Go type for that kind. The
-// "wrong value" is what lets the contract test confirm that a kind
-// match alone is not enough — Value's Go type must also match.
-type accessorCase struct {
-	name        string
-	kind        TypeKind
-	wrongValue  any
-	callBoxed   func(*LiteralValue) (any, bool)
+// accessorResult bundles the (got, ok) pair every typed accessor
+// returns. Wrapping the pair in a single struct lets the tests do one
+// assert.Equal per case (avoiding Assertion Roulette) and makes the
+// failing diff show both halves of the contract together.
+type accessorResult struct {
+	Got any
+	OK  bool
 }
+
+// accessorCase carries every fixture a typed-accessor test needs in
+// one row: the accessor's kind and matching Type, a happy-path Value
+// and the want it produces, a wrong-Go-type Value for the value-type-
+// mismatch axis, the zero return for any contract violation, a
+// distinct Type for the kind-mismatch axis, and a boxed call that
+// erases the per-accessor return type so all rows share one signature.
+//
+// Holding all of this in the row (instead of looking it up through
+// helpers keyed off accessor name or kind) keeps the row itself the
+// single source of truth: adding an accessor means adding one row,
+// and there is no helper switch to forget to update.
+type accessorCase struct {
+	name       string
+	typ        Type
+	wrongTyp   Type
+	happyValue any
+	happyWant  any
+	wrongValue any
+	zero       any
+	call       func(*LiteralValue) accessorResult
+}
+
+func box(g any, ok bool) accessorResult { return accessorResult{Got: g, OK: ok} }
 
 // allAccessors enumerates every typed accessor on LiteralValue. The
 // HappyPath and ContractViolation tests both iterate this list so a
 // newly added accessor is forced into both axes by adding one row.
 func allAccessors() []accessorCase {
+	timestampFixture := timestamppb.New(time.Date(2026, 5, 10, 12, 0, 0, 0, time.UTC))
 	return []accessorCase{
 		{
-			name: "AsInt32", kind: Int32, wrongValue: "not-int32",
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsInt32(); return g, ok },
+			name: "AsInt32", typ: Int32Type(), wrongTyp: Int64Type(),
+			happyValue: int32(7), happyWant: int32(7),
+			wrongValue: "not-int32", zero: int32(0),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsInt32()) },
 		},
 		{
-			name: "AsInt64", kind: Int64, wrongValue: "not-int64",
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsInt64(); return g, ok },
+			name: "AsInt64", typ: Int64Type(), wrongTyp: Int32Type(),
+			happyValue: int64(42), happyWant: int64(42),
+			wrongValue: "not-int64", zero: int64(0),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsInt64()) },
 		},
 		{
-			name: "AsUint32", kind: Uint32, wrongValue: "not-uint32",
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsUint32(); return g, ok },
+			name: "AsUint32", typ: Uint32Type(), wrongTyp: Int64Type(),
+			happyValue: uint32(7), happyWant: uint32(7),
+			wrongValue: "not-uint32", zero: uint32(0),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsUint32()) },
 		},
 		{
-			name: "AsUint64", kind: Uint64, wrongValue: "not-uint64",
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsUint64(); return g, ok },
+			name: "AsUint64", typ: Uint64Type(), wrongTyp: Int64Type(),
+			happyValue: uint64(42), happyWant: uint64(42),
+			wrongValue: "not-uint64", zero: uint64(0),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsUint64()) },
 		},
 		{
-			name: "AsBool", kind: Bool, wrongValue: int64(1),
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsBool(); return g, ok },
+			name: "AsBool", typ: BoolType(), wrongTyp: Int64Type(),
+			happyValue: true, happyWant: true,
+			wrongValue: int64(1), zero: false,
+			call: func(v *LiteralValue) accessorResult { return box(v.AsBool()) },
 		},
 		{
-			name: "AsFloat", kind: Float, wrongValue: float64(1),
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsFloat(); return g, ok },
+			name: "AsFloat", typ: FloatType(), wrongTyp: Int64Type(),
+			happyValue: float32(1.5), happyWant: float32(1.5),
+			wrongValue: float64(1), zero: float32(0),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsFloat()) },
 		},
 		{
-			name: "AsDouble", kind: Double, wrongValue: float32(1),
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsDouble(); return g, ok },
+			name: "AsDouble", typ: DoubleType(), wrongTyp: Int64Type(),
+			happyValue: float64(2.5), happyWant: float64(2.5),
+			wrongValue: float32(1), zero: float64(0),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsDouble()) },
 		},
 		{
-			name: "AsString", kind: String, wrongValue: []byte("not-string"),
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsString(); return g, ok },
+			name: "AsString", typ: StringType(), wrongTyp: Int64Type(),
+			happyValue: "hello", happyWant: "hello",
+			wrongValue: []byte("not-string"), zero: "",
+			call: func(v *LiteralValue) accessorResult { return box(v.AsString()) },
 		},
 		{
-			name: "AsBytes", kind: Bytes, wrongValue: "not-bytes",
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsBytes(); return g, ok },
+			name: "AsBytes", typ: BytesType(), wrongTyp: Int64Type(),
+			happyValue: []byte{0x01, 0x02}, happyWant: []byte{0x01, 0x02},
+			wrongValue: "not-bytes", zero: ([]byte)(nil),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsBytes()) },
 		},
 		{
-			name: "AsJson", kind: Json, wrongValue: []byte("not-json"),
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsJson(); return g, ok },
+			name: "AsJson", typ: JsonType(), wrongTyp: Int64Type(),
+			happyValue: `{"k":1}`, happyWant: `{"k":1}`,
+			wrongValue: []byte("not-json"), zero: "",
+			call: func(v *LiteralValue) accessorResult { return box(v.AsJson()) },
 		},
 		{
-			name: "AsDateDays", kind: Date, wrongValue: int64(1),
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsDateDays(); return g, ok },
+			name: "AsDateDays", typ: DateType(), wrongTyp: Int64Type(),
+			happyValue: int32(20000), happyWant: int32(20000),
+			wrongValue: int64(1), zero: int32(0),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsDateDays()) },
 		},
 		{
-			name: "AsTimeMicros", kind: Time, wrongValue: int32(1),
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsTimeMicros(); return g, ok },
+			name: "AsTimeMicros", typ: TimeType(), wrongTyp: Int64Type(),
+			happyValue: int64(123456789), happyWant: int64(123456789),
+			wrongValue: int32(1), zero: int64(0),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsTimeMicros()) },
 		},
 		{
-			name: "AsTimestamp", kind: Timestamp, wrongValue: int64(1),
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsTimestamp(); return g, ok },
+			name: "AsTimestamp", typ: TimestampType(), wrongTyp: Int64Type(),
+			happyValue: timestampFixture,
+			happyWant:  time.Date(2026, 5, 10, 12, 0, 0, 0, time.UTC),
+			wrongValue: int64(1), zero: time.Time{},
+			call: func(v *LiteralValue) accessorResult { return box(v.AsTimestamp()) },
 		},
 		{
-			name: "AsArray", kind: Array, wrongValue: "not-array",
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsArray(); return g, ok },
+			name:       "AsArray",
+			typ:        &ArrayType{ElementType: Int64Type()},
+			wrongTyp:   Int64Type(),
+			happyValue: ArrayValue{{Type: Int64Type(), Value: int64(1)}},
+			happyWant:  ArrayValue{{Type: Int64Type(), Value: int64(1)}},
+			wrongValue: "not-array", zero: (ArrayValue)(nil),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsArray()) },
 		},
 		{
-			name: "AsStruct", kind: Struct, wrongValue: "not-struct",
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsStruct(); return g, ok },
+			name:       "AsStruct",
+			typ:        &StructType{Fields: []*StructField{{Name: "a", Type: Int64Type()}}},
+			wrongTyp:   Int64Type(),
+			happyValue: StructValue{{Type: Int64Type(), Value: int64(1)}},
+			happyWant:  StructValue{{Type: Int64Type(), Value: int64(1)}},
+			wrongValue: "not-struct", zero: (StructValue)(nil),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsStruct()) },
 		},
 		{
-			name: "AsNumeric", kind: Numeric, wrongValue: "not-bytes",
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsNumeric(); return g, ok },
+			name: "AsNumeric", typ: NumericType(), wrongTyp: Int64Type(),
+			happyValue: []byte{0xAA}, happyWant: []byte{0xAA},
+			wrongValue: "not-bytes", zero: ([]byte)(nil),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsNumeric()) },
 		},
 		{
-			name: "AsBigNumeric", kind: BigNumeric, wrongValue: "not-bytes",
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsBigNumeric(); return g, ok },
+			name: "AsBigNumeric", typ: BigNumericType(), wrongTyp: Int64Type(),
+			happyValue: []byte{0xBB}, happyWant: []byte{0xBB},
+			wrongValue: "not-bytes", zero: ([]byte)(nil),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsBigNumeric()) },
 		},
 		{
-			name: "AsInterval", kind: Interval, wrongValue: "not-bytes",
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsInterval(); return g, ok },
+			name: "AsInterval", typ: IntervalType(), wrongTyp: Int64Type(),
+			happyValue: []byte{0xCC}, happyWant: []byte{0xCC},
+			wrongValue: "not-bytes", zero: ([]byte)(nil),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsInterval()) },
 		},
 		{
-			name: "AsGeography", kind: Geography, wrongValue: "not-bytes",
-			callBoxed: func(v *LiteralValue) (any, bool) { g, ok := v.AsGeography(); return g, ok },
+			name: "AsGeography", typ: GeographyType(), wrongTyp: Int64Type(),
+			happyValue: []byte{0xDD}, happyWant: []byte{0xDD},
+			wrongValue: "not-bytes", zero: ([]byte)(nil),
+			call: func(v *LiteralValue) accessorResult { return box(v.AsGeography()) },
 		},
 	}
-}
-
-// typeFor returns the canonical Type for kinds the accessor surface
-// covers. Composite kinds (Array, Struct) get a minimal element/field
-// schema so the kind dispatch can be exercised without coupling the
-// test to deeper recursion (covered by TestWrapLiteralValue).
-func typeFor(k TypeKind) Type {
-	switch k {
-	case Int32:
-		return Int32Type()
-	case Int64:
-		return Int64Type()
-	case Uint32:
-		return Uint32Type()
-	case Uint64:
-		return Uint64Type()
-	case Bool:
-		return BoolType()
-	case Float:
-		return FloatType()
-	case Double:
-		return DoubleType()
-	case String:
-		return StringType()
-	case Bytes:
-		return BytesType()
-	case Date:
-		return DateType()
-	case Time:
-		return TimeType()
-	case Timestamp:
-		return TimestampType()
-	case Geography:
-		return GeographyType()
-	case Numeric:
-		return NumericType()
-	case BigNumeric:
-		return BigNumericType()
-	case Json:
-		return JsonType()
-	case Interval:
-		return IntervalType()
-	case Array:
-		return &ArrayType{ElementType: Int64Type()}
-	case Struct:
-		return &StructType{Fields: []*StructField{{Name: "a", Type: Int64Type()}}}
-	}
-	return nil
 }
 
 // TestLiteralValue_TypedAccessors_HappyPath checks that every accessor
@@ -331,147 +351,17 @@ func typeFor(k TypeKind) Type {
 // fixture so the assertion is on the accessor's own contract, not on
 // recursive wrapping (which TestWrapLiteralValue already covers).
 func TestLiteralValue_TypedAccessors_HappyPath(t *testing.T) {
-	timestampFixture := timestamppb.New(time.Date(2026, 5, 10, 12, 0, 0, 0, time.UTC))
-
-	tests := []struct {
-		name string
-		in   *LiteralValue
-		call func(*LiteralValue) (any, bool)
-		want any
-	}{
-		{
-			name: "AsInt32",
-			in:   &LiteralValue{Type: Int32Type(), Value: int32(7)},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsInt32(); return g, ok },
-			want: int32(7),
-		},
-		{
-			name: "AsInt64",
-			in:   &LiteralValue{Type: Int64Type(), Value: int64(42)},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsInt64(); return g, ok },
-			want: int64(42),
-		},
-		{
-			name: "AsUint32",
-			in:   &LiteralValue{Type: Uint32Type(), Value: uint32(7)},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsUint32(); return g, ok },
-			want: uint32(7),
-		},
-		{
-			name: "AsUint64",
-			in:   &LiteralValue{Type: Uint64Type(), Value: uint64(42)},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsUint64(); return g, ok },
-			want: uint64(42),
-		},
-		{
-			name: "AsBool",
-			in:   &LiteralValue{Type: BoolType(), Value: true},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsBool(); return g, ok },
-			want: true,
-		},
-		{
-			name: "AsFloat",
-			in:   &LiteralValue{Type: FloatType(), Value: float32(1.5)},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsFloat(); return g, ok },
-			want: float32(1.5),
-		},
-		{
-			name: "AsDouble",
-			in:   &LiteralValue{Type: DoubleType(), Value: float64(2.5)},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsDouble(); return g, ok },
-			want: float64(2.5),
-		},
-		{
-			name: "AsString",
-			in:   &LiteralValue{Type: StringType(), Value: "hello"},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsString(); return g, ok },
-			want: "hello",
-		},
-		{
-			name: "AsBytes",
-			in:   &LiteralValue{Type: BytesType(), Value: []byte{0x01, 0x02}},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsBytes(); return g, ok },
-			want: []byte{0x01, 0x02},
-		},
-		{
-			name: "AsJson",
-			in:   &LiteralValue{Type: JsonType(), Value: `{"k":1}`},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsJson(); return g, ok },
-			want: `{"k":1}`,
-		},
-		{
-			name: "AsDateDays",
-			in:   &LiteralValue{Type: DateType(), Value: int32(20000)},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsDateDays(); return g, ok },
-			want: int32(20000),
-		},
-		{
-			name: "AsTimeMicros",
-			in:   &LiteralValue{Type: TimeType(), Value: int64(123456789)},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsTimeMicros(); return g, ok },
-			want: int64(123456789),
-		},
-		{
-			name: "AsTimestamp",
-			in:   &LiteralValue{Type: TimestampType(), Value: timestampFixture},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsTimestamp(); return g, ok },
-			want: time.Date(2026, 5, 10, 12, 0, 0, 0, time.UTC),
-		},
-		{
-			name: "AsArray",
-			in: &LiteralValue{
-				Type:  &ArrayType{ElementType: Int64Type()},
-				Value: ArrayValue{{Type: Int64Type(), Value: int64(1)}},
-			},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsArray(); return g, ok },
-			want: ArrayValue{{Type: Int64Type(), Value: int64(1)}},
-		},
-		{
-			name: "AsStruct",
-			in: &LiteralValue{
-				Type:  &StructType{Fields: []*StructField{{Name: "a", Type: Int64Type()}}},
-				Value: StructValue{{Type: Int64Type(), Value: int64(1)}},
-			},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsStruct(); return g, ok },
-			want: StructValue{{Type: Int64Type(), Value: int64(1)}},
-		},
-		{
-			name: "AsNumeric",
-			in:   &LiteralValue{Type: NumericType(), Value: []byte{0xAA}},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsNumeric(); return g, ok },
-			want: []byte{0xAA},
-		},
-		{
-			name: "AsBigNumeric",
-			in:   &LiteralValue{Type: BigNumericType(), Value: []byte{0xBB}},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsBigNumeric(); return g, ok },
-			want: []byte{0xBB},
-		},
-		{
-			name: "AsInterval",
-			in:   &LiteralValue{Type: IntervalType(), Value: []byte{0xCC}},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsInterval(); return g, ok },
-			want: []byte{0xCC},
-		},
-		{
-			name: "AsGeography",
-			in:   &LiteralValue{Type: GeographyType(), Value: []byte{0xDD}},
-			call: func(v *LiteralValue) (any, bool) { g, ok := v.AsGeography(); return g, ok },
-			want: []byte{0xDD},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	for _, c := range allAccessors() {
+		t.Run(c.name, func(t *testing.T) {
 			// Arrange
-			sut := tt.in
+			sut := &LiteralValue{Type: c.typ, Value: c.happyValue}
+			want := accessorResult{Got: c.happyWant, OK: true}
 
 			// Act
-			got, ok := tt.call(sut)
+			got := c.call(sut)
 
 			// Assert
-			assert.True(t, ok)
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, want, got)
 		})
 	}
 }
@@ -484,112 +374,34 @@ func TestLiteralValue_TypedAccessors_HappyPath(t *testing.T) {
 // of accessors is shared with the HappyPath test so a new accessor
 // must satisfy both axes.
 func TestLiteralValue_TypedAccessors_ContractViolation(t *testing.T) {
-	// wrongKind picks a kind that is guaranteed to differ from the
-	// accessor's own kind. Using Int64 as the default and Int32 only
-	// when the accessor itself is Int64 keeps the rule a one-liner.
-	wrongKind := func(self TypeKind) Type {
-		if self == Int64 {
-			return Int32Type()
-		}
-		return Int64Type()
-	}
+	for _, c := range allAccessors() {
+		t.Run(c.name, func(t *testing.T) {
+			want := accessorResult{Got: c.zero, OK: false}
 
-	for _, a := range allAccessors() {
-		t.Run(a.name, func(t *testing.T) {
-			t.Run("nil receiver", func(t *testing.T) {
-				// Arrange
-				var sut *LiteralValue
+			violations := []struct {
+				name string
+				in   *LiteralValue
+			}{
+				{"nil receiver", nil},
+				{"nil Type", &LiteralValue{Type: nil, Value: c.wrongValue}},
+				{"kind mismatch", &LiteralValue{Type: c.wrongTyp, Value: nil}},
+				{"value type mismatch", &LiteralValue{Type: c.typ, Value: c.wrongValue}},
+				{"NULL (Value=nil)", &LiteralValue{Type: c.typ, Value: nil}},
+			}
+			for _, v := range violations {
+				t.Run(v.name, func(t *testing.T) {
+					// Arrange
+					sut := v.in
 
-				// Act
-				got, ok := a.callBoxed(sut)
+					// Act
+					got := c.call(sut)
 
-				// Assert
-				assert.False(t, ok)
-				assert.Equal(t, zeroFor(a.name), got)
-			})
-			t.Run("nil Type", func(t *testing.T) {
-				// Arrange
-				sut := &LiteralValue{Type: nil, Value: a.wrongValue}
-
-				// Act
-				got, ok := a.callBoxed(sut)
-
-				// Assert
-				assert.False(t, ok)
-				assert.Equal(t, zeroFor(a.name), got)
-			})
-			t.Run("kind mismatch", func(t *testing.T) {
-				// Arrange: Type carries a kind the accessor does not
-				// dispatch on. Value is left nil because we want the
-				// kind check to be the one that rejects the call.
-				sut := &LiteralValue{Type: wrongKind(a.kind), Value: nil}
-
-				// Act
-				got, ok := a.callBoxed(sut)
-
-				// Assert
-				assert.False(t, ok)
-				assert.Equal(t, zeroFor(a.name), got)
-			})
-			t.Run("value type mismatch", func(t *testing.T) {
-				// Arrange: kind is correct, Value's Go type is not.
-				sut := &LiteralValue{Type: typeFor(a.kind), Value: a.wrongValue}
-
-				// Act
-				got, ok := a.callBoxed(sut)
-
-				// Assert
-				assert.False(t, ok)
-				assert.Equal(t, zeroFor(a.name), got)
-			})
-			t.Run("NULL (Value=nil)", func(t *testing.T) {
-				// Arrange: kind matches but Value is nil, the proto
-				// "empty oneof" convention for SQL NULL.
-				sut := &LiteralValue{Type: typeFor(a.kind), Value: nil}
-
-				// Act
-				got, ok := a.callBoxed(sut)
-
-				// Assert
-				assert.False(t, ok)
-				assert.Equal(t, zeroFor(a.name), got)
-			})
+					// Assert
+					assert.Equal(t, want, got)
+				})
+			}
 		})
 	}
-}
-
-// zeroFor returns the zero value an accessor must hand back when its
-// contract is violated. Listing it once, keyed by accessor name,
-// keeps every contract subtest's `want` honest without each subtest
-// re-deriving the zero from the accessor's signature.
-func zeroFor(accessor string) any {
-	switch accessor {
-	case "AsInt32", "AsDateDays":
-		return int32(0)
-	case "AsInt64", "AsTimeMicros":
-		return int64(0)
-	case "AsUint32":
-		return uint32(0)
-	case "AsUint64":
-		return uint64(0)
-	case "AsBool":
-		return false
-	case "AsFloat":
-		return float32(0)
-	case "AsDouble":
-		return float64(0)
-	case "AsString", "AsJson":
-		return ""
-	case "AsBytes", "AsNumeric", "AsBigNumeric", "AsInterval", "AsGeography":
-		return ([]byte)(nil)
-	case "AsTimestamp":
-		return time.Time{}
-	case "AsArray":
-		return (ArrayValue)(nil)
-	case "AsStruct":
-		return (StructValue)(nil)
-	}
-	return nil
 }
 
 // TestLiteralValue_AsTimestamp_TypedNilPointer covers a case the
