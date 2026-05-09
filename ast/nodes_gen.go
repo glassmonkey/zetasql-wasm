@@ -96,13 +96,13 @@ func (n *AddColumnActionNode) IsIfNotExists() bool {
 
 func (n *AddColumnActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnDefinition() != nil {
+	if n.ColumnDefinition() != nil {
 		count++
 	}
-	if n.raw.GetColumnPosition() != nil {
+	if n.ColumnPosition() != nil {
 		count++
 	}
-	if n.raw.GetFillExpression() != nil {
+	if n.FillExpression() != nil {
 		count++
 	}
 	return count
@@ -110,19 +110,19 @@ func (n *AddColumnActionNode) NumChildren() int {
 
 func (n *AddColumnActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnDefinition() != nil {
+	if n.ColumnDefinition() != nil {
 		if idx == i {
 			return n.ColumnDefinition()
 		}
 		idx++
 	}
-	if n.raw.GetColumnPosition() != nil {
+	if n.ColumnPosition() != nil {
 		if idx == i {
 			return n.ColumnPosition()
 		}
 		idx++
 	}
-	if n.raw.GetFillExpression() != nil {
+	if n.FillExpression() != nil {
 		if idx == i {
 			return n.FillExpression()
 		}
@@ -176,10 +176,10 @@ func (n *AddColumnIdentifierActionNode) IsIfNotExists() bool {
 
 func (n *AddColumnIdentifierActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -187,13 +187,13 @@ func (n *AddColumnIdentifierActionNode) NumChildren() int {
 
 func (n *AddColumnIdentifierActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		if idx == i {
 			return n.ColumnName()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -243,7 +243,7 @@ func (n *AddConstraintActionNode) IsIfNotExists() bool {
 
 func (n *AddConstraintActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetConstraint() != nil {
+	if n.Constraint() != nil {
 		count++
 	}
 	return count
@@ -251,7 +251,7 @@ func (n *AddConstraintActionNode) NumChildren() int {
 
 func (n *AddConstraintActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetConstraint() != nil {
+	if n.Constraint() != nil {
 		if idx == i {
 			return n.Constraint()
 		}
@@ -309,13 +309,13 @@ func (n *AddSubEntityActionNode) IsIfNotExists() bool {
 
 func (n *AddSubEntityActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		count++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -323,19 +323,19 @@ func (n *AddSubEntityActionNode) NumChildren() int {
 
 func (n *AddSubEntityActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		if idx == i {
 			return n.Type()
 		}
 		idx++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -385,7 +385,7 @@ func (n *AddToRestricteeListClauseNode) RestricteeList() *GranteeListNode {
 
 func (n *AddToRestricteeListClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetRestricteeList() != nil {
+	if n.RestricteeList() != nil {
 		count++
 	}
 	return count
@@ -393,7 +393,7 @@ func (n *AddToRestricteeListClauseNode) NumChildren() int {
 
 func (n *AddToRestricteeListClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetRestricteeList() != nil {
+	if n.RestricteeList() != nil {
 		if idx == i {
 			return n.RestricteeList()
 		}
@@ -443,7 +443,7 @@ func (n *AddTtlActionNode) IsIfNotExists() bool {
 
 func (n *AddTtlActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -451,7 +451,7 @@ func (n *AddTtlActionNode) NumChildren() int {
 
 func (n *AddTtlActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -541,7 +541,7 @@ func (n *AliasNode) Identifier() *IdentifierNode {
 
 func (n *AliasNode) NumChildren() int {
 	count := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		count++
 	}
 	return count
@@ -549,7 +549,7 @@ func (n *AliasNode) NumChildren() int {
 
 func (n *AliasNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		if idx == i {
 			return n.Identifier()
 		}
@@ -595,7 +595,7 @@ func (n *AliasedGroupRowsNode) Alias() *IdentifierNode {
 
 func (n *AliasedGroupRowsNode) NumChildren() int {
 	count := 0
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -603,7 +603,7 @@ func (n *AliasedGroupRowsNode) NumChildren() int {
 
 func (n *AliasedGroupRowsNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -644,6 +644,10 @@ func (n *AliasedQueryExpressionNode) ParseLocationRange() *generated.ParseLocati
 }
 func (n *AliasedQueryExpressionNode) queryExpressionNode() {}
 
+func (n *AliasedQueryExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *AliasedQueryExpressionNode) Query() *QueryNode {
 	return newQueryNode(n.raw.GetQuery())
 }
@@ -654,10 +658,10 @@ func (n *AliasedQueryExpressionNode) Alias() *AliasNode {
 
 func (n *AliasedQueryExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -665,13 +669,13 @@ func (n *AliasedQueryExpressionNode) NumChildren() int {
 
 func (n *AliasedQueryExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		if idx == i {
 			return n.Query()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -770,7 +774,7 @@ func (n *AliasedQueryModifiersNode) RecursionDepthModifier() *RecursionDepthModi
 
 func (n *AliasedQueryModifiersNode) NumChildren() int {
 	count := 0
-	if n.raw.GetRecursionDepthModifier() != nil {
+	if n.RecursionDepthModifier() != nil {
 		count++
 	}
 	return count
@@ -778,7 +782,7 @@ func (n *AliasedQueryModifiersNode) NumChildren() int {
 
 func (n *AliasedQueryModifiersNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetRecursionDepthModifier() != nil {
+	if n.RecursionDepthModifier() != nil {
 		if idx == i {
 			return n.RecursionDepthModifier()
 		}
@@ -832,13 +836,13 @@ func (n *AliasedQueryNode) Modifiers() *AliasedQueryModifiersNode {
 
 func (n *AliasedQueryNode) NumChildren() int {
 	count := 0
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		count++
 	}
-	if n.raw.GetModifiers() != nil {
+	if n.Modifiers() != nil {
 		count++
 	}
 	return count
@@ -846,19 +850,19 @@ func (n *AliasedQueryNode) NumChildren() int {
 
 func (n *AliasedQueryNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
 		idx++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		if idx == i {
 			return n.Query()
 		}
 		idx++
 	}
-	if n.raw.GetModifiers() != nil {
+	if n.Modifiers() != nil {
 		if idx == i {
 			return n.Modifiers()
 		}
@@ -964,10 +968,10 @@ func (n *AlterAllRowAccessPoliciesStatementNode) AlterAction() Node {
 
 func (n *AlterAllRowAccessPoliciesStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTableNamePath() != nil {
+	if n.TableNamePath() != nil {
 		count++
 	}
-	if n.raw.GetAlterAction() != nil {
+	if n.AlterAction() != nil {
 		count++
 	}
 	return count
@@ -975,13 +979,13 @@ func (n *AlterAllRowAccessPoliciesStatementNode) NumChildren() int {
 
 func (n *AlterAllRowAccessPoliciesStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTableNamePath() != nil {
+	if n.TableNamePath() != nil {
 		if idx == i {
 			return n.TableNamePath()
 		}
 		idx++
 	}
-	if n.raw.GetAlterAction() != nil {
+	if n.AlterAction() != nil {
 		if idx == i {
 			return n.AlterAction()
 		}
@@ -1022,12 +1026,43 @@ func (n *AlterApproxViewStatementNode) ParseLocationRange() *generated.ParseLoca
 }
 func (n *AlterApproxViewStatementNode) statementNode() {}
 
+func (n *AlterApproxViewStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterApproxViewStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterApproxViewStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterApproxViewStatementNode) NumChildren() int {
 	count := 0
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *AlterApproxViewStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -1072,7 +1107,7 @@ func (n *AlterColumnDropDefaultActionNode) IsIfExists() bool {
 
 func (n *AlterColumnDropDefaultActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		count++
 	}
 	return count
@@ -1080,7 +1115,7 @@ func (n *AlterColumnDropDefaultActionNode) NumChildren() int {
 
 func (n *AlterColumnDropDefaultActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		if idx == i {
 			return n.ColumnName()
 		}
@@ -1130,7 +1165,7 @@ func (n *AlterColumnDropGeneratedActionNode) IsIfExists() bool {
 
 func (n *AlterColumnDropGeneratedActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		count++
 	}
 	return count
@@ -1138,7 +1173,7 @@ func (n *AlterColumnDropGeneratedActionNode) NumChildren() int {
 
 func (n *AlterColumnDropGeneratedActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		if idx == i {
 			return n.ColumnName()
 		}
@@ -1188,7 +1223,7 @@ func (n *AlterColumnDropNotNullActionNode) IsIfExists() bool {
 
 func (n *AlterColumnDropNotNullActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		count++
 	}
 	return count
@@ -1196,7 +1231,7 @@ func (n *AlterColumnDropNotNullActionNode) NumChildren() int {
 
 func (n *AlterColumnDropNotNullActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		if idx == i {
 			return n.ColumnName()
 		}
@@ -1250,10 +1285,10 @@ func (n *AlterColumnOptionsActionNode) IsIfExists() bool {
 
 func (n *AlterColumnOptionsActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -1261,13 +1296,13 @@ func (n *AlterColumnOptionsActionNode) NumChildren() int {
 
 func (n *AlterColumnOptionsActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		if idx == i {
 			return n.ColumnName()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -1321,10 +1356,10 @@ func (n *AlterColumnSetDefaultActionNode) IsIfExists() bool {
 
 func (n *AlterColumnSetDefaultActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		count++
 	}
-	if n.raw.GetDefaultExpression() != nil {
+	if n.DefaultExpression() != nil {
 		count++
 	}
 	return count
@@ -1332,13 +1367,13 @@ func (n *AlterColumnSetDefaultActionNode) NumChildren() int {
 
 func (n *AlterColumnSetDefaultActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		if idx == i {
 			return n.ColumnName()
 		}
 		idx++
 	}
-	if n.raw.GetDefaultExpression() != nil {
+	if n.DefaultExpression() != nil {
 		if idx == i {
 			return n.DefaultExpression()
 		}
@@ -1392,10 +1427,10 @@ func (n *AlterColumnSetGeneratedActionNode) IsIfExists() bool {
 
 func (n *AlterColumnSetGeneratedActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		count++
 	}
-	if n.raw.GetGeneratedColumnInfo() != nil {
+	if n.GeneratedColumnInfo() != nil {
 		count++
 	}
 	return count
@@ -1403,13 +1438,13 @@ func (n *AlterColumnSetGeneratedActionNode) NumChildren() int {
 
 func (n *AlterColumnSetGeneratedActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		if idx == i {
 			return n.ColumnName()
 		}
 		idx++
 	}
-	if n.raw.GetGeneratedColumnInfo() != nil {
+	if n.GeneratedColumnInfo() != nil {
 		if idx == i {
 			return n.GeneratedColumnInfo()
 		}
@@ -1467,13 +1502,13 @@ func (n *AlterColumnTypeActionNode) IsIfExists() bool {
 
 func (n *AlterColumnTypeActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		count++
 	}
-	if n.raw.GetSchema() != nil {
+	if n.Schema() != nil {
 		count++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		count++
 	}
 	return count
@@ -1481,19 +1516,19 @@ func (n *AlterColumnTypeActionNode) NumChildren() int {
 
 func (n *AlterColumnTypeActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		if idx == i {
 			return n.ColumnName()
 		}
 		idx++
 	}
-	if n.raw.GetSchema() != nil {
+	if n.Schema() != nil {
 		if idx == i {
 			return n.Schema()
 		}
 		idx++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		if idx == i {
 			return n.Collate()
 		}
@@ -1534,12 +1569,43 @@ func (n *AlterConnectionStatementNode) ParseLocationRange() *generated.ParseLoca
 }
 func (n *AlterConnectionStatementNode) statementNode() {}
 
+func (n *AlterConnectionStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterConnectionStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterConnectionStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterConnectionStatementNode) NumChildren() int {
 	count := 0
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *AlterConnectionStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -1590,7 +1656,7 @@ func (n *AlterConstraintEnforcementActionNode) IsEnforced() bool {
 
 func (n *AlterConstraintEnforcementActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		count++
 	}
 	return count
@@ -1598,7 +1664,7 @@ func (n *AlterConstraintEnforcementActionNode) NumChildren() int {
 
 func (n *AlterConstraintEnforcementActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		if idx == i {
 			return n.ConstraintName()
 		}
@@ -1652,10 +1718,10 @@ func (n *AlterConstraintSetOptionsActionNode) IsIfExists() bool {
 
 func (n *AlterConstraintSetOptionsActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -1663,13 +1729,13 @@ func (n *AlterConstraintSetOptionsActionNode) NumChildren() int {
 
 func (n *AlterConstraintSetOptionsActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		if idx == i {
 			return n.ConstraintName()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -1710,12 +1776,43 @@ func (n *AlterDatabaseStatementNode) ParseLocationRange() *generated.ParseLocati
 }
 func (n *AlterDatabaseStatementNode) statementNode() {}
 
+func (n *AlterDatabaseStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterDatabaseStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterDatabaseStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterDatabaseStatementNode) NumChildren() int {
 	count := 0
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *AlterDatabaseStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -1751,13 +1848,31 @@ func (n *AlterEntityStatementNode) ParseLocationRange() *generated.ParseLocation
 }
 func (n *AlterEntityStatementNode) statementNode() {}
 
+func (n *AlterEntityStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterEntityStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterEntityStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterEntityStatementNode) Type() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetType())
 }
 
 func (n *AlterEntityStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetType() != nil {
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
+	if n.Type() != nil {
 		count++
 	}
 	return count
@@ -1765,7 +1880,19 @@ func (n *AlterEntityStatementNode) NumChildren() int {
 
 func (n *AlterEntityStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetType() != nil {
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
+	if n.Type() != nil {
 		if idx == i {
 			return n.Type()
 		}
@@ -1806,12 +1933,43 @@ func (n *AlterExternalSchemaStatementNode) ParseLocationRange() *generated.Parse
 }
 func (n *AlterExternalSchemaStatementNode) statementNode() {}
 
+func (n *AlterExternalSchemaStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterExternalSchemaStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterExternalSchemaStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterExternalSchemaStatementNode) NumChildren() int {
 	count := 0
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *AlterExternalSchemaStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -1847,6 +2005,18 @@ func (n *AlterIndexStatementNode) ParseLocationRange() *generated.ParseLocationR
 }
 func (n *AlterIndexStatementNode) statementNode() {}
 
+func (n *AlterIndexStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterIndexStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterIndexStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterIndexStatementNode) TableName() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetTableName())
 }
@@ -1857,7 +2027,13 @@ func (n *AlterIndexStatementNode) IndexType() generated.ASTAlterIndexStatementEn
 
 func (n *AlterIndexStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTableName() != nil {
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
+	if n.TableName() != nil {
 		count++
 	}
 	return count
@@ -1865,7 +2041,19 @@ func (n *AlterIndexStatementNode) NumChildren() int {
 
 func (n *AlterIndexStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTableName() != nil {
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
+	if n.TableName() != nil {
 		if idx == i {
 			return n.TableName()
 		}
@@ -1906,12 +2094,43 @@ func (n *AlterMaterializedViewStatementNode) ParseLocationRange() *generated.Par
 }
 func (n *AlterMaterializedViewStatementNode) statementNode() {}
 
+func (n *AlterMaterializedViewStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterMaterializedViewStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterMaterializedViewStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterMaterializedViewStatementNode) NumChildren() int {
 	count := 0
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *AlterMaterializedViewStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -1947,12 +2166,43 @@ func (n *AlterModelStatementNode) ParseLocationRange() *generated.ParseLocationR
 }
 func (n *AlterModelStatementNode) statementNode() {}
 
+func (n *AlterModelStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterModelStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterModelStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterModelStatementNode) NumChildren() int {
 	count := 0
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *AlterModelStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -1990,6 +2240,18 @@ func (n *AlterPrivilegeRestrictionStatementNode) ParseLocationRange() *generated
 }
 func (n *AlterPrivilegeRestrictionStatementNode) statementNode() {}
 
+func (n *AlterPrivilegeRestrictionStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterPrivilegeRestrictionStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterPrivilegeRestrictionStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterPrivilegeRestrictionStatementNode) Privileges() *PrivilegesNode {
 	return newPrivilegesNode(n.raw.GetPrivileges())
 }
@@ -2000,10 +2262,16 @@ func (n *AlterPrivilegeRestrictionStatementNode) ObjectType() *IdentifierNode {
 
 func (n *AlterPrivilegeRestrictionStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPrivileges() != nil {
+	if n.Path() != nil {
 		count++
 	}
-	if n.raw.GetObjectType() != nil {
+	if n.ActionList() != nil {
+		count++
+	}
+	if n.Privileges() != nil {
+		count++
+	}
+	if n.ObjectType() != nil {
 		count++
 	}
 	return count
@@ -2011,13 +2279,25 @@ func (n *AlterPrivilegeRestrictionStatementNode) NumChildren() int {
 
 func (n *AlterPrivilegeRestrictionStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPrivileges() != nil {
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
+	if n.Privileges() != nil {
 		if idx == i {
 			return n.Privileges()
 		}
 		idx++
 	}
-	if n.raw.GetObjectType() != nil {
+	if n.ObjectType() != nil {
 		if idx == i {
 			return n.ObjectType()
 		}
@@ -2058,13 +2338,31 @@ func (n *AlterRowAccessPolicyStatementNode) ParseLocationRange() *generated.Pars
 }
 func (n *AlterRowAccessPolicyStatementNode) statementNode() {}
 
+func (n *AlterRowAccessPolicyStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterRowAccessPolicyStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterRowAccessPolicyStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterRowAccessPolicyStatementNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
 }
 
 func (n *AlterRowAccessPolicyStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -2072,7 +2370,19 @@ func (n *AlterRowAccessPolicyStatementNode) NumChildren() int {
 
 func (n *AlterRowAccessPolicyStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -2113,12 +2423,43 @@ func (n *AlterSchemaStatementNode) ParseLocationRange() *generated.ParseLocation
 }
 func (n *AlterSchemaStatementNode) statementNode() {}
 
+func (n *AlterSchemaStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterSchemaStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterSchemaStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterSchemaStatementNode) NumChildren() int {
 	count := 0
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *AlterSchemaStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -2154,12 +2495,43 @@ func (n *AlterSequenceStatementNode) ParseLocationRange() *generated.ParseLocati
 }
 func (n *AlterSequenceStatementNode) statementNode() {}
 
+func (n *AlterSequenceStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterSequenceStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterSequenceStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterSequenceStatementNode) NumChildren() int {
 	count := 0
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *AlterSequenceStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -2212,13 +2584,13 @@ func (n *AlterSubEntityActionNode) IsIfExists() bool {
 
 func (n *AlterSubEntityActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		count++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetAction() != nil {
+	if n.Action() != nil {
 		count++
 	}
 	return count
@@ -2226,19 +2598,19 @@ func (n *AlterSubEntityActionNode) NumChildren() int {
 
 func (n *AlterSubEntityActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		if idx == i {
 			return n.Type()
 		}
 		idx++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetAction() != nil {
+	if n.Action() != nil {
 		if idx == i {
 			return n.Action()
 		}
@@ -2279,12 +2651,43 @@ func (n *AlterTableStatementNode) ParseLocationRange() *generated.ParseLocationR
 }
 func (n *AlterTableStatementNode) statementNode() {}
 
+func (n *AlterTableStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterTableStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterTableStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterTableStatementNode) NumChildren() int {
 	count := 0
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *AlterTableStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -2320,12 +2723,43 @@ func (n *AlterViewStatementNode) ParseLocationRange() *generated.ParseLocationRa
 }
 func (n *AlterViewStatementNode) statementNode() {}
 
+func (n *AlterViewStatementNode) Path() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPath())
+}
+
+func (n *AlterViewStatementNode) ActionList() *AlterActionListNode {
+	return newAlterActionListNode(n.raw.GetParent().GetActionList())
+}
+
+func (n *AlterViewStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *AlterViewStatementNode) NumChildren() int {
 	count := 0
+	if n.Path() != nil {
+		count++
+	}
+	if n.ActionList() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *AlterViewStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Path() != nil {
+		if idx == i {
+			return n.Path()
+		}
+		idx++
+	}
+	if n.ActionList() != nil {
+		if idx == i {
+			return n.ActionList()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -2361,6 +2795,10 @@ func (n *AnalyticFunctionCallNode) ParseLocationRange() *generated.ParseLocation
 }
 func (n *AnalyticFunctionCallNode) expressionNode() {}
 
+func (n *AnalyticFunctionCallNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *AnalyticFunctionCallNode) Function() *FunctionCallNode {
 	return newFunctionCallNode(n.raw.GetFunction())
 }
@@ -2371,10 +2809,10 @@ func (n *AnalyticFunctionCallNode) WindowSpec() *WindowSpecificationNode {
 
 func (n *AnalyticFunctionCallNode) NumChildren() int {
 	count := 0
-	if n.raw.GetFunction() != nil {
+	if n.Function() != nil {
 		count++
 	}
-	if n.raw.GetWindowSpec() != nil {
+	if n.WindowSpec() != nil {
 		count++
 	}
 	return count
@@ -2382,13 +2820,13 @@ func (n *AnalyticFunctionCallNode) NumChildren() int {
 
 func (n *AnalyticFunctionCallNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetFunction() != nil {
+	if n.Function() != nil {
 		if idx == i {
 			return n.Function()
 		}
 		idx++
 	}
-	if n.raw.GetWindowSpec() != nil {
+	if n.WindowSpec() != nil {
 		if idx == i {
 			return n.WindowSpec()
 		}
@@ -2439,10 +2877,10 @@ func (n *AnalyzeStatementNode) TableAndColumnInfoList() *TableAndColumnInfoListN
 
 func (n *AnalyzeStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
-	if n.raw.GetTableAndColumnInfoList() != nil {
+	if n.TableAndColumnInfoList() != nil {
 		count++
 	}
 	return count
@@ -2450,13 +2888,13 @@ func (n *AnalyzeStatementNode) NumChildren() int {
 
 func (n *AnalyzeStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
 		idx++
 	}
-	if n.raw.GetTableAndColumnInfoList() != nil {
+	if n.TableAndColumnInfoList() != nil {
 		if idx == i {
 			return n.TableAndColumnInfoList()
 		}
@@ -2496,6 +2934,10 @@ func (n *AndExprNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return parseLocationRangeOf(n.raw)
 }
 func (n *AndExprNode) expressionNode() {}
+
+func (n *AndExprNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
 
 func (n *AndExprNode) Conjuncts() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetConjuncts())
@@ -2594,12 +3036,104 @@ func (n *ArrayColumnSchemaNode) ParseLocationRange() *generated.ParseLocationRan
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *ArrayColumnSchemaNode) TypeParameters() *TypeParameterListNode {
+	return newTypeParameterListNode(n.raw.GetParent().GetParent().GetTypeParameters())
+}
+
+func (n *ArrayColumnSchemaNode) GeneratedColumnInfo() *GeneratedColumnInfoNode {
+	return newGeneratedColumnInfoNode(n.raw.GetParent().GetParent().GetGeneratedColumnInfo())
+}
+
+func (n *ArrayColumnSchemaNode) DefaultExpression() ExpressionNode {
+	return wrapExpression(n.raw.GetParent().GetParent().GetDefaultExpression())
+}
+
+func (n *ArrayColumnSchemaNode) Collate() *CollateNode {
+	return newCollateNode(n.raw.GetParent().GetParent().GetCollate())
+}
+
+func (n *ArrayColumnSchemaNode) Attributes() *ColumnAttributeListNode {
+	return newColumnAttributeListNode(n.raw.GetParent().GetParent().GetAttributes())
+}
+
+func (n *ArrayColumnSchemaNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetParent().GetOptionsList())
+}
+
+func (n *ArrayColumnSchemaNode) ElementSchema() Node {
+	return wrapColumnSchema(n.raw.GetParent().GetElementSchema())
+}
+
 func (n *ArrayColumnSchemaNode) NumChildren() int {
 	count := 0
+	if n.TypeParameters() != nil {
+		count++
+	}
+	if n.GeneratedColumnInfo() != nil {
+		count++
+	}
+	if n.DefaultExpression() != nil {
+		count++
+	}
+	if n.Collate() != nil {
+		count++
+	}
+	if n.Attributes() != nil {
+		count++
+	}
+	if n.OptionsList() != nil {
+		count++
+	}
+	if n.ElementSchema() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *ArrayColumnSchemaNode) Child(i int) Node {
+	idx := 0
+	if n.TypeParameters() != nil {
+		if idx == i {
+			return n.TypeParameters()
+		}
+		idx++
+	}
+	if n.GeneratedColumnInfo() != nil {
+		if idx == i {
+			return n.GeneratedColumnInfo()
+		}
+		idx++
+	}
+	if n.DefaultExpression() != nil {
+		if idx == i {
+			return n.DefaultExpression()
+		}
+		idx++
+	}
+	if n.Collate() != nil {
+		if idx == i {
+			return n.Collate()
+		}
+		idx++
+	}
+	if n.Attributes() != nil {
+		if idx == i {
+			return n.Attributes()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.ElementSchema() != nil {
+		if idx == i {
+			return n.ElementSchema()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -2635,6 +3169,10 @@ func (n *ArrayConstructorNode) ParseLocationRange() *generated.ParseLocationRang
 }
 func (n *ArrayConstructorNode) expressionNode() {}
 
+func (n *ArrayConstructorNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *ArrayConstructorNode) Type() *ArrayTypeNode {
 	return newArrayTypeNode(n.raw.GetType())
 }
@@ -2645,7 +3183,7 @@ func (n *ArrayConstructorNode) Elements() []ExpressionNode {
 
 func (n *ArrayConstructorNode) NumChildren() int {
 	count := 0
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		count++
 	}
 	count += len(n.Elements())
@@ -2654,7 +3192,7 @@ func (n *ArrayConstructorNode) NumChildren() int {
 
 func (n *ArrayConstructorNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		if idx == i {
 			return n.Type()
 		}
@@ -2702,6 +3240,10 @@ func (n *ArrayElementNode) ParseLocationRange() *generated.ParseLocationRangePro
 }
 func (n *ArrayElementNode) expressionNode() {}
 
+func (n *ArrayElementNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParenthesized()
+}
+
 func (n *ArrayElementNode) Array() ExpressionNode {
 	return wrapExpression(n.raw.GetArray())
 }
@@ -2716,13 +3258,13 @@ func (n *ArrayElementNode) OpenBracketLocation() *LocationNode {
 
 func (n *ArrayElementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetArray() != nil {
+	if n.Array() != nil {
 		count++
 	}
-	if n.raw.GetPosition() != nil {
+	if n.Position() != nil {
 		count++
 	}
-	if n.raw.GetOpenBracketLocation() != nil {
+	if n.OpenBracketLocation() != nil {
 		count++
 	}
 	return count
@@ -2730,19 +3272,19 @@ func (n *ArrayElementNode) NumChildren() int {
 
 func (n *ArrayElementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetArray() != nil {
+	if n.Array() != nil {
 		if idx == i {
 			return n.Array()
 		}
 		idx++
 	}
-	if n.raw.GetPosition() != nil {
+	if n.Position() != nil {
 		if idx == i {
 			return n.Position()
 		}
 		idx++
 	}
-	if n.raw.GetOpenBracketLocation() != nil {
+	if n.OpenBracketLocation() != nil {
 		if idx == i {
 			return n.OpenBracketLocation()
 		}
@@ -2796,13 +3338,13 @@ func (n *ArrayTypeNode) Collate() *CollateNode {
 
 func (n *ArrayTypeNode) NumChildren() int {
 	count := 0
-	if n.raw.GetElementType() != nil {
+	if n.ElementType() != nil {
 		count++
 	}
-	if n.raw.GetTypeParameters() != nil {
+	if n.TypeParameters() != nil {
 		count++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		count++
 	}
 	return count
@@ -2810,19 +3352,19 @@ func (n *ArrayTypeNode) NumChildren() int {
 
 func (n *ArrayTypeNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetElementType() != nil {
+	if n.ElementType() != nil {
 		if idx == i {
 			return n.ElementType()
 		}
 		idx++
 	}
-	if n.raw.GetTypeParameters() != nil {
+	if n.TypeParameters() != nil {
 		if idx == i {
 			return n.TypeParameters()
 		}
 		idx++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		if idx == i {
 			return n.Collate()
 		}
@@ -2868,7 +3410,7 @@ func (n *AssertRowsModifiedNode) NumRows() ExpressionNode {
 
 func (n *AssertRowsModifiedNode) NumChildren() int {
 	count := 0
-	if n.raw.GetNumRows() != nil {
+	if n.NumRows() != nil {
 		count++
 	}
 	return count
@@ -2876,7 +3418,7 @@ func (n *AssertRowsModifiedNode) NumChildren() int {
 
 func (n *AssertRowsModifiedNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetNumRows() != nil {
+	if n.NumRows() != nil {
 		if idx == i {
 			return n.NumRows()
 		}
@@ -2927,10 +3469,10 @@ func (n *AssertStatementNode) Description() *StringLiteralNode {
 
 func (n *AssertStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		count++
 	}
-	if n.raw.GetDescription() != nil {
+	if n.Description() != nil {
 		count++
 	}
 	return count
@@ -2938,13 +3480,13 @@ func (n *AssertStatementNode) NumChildren() int {
 
 func (n *AssertStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		if idx == i {
 			return n.Expr()
 		}
 		idx++
 	}
-	if n.raw.GetDescription() != nil {
+	if n.Description() != nil {
 		if idx == i {
 			return n.Description()
 		}
@@ -2995,10 +3537,10 @@ func (n *AssignmentFromStructNode) StructExpression() ExpressionNode {
 
 func (n *AssignmentFromStructNode) NumChildren() int {
 	count := 0
-	if n.raw.GetVariables() != nil {
+	if n.Variables() != nil {
 		count++
 	}
-	if n.raw.GetStructExpression() != nil {
+	if n.StructExpression() != nil {
 		count++
 	}
 	return count
@@ -3006,13 +3548,13 @@ func (n *AssignmentFromStructNode) NumChildren() int {
 
 func (n *AssignmentFromStructNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetVariables() != nil {
+	if n.Variables() != nil {
 		if idx == i {
 			return n.Variables()
 		}
 		idx++
 	}
-	if n.raw.GetStructExpression() != nil {
+	if n.StructExpression() != nil {
 		if idx == i {
 			return n.StructExpression()
 		}
@@ -3058,7 +3600,7 @@ func (n *AuxLoadDataFromFilesOptionsListNode) OptionsList() *OptionsListNode {
 
 func (n *AuxLoadDataFromFilesOptionsListNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -3066,7 +3608,7 @@ func (n *AuxLoadDataFromFilesOptionsListNode) NumChildren() int {
 
 func (n *AuxLoadDataFromFilesOptionsListNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -3116,7 +3658,7 @@ func (n *AuxLoadDataPartitionsClauseNode) IsOverwrite() bool {
 
 func (n *AuxLoadDataPartitionsClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPartitionFilter() != nil {
+	if n.PartitionFilter() != nil {
 		count++
 	}
 	return count
@@ -3124,7 +3666,7 @@ func (n *AuxLoadDataPartitionsClauseNode) NumChildren() int {
 
 func (n *AuxLoadDataPartitionsClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPartitionFilter() != nil {
+	if n.PartitionFilter() != nil {
 		if idx == i {
 			return n.PartitionFilter()
 		}
@@ -3165,6 +3707,42 @@ func (n *AuxLoadDataStatementNode) ParseLocationRange() *generated.ParseLocation
 }
 func (n *AuxLoadDataStatementNode) statementNode() {}
 
+func (n *AuxLoadDataStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetParent().GetScope()
+}
+
+func (n *AuxLoadDataStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetParent().GetIsOrReplace()
+}
+
+func (n *AuxLoadDataStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetParent().GetIsIfNotExists()
+}
+
+func (n *AuxLoadDataStatementNode) Name() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetName())
+}
+
+func (n *AuxLoadDataStatementNode) TableElementList() *TableElementListNode {
+	return newTableElementListNode(n.raw.GetParent().GetTableElementList())
+}
+
+func (n *AuxLoadDataStatementNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
+func (n *AuxLoadDataStatementNode) LikeTableName() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetLikeTableName())
+}
+
+func (n *AuxLoadDataStatementNode) Collate() *CollateNode {
+	return newCollateNode(n.raw.GetParent().GetCollate())
+}
+
+func (n *AuxLoadDataStatementNode) WithConnectionClause() *WithConnectionClauseNode {
+	return newWithConnectionClauseNode(n.raw.GetParent().GetWithConnectionClause())
+}
+
 func (n *AuxLoadDataStatementNode) InsertionMode() generated.ASTAuxLoadDataStatementEnums_InsertionMode {
 	return n.raw.GetInsertionMode()
 }
@@ -3195,19 +3773,37 @@ func (n *AuxLoadDataStatementNode) IsTempTable() bool {
 
 func (n *AuxLoadDataStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPartitionBy() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetClusterBy() != nil {
+	if n.TableElementList() != nil {
 		count++
 	}
-	if n.raw.GetFromFiles() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
-	if n.raw.GetWithPartitionColumnsClause() != nil {
+	if n.LikeTableName() != nil {
 		count++
 	}
-	if n.raw.GetLoadDataPartitionsClause() != nil {
+	if n.Collate() != nil {
+		count++
+	}
+	if n.WithConnectionClause() != nil {
+		count++
+	}
+	if n.PartitionBy() != nil {
+		count++
+	}
+	if n.ClusterBy() != nil {
+		count++
+	}
+	if n.FromFiles() != nil {
+		count++
+	}
+	if n.WithPartitionColumnsClause() != nil {
+		count++
+	}
+	if n.LoadDataPartitionsClause() != nil {
 		count++
 	}
 	return count
@@ -3215,31 +3811,67 @@ func (n *AuxLoadDataStatementNode) NumChildren() int {
 
 func (n *AuxLoadDataStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPartitionBy() != nil {
+	if n.Name() != nil {
+		if idx == i {
+			return n.Name()
+		}
+		idx++
+	}
+	if n.TableElementList() != nil {
+		if idx == i {
+			return n.TableElementList()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.LikeTableName() != nil {
+		if idx == i {
+			return n.LikeTableName()
+		}
+		idx++
+	}
+	if n.Collate() != nil {
+		if idx == i {
+			return n.Collate()
+		}
+		idx++
+	}
+	if n.WithConnectionClause() != nil {
+		if idx == i {
+			return n.WithConnectionClause()
+		}
+		idx++
+	}
+	if n.PartitionBy() != nil {
 		if idx == i {
 			return n.PartitionBy()
 		}
 		idx++
 	}
-	if n.raw.GetClusterBy() != nil {
+	if n.ClusterBy() != nil {
 		if idx == i {
 			return n.ClusterBy()
 		}
 		idx++
 	}
-	if n.raw.GetFromFiles() != nil {
+	if n.FromFiles() != nil {
 		if idx == i {
 			return n.FromFiles()
 		}
 		idx++
 	}
-	if n.raw.GetWithPartitionColumnsClause() != nil {
+	if n.WithPartitionColumnsClause() != nil {
 		if idx == i {
 			return n.WithPartitionColumnsClause()
 		}
 		idx++
 	}
-	if n.raw.GetLoadDataPartitionsClause() != nil {
+	if n.LoadDataPartitionsClause() != nil {
 		if idx == i {
 			return n.LoadDataPartitionsClause()
 		}
@@ -3294,13 +3926,13 @@ func (n *BeginEndBlockNode) HandlerList() *ExceptionHandlerListNode {
 
 func (n *BeginEndBlockNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLabel() != nil {
+	if n.Label() != nil {
 		count++
 	}
-	if n.raw.GetStatementListNode() != nil {
+	if n.StatementListNode() != nil {
 		count++
 	}
-	if n.raw.GetHandlerList() != nil {
+	if n.HandlerList() != nil {
 		count++
 	}
 	return count
@@ -3308,19 +3940,19 @@ func (n *BeginEndBlockNode) NumChildren() int {
 
 func (n *BeginEndBlockNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLabel() != nil {
+	if n.Label() != nil {
 		if idx == i {
 			return n.Label()
 		}
 		idx++
 	}
-	if n.raw.GetStatementListNode() != nil {
+	if n.StatementListNode() != nil {
 		if idx == i {
 			return n.StatementListNode()
 		}
 		idx++
 	}
-	if n.raw.GetHandlerList() != nil {
+	if n.HandlerList() != nil {
 		if idx == i {
 			return n.HandlerList()
 		}
@@ -3367,7 +3999,7 @@ func (n *BeginStatementNode) ModeList() *TransactionModeListNode {
 
 func (n *BeginStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetModeList() != nil {
+	if n.ModeList() != nil {
 		count++
 	}
 	return count
@@ -3375,7 +4007,7 @@ func (n *BeginStatementNode) NumChildren() int {
 
 func (n *BeginStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetModeList() != nil {
+	if n.ModeList() != nil {
 		if idx == i {
 			return n.ModeList()
 		}
@@ -3416,6 +4048,10 @@ func (n *BetweenExpressionNode) ParseLocationRange() *generated.ParseLocationRan
 }
 func (n *BetweenExpressionNode) expressionNode() {}
 
+func (n *BetweenExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *BetweenExpressionNode) Lhs() ExpressionNode {
 	return wrapExpression(n.raw.GetLhs())
 }
@@ -3438,16 +4074,16 @@ func (n *BetweenExpressionNode) BetweenLocation() *LocationNode {
 
 func (n *BetweenExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLhs() != nil {
+	if n.Lhs() != nil {
 		count++
 	}
-	if n.raw.GetLow() != nil {
+	if n.Low() != nil {
 		count++
 	}
-	if n.raw.GetHigh() != nil {
+	if n.High() != nil {
 		count++
 	}
-	if n.raw.GetBetweenLocation() != nil {
+	if n.BetweenLocation() != nil {
 		count++
 	}
 	return count
@@ -3455,25 +4091,25 @@ func (n *BetweenExpressionNode) NumChildren() int {
 
 func (n *BetweenExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLhs() != nil {
+	if n.Lhs() != nil {
 		if idx == i {
 			return n.Lhs()
 		}
 		idx++
 	}
-	if n.raw.GetLow() != nil {
+	if n.Low() != nil {
 		if idx == i {
 			return n.Low()
 		}
 		idx++
 	}
-	if n.raw.GetHigh() != nil {
+	if n.High() != nil {
 		if idx == i {
 			return n.High()
 		}
 		idx++
 	}
-	if n.raw.GetBetweenLocation() != nil {
+	if n.BetweenLocation() != nil {
 		if idx == i {
 			return n.BetweenLocation()
 		}
@@ -3515,13 +4151,17 @@ func (n *BigNumericLiteralNode) ParseLocationRange() *generated.ParseLocationRan
 func (n *BigNumericLiteralNode) expressionNode() {}
 func (n *BigNumericLiteralNode) leafNode()       {}
 
+func (n *BigNumericLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParenthesized()
+}
+
 func (n *BigNumericLiteralNode) StringLiteral() *StringLiteralNode {
 	return newStringLiteralNode(n.raw.GetStringLiteral())
 }
 
 func (n *BigNumericLiteralNode) NumChildren() int {
 	count := 0
-	if n.raw.GetStringLiteral() != nil {
+	if n.StringLiteral() != nil {
 		count++
 	}
 	return count
@@ -3529,7 +4169,7 @@ func (n *BigNumericLiteralNode) NumChildren() int {
 
 func (n *BigNumericLiteralNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetStringLiteral() != nil {
+	if n.StringLiteral() != nil {
 		if idx == i {
 			return n.StringLiteral()
 		}
@@ -3570,6 +4210,10 @@ func (n *BinaryExpressionNode) ParseLocationRange() *generated.ParseLocationRang
 }
 func (n *BinaryExpressionNode) expressionNode() {}
 
+func (n *BinaryExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *BinaryExpressionNode) Op() generated.ASTBinaryExpressionEnums_Op {
 	return n.raw.GetOp()
 }
@@ -3588,10 +4232,10 @@ func (n *BinaryExpressionNode) Rhs() ExpressionNode {
 
 func (n *BinaryExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLhs() != nil {
+	if n.Lhs() != nil {
 		count++
 	}
-	if n.raw.GetRhs() != nil {
+	if n.Rhs() != nil {
 		count++
 	}
 	return count
@@ -3599,13 +4243,13 @@ func (n *BinaryExpressionNode) NumChildren() int {
 
 func (n *BinaryExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLhs() != nil {
+	if n.Lhs() != nil {
 		if idx == i {
 			return n.Lhs()
 		}
 		idx++
 	}
-	if n.raw.GetRhs() != nil {
+	if n.Rhs() != nil {
 		if idx == i {
 			return n.Rhs()
 		}
@@ -3646,6 +4290,10 @@ func (n *BitwiseShiftExpressionNode) ParseLocationRange() *generated.ParseLocati
 }
 func (n *BitwiseShiftExpressionNode) expressionNode() {}
 
+func (n *BitwiseShiftExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *BitwiseShiftExpressionNode) Lhs() ExpressionNode {
 	return wrapExpression(n.raw.GetLhs())
 }
@@ -3664,13 +4312,13 @@ func (n *BitwiseShiftExpressionNode) OperatorLocation() *LocationNode {
 
 func (n *BitwiseShiftExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLhs() != nil {
+	if n.Lhs() != nil {
 		count++
 	}
-	if n.raw.GetRhs() != nil {
+	if n.Rhs() != nil {
 		count++
 	}
-	if n.raw.GetOperatorLocation() != nil {
+	if n.OperatorLocation() != nil {
 		count++
 	}
 	return count
@@ -3678,19 +4326,19 @@ func (n *BitwiseShiftExpressionNode) NumChildren() int {
 
 func (n *BitwiseShiftExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLhs() != nil {
+	if n.Lhs() != nil {
 		if idx == i {
 			return n.Lhs()
 		}
 		idx++
 	}
-	if n.raw.GetRhs() != nil {
+	if n.Rhs() != nil {
 		if idx == i {
 			return n.Rhs()
 		}
 		idx++
 	}
-	if n.raw.GetOperatorLocation() != nil {
+	if n.OperatorLocation() != nil {
 		if idx == i {
 			return n.OperatorLocation()
 		}
@@ -3731,6 +4379,14 @@ func (n *BooleanLiteralNode) ParseLocationRange() *generated.ParseLocationRangeP
 }
 func (n *BooleanLiteralNode) expressionNode() {}
 func (n *BooleanLiteralNode) leafNode()       {}
+
+func (n *BooleanLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParent().GetParenthesized()
+}
+
+func (n *BooleanLiteralNode) Image() string {
+	return n.raw.GetParent().GetImage()
+}
 
 func (n *BooleanLiteralNode) Value() bool {
 	return n.raw.GetValue()
@@ -3776,6 +4432,10 @@ func (n *BoundedQuantifierNode) ParseLocationRange() *generated.ParseLocationRan
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *BoundedQuantifierNode) IsReluctant() bool {
+	return n.raw.GetParent().GetIsReluctant()
+}
+
 func (n *BoundedQuantifierNode) LowerBound() *QuantifierBoundNode {
 	return newQuantifierBoundNode(n.raw.GetLowerBound())
 }
@@ -3786,10 +4446,10 @@ func (n *BoundedQuantifierNode) UpperBound() *QuantifierBoundNode {
 
 func (n *BoundedQuantifierNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLowerBound() != nil {
+	if n.LowerBound() != nil {
 		count++
 	}
-	if n.raw.GetUpperBound() != nil {
+	if n.UpperBound() != nil {
 		count++
 	}
 	return count
@@ -3797,13 +4457,13 @@ func (n *BoundedQuantifierNode) NumChildren() int {
 
 func (n *BoundedQuantifierNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLowerBound() != nil {
+	if n.LowerBound() != nil {
 		if idx == i {
 			return n.LowerBound()
 		}
 		idx++
 	}
-	if n.raw.GetUpperBound() != nil {
+	if n.UpperBound() != nil {
 		if idx == i {
 			return n.UpperBound()
 		}
@@ -3857,10 +4517,10 @@ func (n *BracedConstructorFieldNode) BracedConstructorLhs() *BracedConstructorLh
 
 func (n *BracedConstructorFieldNode) NumChildren() int {
 	count := 0
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		count++
 	}
-	if n.raw.GetBracedConstructorLhs() != nil {
+	if n.BracedConstructorLhs() != nil {
 		count++
 	}
 	return count
@@ -3868,13 +4528,13 @@ func (n *BracedConstructorFieldNode) NumChildren() int {
 
 func (n *BracedConstructorFieldNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		if idx == i {
 			return n.Value()
 		}
 		idx++
 	}
-	if n.raw.GetBracedConstructorLhs() != nil {
+	if n.BracedConstructorLhs() != nil {
 		if idx == i {
 			return n.BracedConstructorLhs()
 		}
@@ -3924,7 +4584,7 @@ func (n *BracedConstructorFieldValueNode) ColonPrefixed() bool {
 
 func (n *BracedConstructorFieldValueNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -3932,7 +4592,7 @@ func (n *BracedConstructorFieldValueNode) NumChildren() int {
 
 func (n *BracedConstructorFieldValueNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -3973,6 +4633,10 @@ func (n *BracedConstructorLhsNode) ParseLocationRange() *generated.ParseLocation
 }
 func (n *BracedConstructorLhsNode) expressionNode() {}
 
+func (n *BracedConstructorLhsNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *BracedConstructorLhsNode) ExtendedPathExpr() ExpressionNode {
 	return wrapGeneralizedPathExpression(n.raw.GetExtendedPathExpr())
 }
@@ -3983,7 +4647,7 @@ func (n *BracedConstructorLhsNode) Operation() generated.ASTBracedConstructorLhs
 
 func (n *BracedConstructorLhsNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExtendedPathExpr() != nil {
+	if n.ExtendedPathExpr() != nil {
 		count++
 	}
 	return count
@@ -3991,7 +4655,7 @@ func (n *BracedConstructorLhsNode) NumChildren() int {
 
 func (n *BracedConstructorLhsNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExtendedPathExpr() != nil {
+	if n.ExtendedPathExpr() != nil {
 		if idx == i {
 			return n.ExtendedPathExpr()
 		}
@@ -4031,6 +4695,10 @@ func (n *BracedConstructorNode) ParseLocationRange() *generated.ParseLocationRan
 	return parseLocationRangeOf(n.raw)
 }
 func (n *BracedConstructorNode) expressionNode() {}
+
+func (n *BracedConstructorNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
 
 func (n *BracedConstructorNode) Fields() []*BracedConstructorFieldNode {
 	return newBracedConstructorFieldNodeSlice(n.raw.GetFields())
@@ -4086,6 +4754,10 @@ func (n *BracedNewConstructorNode) ParseLocationRange() *generated.ParseLocation
 }
 func (n *BracedNewConstructorNode) expressionNode() {}
 
+func (n *BracedNewConstructorNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *BracedNewConstructorNode) TypeName() *SimpleTypeNode {
 	return newSimpleTypeNode(n.raw.GetTypeName())
 }
@@ -4096,10 +4768,10 @@ func (n *BracedNewConstructorNode) BracedConstructor() *BracedConstructorNode {
 
 func (n *BracedNewConstructorNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTypeName() != nil {
+	if n.TypeName() != nil {
 		count++
 	}
-	if n.raw.GetBracedConstructor() != nil {
+	if n.BracedConstructor() != nil {
 		count++
 	}
 	return count
@@ -4107,13 +4779,13 @@ func (n *BracedNewConstructorNode) NumChildren() int {
 
 func (n *BracedNewConstructorNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTypeName() != nil {
+	if n.TypeName() != nil {
 		if idx == i {
 			return n.TypeName()
 		}
 		idx++
 	}
-	if n.raw.GetBracedConstructor() != nil {
+	if n.BracedConstructor() != nil {
 		if idx == i {
 			return n.BracedConstructor()
 		}
@@ -4154,16 +4826,30 @@ func (n *BreakStatementNode) ParseLocationRange() *generated.ParseLocationRangeP
 }
 func (n *BreakStatementNode) statementNode() {}
 
+func (n *BreakStatementNode) Label() *LabelNode {
+	return newLabelNode(n.raw.GetParent().GetLabel())
+}
+
 func (n *BreakStatementNode) Keyword() generated.ASTBreakContinueStatementEnums_BreakContinueKeyword {
 	return n.raw.GetKeyword()
 }
 
 func (n *BreakStatementNode) NumChildren() int {
 	count := 0
+	if n.Label() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *BreakStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Label() != nil {
+		if idx == i {
+			return n.Label()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -4199,6 +4885,14 @@ func (n *BytesLiteralComponentNode) ParseLocationRange() *generated.ParseLocatio
 }
 func (n *BytesLiteralComponentNode) expressionNode() {}
 func (n *BytesLiteralComponentNode) leafNode()       {}
+
+func (n *BytesLiteralComponentNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParent().GetParenthesized()
+}
+
+func (n *BytesLiteralComponentNode) Image() string {
+	return n.raw.GetParent().GetImage()
+}
 
 func (n *BytesLiteralComponentNode) NumChildren() int {
 	count := 0
@@ -4241,6 +4935,10 @@ func (n *BytesLiteralNode) ParseLocationRange() *generated.ParseLocationRangePro
 }
 func (n *BytesLiteralNode) expressionNode() {}
 func (n *BytesLiteralNode) leafNode()       {}
+
+func (n *BytesLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParenthesized()
+}
 
 func (n *BytesLiteralNode) Components() []*BytesLiteralComponentNode {
 	return newBytesLiteralComponentNodeSlice(n.raw.GetComponents())
@@ -4310,7 +5008,7 @@ func (n *CallStatementNode) Arguments() []*TVFArgumentNode {
 
 func (n *CallStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetProcedureName() != nil {
+	if n.ProcedureName() != nil {
 		count++
 	}
 	count += len(n.Arguments())
@@ -4319,7 +5017,7 @@ func (n *CallStatementNode) NumChildren() int {
 
 func (n *CallStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetProcedureName() != nil {
+	if n.ProcedureName() != nil {
 		if idx == i {
 			return n.ProcedureName()
 		}
@@ -4366,6 +5064,10 @@ func (n *CaseNoValueExpressionNode) ParseLocationRange() *generated.ParseLocatio
 	return parseLocationRangeOf(n.raw)
 }
 func (n *CaseNoValueExpressionNode) expressionNode() {}
+
+func (n *CaseNoValueExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
 
 func (n *CaseNoValueExpressionNode) Arguments() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetArguments())
@@ -4435,13 +5137,13 @@ func (n *CaseStatementNode) ElseList() *StatementListNode {
 
 func (n *CaseStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetWhenThenClauses() != nil {
+	if n.WhenThenClauses() != nil {
 		count++
 	}
-	if n.raw.GetElseList() != nil {
+	if n.ElseList() != nil {
 		count++
 	}
 	return count
@@ -4449,19 +5151,19 @@ func (n *CaseStatementNode) NumChildren() int {
 
 func (n *CaseStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetWhenThenClauses() != nil {
+	if n.WhenThenClauses() != nil {
 		if idx == i {
 			return n.WhenThenClauses()
 		}
 		idx++
 	}
-	if n.raw.GetElseList() != nil {
+	if n.ElseList() != nil {
 		if idx == i {
 			return n.ElseList()
 		}
@@ -4501,6 +5203,10 @@ func (n *CaseValueExpressionNode) ParseLocationRange() *generated.ParseLocationR
 	return parseLocationRangeOf(n.raw)
 }
 func (n *CaseValueExpressionNode) expressionNode() {}
+
+func (n *CaseValueExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
 
 func (n *CaseValueExpressionNode) Arguments() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetArguments())
@@ -4556,6 +5262,10 @@ func (n *CastExpressionNode) ParseLocationRange() *generated.ParseLocationRangeP
 }
 func (n *CastExpressionNode) expressionNode() {}
 
+func (n *CastExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *CastExpressionNode) Expr() ExpressionNode {
 	return wrapExpression(n.raw.GetExpr())
 }
@@ -4574,13 +5284,13 @@ func (n *CastExpressionNode) IsSafeCast() bool {
 
 func (n *CastExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		count++
 	}
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		count++
 	}
-	if n.raw.GetFormat() != nil {
+	if n.Format() != nil {
 		count++
 	}
 	return count
@@ -4588,19 +5298,19 @@ func (n *CastExpressionNode) NumChildren() int {
 
 func (n *CastExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		if idx == i {
 			return n.Expr()
 		}
 		idx++
 	}
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		if idx == i {
 			return n.Type()
 		}
 		idx++
 	}
-	if n.raw.GetFormat() != nil {
+	if n.Format() != nil {
 		if idx == i {
 			return n.Format()
 		}
@@ -4646,7 +5356,7 @@ func (n *ChainedBaseExprNode) Expr() ExpressionNode {
 
 func (n *ChainedBaseExprNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		count++
 	}
 	return count
@@ -4654,7 +5364,7 @@ func (n *ChainedBaseExprNode) NumChildren() int {
 
 func (n *ChainedBaseExprNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		if idx == i {
 			return n.Expr()
 		}
@@ -4712,13 +5422,13 @@ func (n *CheckConstraintNode) IsEnforced() bool {
 
 func (n *CheckConstraintNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		count++
 	}
 	return count
@@ -4726,19 +5436,19 @@ func (n *CheckConstraintNode) NumChildren() int {
 
 func (n *CheckConstraintNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
 		idx++
 	}
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		if idx == i {
 			return n.ConstraintName()
 		}
@@ -4788,10 +5498,10 @@ func (n *ClampedBetweenModifierNode) High() ExpressionNode {
 
 func (n *ClampedBetweenModifierNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLow() != nil {
+	if n.Low() != nil {
 		count++
 	}
-	if n.raw.GetHigh() != nil {
+	if n.High() != nil {
 		count++
 	}
 	return count
@@ -4799,13 +5509,13 @@ func (n *ClampedBetweenModifierNode) NumChildren() int {
 
 func (n *ClampedBetweenModifierNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLow() != nil {
+	if n.Low() != nil {
 		if idx == i {
 			return n.Low()
 		}
 		idx++
 	}
-	if n.raw.GetHigh() != nil {
+	if n.High() != nil {
 		if idx == i {
 			return n.High()
 		}
@@ -4899,12 +5609,64 @@ func (n *CloneDataSourceNode) ParseLocationRange() *generated.ParseLocationRange
 }
 func (n *CloneDataSourceNode) tableExpressionNode() {}
 
+func (n *CloneDataSourceNode) PostfixOperators() []Node {
+	return wrapPostfixTableOperatorSlice(n.raw.GetParent().GetParent().GetPostfixOperators())
+}
+
+func (n *CloneDataSourceNode) PathExpr() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPathExpr())
+}
+
+func (n *CloneDataSourceNode) ForSystemTime() *ForSystemTimeNode {
+	return newForSystemTimeNode(n.raw.GetParent().GetForSystemTime())
+}
+
+func (n *CloneDataSourceNode) WhereClause() *WhereClauseNode {
+	return newWhereClauseNode(n.raw.GetParent().GetWhereClause())
+}
+
 func (n *CloneDataSourceNode) NumChildren() int {
 	count := 0
+	count += len(n.PostfixOperators())
+	if n.PathExpr() != nil {
+		count++
+	}
+	if n.ForSystemTime() != nil {
+		count++
+	}
+	if n.WhereClause() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *CloneDataSourceNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.PostfixOperators()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.PathExpr() != nil {
+		if idx == i {
+			return n.PathExpr()
+		}
+		idx++
+	}
+	if n.ForSystemTime() != nil {
+		if idx == i {
+			return n.ForSystemTime()
+		}
+		idx++
+	}
+	if n.WhereClause() != nil {
+		if idx == i {
+			return n.WhereClause()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -4950,10 +5712,10 @@ func (n *CloneDataStatementNode) DataSourceList() *CloneDataSourceListNode {
 
 func (n *CloneDataStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		count++
 	}
-	if n.raw.GetDataSourceList() != nil {
+	if n.DataSourceList() != nil {
 		count++
 	}
 	return count
@@ -4961,13 +5723,13 @@ func (n *CloneDataStatementNode) NumChildren() int {
 
 func (n *CloneDataStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		if idx == i {
 			return n.TargetPath()
 		}
 		idx++
 	}
-	if n.raw.GetDataSourceList() != nil {
+	if n.DataSourceList() != nil {
 		if idx == i {
 			return n.DataSourceList()
 		}
@@ -5066,7 +5828,7 @@ func (n *CollateNode) CollationName() ExpressionNode {
 
 func (n *CollateNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCollationName() != nil {
+	if n.CollationName() != nil {
 		count++
 	}
 	return count
@@ -5074,7 +5836,7 @@ func (n *CollateNode) NumChildren() int {
 
 func (n *CollateNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCollationName() != nil {
+	if n.CollationName() != nil {
 		if idx == i {
 			return n.CollationName()
 		}
@@ -5177,10 +5939,10 @@ func (n *ColumnDefinitionNode) Schema() Node {
 
 func (n *ColumnDefinitionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetSchema() != nil {
+	if n.Schema() != nil {
 		count++
 	}
 	return count
@@ -5188,13 +5950,13 @@ func (n *ColumnDefinitionNode) NumChildren() int {
 
 func (n *ColumnDefinitionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetSchema() != nil {
+	if n.Schema() != nil {
 		if idx == i {
 			return n.Schema()
 		}
@@ -5297,7 +6059,7 @@ func (n *ColumnPositionNode) Type() generated.ASTColumnPositionEnums_RelativePos
 
 func (n *ColumnPositionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		count++
 	}
 	return count
@@ -5305,7 +6067,7 @@ func (n *ColumnPositionNode) NumChildren() int {
 
 func (n *ColumnPositionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		if idx == i {
 			return n.Identifier()
 		}
@@ -5408,10 +6170,10 @@ func (n *ColumnWithOptionsNode) OptionsList() *OptionsListNode {
 
 func (n *ColumnWithOptionsNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -5419,13 +6181,13 @@ func (n *ColumnWithOptionsNode) NumChildren() int {
 
 func (n *ColumnWithOptionsNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -5507,6 +6269,10 @@ func (n *ConcatExprNode) ParseLocationRange() *generated.ParseLocationRangeProto
 }
 func (n *ConcatExprNode) expressionNode() {}
 
+func (n *ConcatExprNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *ConcatExprNode) Operands() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetOperands())
 }
@@ -5566,7 +6332,7 @@ func (n *ConnectionClauseNode) ConnectionPath() ExpressionNode {
 
 func (n *ConnectionClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetConnectionPath() != nil {
+	if n.ConnectionPath() != nil {
 		count++
 	}
 	return count
@@ -5574,7 +6340,7 @@ func (n *ConnectionClauseNode) NumChildren() int {
 
 func (n *ConnectionClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetConnectionPath() != nil {
+	if n.ConnectionPath() != nil {
 		if idx == i {
 			return n.ConnectionPath()
 		}
@@ -5615,16 +6381,30 @@ func (n *ContinueStatementNode) ParseLocationRange() *generated.ParseLocationRan
 }
 func (n *ContinueStatementNode) statementNode() {}
 
+func (n *ContinueStatementNode) Label() *LabelNode {
+	return newLabelNode(n.raw.GetParent().GetLabel())
+}
+
 func (n *ContinueStatementNode) Keyword() generated.ASTBreakContinueStatementEnums_BreakContinueKeyword {
 	return n.raw.GetKeyword()
 }
 
 func (n *ContinueStatementNode) NumChildren() int {
 	count := 0
+	if n.Label() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *ContinueStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Label() != nil {
+		if idx == i {
+			return n.Label()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -5660,12 +6440,64 @@ func (n *CopyDataSourceNode) ParseLocationRange() *generated.ParseLocationRangeP
 }
 func (n *CopyDataSourceNode) tableExpressionNode() {}
 
+func (n *CopyDataSourceNode) PostfixOperators() []Node {
+	return wrapPostfixTableOperatorSlice(n.raw.GetParent().GetParent().GetPostfixOperators())
+}
+
+func (n *CopyDataSourceNode) PathExpr() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetPathExpr())
+}
+
+func (n *CopyDataSourceNode) ForSystemTime() *ForSystemTimeNode {
+	return newForSystemTimeNode(n.raw.GetParent().GetForSystemTime())
+}
+
+func (n *CopyDataSourceNode) WhereClause() *WhereClauseNode {
+	return newWhereClauseNode(n.raw.GetParent().GetWhereClause())
+}
+
 func (n *CopyDataSourceNode) NumChildren() int {
 	count := 0
+	count += len(n.PostfixOperators())
+	if n.PathExpr() != nil {
+		count++
+	}
+	if n.ForSystemTime() != nil {
+		count++
+	}
+	if n.WhereClause() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *CopyDataSourceNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.PostfixOperators()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.PathExpr() != nil {
+		if idx == i {
+			return n.PathExpr()
+		}
+		idx++
+	}
+	if n.ForSystemTime() != nil {
+		if idx == i {
+			return n.ForSystemTime()
+		}
+		idx++
+	}
+	if n.WhereClause() != nil {
+		if idx == i {
+			return n.WhereClause()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -5701,12 +6533,85 @@ func (n *CreateApproxViewStatementNode) ParseLocationRange() *generated.ParseLoc
 }
 func (n *CreateApproxViewStatementNode) statementNode() {}
 
+func (n *CreateApproxViewStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetParent().GetScope()
+}
+
+func (n *CreateApproxViewStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetParent().GetIsOrReplace()
+}
+
+func (n *CreateApproxViewStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetParent().GetIsIfNotExists()
+}
+
+func (n *CreateApproxViewStatementNode) Name() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetName())
+}
+
+func (n *CreateApproxViewStatementNode) ColumnWithOptionsList() *ColumnWithOptionsListNode {
+	return newColumnWithOptionsListNode(n.raw.GetParent().GetColumnWithOptionsList())
+}
+
+func (n *CreateApproxViewStatementNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
+func (n *CreateApproxViewStatementNode) Query() *QueryNode {
+	return newQueryNode(n.raw.GetParent().GetQuery())
+}
+
+func (n *CreateApproxViewStatementNode) SqlSecurity() generated.ASTCreateStatementEnums_SqlSecurity {
+	return n.raw.GetParent().GetSqlSecurity()
+}
+
+func (n *CreateApproxViewStatementNode) Recursive() bool {
+	return n.raw.GetParent().GetRecursive()
+}
+
 func (n *CreateApproxViewStatementNode) NumChildren() int {
 	count := 0
+	if n.Name() != nil {
+		count++
+	}
+	if n.ColumnWithOptionsList() != nil {
+		count++
+	}
+	if n.OptionsList() != nil {
+		count++
+	}
+	if n.Query() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *CreateApproxViewStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Name() != nil {
+		if idx == i {
+			return n.Name()
+		}
+		idx++
+	}
+	if n.ColumnWithOptionsList() != nil {
+		if idx == i {
+			return n.ColumnWithOptionsList()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.Query() != nil {
+		if idx == i {
+			return n.Query()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -5742,6 +6647,18 @@ func (n *CreateConnectionStatementNode) ParseLocationRange() *generated.ParseLoc
 }
 func (n *CreateConnectionStatementNode) statementNode() {}
 
+func (n *CreateConnectionStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetScope()
+}
+
+func (n *CreateConnectionStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetIsOrReplace()
+}
+
+func (n *CreateConnectionStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetIsIfNotExists()
+}
+
 func (n *CreateConnectionStatementNode) Name() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetName())
 }
@@ -5752,10 +6669,10 @@ func (n *CreateConnectionStatementNode) OptionsList() *OptionsListNode {
 
 func (n *CreateConnectionStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -5763,13 +6680,13 @@ func (n *CreateConnectionStatementNode) NumChildren() int {
 
 func (n *CreateConnectionStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -5810,6 +6727,18 @@ func (n *CreateConstantStatementNode) ParseLocationRange() *generated.ParseLocat
 }
 func (n *CreateConstantStatementNode) statementNode() {}
 
+func (n *CreateConstantStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetScope()
+}
+
+func (n *CreateConstantStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetIsOrReplace()
+}
+
+func (n *CreateConstantStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetIsIfNotExists()
+}
+
 func (n *CreateConstantStatementNode) Name() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetName())
 }
@@ -5820,10 +6749,10 @@ func (n *CreateConstantStatementNode) Expr() ExpressionNode {
 
 func (n *CreateConstantStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		count++
 	}
 	return count
@@ -5831,13 +6760,13 @@ func (n *CreateConstantStatementNode) NumChildren() int {
 
 func (n *CreateConstantStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		if idx == i {
 			return n.Expr()
 		}
@@ -5888,10 +6817,10 @@ func (n *CreateDatabaseStatementNode) OptionsList() *OptionsListNode {
 
 func (n *CreateDatabaseStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -5899,13 +6828,13 @@ func (n *CreateDatabaseStatementNode) NumChildren() int {
 
 func (n *CreateDatabaseStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -5946,6 +6875,18 @@ func (n *CreateEntityStatementNode) ParseLocationRange() *generated.ParseLocatio
 }
 func (n *CreateEntityStatementNode) statementNode() {}
 
+func (n *CreateEntityStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetScope()
+}
+
+func (n *CreateEntityStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetIsOrReplace()
+}
+
+func (n *CreateEntityStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetIsIfNotExists()
+}
+
 func (n *CreateEntityStatementNode) Type() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetType())
 }
@@ -5968,19 +6909,19 @@ func (n *CreateEntityStatementNode) TextBody() *StringLiteralNode {
 
 func (n *CreateEntityStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		count++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
-	if n.raw.GetJsonBody() != nil {
+	if n.JsonBody() != nil {
 		count++
 	}
-	if n.raw.GetTextBody() != nil {
+	if n.TextBody() != nil {
 		count++
 	}
 	return count
@@ -5988,31 +6929,31 @@ func (n *CreateEntityStatementNode) NumChildren() int {
 
 func (n *CreateEntityStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		if idx == i {
 			return n.Type()
 		}
 		idx++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
 		idx++
 	}
-	if n.raw.GetJsonBody() != nil {
+	if n.JsonBody() != nil {
 		if idx == i {
 			return n.JsonBody()
 		}
 		idx++
 	}
-	if n.raw.GetTextBody() != nil {
+	if n.TextBody() != nil {
 		if idx == i {
 			return n.TextBody()
 		}
@@ -6053,13 +6994,39 @@ func (n *CreateExternalSchemaStatementNode) ParseLocationRange() *generated.Pars
 }
 func (n *CreateExternalSchemaStatementNode) statementNode() {}
 
+func (n *CreateExternalSchemaStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetParent().GetScope()
+}
+
+func (n *CreateExternalSchemaStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetParent().GetIsOrReplace()
+}
+
+func (n *CreateExternalSchemaStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetParent().GetIsIfNotExists()
+}
+
+func (n *CreateExternalSchemaStatementNode) Name() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetName())
+}
+
+func (n *CreateExternalSchemaStatementNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
 func (n *CreateExternalSchemaStatementNode) WithConnectionClause() *WithConnectionClauseNode {
 	return newWithConnectionClauseNode(n.raw.GetWithConnectionClause())
 }
 
 func (n *CreateExternalSchemaStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.Name() != nil {
+		count++
+	}
+	if n.OptionsList() != nil {
+		count++
+	}
+	if n.WithConnectionClause() != nil {
 		count++
 	}
 	return count
@@ -6067,7 +7034,19 @@ func (n *CreateExternalSchemaStatementNode) NumChildren() int {
 
 func (n *CreateExternalSchemaStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.Name() != nil {
+		if idx == i {
+			return n.Name()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.WithConnectionClause() != nil {
 		if idx == i {
 			return n.WithConnectionClause()
 		}
@@ -6108,13 +7087,67 @@ func (n *CreateExternalTableStatementNode) ParseLocationRange() *generated.Parse
 }
 func (n *CreateExternalTableStatementNode) statementNode() {}
 
+func (n *CreateExternalTableStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetParent().GetScope()
+}
+
+func (n *CreateExternalTableStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetParent().GetIsOrReplace()
+}
+
+func (n *CreateExternalTableStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetParent().GetIsIfNotExists()
+}
+
+func (n *CreateExternalTableStatementNode) Name() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetName())
+}
+
+func (n *CreateExternalTableStatementNode) TableElementList() *TableElementListNode {
+	return newTableElementListNode(n.raw.GetParent().GetTableElementList())
+}
+
+func (n *CreateExternalTableStatementNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
+func (n *CreateExternalTableStatementNode) LikeTableName() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetLikeTableName())
+}
+
+func (n *CreateExternalTableStatementNode) Collate() *CollateNode {
+	return newCollateNode(n.raw.GetParent().GetCollate())
+}
+
+func (n *CreateExternalTableStatementNode) WithConnectionClause() *WithConnectionClauseNode {
+	return newWithConnectionClauseNode(n.raw.GetParent().GetWithConnectionClause())
+}
+
 func (n *CreateExternalTableStatementNode) WithPartitionColumnsClause() *WithPartitionColumnsClauseNode {
 	return newWithPartitionColumnsClauseNode(n.raw.GetWithPartitionColumnsClause())
 }
 
 func (n *CreateExternalTableStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetWithPartitionColumnsClause() != nil {
+	if n.Name() != nil {
+		count++
+	}
+	if n.TableElementList() != nil {
+		count++
+	}
+	if n.OptionsList() != nil {
+		count++
+	}
+	if n.LikeTableName() != nil {
+		count++
+	}
+	if n.Collate() != nil {
+		count++
+	}
+	if n.WithConnectionClause() != nil {
+		count++
+	}
+	if n.WithPartitionColumnsClause() != nil {
 		count++
 	}
 	return count
@@ -6122,7 +7155,43 @@ func (n *CreateExternalTableStatementNode) NumChildren() int {
 
 func (n *CreateExternalTableStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetWithPartitionColumnsClause() != nil {
+	if n.Name() != nil {
+		if idx == i {
+			return n.Name()
+		}
+		idx++
+	}
+	if n.TableElementList() != nil {
+		if idx == i {
+			return n.TableElementList()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.LikeTableName() != nil {
+		if idx == i {
+			return n.LikeTableName()
+		}
+		idx++
+	}
+	if n.Collate() != nil {
+		if idx == i {
+			return n.Collate()
+		}
+		idx++
+	}
+	if n.WithConnectionClause() != nil {
+		if idx == i {
+			return n.WithConnectionClause()
+		}
+		idx++
+	}
+	if n.WithPartitionColumnsClause() != nil {
 		if idx == i {
 			return n.WithPartitionColumnsClause()
 		}
@@ -6163,6 +7232,42 @@ func (n *CreateFunctionStatementNode) ParseLocationRange() *generated.ParseLocat
 }
 func (n *CreateFunctionStatementNode) statementNode() {}
 
+func (n *CreateFunctionStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetParent().GetScope()
+}
+
+func (n *CreateFunctionStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetParent().GetIsOrReplace()
+}
+
+func (n *CreateFunctionStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetParent().GetIsIfNotExists()
+}
+
+func (n *CreateFunctionStatementNode) FunctionDeclaration() *FunctionDeclarationNode {
+	return newFunctionDeclarationNode(n.raw.GetParent().GetFunctionDeclaration())
+}
+
+func (n *CreateFunctionStatementNode) Language() *IdentifierNode {
+	return newIdentifierNode(n.raw.GetParent().GetLanguage())
+}
+
+func (n *CreateFunctionStatementNode) Code() *StringLiteralNode {
+	return newStringLiteralNode(n.raw.GetParent().GetCode())
+}
+
+func (n *CreateFunctionStatementNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
+func (n *CreateFunctionStatementNode) DeterminismLevel() generated.ASTCreateFunctionStmtBaseEnums_DeterminismLevel {
+	return n.raw.GetParent().GetDeterminismLevel()
+}
+
+func (n *CreateFunctionStatementNode) SqlSecurity() generated.ASTCreateStatementEnums_SqlSecurity {
+	return n.raw.GetParent().GetSqlSecurity()
+}
+
 func (n *CreateFunctionStatementNode) ReturnType() Node {
 	return wrapType(n.raw.GetReturnType())
 }
@@ -6185,13 +7290,25 @@ func (n *CreateFunctionStatementNode) WithConnectionClause() *WithConnectionClau
 
 func (n *CreateFunctionStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetReturnType() != nil {
+	if n.FunctionDeclaration() != nil {
 		count++
 	}
-	if n.raw.GetSqlFunctionBody() != nil {
+	if n.Language() != nil {
 		count++
 	}
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.Code() != nil {
+		count++
+	}
+	if n.OptionsList() != nil {
+		count++
+	}
+	if n.ReturnType() != nil {
+		count++
+	}
+	if n.SqlFunctionBody() != nil {
+		count++
+	}
+	if n.WithConnectionClause() != nil {
 		count++
 	}
 	return count
@@ -6199,19 +7316,43 @@ func (n *CreateFunctionStatementNode) NumChildren() int {
 
 func (n *CreateFunctionStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetReturnType() != nil {
+	if n.FunctionDeclaration() != nil {
+		if idx == i {
+			return n.FunctionDeclaration()
+		}
+		idx++
+	}
+	if n.Language() != nil {
+		if idx == i {
+			return n.Language()
+		}
+		idx++
+	}
+	if n.Code() != nil {
+		if idx == i {
+			return n.Code()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.ReturnType() != nil {
 		if idx == i {
 			return n.ReturnType()
 		}
 		idx++
 	}
-	if n.raw.GetSqlFunctionBody() != nil {
+	if n.SqlFunctionBody() != nil {
 		if idx == i {
 			return n.SqlFunctionBody()
 		}
 		idx++
 	}
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.WithConnectionClause() != nil {
 		if idx == i {
 			return n.WithConnectionClause()
 		}
@@ -6251,6 +7392,18 @@ func (n *CreateIndexStatementNode) ParseLocationRange() *generated.ParseLocation
 	return parseLocationRangeOf(n.raw)
 }
 func (n *CreateIndexStatementNode) statementNode() {}
+
+func (n *CreateIndexStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetScope()
+}
+
+func (n *CreateIndexStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetIsOrReplace()
+}
+
+func (n *CreateIndexStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetIsIfNotExists()
+}
 
 func (n *CreateIndexStatementNode) Name() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetName())
@@ -6306,31 +7459,31 @@ func (n *CreateIndexStatementNode) IsVector() bool {
 
 func (n *CreateIndexStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetTableName() != nil {
+	if n.TableName() != nil {
 		count++
 	}
-	if n.raw.GetOptionalTableAlias() != nil {
+	if n.OptionalTableAlias() != nil {
 		count++
 	}
-	if n.raw.GetOptionalIndexUnnestExpressionList() != nil {
+	if n.OptionalIndexUnnestExpressionList() != nil {
 		count++
 	}
-	if n.raw.GetIndexItemList() != nil {
+	if n.IndexItemList() != nil {
 		count++
 	}
-	if n.raw.GetOptionalIndexStoringExpressions() != nil {
+	if n.OptionalIndexStoringExpressions() != nil {
 		count++
 	}
-	if n.raw.GetOptionalPartitionBy() != nil {
+	if n.OptionalPartitionBy() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
-	if n.raw.GetSpannerInterleaveClause() != nil {
+	if n.SpannerInterleaveClause() != nil {
 		count++
 	}
 	return count
@@ -6338,55 +7491,55 @@ func (n *CreateIndexStatementNode) NumChildren() int {
 
 func (n *CreateIndexStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetTableName() != nil {
+	if n.TableName() != nil {
 		if idx == i {
 			return n.TableName()
 		}
 		idx++
 	}
-	if n.raw.GetOptionalTableAlias() != nil {
+	if n.OptionalTableAlias() != nil {
 		if idx == i {
 			return n.OptionalTableAlias()
 		}
 		idx++
 	}
-	if n.raw.GetOptionalIndexUnnestExpressionList() != nil {
+	if n.OptionalIndexUnnestExpressionList() != nil {
 		if idx == i {
 			return n.OptionalIndexUnnestExpressionList()
 		}
 		idx++
 	}
-	if n.raw.GetIndexItemList() != nil {
+	if n.IndexItemList() != nil {
 		if idx == i {
 			return n.IndexItemList()
 		}
 		idx++
 	}
-	if n.raw.GetOptionalIndexStoringExpressions() != nil {
+	if n.OptionalIndexStoringExpressions() != nil {
 		if idx == i {
 			return n.OptionalIndexStoringExpressions()
 		}
 		idx++
 	}
-	if n.raw.GetOptionalPartitionBy() != nil {
+	if n.OptionalPartitionBy() != nil {
 		if idx == i {
 			return n.OptionalPartitionBy()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
 		idx++
 	}
-	if n.raw.GetSpannerInterleaveClause() != nil {
+	if n.SpannerInterleaveClause() != nil {
 		if idx == i {
 			return n.SpannerInterleaveClause()
 		}
@@ -6437,10 +7590,10 @@ func (n *CreateLocalityGroupStatementNode) OptionsList() *OptionsListNode {
 
 func (n *CreateLocalityGroupStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -6448,13 +7601,13 @@ func (n *CreateLocalityGroupStatementNode) NumChildren() int {
 
 func (n *CreateLocalityGroupStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -6495,6 +7648,42 @@ func (n *CreateMaterializedViewStatementNode) ParseLocationRange() *generated.Pa
 }
 func (n *CreateMaterializedViewStatementNode) statementNode() {}
 
+func (n *CreateMaterializedViewStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetParent().GetScope()
+}
+
+func (n *CreateMaterializedViewStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetParent().GetIsOrReplace()
+}
+
+func (n *CreateMaterializedViewStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetParent().GetIsIfNotExists()
+}
+
+func (n *CreateMaterializedViewStatementNode) Name() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetName())
+}
+
+func (n *CreateMaterializedViewStatementNode) ColumnWithOptionsList() *ColumnWithOptionsListNode {
+	return newColumnWithOptionsListNode(n.raw.GetParent().GetColumnWithOptionsList())
+}
+
+func (n *CreateMaterializedViewStatementNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
+func (n *CreateMaterializedViewStatementNode) Query() *QueryNode {
+	return newQueryNode(n.raw.GetParent().GetQuery())
+}
+
+func (n *CreateMaterializedViewStatementNode) SqlSecurity() generated.ASTCreateStatementEnums_SqlSecurity {
+	return n.raw.GetParent().GetSqlSecurity()
+}
+
+func (n *CreateMaterializedViewStatementNode) Recursive() bool {
+	return n.raw.GetParent().GetRecursive()
+}
+
 func (n *CreateMaterializedViewStatementNode) PartitionBy() *PartitionByNode {
 	return newPartitionByNode(n.raw.GetPartitionBy())
 }
@@ -6509,13 +7698,25 @@ func (n *CreateMaterializedViewStatementNode) ReplicaSource() *PathExpressionNod
 
 func (n *CreateMaterializedViewStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPartitionBy() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetClusterBy() != nil {
+	if n.ColumnWithOptionsList() != nil {
 		count++
 	}
-	if n.raw.GetReplicaSource() != nil {
+	if n.OptionsList() != nil {
+		count++
+	}
+	if n.Query() != nil {
+		count++
+	}
+	if n.PartitionBy() != nil {
+		count++
+	}
+	if n.ClusterBy() != nil {
+		count++
+	}
+	if n.ReplicaSource() != nil {
 		count++
 	}
 	return count
@@ -6523,19 +7724,43 @@ func (n *CreateMaterializedViewStatementNode) NumChildren() int {
 
 func (n *CreateMaterializedViewStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPartitionBy() != nil {
+	if n.Name() != nil {
+		if idx == i {
+			return n.Name()
+		}
+		idx++
+	}
+	if n.ColumnWithOptionsList() != nil {
+		if idx == i {
+			return n.ColumnWithOptionsList()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.Query() != nil {
+		if idx == i {
+			return n.Query()
+		}
+		idx++
+	}
+	if n.PartitionBy() != nil {
 		if idx == i {
 			return n.PartitionBy()
 		}
 		idx++
 	}
-	if n.raw.GetClusterBy() != nil {
+	if n.ClusterBy() != nil {
 		if idx == i {
 			return n.ClusterBy()
 		}
 		idx++
 	}
-	if n.raw.GetReplicaSource() != nil {
+	if n.ReplicaSource() != nil {
 		if idx == i {
 			return n.ReplicaSource()
 		}
@@ -6576,6 +7801,18 @@ func (n *CreateModelStatementNode) ParseLocationRange() *generated.ParseLocation
 }
 func (n *CreateModelStatementNode) statementNode() {}
 
+func (n *CreateModelStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetScope()
+}
+
+func (n *CreateModelStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetIsOrReplace()
+}
+
+func (n *CreateModelStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetIsIfNotExists()
+}
+
 func (n *CreateModelStatementNode) Name() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetName())
 }
@@ -6610,25 +7847,25 @@ func (n *CreateModelStatementNode) AliasedQueryList() *AliasedQueryListNode {
 
 func (n *CreateModelStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetTransformClause() != nil {
+	if n.TransformClause() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		count++
 	}
-	if n.raw.GetInputOutputClause() != nil {
+	if n.InputOutputClause() != nil {
 		count++
 	}
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.WithConnectionClause() != nil {
 		count++
 	}
-	if n.raw.GetAliasedQueryList() != nil {
+	if n.AliasedQueryList() != nil {
 		count++
 	}
 	return count
@@ -6636,43 +7873,43 @@ func (n *CreateModelStatementNode) NumChildren() int {
 
 func (n *CreateModelStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetTransformClause() != nil {
+	if n.TransformClause() != nil {
 		if idx == i {
 			return n.TransformClause()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
 		idx++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		if idx == i {
 			return n.Query()
 		}
 		idx++
 	}
-	if n.raw.GetInputOutputClause() != nil {
+	if n.InputOutputClause() != nil {
 		if idx == i {
 			return n.InputOutputClause()
 		}
 		idx++
 	}
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.WithConnectionClause() != nil {
 		if idx == i {
 			return n.WithConnectionClause()
 		}
 		idx++
 	}
-	if n.raw.GetAliasedQueryList() != nil {
+	if n.AliasedQueryList() != nil {
 		if idx == i {
 			return n.AliasedQueryList()
 		}
@@ -6715,6 +7952,18 @@ func (n *CreatePrivilegeRestrictionStatementNode) ParseLocationRange() *generate
 }
 func (n *CreatePrivilegeRestrictionStatementNode) statementNode() {}
 
+func (n *CreatePrivilegeRestrictionStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetScope()
+}
+
+func (n *CreatePrivilegeRestrictionStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetIsOrReplace()
+}
+
+func (n *CreatePrivilegeRestrictionStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetIsIfNotExists()
+}
+
 func (n *CreatePrivilegeRestrictionStatementNode) Privileges() *PrivilegesNode {
 	return newPrivilegesNode(n.raw.GetPrivileges())
 }
@@ -6733,16 +7982,16 @@ func (n *CreatePrivilegeRestrictionStatementNode) RestrictTo() *RestrictToClause
 
 func (n *CreatePrivilegeRestrictionStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPrivileges() != nil {
+	if n.Privileges() != nil {
 		count++
 	}
-	if n.raw.GetObjectType() != nil {
+	if n.ObjectType() != nil {
 		count++
 	}
-	if n.raw.GetNamePath() != nil {
+	if n.NamePath() != nil {
 		count++
 	}
-	if n.raw.GetRestrictTo() != nil {
+	if n.RestrictTo() != nil {
 		count++
 	}
 	return count
@@ -6750,25 +7999,25 @@ func (n *CreatePrivilegeRestrictionStatementNode) NumChildren() int {
 
 func (n *CreatePrivilegeRestrictionStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPrivileges() != nil {
+	if n.Privileges() != nil {
 		if idx == i {
 			return n.Privileges()
 		}
 		idx++
 	}
-	if n.raw.GetObjectType() != nil {
+	if n.ObjectType() != nil {
 		if idx == i {
 			return n.ObjectType()
 		}
 		idx++
 	}
-	if n.raw.GetNamePath() != nil {
+	if n.NamePath() != nil {
 		if idx == i {
 			return n.NamePath()
 		}
 		idx++
 	}
-	if n.raw.GetRestrictTo() != nil {
+	if n.RestrictTo() != nil {
 		if idx == i {
 			return n.RestrictTo()
 		}
@@ -6809,6 +8058,18 @@ func (n *CreateProcedureStatementNode) ParseLocationRange() *generated.ParseLoca
 }
 func (n *CreateProcedureStatementNode) statementNode() {}
 
+func (n *CreateProcedureStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetScope()
+}
+
+func (n *CreateProcedureStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetIsOrReplace()
+}
+
+func (n *CreateProcedureStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetIsIfNotExists()
+}
+
 func (n *CreateProcedureStatementNode) Name() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetName())
 }
@@ -6843,25 +8104,25 @@ func (n *CreateProcedureStatementNode) ExternalSecurity() generated.ASTCreateSta
 
 func (n *CreateProcedureStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetParameters() != nil {
+	if n.Parameters() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
-	if n.raw.GetBody() != nil {
+	if n.Body() != nil {
 		count++
 	}
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.WithConnectionClause() != nil {
 		count++
 	}
-	if n.raw.GetLanguage() != nil {
+	if n.Language() != nil {
 		count++
 	}
-	if n.raw.GetCode() != nil {
+	if n.Code() != nil {
 		count++
 	}
 	return count
@@ -6869,43 +8130,43 @@ func (n *CreateProcedureStatementNode) NumChildren() int {
 
 func (n *CreateProcedureStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetParameters() != nil {
+	if n.Parameters() != nil {
 		if idx == i {
 			return n.Parameters()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
 		idx++
 	}
-	if n.raw.GetBody() != nil {
+	if n.Body() != nil {
 		if idx == i {
 			return n.Body()
 		}
 		idx++
 	}
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.WithConnectionClause() != nil {
 		if idx == i {
 			return n.WithConnectionClause()
 		}
 		idx++
 	}
-	if n.raw.GetLanguage() != nil {
+	if n.Language() != nil {
 		if idx == i {
 			return n.Language()
 		}
 		idx++
 	}
-	if n.raw.GetCode() != nil {
+	if n.Code() != nil {
 		if idx == i {
 			return n.Code()
 		}
@@ -6946,6 +8207,18 @@ func (n *CreatePropertyGraphStatementNode) ParseLocationRange() *generated.Parse
 }
 func (n *CreatePropertyGraphStatementNode) statementNode() {}
 
+func (n *CreatePropertyGraphStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetScope()
+}
+
+func (n *CreatePropertyGraphStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetIsOrReplace()
+}
+
+func (n *CreatePropertyGraphStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetIsIfNotExists()
+}
+
 func (n *CreatePropertyGraphStatementNode) Name() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetName())
 }
@@ -6964,16 +8237,16 @@ func (n *CreatePropertyGraphStatementNode) OptionsList() *OptionsListNode {
 
 func (n *CreatePropertyGraphStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetNodeTableList() != nil {
+	if n.NodeTableList() != nil {
 		count++
 	}
-	if n.raw.GetEdgeTableList() != nil {
+	if n.EdgeTableList() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -6981,25 +8254,25 @@ func (n *CreatePropertyGraphStatementNode) NumChildren() int {
 
 func (n *CreatePropertyGraphStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetNodeTableList() != nil {
+	if n.NodeTableList() != nil {
 		if idx == i {
 			return n.NodeTableList()
 		}
 		idx++
 	}
-	if n.raw.GetEdgeTableList() != nil {
+	if n.EdgeTableList() != nil {
 		if idx == i {
 			return n.EdgeTableList()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -7040,6 +8313,18 @@ func (n *CreateRowAccessPolicyStatementNode) ParseLocationRange() *generated.Par
 }
 func (n *CreateRowAccessPolicyStatementNode) statementNode() {}
 
+func (n *CreateRowAccessPolicyStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetScope()
+}
+
+func (n *CreateRowAccessPolicyStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetIsOrReplace()
+}
+
+func (n *CreateRowAccessPolicyStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetIsIfNotExists()
+}
+
 func (n *CreateRowAccessPolicyStatementNode) TargetPath() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetTargetPath())
 }
@@ -7062,16 +8347,16 @@ func (n *CreateRowAccessPolicyStatementNode) HasAccessKeyword() bool {
 
 func (n *CreateRowAccessPolicyStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		count++
 	}
-	if n.raw.GetGrantTo() != nil {
+	if n.GrantTo() != nil {
 		count++
 	}
-	if n.raw.GetFilterUsing() != nil {
+	if n.FilterUsing() != nil {
 		count++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -7079,25 +8364,25 @@ func (n *CreateRowAccessPolicyStatementNode) NumChildren() int {
 
 func (n *CreateRowAccessPolicyStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		if idx == i {
 			return n.TargetPath()
 		}
 		idx++
 	}
-	if n.raw.GetGrantTo() != nil {
+	if n.GrantTo() != nil {
 		if idx == i {
 			return n.GrantTo()
 		}
 		idx++
 	}
-	if n.raw.GetFilterUsing() != nil {
+	if n.FilterUsing() != nil {
 		if idx == i {
 			return n.FilterUsing()
 		}
 		idx++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -7138,13 +8423,39 @@ func (n *CreateSchemaStatementNode) ParseLocationRange() *generated.ParseLocatio
 }
 func (n *CreateSchemaStatementNode) statementNode() {}
 
+func (n *CreateSchemaStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetParent().GetScope()
+}
+
+func (n *CreateSchemaStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetParent().GetIsOrReplace()
+}
+
+func (n *CreateSchemaStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetParent().GetIsIfNotExists()
+}
+
+func (n *CreateSchemaStatementNode) Name() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetName())
+}
+
+func (n *CreateSchemaStatementNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
 func (n *CreateSchemaStatementNode) Collate() *CollateNode {
 	return newCollateNode(n.raw.GetCollate())
 }
 
 func (n *CreateSchemaStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCollate() != nil {
+	if n.Name() != nil {
+		count++
+	}
+	if n.OptionsList() != nil {
+		count++
+	}
+	if n.Collate() != nil {
 		count++
 	}
 	return count
@@ -7152,7 +8463,19 @@ func (n *CreateSchemaStatementNode) NumChildren() int {
 
 func (n *CreateSchemaStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCollate() != nil {
+	if n.Name() != nil {
+		if idx == i {
+			return n.Name()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.Collate() != nil {
 		if idx == i {
 			return n.Collate()
 		}
@@ -7193,6 +8516,18 @@ func (n *CreateSequenceStatementNode) ParseLocationRange() *generated.ParseLocat
 }
 func (n *CreateSequenceStatementNode) statementNode() {}
 
+func (n *CreateSequenceStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetScope()
+}
+
+func (n *CreateSequenceStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetIsOrReplace()
+}
+
+func (n *CreateSequenceStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetIsIfNotExists()
+}
+
 func (n *CreateSequenceStatementNode) Name() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetName())
 }
@@ -7203,10 +8538,10 @@ func (n *CreateSequenceStatementNode) OptionsList() *OptionsListNode {
 
 func (n *CreateSequenceStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -7214,13 +8549,13 @@ func (n *CreateSequenceStatementNode) NumChildren() int {
 
 func (n *CreateSequenceStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -7261,6 +8596,18 @@ func (n *CreateSnapshotStatementNode) ParseLocationRange() *generated.ParseLocat
 }
 func (n *CreateSnapshotStatementNode) statementNode() {}
 
+func (n *CreateSnapshotStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetScope()
+}
+
+func (n *CreateSnapshotStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetIsOrReplace()
+}
+
+func (n *CreateSnapshotStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetIsIfNotExists()
+}
+
 func (n *CreateSnapshotStatementNode) SchemaObjectKind() generated.SchemaObjectKind {
 	return n.raw.GetSchemaObjectKind()
 }
@@ -7279,13 +8626,13 @@ func (n *CreateSnapshotStatementNode) OptionsList() *OptionsListNode {
 
 func (n *CreateSnapshotStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetCloneDataSource() != nil {
+	if n.CloneDataSource() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -7293,19 +8640,19 @@ func (n *CreateSnapshotStatementNode) NumChildren() int {
 
 func (n *CreateSnapshotStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetCloneDataSource() != nil {
+	if n.CloneDataSource() != nil {
 		if idx == i {
 			return n.CloneDataSource()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -7346,6 +8693,18 @@ func (n *CreateSnapshotTableStatementNode) ParseLocationRange() *generated.Parse
 }
 func (n *CreateSnapshotTableStatementNode) statementNode() {}
 
+func (n *CreateSnapshotTableStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetScope()
+}
+
+func (n *CreateSnapshotTableStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetIsOrReplace()
+}
+
+func (n *CreateSnapshotTableStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetIsIfNotExists()
+}
+
 func (n *CreateSnapshotTableStatementNode) Name() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetName())
 }
@@ -7360,13 +8719,13 @@ func (n *CreateSnapshotTableStatementNode) OptionsList() *OptionsListNode {
 
 func (n *CreateSnapshotTableStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetCloneDataSource() != nil {
+	if n.CloneDataSource() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -7374,19 +8733,19 @@ func (n *CreateSnapshotTableStatementNode) NumChildren() int {
 
 func (n *CreateSnapshotTableStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetCloneDataSource() != nil {
+	if n.CloneDataSource() != nil {
 		if idx == i {
 			return n.CloneDataSource()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -7427,6 +8786,42 @@ func (n *CreateTableFunctionStatementNode) ParseLocationRange() *generated.Parse
 }
 func (n *CreateTableFunctionStatementNode) statementNode() {}
 
+func (n *CreateTableFunctionStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetParent().GetScope()
+}
+
+func (n *CreateTableFunctionStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetParent().GetIsOrReplace()
+}
+
+func (n *CreateTableFunctionStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetParent().GetIsIfNotExists()
+}
+
+func (n *CreateTableFunctionStatementNode) FunctionDeclaration() *FunctionDeclarationNode {
+	return newFunctionDeclarationNode(n.raw.GetParent().GetFunctionDeclaration())
+}
+
+func (n *CreateTableFunctionStatementNode) Language() *IdentifierNode {
+	return newIdentifierNode(n.raw.GetParent().GetLanguage())
+}
+
+func (n *CreateTableFunctionStatementNode) Code() *StringLiteralNode {
+	return newStringLiteralNode(n.raw.GetParent().GetCode())
+}
+
+func (n *CreateTableFunctionStatementNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
+func (n *CreateTableFunctionStatementNode) DeterminismLevel() generated.ASTCreateFunctionStmtBaseEnums_DeterminismLevel {
+	return n.raw.GetParent().GetDeterminismLevel()
+}
+
+func (n *CreateTableFunctionStatementNode) SqlSecurity() generated.ASTCreateStatementEnums_SqlSecurity {
+	return n.raw.GetParent().GetSqlSecurity()
+}
+
 func (n *CreateTableFunctionStatementNode) ReturnTvfSchema() *TVFSchemaNode {
 	return newTVFSchemaNode(n.raw.GetReturnTvfSchema())
 }
@@ -7437,10 +8832,22 @@ func (n *CreateTableFunctionStatementNode) Query() *QueryNode {
 
 func (n *CreateTableFunctionStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetReturnTvfSchema() != nil {
+	if n.FunctionDeclaration() != nil {
 		count++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Language() != nil {
+		count++
+	}
+	if n.Code() != nil {
+		count++
+	}
+	if n.OptionsList() != nil {
+		count++
+	}
+	if n.ReturnTvfSchema() != nil {
+		count++
+	}
+	if n.Query() != nil {
 		count++
 	}
 	return count
@@ -7448,13 +8855,37 @@ func (n *CreateTableFunctionStatementNode) NumChildren() int {
 
 func (n *CreateTableFunctionStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetReturnTvfSchema() != nil {
+	if n.FunctionDeclaration() != nil {
+		if idx == i {
+			return n.FunctionDeclaration()
+		}
+		idx++
+	}
+	if n.Language() != nil {
+		if idx == i {
+			return n.Language()
+		}
+		idx++
+	}
+	if n.Code() != nil {
+		if idx == i {
+			return n.Code()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.ReturnTvfSchema() != nil {
 		if idx == i {
 			return n.ReturnTvfSchema()
 		}
 		idx++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		if idx == i {
 			return n.Query()
 		}
@@ -7495,6 +8926,42 @@ func (n *CreateTableStatementNode) ParseLocationRange() *generated.ParseLocation
 }
 func (n *CreateTableStatementNode) statementNode() {}
 
+func (n *CreateTableStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetParent().GetScope()
+}
+
+func (n *CreateTableStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetParent().GetIsOrReplace()
+}
+
+func (n *CreateTableStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetParent().GetIsIfNotExists()
+}
+
+func (n *CreateTableStatementNode) Name() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetName())
+}
+
+func (n *CreateTableStatementNode) TableElementList() *TableElementListNode {
+	return newTableElementListNode(n.raw.GetParent().GetTableElementList())
+}
+
+func (n *CreateTableStatementNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
+func (n *CreateTableStatementNode) LikeTableName() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetLikeTableName())
+}
+
+func (n *CreateTableStatementNode) Collate() *CollateNode {
+	return newCollateNode(n.raw.GetParent().GetCollate())
+}
+
+func (n *CreateTableStatementNode) WithConnectionClause() *WithConnectionClauseNode {
+	return newWithConnectionClauseNode(n.raw.GetParent().GetWithConnectionClause())
+}
+
 func (n *CreateTableStatementNode) CloneDataSource() *CloneDataSourceNode {
 	return newCloneDataSourceNode(n.raw.GetCloneDataSource())
 }
@@ -7525,25 +8992,43 @@ func (n *CreateTableStatementNode) Ttl() *TtlClauseNode {
 
 func (n *CreateTableStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCloneDataSource() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetCopyDataSource() != nil {
+	if n.TableElementList() != nil {
 		count++
 	}
-	if n.raw.GetPartitionBy() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
-	if n.raw.GetClusterBy() != nil {
+	if n.LikeTableName() != nil {
 		count++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Collate() != nil {
 		count++
 	}
-	if n.raw.GetSpannerOptions() != nil {
+	if n.WithConnectionClause() != nil {
 		count++
 	}
-	if n.raw.GetTtl() != nil {
+	if n.CloneDataSource() != nil {
+		count++
+	}
+	if n.CopyDataSource() != nil {
+		count++
+	}
+	if n.PartitionBy() != nil {
+		count++
+	}
+	if n.ClusterBy() != nil {
+		count++
+	}
+	if n.Query() != nil {
+		count++
+	}
+	if n.SpannerOptions() != nil {
+		count++
+	}
+	if n.Ttl() != nil {
 		count++
 	}
 	return count
@@ -7551,43 +9036,79 @@ func (n *CreateTableStatementNode) NumChildren() int {
 
 func (n *CreateTableStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCloneDataSource() != nil {
+	if n.Name() != nil {
+		if idx == i {
+			return n.Name()
+		}
+		idx++
+	}
+	if n.TableElementList() != nil {
+		if idx == i {
+			return n.TableElementList()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.LikeTableName() != nil {
+		if idx == i {
+			return n.LikeTableName()
+		}
+		idx++
+	}
+	if n.Collate() != nil {
+		if idx == i {
+			return n.Collate()
+		}
+		idx++
+	}
+	if n.WithConnectionClause() != nil {
+		if idx == i {
+			return n.WithConnectionClause()
+		}
+		idx++
+	}
+	if n.CloneDataSource() != nil {
 		if idx == i {
 			return n.CloneDataSource()
 		}
 		idx++
 	}
-	if n.raw.GetCopyDataSource() != nil {
+	if n.CopyDataSource() != nil {
 		if idx == i {
 			return n.CopyDataSource()
 		}
 		idx++
 	}
-	if n.raw.GetPartitionBy() != nil {
+	if n.PartitionBy() != nil {
 		if idx == i {
 			return n.PartitionBy()
 		}
 		idx++
 	}
-	if n.raw.GetClusterBy() != nil {
+	if n.ClusterBy() != nil {
 		if idx == i {
 			return n.ClusterBy()
 		}
 		idx++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		if idx == i {
 			return n.Query()
 		}
 		idx++
 	}
-	if n.raw.GetSpannerOptions() != nil {
+	if n.SpannerOptions() != nil {
 		if idx == i {
 			return n.SpannerOptions()
 		}
 		idx++
 	}
-	if n.raw.GetTtl() != nil {
+	if n.Ttl() != nil {
 		if idx == i {
 			return n.Ttl()
 		}
@@ -7628,12 +9149,85 @@ func (n *CreateViewStatementNode) ParseLocationRange() *generated.ParseLocationR
 }
 func (n *CreateViewStatementNode) statementNode() {}
 
+func (n *CreateViewStatementNode) Scope() generated.ASTCreateStatementEnums_Scope {
+	return n.raw.GetParent().GetParent().GetScope()
+}
+
+func (n *CreateViewStatementNode) IsOrReplace() bool {
+	return n.raw.GetParent().GetParent().GetIsOrReplace()
+}
+
+func (n *CreateViewStatementNode) IsIfNotExists() bool {
+	return n.raw.GetParent().GetParent().GetIsIfNotExists()
+}
+
+func (n *CreateViewStatementNode) Name() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetName())
+}
+
+func (n *CreateViewStatementNode) ColumnWithOptionsList() *ColumnWithOptionsListNode {
+	return newColumnWithOptionsListNode(n.raw.GetParent().GetColumnWithOptionsList())
+}
+
+func (n *CreateViewStatementNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
+func (n *CreateViewStatementNode) Query() *QueryNode {
+	return newQueryNode(n.raw.GetParent().GetQuery())
+}
+
+func (n *CreateViewStatementNode) SqlSecurity() generated.ASTCreateStatementEnums_SqlSecurity {
+	return n.raw.GetParent().GetSqlSecurity()
+}
+
+func (n *CreateViewStatementNode) Recursive() bool {
+	return n.raw.GetParent().GetRecursive()
+}
+
 func (n *CreateViewStatementNode) NumChildren() int {
 	count := 0
+	if n.Name() != nil {
+		count++
+	}
+	if n.ColumnWithOptionsList() != nil {
+		count++
+	}
+	if n.OptionsList() != nil {
+		count++
+	}
+	if n.Query() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *CreateViewStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Name() != nil {
+		if idx == i {
+			return n.Name()
+		}
+		idx++
+	}
+	if n.ColumnWithOptionsList() != nil {
+		if idx == i {
+			return n.ColumnWithOptionsList()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.Query() != nil {
+		if idx == i {
+			return n.Query()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -7722,6 +9316,10 @@ func (n *DateOrTimeLiteralNode) ParseLocationRange() *generated.ParseLocationRan
 }
 func (n *DateOrTimeLiteralNode) expressionNode() {}
 
+func (n *DateOrTimeLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *DateOrTimeLiteralNode) StringLiteral() *StringLiteralNode {
 	return newStringLiteralNode(n.raw.GetStringLiteral())
 }
@@ -7732,7 +9330,7 @@ func (n *DateOrTimeLiteralNode) TypeKind() generated.TypeKind {
 
 func (n *DateOrTimeLiteralNode) NumChildren() int {
 	count := 0
-	if n.raw.GetStringLiteral() != nil {
+	if n.StringLiteral() != nil {
 		count++
 	}
 	return count
@@ -7740,7 +9338,7 @@ func (n *DateOrTimeLiteralNode) NumChildren() int {
 
 func (n *DateOrTimeLiteralNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetStringLiteral() != nil {
+	if n.StringLiteral() != nil {
 		if idx == i {
 			return n.StringLiteral()
 		}
@@ -7780,6 +9378,10 @@ func (n *DefaultLiteralNode) ParseLocationRange() *generated.ParseLocationRangeP
 	return parseLocationRangeOf(n.raw)
 }
 func (n *DefaultLiteralNode) expressionNode() {}
+
+func (n *DefaultLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
 
 func (n *DefaultLiteralNode) NumChildren() int {
 	count := 0
@@ -7832,10 +9434,10 @@ func (n *DefineMacroStatementNode) Body() *MacroBodyNode {
 
 func (n *DefineMacroStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetBody() != nil {
+	if n.Body() != nil {
 		count++
 	}
 	return count
@@ -7843,13 +9445,13 @@ func (n *DefineMacroStatementNode) NumChildren() int {
 
 func (n *DefineMacroStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetBody() != nil {
+	if n.Body() != nil {
 		if idx == i {
 			return n.Body()
 		}
@@ -7900,10 +9502,10 @@ func (n *DefineTableStatementNode) OptionsList() *OptionsListNode {
 
 func (n *DefineTableStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -7911,13 +9513,13 @@ func (n *DefineTableStatementNode) NumChildren() int {
 
 func (n *DefineTableStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -7988,25 +9590,25 @@ func (n *DeleteStatementNode) Hint() *HintNode {
 
 func (n *DeleteStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
-	if n.raw.GetOffset() != nil {
+	if n.Offset() != nil {
 		count++
 	}
-	if n.raw.GetWhere() != nil {
+	if n.Where() != nil {
 		count++
 	}
-	if n.raw.GetAssertRowsModified() != nil {
+	if n.AssertRowsModified() != nil {
 		count++
 	}
-	if n.raw.GetReturning() != nil {
+	if n.Returning() != nil {
 		count++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
 	return count
@@ -8014,43 +9616,43 @@ func (n *DeleteStatementNode) NumChildren() int {
 
 func (n *DeleteStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		if idx == i {
 			return n.TargetPath()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
 		idx++
 	}
-	if n.raw.GetOffset() != nil {
+	if n.Offset() != nil {
 		if idx == i {
 			return n.Offset()
 		}
 		idx++
 	}
-	if n.raw.GetWhere() != nil {
+	if n.Where() != nil {
 		if idx == i {
 			return n.Where()
 		}
 		idx++
 	}
-	if n.raw.GetAssertRowsModified() != nil {
+	if n.AssertRowsModified() != nil {
 		if idx == i {
 			return n.AssertRowsModified()
 		}
 		idx++
 	}
-	if n.raw.GetReturning() != nil {
+	if n.Returning() != nil {
 		if idx == i {
 			return n.Returning()
 		}
 		idx++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
@@ -8105,13 +9707,13 @@ func (n *DescribeStatementNode) OptionalFromName() *PathExpressionNode {
 
 func (n *DescribeStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOptionalIdentifier() != nil {
+	if n.OptionalIdentifier() != nil {
 		count++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetOptionalFromName() != nil {
+	if n.OptionalFromName() != nil {
 		count++
 	}
 	return count
@@ -8119,19 +9721,19 @@ func (n *DescribeStatementNode) NumChildren() int {
 
 func (n *DescribeStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOptionalIdentifier() != nil {
+	if n.OptionalIdentifier() != nil {
 		if idx == i {
 			return n.OptionalIdentifier()
 		}
 		idx++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetOptionalFromName() != nil {
+	if n.OptionalFromName() != nil {
 		if idx == i {
 			return n.OptionalFromName()
 		}
@@ -8230,7 +9832,7 @@ func (n *DescriptorColumnNode) Name() *IdentifierNode {
 
 func (n *DescriptorColumnNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -8238,7 +9840,7 @@ func (n *DescriptorColumnNode) NumChildren() int {
 
 func (n *DescriptorColumnNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -8284,7 +9886,7 @@ func (n *DescriptorNode) Columns() *DescriptorColumnListNode {
 
 func (n *DescriptorNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumns() != nil {
+	if n.Columns() != nil {
 		count++
 	}
 	return count
@@ -8292,7 +9894,7 @@ func (n *DescriptorNode) NumChildren() int {
 
 func (n *DescriptorNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumns() != nil {
+	if n.Columns() != nil {
 		if idx == i {
 			return n.Columns()
 		}
@@ -8333,6 +9935,10 @@ func (n *DotGeneralizedFieldNode) ParseLocationRange() *generated.ParseLocationR
 }
 func (n *DotGeneralizedFieldNode) expressionNode() {}
 
+func (n *DotGeneralizedFieldNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParenthesized()
+}
+
 func (n *DotGeneralizedFieldNode) Expr() ExpressionNode {
 	return wrapExpression(n.raw.GetExpr())
 }
@@ -8343,10 +9949,10 @@ func (n *DotGeneralizedFieldNode) Path() *PathExpressionNode {
 
 func (n *DotGeneralizedFieldNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		count++
 	}
-	if n.raw.GetPath() != nil {
+	if n.Path() != nil {
 		count++
 	}
 	return count
@@ -8354,13 +9960,13 @@ func (n *DotGeneralizedFieldNode) NumChildren() int {
 
 func (n *DotGeneralizedFieldNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		if idx == i {
 			return n.Expr()
 		}
 		idx++
 	}
-	if n.raw.GetPath() != nil {
+	if n.Path() != nil {
 		if idx == i {
 			return n.Path()
 		}
@@ -8401,6 +10007,10 @@ func (n *DotIdentifierNode) ParseLocationRange() *generated.ParseLocationRangePr
 }
 func (n *DotIdentifierNode) expressionNode() {}
 
+func (n *DotIdentifierNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParenthesized()
+}
+
 func (n *DotIdentifierNode) Expr() ExpressionNode {
 	return wrapExpression(n.raw.GetExpr())
 }
@@ -8411,10 +10021,10 @@ func (n *DotIdentifierNode) Name() *IdentifierNode {
 
 func (n *DotIdentifierNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		count++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -8422,13 +10032,13 @@ func (n *DotIdentifierNode) NumChildren() int {
 
 func (n *DotIdentifierNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		if idx == i {
 			return n.Expr()
 		}
 		idx++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -8469,13 +10079,17 @@ func (n *DotStarNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 }
 func (n *DotStarNode) expressionNode() {}
 
+func (n *DotStarNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *DotStarNode) Expr() ExpressionNode {
 	return wrapExpression(n.raw.GetExpr())
 }
 
 func (n *DotStarNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		count++
 	}
 	return count
@@ -8483,7 +10097,7 @@ func (n *DotStarNode) NumChildren() int {
 
 func (n *DotStarNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		if idx == i {
 			return n.Expr()
 		}
@@ -8524,6 +10138,10 @@ func (n *DotStarWithModifiersNode) ParseLocationRange() *generated.ParseLocation
 }
 func (n *DotStarWithModifiersNode) expressionNode() {}
 
+func (n *DotStarWithModifiersNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *DotStarWithModifiersNode) Expr() ExpressionNode {
 	return wrapExpression(n.raw.GetExpr())
 }
@@ -8534,10 +10152,10 @@ func (n *DotStarWithModifiersNode) Modifiers() *StarModifiersNode {
 
 func (n *DotStarWithModifiersNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		count++
 	}
-	if n.raw.GetModifiers() != nil {
+	if n.Modifiers() != nil {
 		count++
 	}
 	return count
@@ -8545,13 +10163,13 @@ func (n *DotStarWithModifiersNode) NumChildren() int {
 
 func (n *DotStarWithModifiersNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		if idx == i {
 			return n.Expr()
 		}
 		idx++
 	}
-	if n.raw.GetModifiers() != nil {
+	if n.Modifiers() != nil {
 		if idx == i {
 			return n.Modifiers()
 		}
@@ -8604,7 +10222,7 @@ func (n *DropAllRowAccessPoliciesStatementNode) HasAccessKeyword() bool {
 
 func (n *DropAllRowAccessPoliciesStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTableName() != nil {
+	if n.TableName() != nil {
 		count++
 	}
 	return count
@@ -8612,7 +10230,7 @@ func (n *DropAllRowAccessPoliciesStatementNode) NumChildren() int {
 
 func (n *DropAllRowAccessPoliciesStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTableName() != nil {
+	if n.TableName() != nil {
 		if idx == i {
 			return n.TableName()
 		}
@@ -8662,7 +10280,7 @@ func (n *DropColumnActionNode) IsIfExists() bool {
 
 func (n *DropColumnActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		count++
 	}
 	return count
@@ -8670,7 +10288,7 @@ func (n *DropColumnActionNode) NumChildren() int {
 
 func (n *DropColumnActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		if idx == i {
 			return n.ColumnName()
 		}
@@ -8720,7 +10338,7 @@ func (n *DropConstraintActionNode) IsIfExists() bool {
 
 func (n *DropConstraintActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		count++
 	}
 	return count
@@ -8728,7 +10346,7 @@ func (n *DropConstraintActionNode) NumChildren() int {
 
 func (n *DropConstraintActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		if idx == i {
 			return n.ConstraintName()
 		}
@@ -8783,10 +10401,10 @@ func (n *DropEntityStatementNode) IsIfExists() bool {
 
 func (n *DropEntityStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetEntityType() != nil {
+	if n.EntityType() != nil {
 		count++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -8794,13 +10412,13 @@ func (n *DropEntityStatementNode) NumChildren() int {
 
 func (n *DropEntityStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetEntityType() != nil {
+	if n.EntityType() != nil {
 		if idx == i {
 			return n.EntityType()
 		}
 		idx++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -8855,10 +10473,10 @@ func (n *DropFunctionStatementNode) IsIfExists() bool {
 
 func (n *DropFunctionStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetParameters() != nil {
+	if n.Parameters() != nil {
 		count++
 	}
 	return count
@@ -8866,13 +10484,13 @@ func (n *DropFunctionStatementNode) NumChildren() int {
 
 func (n *DropFunctionStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetParameters() != nil {
+	if n.Parameters() != nil {
 		if idx == i {
 			return n.Parameters()
 		}
@@ -8923,7 +10541,7 @@ func (n *DropMaterializedViewStatementNode) IsIfExists() bool {
 
 func (n *DropMaterializedViewStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -8931,7 +10549,7 @@ func (n *DropMaterializedViewStatementNode) NumChildren() int {
 
 func (n *DropMaterializedViewStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -9036,13 +10654,13 @@ func (n *DropPrivilegeRestrictionStatementNode) NamePath() *PathExpressionNode {
 
 func (n *DropPrivilegeRestrictionStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPrivileges() != nil {
+	if n.Privileges() != nil {
 		count++
 	}
-	if n.raw.GetObjectType() != nil {
+	if n.ObjectType() != nil {
 		count++
 	}
-	if n.raw.GetNamePath() != nil {
+	if n.NamePath() != nil {
 		count++
 	}
 	return count
@@ -9050,19 +10668,19 @@ func (n *DropPrivilegeRestrictionStatementNode) NumChildren() int {
 
 func (n *DropPrivilegeRestrictionStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPrivileges() != nil {
+	if n.Privileges() != nil {
 		if idx == i {
 			return n.Privileges()
 		}
 		idx++
 	}
-	if n.raw.GetObjectType() != nil {
+	if n.ObjectType() != nil {
 		if idx == i {
 			return n.ObjectType()
 		}
 		idx++
 	}
-	if n.raw.GetNamePath() != nil {
+	if n.NamePath() != nil {
 		if idx == i {
 			return n.NamePath()
 		}
@@ -9117,10 +10735,10 @@ func (n *DropRowAccessPolicyStatementNode) IsIfExists() bool {
 
 func (n *DropRowAccessPolicyStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetTableName() != nil {
+	if n.TableName() != nil {
 		count++
 	}
 	return count
@@ -9128,13 +10746,13 @@ func (n *DropRowAccessPolicyStatementNode) NumChildren() int {
 
 func (n *DropRowAccessPolicyStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetTableName() != nil {
+	if n.TableName() != nil {
 		if idx == i {
 			return n.TableName()
 		}
@@ -9175,12 +10793,43 @@ func (n *DropSearchIndexStatementNode) ParseLocationRange() *generated.ParseLoca
 }
 func (n *DropSearchIndexStatementNode) statementNode() {}
 
+func (n *DropSearchIndexStatementNode) Name() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetName())
+}
+
+func (n *DropSearchIndexStatementNode) TableName() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetTableName())
+}
+
+func (n *DropSearchIndexStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *DropSearchIndexStatementNode) NumChildren() int {
 	count := 0
+	if n.Name() != nil {
+		count++
+	}
+	if n.TableName() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *DropSearchIndexStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Name() != nil {
+		if idx == i {
+			return n.Name()
+		}
+		idx++
+	}
+	if n.TableName() != nil {
+		if idx == i {
+			return n.TableName()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -9226,7 +10875,7 @@ func (n *DropSnapshotTableStatementNode) IsIfExists() bool {
 
 func (n *DropSnapshotTableStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -9234,7 +10883,7 @@ func (n *DropSnapshotTableStatementNode) NumChildren() int {
 
 func (n *DropSnapshotTableStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -9293,7 +10942,7 @@ func (n *DropStatementNode) SchemaObjectKind() generated.SchemaObjectKind {
 
 func (n *DropStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -9301,7 +10950,7 @@ func (n *DropStatementNode) NumChildren() int {
 
 func (n *DropStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -9355,10 +11004,10 @@ func (n *DropSubEntityActionNode) IsIfExists() bool {
 
 func (n *DropSubEntityActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		count++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -9366,13 +11015,13 @@ func (n *DropSubEntityActionNode) NumChildren() int {
 
 func (n *DropSubEntityActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		if idx == i {
 			return n.Type()
 		}
 		idx++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -9423,7 +11072,7 @@ func (n *DropTableFunctionStatementNode) IsIfExists() bool {
 
 func (n *DropTableFunctionStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -9431,7 +11080,7 @@ func (n *DropTableFunctionStatementNode) NumChildren() int {
 
 func (n *DropTableFunctionStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -9516,12 +11165,43 @@ func (n *DropVectorIndexStatementNode) ParseLocationRange() *generated.ParseLoca
 }
 func (n *DropVectorIndexStatementNode) statementNode() {}
 
+func (n *DropVectorIndexStatementNode) Name() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetName())
+}
+
+func (n *DropVectorIndexStatementNode) TableName() *PathExpressionNode {
+	return newPathExpressionNode(n.raw.GetParent().GetTableName())
+}
+
+func (n *DropVectorIndexStatementNode) IsIfExists() bool {
+	return n.raw.GetParent().GetIsIfExists()
+}
+
 func (n *DropVectorIndexStatementNode) NumChildren() int {
 	count := 0
+	if n.Name() != nil {
+		count++
+	}
+	if n.TableName() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *DropVectorIndexStatementNode) Child(i int) Node {
+	idx := 0
+	if n.Name() != nil {
+		if idx == i {
+			return n.Name()
+		}
+		idx++
+	}
+	if n.TableName() != nil {
+		if idx == i {
+			return n.TableName()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -9619,10 +11299,10 @@ func (n *ElseifClauseNode) Body() *StatementListNode {
 
 func (n *ElseifClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		count++
 	}
-	if n.raw.GetBody() != nil {
+	if n.Body() != nil {
 		count++
 	}
 	return count
@@ -9630,13 +11310,13 @@ func (n *ElseifClauseNode) NumChildren() int {
 
 func (n *ElseifClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		if idx == i {
 			return n.Condition()
 		}
 		idx++
 	}
-	if n.raw.GetBody() != nil {
+	if n.Body() != nil {
 		if idx == i {
 			return n.Body()
 		}
@@ -9674,6 +11354,10 @@ func (n *EmptyRowPatternNode) String() string { return formatNode(n) }
 
 func (n *EmptyRowPatternNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return parseLocationRangeOf(n.raw)
+}
+
+func (n *EmptyRowPatternNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
 }
 
 func (n *EmptyRowPatternNode) NumChildren() int {
@@ -9775,7 +11459,7 @@ func (n *ExceptionHandlerNode) StatementList() *StatementListNode {
 
 func (n *ExceptionHandlerNode) NumChildren() int {
 	count := 0
-	if n.raw.GetStatementList() != nil {
+	if n.StatementList() != nil {
 		count++
 	}
 	return count
@@ -9783,7 +11467,7 @@ func (n *ExceptionHandlerNode) NumChildren() int {
 
 func (n *ExceptionHandlerNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetStatementList() != nil {
+	if n.StatementList() != nil {
 		if idx == i {
 			return n.StatementList()
 		}
@@ -9838,13 +11522,13 @@ func (n *ExecuteImmediateStatementNode) UsingClause() *ExecuteUsingClauseNode {
 
 func (n *ExecuteImmediateStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSql() != nil {
+	if n.Sql() != nil {
 		count++
 	}
-	if n.raw.GetIntoClause() != nil {
+	if n.IntoClause() != nil {
 		count++
 	}
-	if n.raw.GetUsingClause() != nil {
+	if n.UsingClause() != nil {
 		count++
 	}
 	return count
@@ -9852,19 +11536,19 @@ func (n *ExecuteImmediateStatementNode) NumChildren() int {
 
 func (n *ExecuteImmediateStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSql() != nil {
+	if n.Sql() != nil {
 		if idx == i {
 			return n.Sql()
 		}
 		idx++
 	}
-	if n.raw.GetIntoClause() != nil {
+	if n.IntoClause() != nil {
 		if idx == i {
 			return n.IntoClause()
 		}
 		idx++
 	}
-	if n.raw.GetUsingClause() != nil {
+	if n.UsingClause() != nil {
 		if idx == i {
 			return n.UsingClause()
 		}
@@ -9910,7 +11594,7 @@ func (n *ExecuteIntoClauseNode) Identifiers() *IdentifierListNode {
 
 func (n *ExecuteIntoClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetIdentifiers() != nil {
+	if n.Identifiers() != nil {
 		count++
 	}
 	return count
@@ -9918,7 +11602,7 @@ func (n *ExecuteIntoClauseNode) NumChildren() int {
 
 func (n *ExecuteIntoClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetIdentifiers() != nil {
+	if n.Identifiers() != nil {
 		if idx == i {
 			return n.Identifiers()
 		}
@@ -9968,10 +11652,10 @@ func (n *ExecuteUsingArgumentNode) Alias() *AliasNode {
 
 func (n *ExecuteUsingArgumentNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -9979,13 +11663,13 @@ func (n *ExecuteUsingArgumentNode) NumChildren() int {
 
 func (n *ExecuteUsingArgumentNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -10085,7 +11769,7 @@ func (n *ExplainStatementNode) Statement() StatementNode {
 
 func (n *ExplainStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetStatement() != nil {
+	if n.Statement() != nil {
 		count++
 	}
 	return count
@@ -10093,7 +11777,7 @@ func (n *ExplainStatementNode) NumChildren() int {
 
 func (n *ExplainStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetStatement() != nil {
+	if n.Statement() != nil {
 		if idx == i {
 			return n.Statement()
 		}
@@ -10148,13 +11832,13 @@ func (n *ExportDataStatementNode) Query() *QueryNode {
 
 func (n *ExportDataStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.WithConnectionClause() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		count++
 	}
 	return count
@@ -10162,19 +11846,19 @@ func (n *ExportDataStatementNode) NumChildren() int {
 
 func (n *ExportDataStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.WithConnectionClause() != nil {
 		if idx == i {
 			return n.WithConnectionClause()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
 		idx++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		if idx == i {
 			return n.Query()
 		}
@@ -10233,13 +11917,13 @@ func (n *ExportMetadataStatementNode) OptionsList() *OptionsListNode {
 
 func (n *ExportMetadataStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetNamePath() != nil {
+	if n.NamePath() != nil {
 		count++
 	}
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.WithConnectionClause() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -10247,19 +11931,19 @@ func (n *ExportMetadataStatementNode) NumChildren() int {
 
 func (n *ExportMetadataStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetNamePath() != nil {
+	if n.NamePath() != nil {
 		if idx == i {
 			return n.NamePath()
 		}
 		idx++
 	}
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.WithConnectionClause() != nil {
 		if idx == i {
 			return n.WithConnectionClause()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -10314,13 +11998,13 @@ func (n *ExportModelStatementNode) OptionsList() *OptionsListNode {
 
 func (n *ExportModelStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetModelNamePath() != nil {
+	if n.ModelNamePath() != nil {
 		count++
 	}
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.WithConnectionClause() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -10328,19 +12012,19 @@ func (n *ExportModelStatementNode) NumChildren() int {
 
 func (n *ExportModelStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetModelNamePath() != nil {
+	if n.ModelNamePath() != nil {
 		if idx == i {
 			return n.ModelNamePath()
 		}
 		idx++
 	}
-	if n.raw.GetWithConnectionClause() != nil {
+	if n.WithConnectionClause() != nil {
 		if idx == i {
 			return n.WithConnectionClause()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -10381,6 +12065,10 @@ func (n *ExpressionSubqueryNode) ParseLocationRange() *generated.ParseLocationRa
 }
 func (n *ExpressionSubqueryNode) expressionNode() {}
 
+func (n *ExpressionSubqueryNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *ExpressionSubqueryNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
 }
@@ -10395,10 +12083,10 @@ func (n *ExpressionSubqueryNode) Modifier() generated.ASTExpressionSubqueryEnums
 
 func (n *ExpressionSubqueryNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		count++
 	}
 	return count
@@ -10406,13 +12094,13 @@ func (n *ExpressionSubqueryNode) NumChildren() int {
 
 func (n *ExpressionSubqueryNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		if idx == i {
 			return n.Query()
 		}
@@ -10453,6 +12141,10 @@ func (n *ExpressionWithAliasNode) ParseLocationRange() *generated.ParseLocationR
 }
 func (n *ExpressionWithAliasNode) expressionNode() {}
 
+func (n *ExpressionWithAliasNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *ExpressionWithAliasNode) Expression() ExpressionNode {
 	return wrapExpression(n.raw.GetExpression())
 }
@@ -10463,10 +12155,10 @@ func (n *ExpressionWithAliasNode) Alias() *AliasNode {
 
 func (n *ExpressionWithAliasNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -10474,13 +12166,13 @@ func (n *ExpressionWithAliasNode) NumChildren() int {
 
 func (n *ExpressionWithAliasNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -10530,10 +12222,10 @@ func (n *ExpressionWithOptAliasNode) OptionalAlias() *AliasNode {
 
 func (n *ExpressionWithOptAliasNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetOptionalAlias() != nil {
+	if n.OptionalAlias() != nil {
 		count++
 	}
 	return count
@@ -10541,13 +12233,13 @@ func (n *ExpressionWithOptAliasNode) NumChildren() int {
 
 func (n *ExpressionWithOptAliasNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetOptionalAlias() != nil {
+	if n.OptionalAlias() != nil {
 		if idx == i {
 			return n.OptionalAlias()
 		}
@@ -10588,6 +12280,10 @@ func (n *ExtendedPathExpressionNode) ParseLocationRange() *generated.ParseLocati
 }
 func (n *ExtendedPathExpressionNode) expressionNode() {}
 
+func (n *ExtendedPathExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParenthesized()
+}
+
 func (n *ExtendedPathExpressionNode) ParenthesizedPath() ExpressionNode {
 	return wrapGeneralizedPathExpression(n.raw.GetParenthesizedPath())
 }
@@ -10598,10 +12294,10 @@ func (n *ExtendedPathExpressionNode) GeneralizedPathExpression() ExpressionNode 
 
 func (n *ExtendedPathExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetParenthesizedPath() != nil {
+	if n.ParenthesizedPath() != nil {
 		count++
 	}
-	if n.raw.GetGeneralizedPathExpression() != nil {
+	if n.GeneralizedPathExpression() != nil {
 		count++
 	}
 	return count
@@ -10609,13 +12305,13 @@ func (n *ExtendedPathExpressionNode) NumChildren() int {
 
 func (n *ExtendedPathExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetParenthesizedPath() != nil {
+	if n.ParenthesizedPath() != nil {
 		if idx == i {
 			return n.ParenthesizedPath()
 		}
 		idx++
 	}
-	if n.raw.GetGeneralizedPathExpression() != nil {
+	if n.GeneralizedPathExpression() != nil {
 		if idx == i {
 			return n.GeneralizedPathExpression()
 		}
@@ -10656,6 +12352,10 @@ func (n *ExtractExpressionNode) ParseLocationRange() *generated.ParseLocationRan
 }
 func (n *ExtractExpressionNode) expressionNode() {}
 
+func (n *ExtractExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *ExtractExpressionNode) LhsExpr() ExpressionNode {
 	return wrapExpression(n.raw.GetLhsExpr())
 }
@@ -10670,13 +12370,13 @@ func (n *ExtractExpressionNode) TimeZoneExpr() ExpressionNode {
 
 func (n *ExtractExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLhsExpr() != nil {
+	if n.LhsExpr() != nil {
 		count++
 	}
-	if n.raw.GetRhsExpr() != nil {
+	if n.RhsExpr() != nil {
 		count++
 	}
-	if n.raw.GetTimeZoneExpr() != nil {
+	if n.TimeZoneExpr() != nil {
 		count++
 	}
 	return count
@@ -10684,19 +12384,19 @@ func (n *ExtractExpressionNode) NumChildren() int {
 
 func (n *ExtractExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLhsExpr() != nil {
+	if n.LhsExpr() != nil {
 		if idx == i {
 			return n.LhsExpr()
 		}
 		idx++
 	}
-	if n.raw.GetRhsExpr() != nil {
+	if n.RhsExpr() != nil {
 		if idx == i {
 			return n.RhsExpr()
 		}
 		idx++
 	}
-	if n.raw.GetTimeZoneExpr() != nil {
+	if n.TimeZoneExpr() != nil {
 		if idx == i {
 			return n.TimeZoneExpr()
 		}
@@ -10746,7 +12446,7 @@ func (n *FilterFieldsArgNode) FilterType() generated.ASTFilterFieldsArgEnums_Fil
 
 func (n *FilterFieldsArgNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPathExpression() != nil {
+	if n.PathExpression() != nil {
 		count++
 	}
 	return count
@@ -10754,7 +12454,7 @@ func (n *FilterFieldsArgNode) NumChildren() int {
 
 func (n *FilterFieldsArgNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPathExpression() != nil {
+	if n.PathExpression() != nil {
 		if idx == i {
 			return n.PathExpression()
 		}
@@ -10804,7 +12504,7 @@ func (n *FilterUsingClauseNode) HasFilterKeyword() bool {
 
 func (n *FilterUsingClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPredicate() != nil {
+	if n.Predicate() != nil {
 		count++
 	}
 	return count
@@ -10812,7 +12512,7 @@ func (n *FilterUsingClauseNode) NumChildren() int {
 
 func (n *FilterUsingClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPredicate() != nil {
+	if n.Predicate() != nil {
 		if idx == i {
 			return n.Predicate()
 		}
@@ -10852,13 +12552,17 @@ func (n *FixedQuantifierNode) ParseLocationRange() *generated.ParseLocationRange
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *FixedQuantifierNode) IsReluctant() bool {
+	return n.raw.GetParent().GetIsReluctant()
+}
+
 func (n *FixedQuantifierNode) Bound() ExpressionNode {
 	return wrapExpression(n.raw.GetBound())
 }
 
 func (n *FixedQuantifierNode) NumChildren() int {
 	count := 0
-	if n.raw.GetBound() != nil {
+	if n.Bound() != nil {
 		count++
 	}
 	return count
@@ -10866,7 +12570,7 @@ func (n *FixedQuantifierNode) NumChildren() int {
 
 func (n *FixedQuantifierNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetBound() != nil {
+	if n.Bound() != nil {
 		if idx == i {
 			return n.Bound()
 		}
@@ -10907,6 +12611,14 @@ func (n *FloatLiteralNode) ParseLocationRange() *generated.ParseLocationRangePro
 }
 func (n *FloatLiteralNode) expressionNode() {}
 func (n *FloatLiteralNode) leafNode()       {}
+
+func (n *FloatLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParent().GetParenthesized()
+}
+
+func (n *FloatLiteralNode) Image() string {
+	return n.raw.GetParent().GetImage()
+}
 
 func (n *FloatLiteralNode) NumChildren() int {
 	count := 0
@@ -10949,6 +12661,14 @@ func (n *ForInStatementNode) ParseLocationRange() *generated.ParseLocationRangeP
 }
 func (n *ForInStatementNode) statementNode() {}
 
+func (n *ForInStatementNode) Label() *LabelNode {
+	return newLabelNode(n.raw.GetParent().GetLabel())
+}
+
+func (n *ForInStatementNode) Body() *StatementListNode {
+	return newStatementListNode(n.raw.GetParent().GetBody())
+}
+
 func (n *ForInStatementNode) Variable() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetVariable())
 }
@@ -10959,10 +12679,16 @@ func (n *ForInStatementNode) Query() *QueryNode {
 
 func (n *ForInStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetVariable() != nil {
+	if n.Label() != nil {
 		count++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Body() != nil {
+		count++
+	}
+	if n.Variable() != nil {
+		count++
+	}
+	if n.Query() != nil {
 		count++
 	}
 	return count
@@ -10970,13 +12696,25 @@ func (n *ForInStatementNode) NumChildren() int {
 
 func (n *ForInStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetVariable() != nil {
+	if n.Label() != nil {
+		if idx == i {
+			return n.Label()
+		}
+		idx++
+	}
+	if n.Body() != nil {
+		if idx == i {
+			return n.Body()
+		}
+		idx++
+	}
+	if n.Variable() != nil {
 		if idx == i {
 			return n.Variable()
 		}
 		idx++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		if idx == i {
 			return n.Query()
 		}
@@ -11022,7 +12760,7 @@ func (n *ForSystemTimeNode) Expression() ExpressionNode {
 
 func (n *ForSystemTimeNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -11030,7 +12768,7 @@ func (n *ForSystemTimeNode) NumChildren() int {
 
 func (n *ForSystemTimeNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -11128,10 +12866,10 @@ func (n *ForeignKeyColumnAttributeNode) Reference() *ForeignKeyReferenceNode {
 
 func (n *ForeignKeyColumnAttributeNode) NumChildren() int {
 	count := 0
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		count++
 	}
-	if n.raw.GetReference() != nil {
+	if n.Reference() != nil {
 		count++
 	}
 	return count
@@ -11139,13 +12877,13 @@ func (n *ForeignKeyColumnAttributeNode) NumChildren() int {
 
 func (n *ForeignKeyColumnAttributeNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		if idx == i {
 			return n.ConstraintName()
 		}
 		idx++
 	}
-	if n.raw.GetReference() != nil {
+	if n.Reference() != nil {
 		if idx == i {
 			return n.Reference()
 		}
@@ -11203,16 +12941,16 @@ func (n *ForeignKeyNode) ConstraintName() *IdentifierNode {
 
 func (n *ForeignKeyNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnList() != nil {
+	if n.ColumnList() != nil {
 		count++
 	}
-	if n.raw.GetReference() != nil {
+	if n.Reference() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		count++
 	}
 	return count
@@ -11220,25 +12958,25 @@ func (n *ForeignKeyNode) NumChildren() int {
 
 func (n *ForeignKeyNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnList() != nil {
+	if n.ColumnList() != nil {
 		if idx == i {
 			return n.ColumnList()
 		}
 		idx++
 	}
-	if n.raw.GetReference() != nil {
+	if n.Reference() != nil {
 		if idx == i {
 			return n.Reference()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
 		idx++
 	}
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		if idx == i {
 			return n.ConstraintName()
 		}
@@ -11300,13 +13038,13 @@ func (n *ForeignKeyReferenceNode) Enforced() bool {
 
 func (n *ForeignKeyReferenceNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTableName() != nil {
+	if n.TableName() != nil {
 		count++
 	}
-	if n.raw.GetColumnList() != nil {
+	if n.ColumnList() != nil {
 		count++
 	}
-	if n.raw.GetActions() != nil {
+	if n.Actions() != nil {
 		count++
 	}
 	return count
@@ -11314,19 +13052,19 @@ func (n *ForeignKeyReferenceNode) NumChildren() int {
 
 func (n *ForeignKeyReferenceNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTableName() != nil {
+	if n.TableName() != nil {
 		if idx == i {
 			return n.TableName()
 		}
 		idx++
 	}
-	if n.raw.GetColumnList() != nil {
+	if n.ColumnList() != nil {
 		if idx == i {
 			return n.ColumnList()
 		}
 		idx++
 	}
-	if n.raw.GetActions() != nil {
+	if n.Actions() != nil {
 		if idx == i {
 			return n.Actions()
 		}
@@ -11376,10 +13114,10 @@ func (n *FormatClauseNode) TimeZoneExpr() ExpressionNode {
 
 func (n *FormatClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetFormat() != nil {
+	if n.Format() != nil {
 		count++
 	}
-	if n.raw.GetTimeZoneExpr() != nil {
+	if n.TimeZoneExpr() != nil {
 		count++
 	}
 	return count
@@ -11387,13 +13125,13 @@ func (n *FormatClauseNode) NumChildren() int {
 
 func (n *FormatClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetFormat() != nil {
+	if n.Format() != nil {
 		if idx == i {
 			return n.Format()
 		}
 		idx++
 	}
-	if n.raw.GetTimeZoneExpr() != nil {
+	if n.TimeZoneExpr() != nil {
 		if idx == i {
 			return n.TimeZoneExpr()
 		}
@@ -11439,7 +13177,7 @@ func (n *FromClauseNode) TableExpression() TableExpressionNode {
 
 func (n *FromClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTableExpression() != nil {
+	if n.TableExpression() != nil {
 		count++
 	}
 	return count
@@ -11447,7 +13185,7 @@ func (n *FromClauseNode) NumChildren() int {
 
 func (n *FromClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTableExpression() != nil {
+	if n.TableExpression() != nil {
 		if idx == i {
 			return n.TableExpression()
 		}
@@ -11488,13 +13226,17 @@ func (n *FromQueryNode) ParseLocationRange() *generated.ParseLocationRangeProto 
 }
 func (n *FromQueryNode) queryExpressionNode() {}
 
+func (n *FromQueryNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *FromQueryNode) FromClause() *FromClauseNode {
 	return newFromClauseNode(n.raw.GetFromClause())
 }
 
 func (n *FromQueryNode) NumChildren() int {
 	count := 0
-	if n.raw.GetFromClause() != nil {
+	if n.FromClause() != nil {
 		count++
 	}
 	return count
@@ -11502,7 +13244,7 @@ func (n *FromQueryNode) NumChildren() int {
 
 func (n *FromQueryNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetFromClause() != nil {
+	if n.FromClause() != nil {
 		if idx == i {
 			return n.FromClause()
 		}
@@ -11542,6 +13284,10 @@ func (n *FunctionCallNode) ParseLocationRange() *generated.ParseLocationRangePro
 	return parseLocationRangeOf(n.raw)
 }
 func (n *FunctionCallNode) expressionNode() {}
+
+func (n *FunctionCallNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
 
 func (n *FunctionCallNode) Function() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetFunction())
@@ -11605,35 +13351,35 @@ func (n *FunctionCallNode) IsChainedCall() bool {
 
 func (n *FunctionCallNode) NumChildren() int {
 	count := 0
-	if n.raw.GetFunction() != nil {
+	if n.Function() != nil {
 		count++
 	}
 	count += len(n.Arguments())
-	if n.raw.GetHavingModifier() != nil {
+	if n.HavingModifier() != nil {
 		count++
 	}
-	if n.raw.GetClampedBetweenModifier() != nil {
+	if n.ClampedBetweenModifier() != nil {
 		count++
 	}
-	if n.raw.GetOrderBy() != nil {
+	if n.OrderBy() != nil {
 		count++
 	}
-	if n.raw.GetLimitOffset() != nil {
+	if n.LimitOffset() != nil {
 		count++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetWithReportModifier() != nil {
+	if n.WithReportModifier() != nil {
 		count++
 	}
-	if n.raw.GetGroupBy() != nil {
+	if n.GroupBy() != nil {
 		count++
 	}
-	if n.raw.GetWhereExpr() != nil {
+	if n.WhereExpr() != nil {
 		count++
 	}
-	if n.raw.GetHavingExpr() != nil {
+	if n.HavingExpr() != nil {
 		count++
 	}
 	return count
@@ -11641,7 +13387,7 @@ func (n *FunctionCallNode) NumChildren() int {
 
 func (n *FunctionCallNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetFunction() != nil {
+	if n.Function() != nil {
 		if idx == i {
 			return n.Function()
 		}
@@ -11654,55 +13400,55 @@ func (n *FunctionCallNode) Child(i int) Node {
 		}
 		idx += len(s)
 	}
-	if n.raw.GetHavingModifier() != nil {
+	if n.HavingModifier() != nil {
 		if idx == i {
 			return n.HavingModifier()
 		}
 		idx++
 	}
-	if n.raw.GetClampedBetweenModifier() != nil {
+	if n.ClampedBetweenModifier() != nil {
 		if idx == i {
 			return n.ClampedBetweenModifier()
 		}
 		idx++
 	}
-	if n.raw.GetOrderBy() != nil {
+	if n.OrderBy() != nil {
 		if idx == i {
 			return n.OrderBy()
 		}
 		idx++
 	}
-	if n.raw.GetLimitOffset() != nil {
+	if n.LimitOffset() != nil {
 		if idx == i {
 			return n.LimitOffset()
 		}
 		idx++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetWithReportModifier() != nil {
+	if n.WithReportModifier() != nil {
 		if idx == i {
 			return n.WithReportModifier()
 		}
 		idx++
 	}
-	if n.raw.GetGroupBy() != nil {
+	if n.GroupBy() != nil {
 		if idx == i {
 			return n.GroupBy()
 		}
 		idx++
 	}
-	if n.raw.GetWhereExpr() != nil {
+	if n.WhereExpr() != nil {
 		if idx == i {
 			return n.WhereExpr()
 		}
 		idx++
 	}
-	if n.raw.GetHavingExpr() != nil {
+	if n.HavingExpr() != nil {
 		if idx == i {
 			return n.HavingExpr()
 		}
@@ -11752,10 +13498,10 @@ func (n *FunctionDeclarationNode) Parameters() *FunctionParametersNode {
 
 func (n *FunctionDeclarationNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetParameters() != nil {
+	if n.Parameters() != nil {
 		count++
 	}
 	return count
@@ -11763,13 +13509,13 @@ func (n *FunctionDeclarationNode) NumChildren() int {
 
 func (n *FunctionDeclarationNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetParameters() != nil {
+	if n.Parameters() != nil {
 		if idx == i {
 			return n.Parameters()
 		}
@@ -11843,22 +13589,22 @@ func (n *FunctionParameterNode) IsNotAggregate() bool {
 
 func (n *FunctionParameterNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		count++
 	}
-	if n.raw.GetTemplatedParameterType() != nil {
+	if n.TemplatedParameterType() != nil {
 		count++
 	}
-	if n.raw.GetTvfSchema() != nil {
+	if n.TvfSchema() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
-	if n.raw.GetDefaultValue() != nil {
+	if n.DefaultValue() != nil {
 		count++
 	}
 	return count
@@ -11866,37 +13612,37 @@ func (n *FunctionParameterNode) NumChildren() int {
 
 func (n *FunctionParameterNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		if idx == i {
 			return n.Type()
 		}
 		idx++
 	}
-	if n.raw.GetTemplatedParameterType() != nil {
+	if n.TemplatedParameterType() != nil {
 		if idx == i {
 			return n.TemplatedParameterType()
 		}
 		idx++
 	}
-	if n.raw.GetTvfSchema() != nil {
+	if n.TvfSchema() != nil {
 		if idx == i {
 			return n.TvfSchema()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
 		idx++
 	}
-	if n.raw.GetDefaultValue() != nil {
+	if n.DefaultValue() != nil {
 		if idx == i {
 			return n.DefaultValue()
 		}
@@ -12060,16 +13806,16 @@ func (n *FunctionTypeNode) Collate() *CollateNode {
 
 func (n *FunctionTypeNode) NumChildren() int {
 	count := 0
-	if n.raw.GetArgList() != nil {
+	if n.ArgList() != nil {
 		count++
 	}
-	if n.raw.GetReturnType() != nil {
+	if n.ReturnType() != nil {
 		count++
 	}
-	if n.raw.GetTypeParameters() != nil {
+	if n.TypeParameters() != nil {
 		count++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		count++
 	}
 	return count
@@ -12077,25 +13823,25 @@ func (n *FunctionTypeNode) NumChildren() int {
 
 func (n *FunctionTypeNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetArgList() != nil {
+	if n.ArgList() != nil {
 		if idx == i {
 			return n.ArgList()
 		}
 		idx++
 	}
-	if n.raw.GetReturnType() != nil {
+	if n.ReturnType() != nil {
 		if idx == i {
 			return n.ReturnType()
 		}
 		idx++
 	}
-	if n.raw.GetTypeParameters() != nil {
+	if n.TypeParameters() != nil {
 		if idx == i {
 			return n.TypeParameters()
 		}
 		idx++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		if idx == i {
 			return n.Collate()
 		}
@@ -12153,10 +13899,10 @@ func (n *GeneratedColumnInfoNode) IdentityColumnInfo() *IdentityColumnInfoNode {
 
 func (n *GeneratedColumnInfoNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetIdentityColumnInfo() != nil {
+	if n.IdentityColumnInfo() != nil {
 		count++
 	}
 	return count
@@ -12164,13 +13910,13 @@ func (n *GeneratedColumnInfoNode) NumChildren() int {
 
 func (n *GeneratedColumnInfoNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetIdentityColumnInfo() != nil {
+	if n.IdentityColumnInfo() != nil {
 		if idx == i {
 			return n.IdentityColumnInfo()
 		}
@@ -12216,7 +13962,7 @@ func (n *GqlFilterNode) Condition() *WhereClauseNode {
 
 func (n *GqlFilterNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		count++
 	}
 	return count
@@ -12224,7 +13970,7 @@ func (n *GqlFilterNode) NumChildren() int {
 
 func (n *GqlFilterNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		if idx == i {
 			return n.Condition()
 		}
@@ -12278,13 +14024,13 @@ func (n *GqlForNode) WithOffset() *WithOffsetNode {
 
 func (n *GqlForNode) NumChildren() int {
 	count := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		count++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetWithOffset() != nil {
+	if n.WithOffset() != nil {
 		count++
 	}
 	return count
@@ -12292,19 +14038,19 @@ func (n *GqlForNode) NumChildren() int {
 
 func (n *GqlForNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		if idx == i {
 			return n.Identifier()
 		}
 		idx++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetWithOffset() != nil {
+	if n.WithOffset() != nil {
 		if idx == i {
 			return n.WithOffset()
 		}
@@ -12345,6 +14091,10 @@ func (n *GqlGraphPatternQueryNode) ParseLocationRange() *generated.ParseLocation
 }
 func (n *GqlGraphPatternQueryNode) queryExpressionNode() {}
 
+func (n *GqlGraphPatternQueryNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *GqlGraphPatternQueryNode) GraphReference() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetGraphReference())
 }
@@ -12355,10 +14105,10 @@ func (n *GqlGraphPatternQueryNode) GraphPattern() *GraphPatternNode {
 
 func (n *GqlGraphPatternQueryNode) NumChildren() int {
 	count := 0
-	if n.raw.GetGraphReference() != nil {
+	if n.GraphReference() != nil {
 		count++
 	}
-	if n.raw.GetGraphPattern() != nil {
+	if n.GraphPattern() != nil {
 		count++
 	}
 	return count
@@ -12366,13 +14116,13 @@ func (n *GqlGraphPatternQueryNode) NumChildren() int {
 
 func (n *GqlGraphPatternQueryNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetGraphReference() != nil {
+	if n.GraphReference() != nil {
 		if idx == i {
 			return n.GraphReference()
 		}
 		idx++
 	}
-	if n.raw.GetGraphPattern() != nil {
+	if n.GraphPattern() != nil {
 		if idx == i {
 			return n.GraphPattern()
 		}
@@ -12412,13 +14162,28 @@ func (n *GqlInlineSubqueryCallNode) ParseLocationRange() *generated.ParseLocatio
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *GqlInlineSubqueryCallNode) Optional() bool {
+	return n.raw.GetParent().GetOptional()
+}
+
+func (n *GqlInlineSubqueryCallNode) IsPartitioning() bool {
+	return n.raw.GetParent().GetIsPartitioning()
+}
+
+func (n *GqlInlineSubqueryCallNode) NameCaptureList() *IdentifierListNode {
+	return newIdentifierListNode(n.raw.GetParent().GetNameCaptureList())
+}
+
 func (n *GqlInlineSubqueryCallNode) Subquery() *QueryNode {
 	return newQueryNode(n.raw.GetSubquery())
 }
 
 func (n *GqlInlineSubqueryCallNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSubquery() != nil {
+	if n.NameCaptureList() != nil {
+		count++
+	}
+	if n.Subquery() != nil {
 		count++
 	}
 	return count
@@ -12426,7 +14191,13 @@ func (n *GqlInlineSubqueryCallNode) NumChildren() int {
 
 func (n *GqlInlineSubqueryCallNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSubquery() != nil {
+	if n.NameCaptureList() != nil {
+		if idx == i {
+			return n.NameCaptureList()
+		}
+		idx++
+	}
+	if n.Subquery() != nil {
 		if idx == i {
 			return n.Subquery()
 		}
@@ -12472,7 +14243,7 @@ func (n *GqlLetNode) VariableDefinitionList() *GqlLetVariableDefinitionListNode 
 
 func (n *GqlLetNode) NumChildren() int {
 	count := 0
-	if n.raw.GetVariableDefinitionList() != nil {
+	if n.VariableDefinitionList() != nil {
 		count++
 	}
 	return count
@@ -12480,7 +14251,7 @@ func (n *GqlLetNode) NumChildren() int {
 
 func (n *GqlLetNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetVariableDefinitionList() != nil {
+	if n.VariableDefinitionList() != nil {
 		if idx == i {
 			return n.VariableDefinitionList()
 		}
@@ -12583,10 +14354,10 @@ func (n *GqlLetVariableDefinitionNode) Expression() ExpressionNode {
 
 func (n *GqlLetVariableDefinitionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		count++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -12594,13 +14365,13 @@ func (n *GqlLetVariableDefinitionNode) NumChildren() int {
 
 func (n *GqlLetVariableDefinitionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		if idx == i {
 			return n.Identifier()
 		}
 		idx++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -12641,6 +14412,10 @@ func (n *GqlLinearOpsQueryNode) ParseLocationRange() *generated.ParseLocationRan
 }
 func (n *GqlLinearOpsQueryNode) queryExpressionNode() {}
 
+func (n *GqlLinearOpsQueryNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *GqlLinearOpsQueryNode) GraphReference() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetGraphReference())
 }
@@ -12651,10 +14426,10 @@ func (n *GqlLinearOpsQueryNode) LinearOps() *GqlOperatorListNode {
 
 func (n *GqlLinearOpsQueryNode) NumChildren() int {
 	count := 0
-	if n.raw.GetGraphReference() != nil {
+	if n.GraphReference() != nil {
 		count++
 	}
-	if n.raw.GetLinearOps() != nil {
+	if n.LinearOps() != nil {
 		count++
 	}
 	return count
@@ -12662,13 +14437,13 @@ func (n *GqlLinearOpsQueryNode) NumChildren() int {
 
 func (n *GqlLinearOpsQueryNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetGraphReference() != nil {
+	if n.GraphReference() != nil {
 		if idx == i {
 			return n.GraphReference()
 		}
 		idx++
 	}
-	if n.raw.GetLinearOps() != nil {
+	if n.LinearOps() != nil {
 		if idx == i {
 			return n.LinearOps()
 		}
@@ -12722,10 +14497,10 @@ func (n *GqlMatchNode) Hint() *HintNode {
 
 func (n *GqlMatchNode) NumChildren() int {
 	count := 0
-	if n.raw.GetGraphPattern() != nil {
+	if n.GraphPattern() != nil {
 		count++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
 	return count
@@ -12733,13 +14508,13 @@ func (n *GqlMatchNode) NumChildren() int {
 
 func (n *GqlMatchNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetGraphPattern() != nil {
+	if n.GraphPattern() != nil {
 		if idx == i {
 			return n.GraphPattern()
 		}
 		idx++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
@@ -12779,6 +14554,18 @@ func (n *GqlNamedCallNode) ParseLocationRange() *generated.ParseLocationRangePro
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *GqlNamedCallNode) Optional() bool {
+	return n.raw.GetParent().GetOptional()
+}
+
+func (n *GqlNamedCallNode) IsPartitioning() bool {
+	return n.raw.GetParent().GetIsPartitioning()
+}
+
+func (n *GqlNamedCallNode) NameCaptureList() *IdentifierListNode {
+	return newIdentifierListNode(n.raw.GetParent().GetNameCaptureList())
+}
+
 func (n *GqlNamedCallNode) TvfCall() *TVFNode {
 	return newTVFNode(n.raw.GetTvfCall())
 }
@@ -12789,10 +14576,13 @@ func (n *GqlNamedCallNode) YieldClause() *YieldItemListNode {
 
 func (n *GqlNamedCallNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTvfCall() != nil {
+	if n.NameCaptureList() != nil {
 		count++
 	}
-	if n.raw.GetYieldClause() != nil {
+	if n.TvfCall() != nil {
+		count++
+	}
+	if n.YieldClause() != nil {
 		count++
 	}
 	return count
@@ -12800,13 +14590,19 @@ func (n *GqlNamedCallNode) NumChildren() int {
 
 func (n *GqlNamedCallNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTvfCall() != nil {
+	if n.NameCaptureList() != nil {
+		if idx == i {
+			return n.NameCaptureList()
+		}
+		idx++
+	}
+	if n.TvfCall() != nil {
 		if idx == i {
 			return n.TvfCall()
 		}
 		idx++
 	}
-	if n.raw.GetYieldClause() != nil {
+	if n.YieldClause() != nil {
 		if idx == i {
 			return n.YieldClause()
 		}
@@ -12909,10 +14705,10 @@ func (n *GqlOrderByAndPageNode) Page() *GqlPageNode {
 
 func (n *GqlOrderByAndPageNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOrderBy() != nil {
+	if n.OrderBy() != nil {
 		count++
 	}
-	if n.raw.GetPage() != nil {
+	if n.Page() != nil {
 		count++
 	}
 	return count
@@ -12920,13 +14716,13 @@ func (n *GqlOrderByAndPageNode) NumChildren() int {
 
 func (n *GqlOrderByAndPageNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOrderBy() != nil {
+	if n.OrderBy() != nil {
 		if idx == i {
 			return n.OrderBy()
 		}
 		idx++
 	}
-	if n.raw.GetPage() != nil {
+	if n.Page() != nil {
 		if idx == i {
 			return n.Page()
 		}
@@ -12972,7 +14768,7 @@ func (n *GqlPageLimitNode) Limit() ExpressionNode {
 
 func (n *GqlPageLimitNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLimit() != nil {
+	if n.Limit() != nil {
 		count++
 	}
 	return count
@@ -12980,7 +14776,7 @@ func (n *GqlPageLimitNode) NumChildren() int {
 
 func (n *GqlPageLimitNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLimit() != nil {
+	if n.Limit() != nil {
 		if idx == i {
 			return n.Limit()
 		}
@@ -13030,10 +14826,10 @@ func (n *GqlPageNode) Limit() *GqlPageLimitNode {
 
 func (n *GqlPageNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOffset() != nil {
+	if n.Offset() != nil {
 		count++
 	}
-	if n.raw.GetLimit() != nil {
+	if n.Limit() != nil {
 		count++
 	}
 	return count
@@ -13041,13 +14837,13 @@ func (n *GqlPageNode) NumChildren() int {
 
 func (n *GqlPageNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOffset() != nil {
+	if n.Offset() != nil {
 		if idx == i {
 			return n.Offset()
 		}
 		idx++
 	}
-	if n.raw.GetLimit() != nil {
+	if n.Limit() != nil {
 		if idx == i {
 			return n.Limit()
 		}
@@ -13093,7 +14889,7 @@ func (n *GqlPageOffsetNode) Offset() ExpressionNode {
 
 func (n *GqlPageOffsetNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOffset() != nil {
+	if n.Offset() != nil {
 		count++
 	}
 	return count
@@ -13101,7 +14897,7 @@ func (n *GqlPageOffsetNode) NumChildren() int {
 
 func (n *GqlPageOffsetNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOffset() != nil {
+	if n.Offset() != nil {
 		if idx == i {
 			return n.Offset()
 		}
@@ -13142,13 +14938,17 @@ func (n *GqlQueryNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 }
 func (n *GqlQueryNode) queryExpressionNode() {}
 
+func (n *GqlQueryNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *GqlQueryNode) GraphTable() *GraphTableQueryNode {
 	return newGraphTableQueryNode(n.raw.GetGraphTable())
 }
 
 func (n *GqlQueryNode) NumChildren() int {
 	count := 0
-	if n.raw.GetGraphTable() != nil {
+	if n.GraphTable() != nil {
 		count++
 	}
 	return count
@@ -13156,7 +14956,7 @@ func (n *GqlQueryNode) NumChildren() int {
 
 func (n *GqlQueryNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetGraphTable() != nil {
+	if n.GraphTable() != nil {
 		if idx == i {
 			return n.GraphTable()
 		}
@@ -13206,10 +15006,10 @@ func (n *GqlReturnNode) OrderByPage() *GqlOrderByAndPageNode {
 
 func (n *GqlReturnNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSelect() != nil {
+	if n.Select() != nil {
 		count++
 	}
-	if n.raw.GetOrderByPage() != nil {
+	if n.OrderByPage() != nil {
 		count++
 	}
 	return count
@@ -13217,13 +15017,13 @@ func (n *GqlReturnNode) NumChildren() int {
 
 func (n *GqlReturnNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSelect() != nil {
+	if n.Select() != nil {
 		if idx == i {
 			return n.Select()
 		}
 		idx++
 	}
-	if n.raw.GetOrderByPage() != nil {
+	if n.OrderByPage() != nil {
 		if idx == i {
 			return n.OrderByPage()
 		}
@@ -13269,7 +15069,7 @@ func (n *GqlSampleNode) Sample() *SampleClauseNode {
 
 func (n *GqlSampleNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSample() != nil {
+	if n.Sample() != nil {
 		count++
 	}
 	return count
@@ -13277,7 +15077,7 @@ func (n *GqlSampleNode) NumChildren() int {
 
 func (n *GqlSampleNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSample() != nil {
+	if n.Sample() != nil {
 		if idx == i {
 			return n.Sample()
 		}
@@ -13327,7 +15127,7 @@ func (n *GqlSetOperationNode) Inputs() []Node {
 
 func (n *GqlSetOperationNode) NumChildren() int {
 	count := 0
-	if n.raw.GetMetadata() != nil {
+	if n.Metadata() != nil {
 		count++
 	}
 	count += len(n.Inputs())
@@ -13336,7 +15136,7 @@ func (n *GqlSetOperationNode) NumChildren() int {
 
 func (n *GqlSetOperationNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetMetadata() != nil {
+	if n.Metadata() != nil {
 		if idx == i {
 			return n.Metadata()
 		}
@@ -13389,7 +15189,7 @@ func (n *GqlWithNode) Select() *SelectNode {
 
 func (n *GqlWithNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSelect() != nil {
+	if n.Select() != nil {
 		count++
 	}
 	return count
@@ -13397,7 +15197,7 @@ func (n *GqlWithNode) NumChildren() int {
 
 func (n *GqlWithNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSelect() != nil {
+	if n.Select() != nil {
 		if idx == i {
 			return n.Select()
 		}
@@ -13456,14 +15256,14 @@ func (n *GrantStatementNode) GranteeList() *GranteeListNode {
 
 func (n *GrantStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPrivileges() != nil {
+	if n.Privileges() != nil {
 		count++
 	}
 	count += len(n.TargetTypeParts())
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		count++
 	}
-	if n.raw.GetGranteeList() != nil {
+	if n.GranteeList() != nil {
 		count++
 	}
 	return count
@@ -13471,7 +15271,7 @@ func (n *GrantStatementNode) NumChildren() int {
 
 func (n *GrantStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPrivileges() != nil {
+	if n.Privileges() != nil {
 		if idx == i {
 			return n.Privileges()
 		}
@@ -13484,13 +15284,13 @@ func (n *GrantStatementNode) Child(i int) Node {
 		}
 		idx += len(s)
 	}
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		if idx == i {
 			return n.TargetPath()
 		}
 		idx++
 	}
-	if n.raw.GetGranteeList() != nil {
+	if n.GranteeList() != nil {
 		if idx == i {
 			return n.GranteeList()
 		}
@@ -13540,7 +15340,7 @@ func (n *GrantToClauseNode) HasGrantKeywordAndParens() bool {
 
 func (n *GrantToClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetGranteeList() != nil {
+	if n.GranteeList() != nil {
 		count++
 	}
 	return count
@@ -13548,7 +15348,7 @@ func (n *GrantToClauseNode) NumChildren() int {
 
 func (n *GrantToClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetGranteeList() != nil {
+	if n.GranteeList() != nil {
 		if idx == i {
 			return n.GranteeList()
 		}
@@ -13708,13 +15508,13 @@ func (n *GraphDerivedPropertyNode) OptionsList() *OptionsListNode {
 
 func (n *GraphDerivedPropertyNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -13722,19 +15522,19 @@ func (n *GraphDerivedPropertyNode) NumChildren() int {
 
 func (n *GraphDerivedPropertyNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -13780,7 +15580,7 @@ func (n *GraphDynamicLabelNode) Label() ExpressionNode {
 
 func (n *GraphDynamicLabelNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLabel() != nil {
+	if n.Label() != nil {
 		count++
 	}
 	return count
@@ -13788,7 +15588,7 @@ func (n *GraphDynamicLabelNode) NumChildren() int {
 
 func (n *GraphDynamicLabelNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLabel() != nil {
+	if n.Label() != nil {
 		if idx == i {
 			return n.Label()
 		}
@@ -13834,7 +15634,7 @@ func (n *GraphDynamicPropertiesNode) Properties() ExpressionNode {
 
 func (n *GraphDynamicPropertiesNode) NumChildren() int {
 	count := 0
-	if n.raw.GetProperties() != nil {
+	if n.Properties() != nil {
 		count++
 	}
 	return count
@@ -13842,7 +15642,7 @@ func (n *GraphDynamicPropertiesNode) NumChildren() int {
 
 func (n *GraphDynamicPropertiesNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetProperties() != nil {
+	if n.Properties() != nil {
 		if idx == i {
 			return n.Properties()
 		}
@@ -13882,6 +15682,14 @@ func (n *GraphEdgePatternNode) ParseLocationRange() *generated.ParseLocationRang
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *GraphEdgePatternNode) Quantifier() Node {
+	return wrapQuantifier(n.raw.GetParent().GetParent().GetQuantifier())
+}
+
+func (n *GraphEdgePatternNode) Filler() *GraphElementPatternFillerNode {
+	return newGraphElementPatternFillerNode(n.raw.GetParent().GetFiller())
+}
+
 func (n *GraphEdgePatternNode) Orientation() generated.ASTGraphEdgePatternEnums_EdgeOrientation {
 	return n.raw.GetOrientation()
 }
@@ -13896,10 +15704,16 @@ func (n *GraphEdgePatternNode) RhsHint() *GraphRhsHintNode {
 
 func (n *GraphEdgePatternNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLhsHint() != nil {
+	if n.Quantifier() != nil {
 		count++
 	}
-	if n.raw.GetRhsHint() != nil {
+	if n.Filler() != nil {
+		count++
+	}
+	if n.LhsHint() != nil {
+		count++
+	}
+	if n.RhsHint() != nil {
 		count++
 	}
 	return count
@@ -13907,13 +15721,25 @@ func (n *GraphEdgePatternNode) NumChildren() int {
 
 func (n *GraphEdgePatternNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLhsHint() != nil {
+	if n.Quantifier() != nil {
+		if idx == i {
+			return n.Quantifier()
+		}
+		idx++
+	}
+	if n.Filler() != nil {
+		if idx == i {
+			return n.Filler()
+		}
+		idx++
+	}
+	if n.LhsHint() != nil {
 		if idx == i {
 			return n.LhsHint()
 		}
 		idx++
 	}
-	if n.raw.GetRhsHint() != nil {
+	if n.RhsHint() != nil {
 		if idx == i {
 			return n.RhsHint()
 		}
@@ -14022,13 +15848,13 @@ func (n *GraphElementLabelAndPropertiesNode) LabelOptionsList() *OptionsListNode
 
 func (n *GraphElementLabelAndPropertiesNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLabelName() != nil {
+	if n.LabelName() != nil {
 		count++
 	}
-	if n.raw.GetProperties() != nil {
+	if n.Properties() != nil {
 		count++
 	}
-	if n.raw.GetLabelOptionsList() != nil {
+	if n.LabelOptionsList() != nil {
 		count++
 	}
 	return count
@@ -14036,19 +15862,19 @@ func (n *GraphElementLabelAndPropertiesNode) NumChildren() int {
 
 func (n *GraphElementLabelAndPropertiesNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLabelName() != nil {
+	if n.LabelName() != nil {
 		if idx == i {
 			return n.LabelName()
 		}
 		idx++
 	}
-	if n.raw.GetProperties() != nil {
+	if n.Properties() != nil {
 		if idx == i {
 			return n.Properties()
 		}
 		idx++
 	}
-	if n.raw.GetLabelOptionsList() != nil {
+	if n.LabelOptionsList() != nil {
 		if idx == i {
 			return n.LabelOptionsList()
 		}
@@ -14088,13 +15914,17 @@ func (n *GraphElementLabelNode) ParseLocationRange() *generated.ParseLocationRan
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *GraphElementLabelNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *GraphElementLabelNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
 }
 
 func (n *GraphElementLabelNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -14102,7 +15932,7 @@ func (n *GraphElementLabelNode) NumChildren() int {
 
 func (n *GraphElementLabelNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -14168,22 +15998,22 @@ func (n *GraphElementPatternFillerNode) EdgeCost() ExpressionNode {
 
 func (n *GraphElementPatternFillerNode) NumChildren() int {
 	count := 0
-	if n.raw.GetVariableName() != nil {
+	if n.VariableName() != nil {
 		count++
 	}
-	if n.raw.GetLabelFilter() != nil {
+	if n.LabelFilter() != nil {
 		count++
 	}
-	if n.raw.GetWhereClause() != nil {
+	if n.WhereClause() != nil {
 		count++
 	}
-	if n.raw.GetPropertySpecification() != nil {
+	if n.PropertySpecification() != nil {
 		count++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetEdgeCost() != nil {
+	if n.EdgeCost() != nil {
 		count++
 	}
 	return count
@@ -14191,37 +16021,37 @@ func (n *GraphElementPatternFillerNode) NumChildren() int {
 
 func (n *GraphElementPatternFillerNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetVariableName() != nil {
+	if n.VariableName() != nil {
 		if idx == i {
 			return n.VariableName()
 		}
 		idx++
 	}
-	if n.raw.GetLabelFilter() != nil {
+	if n.LabelFilter() != nil {
 		if idx == i {
 			return n.LabelFilter()
 		}
 		idx++
 	}
-	if n.raw.GetWhereClause() != nil {
+	if n.WhereClause() != nil {
 		if idx == i {
 			return n.WhereClause()
 		}
 		idx++
 	}
-	if n.raw.GetPropertySpecification() != nil {
+	if n.PropertySpecification() != nil {
 		if idx == i {
 			return n.PropertySpecification()
 		}
 		idx++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetEdgeCost() != nil {
+	if n.EdgeCost() != nil {
 		if idx == i {
 			return n.EdgeCost()
 		}
@@ -14352,31 +16182,31 @@ func (n *GraphElementTableNode) DefaultLabelOptionsList() *OptionsListNode {
 
 func (n *GraphElementTableNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
-	if n.raw.GetKeyList() != nil {
+	if n.KeyList() != nil {
 		count++
 	}
-	if n.raw.GetSourceNodeReference() != nil {
+	if n.SourceNodeReference() != nil {
 		count++
 	}
-	if n.raw.GetDestNodeReference() != nil {
+	if n.DestNodeReference() != nil {
 		count++
 	}
-	if n.raw.GetLabelPropertiesList() != nil {
+	if n.LabelPropertiesList() != nil {
 		count++
 	}
-	if n.raw.GetDynamicLabel() != nil {
+	if n.DynamicLabel() != nil {
 		count++
 	}
-	if n.raw.GetDynamicProperties() != nil {
+	if n.DynamicProperties() != nil {
 		count++
 	}
-	if n.raw.GetDefaultLabelOptionsList() != nil {
+	if n.DefaultLabelOptionsList() != nil {
 		count++
 	}
 	return count
@@ -14384,55 +16214,55 @@ func (n *GraphElementTableNode) NumChildren() int {
 
 func (n *GraphElementTableNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
 		idx++
 	}
-	if n.raw.GetKeyList() != nil {
+	if n.KeyList() != nil {
 		if idx == i {
 			return n.KeyList()
 		}
 		idx++
 	}
-	if n.raw.GetSourceNodeReference() != nil {
+	if n.SourceNodeReference() != nil {
 		if idx == i {
 			return n.SourceNodeReference()
 		}
 		idx++
 	}
-	if n.raw.GetDestNodeReference() != nil {
+	if n.DestNodeReference() != nil {
 		if idx == i {
 			return n.DestNodeReference()
 		}
 		idx++
 	}
-	if n.raw.GetLabelPropertiesList() != nil {
+	if n.LabelPropertiesList() != nil {
 		if idx == i {
 			return n.LabelPropertiesList()
 		}
 		idx++
 	}
-	if n.raw.GetDynamicLabel() != nil {
+	if n.DynamicLabel() != nil {
 		if idx == i {
 			return n.DynamicLabel()
 		}
 		idx++
 	}
-	if n.raw.GetDynamicProperties() != nil {
+	if n.DynamicProperties() != nil {
 		if idx == i {
 			return n.DynamicProperties()
 		}
 		idx++
 	}
-	if n.raw.GetDefaultLabelOptionsList() != nil {
+	if n.DefaultLabelOptionsList() != nil {
 		if idx == i {
 			return n.DefaultLabelOptionsList()
 		}
@@ -14473,6 +16303,10 @@ func (n *GraphIsLabeledPredicateNode) ParseLocationRange() *generated.ParseLocat
 }
 func (n *GraphIsLabeledPredicateNode) expressionNode() {}
 
+func (n *GraphIsLabeledPredicateNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *GraphIsLabeledPredicateNode) IsNot() bool {
 	return n.raw.GetIsNot()
 }
@@ -14487,10 +16321,10 @@ func (n *GraphIsLabeledPredicateNode) LabelExpression() Node {
 
 func (n *GraphIsLabeledPredicateNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOperand() != nil {
+	if n.Operand() != nil {
 		count++
 	}
-	if n.raw.GetLabelExpression() != nil {
+	if n.LabelExpression() != nil {
 		count++
 	}
 	return count
@@ -14498,13 +16332,13 @@ func (n *GraphIsLabeledPredicateNode) NumChildren() int {
 
 func (n *GraphIsLabeledPredicateNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOperand() != nil {
+	if n.Operand() != nil {
 		if idx == i {
 			return n.Operand()
 		}
 		idx++
 	}
-	if n.raw.GetLabelExpression() != nil {
+	if n.LabelExpression() != nil {
 		if idx == i {
 			return n.LabelExpression()
 		}
@@ -14550,7 +16384,7 @@ func (n *GraphLabelFilterNode) LabelExpression() Node {
 
 func (n *GraphLabelFilterNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLabelExpression() != nil {
+	if n.LabelExpression() != nil {
 		count++
 	}
 	return count
@@ -14558,7 +16392,7 @@ func (n *GraphLabelFilterNode) NumChildren() int {
 
 func (n *GraphLabelFilterNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLabelExpression() != nil {
+	if n.LabelExpression() != nil {
 		if idx == i {
 			return n.LabelExpression()
 		}
@@ -14596,6 +16430,10 @@ func (n *GraphLabelOperationNode) String() string { return formatNode(n) }
 
 func (n *GraphLabelOperationNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return parseLocationRangeOf(n.raw)
+}
+
+func (n *GraphLabelOperationNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
 }
 
 func (n *GraphLabelOperationNode) OpType() generated.ASTGraphLabelOperationEnums_OperationType {
@@ -14661,7 +16499,7 @@ func (n *GraphLhsHintNode) Hint() *HintNode {
 
 func (n *GraphLhsHintNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
 	return count
@@ -14669,7 +16507,7 @@ func (n *GraphLhsHintNode) NumChildren() int {
 
 func (n *GraphLhsHintNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
@@ -14709,12 +16547,39 @@ func (n *GraphNodePatternNode) ParseLocationRange() *generated.ParseLocationRang
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *GraphNodePatternNode) Quantifier() Node {
+	return wrapQuantifier(n.raw.GetParent().GetParent().GetQuantifier())
+}
+
+func (n *GraphNodePatternNode) Filler() *GraphElementPatternFillerNode {
+	return newGraphElementPatternFillerNode(n.raw.GetParent().GetFiller())
+}
+
 func (n *GraphNodePatternNode) NumChildren() int {
 	count := 0
+	if n.Quantifier() != nil {
+		count++
+	}
+	if n.Filler() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *GraphNodePatternNode) Child(i int) Node {
+	idx := 0
+	if n.Quantifier() != nil {
+		if idx == i {
+			return n.Quantifier()
+		}
+		idx++
+	}
+	if n.Filler() != nil {
+		if idx == i {
+			return n.Filler()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -14767,13 +16632,13 @@ func (n *GraphNodeTableReferenceNode) NodeReferenceType() generated.ASTGraphNode
 
 func (n *GraphNodeTableReferenceNode) NumChildren() int {
 	count := 0
-	if n.raw.GetNodeTableIdentifier() != nil {
+	if n.NodeTableIdentifier() != nil {
 		count++
 	}
-	if n.raw.GetEdgeTableColumns() != nil {
+	if n.EdgeTableColumns() != nil {
 		count++
 	}
-	if n.raw.GetNodeTableColumns() != nil {
+	if n.NodeTableColumns() != nil {
 		count++
 	}
 	return count
@@ -14781,19 +16646,19 @@ func (n *GraphNodeTableReferenceNode) NumChildren() int {
 
 func (n *GraphNodeTableReferenceNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetNodeTableIdentifier() != nil {
+	if n.NodeTableIdentifier() != nil {
 		if idx == i {
 			return n.NodeTableIdentifier()
 		}
 		idx++
 	}
-	if n.raw.GetEdgeTableColumns() != nil {
+	if n.EdgeTableColumns() != nil {
 		if idx == i {
 			return n.EdgeTableColumns()
 		}
 		idx++
 	}
-	if n.raw.GetNodeTableColumns() != nil {
+	if n.NodeTableColumns() != nil {
 		if idx == i {
 			return n.NodeTableColumns()
 		}
@@ -14877,6 +16742,10 @@ func (n *GraphPathPatternNode) ParseLocationRange() *generated.ParseLocationRang
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *GraphPathPatternNode) Quantifier() Node {
+	return wrapQuantifier(n.raw.GetParent().GetQuantifier())
+}
+
 func (n *GraphPathPatternNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
 }
@@ -14907,20 +16776,23 @@ func (n *GraphPathPatternNode) PathName() *IdentifierNode {
 
 func (n *GraphPathPatternNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Quantifier() != nil {
 		count++
 	}
-	if n.raw.GetWhereClause() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetPathMode() != nil {
+	if n.WhereClause() != nil {
+		count++
+	}
+	if n.PathMode() != nil {
 		count++
 	}
 	count += len(n.InputPatternList())
-	if n.raw.GetSearchPrefix() != nil {
+	if n.SearchPrefix() != nil {
 		count++
 	}
-	if n.raw.GetPathName() != nil {
+	if n.PathName() != nil {
 		count++
 	}
 	return count
@@ -14928,19 +16800,25 @@ func (n *GraphPathPatternNode) NumChildren() int {
 
 func (n *GraphPathPatternNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Quantifier() != nil {
+		if idx == i {
+			return n.Quantifier()
+		}
+		idx++
+	}
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetWhereClause() != nil {
+	if n.WhereClause() != nil {
 		if idx == i {
 			return n.WhereClause()
 		}
 		idx++
 	}
-	if n.raw.GetPathMode() != nil {
+	if n.PathMode() != nil {
 		if idx == i {
 			return n.PathMode()
 		}
@@ -14953,13 +16831,13 @@ func (n *GraphPathPatternNode) Child(i int) Node {
 		}
 		idx += len(s)
 	}
-	if n.raw.GetSearchPrefix() != nil {
+	if n.SearchPrefix() != nil {
 		if idx == i {
 			return n.SearchPrefix()
 		}
 		idx++
 	}
-	if n.raw.GetPathName() != nil {
+	if n.PathName() != nil {
 		if idx == i {
 			return n.PathName()
 		}
@@ -15005,7 +16883,7 @@ func (n *GraphPathSearchPrefixCountNode) PathCount() ExpressionNode {
 
 func (n *GraphPathSearchPrefixCountNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPathCount() != nil {
+	if n.PathCount() != nil {
 		count++
 	}
 	return count
@@ -15013,7 +16891,7 @@ func (n *GraphPathSearchPrefixCountNode) NumChildren() int {
 
 func (n *GraphPathSearchPrefixCountNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPathCount() != nil {
+	if n.PathCount() != nil {
 		if idx == i {
 			return n.PathCount()
 		}
@@ -15063,7 +16941,7 @@ func (n *GraphPathSearchPrefixNode) PathCount() *GraphPathSearchPrefixCountNode 
 
 func (n *GraphPathSearchPrefixNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPathCount() != nil {
+	if n.PathCount() != nil {
 		count++
 	}
 	return count
@@ -15071,7 +16949,7 @@ func (n *GraphPathSearchPrefixNode) NumChildren() int {
 
 func (n *GraphPathSearchPrefixNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPathCount() != nil {
+	if n.PathCount() != nil {
 		if idx == i {
 			return n.PathCount()
 		}
@@ -15122,7 +17000,7 @@ func (n *GraphPatternNode) WhereClause() *WhereClauseNode {
 func (n *GraphPatternNode) NumChildren() int {
 	count := 0
 	count += len(n.Paths())
-	if n.raw.GetWhereClause() != nil {
+	if n.WhereClause() != nil {
 		count++
 	}
 	return count
@@ -15137,7 +17015,7 @@ func (n *GraphPatternNode) Child(i int) Node {
 		}
 		idx += len(s)
 	}
-	if n.raw.GetWhereClause() != nil {
+	if n.WhereClause() != nil {
 		if idx == i {
 			return n.WhereClause()
 		}
@@ -15191,10 +17069,10 @@ func (n *GraphPropertiesNode) AllExceptColumns() *ColumnListNode {
 
 func (n *GraphPropertiesNode) NumChildren() int {
 	count := 0
-	if n.raw.GetDerivedPropertyList() != nil {
+	if n.DerivedPropertyList() != nil {
 		count++
 	}
-	if n.raw.GetAllExceptColumns() != nil {
+	if n.AllExceptColumns() != nil {
 		count++
 	}
 	return count
@@ -15202,13 +17080,13 @@ func (n *GraphPropertiesNode) NumChildren() int {
 
 func (n *GraphPropertiesNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetDerivedPropertyList() != nil {
+	if n.DerivedPropertyList() != nil {
 		if idx == i {
 			return n.DerivedPropertyList()
 		}
 		idx++
 	}
-	if n.raw.GetAllExceptColumns() != nil {
+	if n.AllExceptColumns() != nil {
 		if idx == i {
 			return n.AllExceptColumns()
 		}
@@ -15258,10 +17136,10 @@ func (n *GraphPropertyNameAndValueNode) Value() ExpressionNode {
 
 func (n *GraphPropertyNameAndValueNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPropertyName() != nil {
+	if n.PropertyName() != nil {
 		count++
 	}
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		count++
 	}
 	return count
@@ -15269,13 +17147,13 @@ func (n *GraphPropertyNameAndValueNode) NumChildren() int {
 
 func (n *GraphPropertyNameAndValueNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPropertyName() != nil {
+	if n.PropertyName() != nil {
 		if idx == i {
 			return n.PropertyName()
 		}
 		idx++
 	}
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		if idx == i {
 			return n.Value()
 		}
@@ -15374,7 +17252,7 @@ func (n *GraphRhsHintNode) Hint() *HintNode {
 
 func (n *GraphRhsHintNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
 	return count
@@ -15382,7 +17260,7 @@ func (n *GraphRhsHintNode) NumChildren() int {
 
 func (n *GraphRhsHintNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
@@ -15423,6 +17301,10 @@ func (n *GraphTableQueryNode) ParseLocationRange() *generated.ParseLocationRange
 }
 func (n *GraphTableQueryNode) tableExpressionNode() {}
 
+func (n *GraphTableQueryNode) PostfixOperators() []Node {
+	return wrapPostfixTableOperatorSlice(n.raw.GetParent().GetPostfixOperators())
+}
+
 func (n *GraphTableQueryNode) GraphReference() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetGraphReference())
 }
@@ -15441,16 +17323,17 @@ func (n *GraphTableQueryNode) Alias() *AliasNode {
 
 func (n *GraphTableQueryNode) NumChildren() int {
 	count := 0
-	if n.raw.GetGraphReference() != nil {
+	count += len(n.PostfixOperators())
+	if n.GraphReference() != nil {
 		count++
 	}
-	if n.raw.GetGraphOp() != nil {
+	if n.GraphOp() != nil {
 		count++
 	}
-	if n.raw.GetGraphTableShape() != nil {
+	if n.GraphTableShape() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -15458,25 +17341,32 @@ func (n *GraphTableQueryNode) NumChildren() int {
 
 func (n *GraphTableQueryNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetGraphReference() != nil {
+	{
+		s := n.PostfixOperators()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.GraphReference() != nil {
 		if idx == i {
 			return n.GraphReference()
 		}
 		idx++
 	}
-	if n.raw.GetGraphOp() != nil {
+	if n.GraphOp() != nil {
 		if idx == i {
 			return n.GraphOp()
 		}
 		idx++
 	}
-	if n.raw.GetGraphTableShape() != nil {
+	if n.GraphTableShape() != nil {
 		if idx == i {
 			return n.GraphTableShape()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -15514,6 +17404,10 @@ func (n *GraphWildcardLabelNode) String() string { return formatNode(n) }
 
 func (n *GraphWildcardLabelNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return parseLocationRangeOf(n.raw)
+}
+
+func (n *GraphWildcardLabelNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
 }
 
 func (n *GraphWildcardLabelNode) NumChildren() int {
@@ -15614,10 +17508,10 @@ func (n *GroupByNode) AndOrderBy() bool {
 
 func (n *GroupByNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetAll() != nil {
+	if n.All() != nil {
 		count++
 	}
 	count += len(n.GroupingItems())
@@ -15626,13 +17520,13 @@ func (n *GroupByNode) NumChildren() int {
 
 func (n *GroupByNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetAll() != nil {
+	if n.All() != nil {
 		if idx == i {
 			return n.All()
 		}
@@ -15705,22 +17599,22 @@ func (n *GroupingItemNode) GroupingItemOrder() *GroupingItemOrderNode {
 
 func (n *GroupingItemNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetRollup() != nil {
+	if n.Rollup() != nil {
 		count++
 	}
-	if n.raw.GetCube() != nil {
+	if n.Cube() != nil {
 		count++
 	}
-	if n.raw.GetGroupingSetList() != nil {
+	if n.GroupingSetList() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
-	if n.raw.GetGroupingItemOrder() != nil {
+	if n.GroupingItemOrder() != nil {
 		count++
 	}
 	return count
@@ -15728,37 +17622,37 @@ func (n *GroupingItemNode) NumChildren() int {
 
 func (n *GroupingItemNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetRollup() != nil {
+	if n.Rollup() != nil {
 		if idx == i {
 			return n.Rollup()
 		}
 		idx++
 	}
-	if n.raw.GetCube() != nil {
+	if n.Cube() != nil {
 		if idx == i {
 			return n.Cube()
 		}
 		idx++
 	}
-	if n.raw.GetGroupingSetList() != nil {
+	if n.GroupingSetList() != nil {
 		if idx == i {
 			return n.GroupingSetList()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
 		idx++
 	}
-	if n.raw.GetGroupingItemOrder() != nil {
+	if n.GroupingItemOrder() != nil {
 		if idx == i {
 			return n.GroupingItemOrder()
 		}
@@ -15808,7 +17702,7 @@ func (n *GroupingItemOrderNode) NullOrder() *NullOrderNode {
 
 func (n *GroupingItemOrderNode) NumChildren() int {
 	count := 0
-	if n.raw.GetNullOrder() != nil {
+	if n.NullOrder() != nil {
 		count++
 	}
 	return count
@@ -15816,7 +17710,7 @@ func (n *GroupingItemOrderNode) NumChildren() int {
 
 func (n *GroupingItemOrderNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetNullOrder() != nil {
+	if n.NullOrder() != nil {
 		if idx == i {
 			return n.NullOrder()
 		}
@@ -15923,13 +17817,13 @@ func (n *GroupingSetNode) Cube() *CubeNode {
 
 func (n *GroupingSetNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetRollup() != nil {
+	if n.Rollup() != nil {
 		count++
 	}
-	if n.raw.GetCube() != nil {
+	if n.Cube() != nil {
 		count++
 	}
 	return count
@@ -15937,19 +17831,19 @@ func (n *GroupingSetNode) NumChildren() int {
 
 func (n *GroupingSetNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetRollup() != nil {
+	if n.Rollup() != nil {
 		if idx == i {
 			return n.Rollup()
 		}
 		idx++
 	}
-	if n.raw.GetCube() != nil {
+	if n.Cube() != nil {
 		if idx == i {
 			return n.Cube()
 		}
@@ -15999,7 +17893,7 @@ func (n *HavingModifierNode) ModifierKind() generated.ASTHavingModifierEnums_Mod
 
 func (n *HavingModifierNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		count++
 	}
 	return count
@@ -16007,7 +17901,7 @@ func (n *HavingModifierNode) NumChildren() int {
 
 func (n *HavingModifierNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		if idx == i {
 			return n.Expr()
 		}
@@ -16053,7 +17947,7 @@ func (n *HavingNode) Expression() ExpressionNode {
 
 func (n *HavingNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -16061,7 +17955,7 @@ func (n *HavingNode) NumChildren() int {
 
 func (n *HavingNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -16155,13 +18049,13 @@ func (n *HintEntryNode) Value() ExpressionNode {
 
 func (n *HintEntryNode) NumChildren() int {
 	count := 0
-	if n.raw.GetQualifier() != nil {
+	if n.Qualifier() != nil {
 		count++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		count++
 	}
 	return count
@@ -16169,19 +18063,19 @@ func (n *HintEntryNode) NumChildren() int {
 
 func (n *HintEntryNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetQualifier() != nil {
+	if n.Qualifier() != nil {
 		if idx == i {
 			return n.Qualifier()
 		}
 		idx++
 	}
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		if idx == i {
 			return n.Value()
 		}
@@ -16231,7 +18125,7 @@ func (n *HintNode) HintEntries() []*HintEntryNode {
 
 func (n *HintNode) NumChildren() int {
 	count := 0
-	if n.raw.GetNumShardsHint() != nil {
+	if n.NumShardsHint() != nil {
 		count++
 	}
 	count += len(n.HintEntries())
@@ -16240,7 +18134,7 @@ func (n *HintNode) NumChildren() int {
 
 func (n *HintNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetNumShardsHint() != nil {
+	if n.NumShardsHint() != nil {
 		if idx == i {
 			return n.NumShardsHint()
 		}
@@ -16298,10 +18192,10 @@ func (n *HintedStatementNode) Statement() StatementNode {
 
 func (n *HintedStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetStatement() != nil {
+	if n.Statement() != nil {
 		count++
 	}
 	return count
@@ -16309,13 +18203,13 @@ func (n *HintedStatementNode) NumChildren() int {
 
 func (n *HintedStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetStatement() != nil {
+	if n.Statement() != nil {
 		if idx == i {
 			return n.Statement()
 		}
@@ -16409,6 +18303,10 @@ func (n *IdentifierNode) ParseLocationRange() *generated.ParseLocationRangeProto
 }
 func (n *IdentifierNode) expressionNode() {}
 
+func (n *IdentifierNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *IdentifierNode) IdString() string {
 	return n.raw.GetIdString()
 }
@@ -16463,7 +18361,7 @@ func (n *IdentityColumnIncrementByNode) Value() ExpressionNode {
 
 func (n *IdentityColumnIncrementByNode) NumChildren() int {
 	count := 0
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		count++
 	}
 	return count
@@ -16471,7 +18369,7 @@ func (n *IdentityColumnIncrementByNode) NumChildren() int {
 
 func (n *IdentityColumnIncrementByNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		if idx == i {
 			return n.Value()
 		}
@@ -16533,16 +18431,16 @@ func (n *IdentityColumnInfoNode) CyclingEnabled() bool {
 
 func (n *IdentityColumnInfoNode) NumChildren() int {
 	count := 0
-	if n.raw.GetStartWithValue() != nil {
+	if n.StartWithValue() != nil {
 		count++
 	}
-	if n.raw.GetIncrementByValue() != nil {
+	if n.IncrementByValue() != nil {
 		count++
 	}
-	if n.raw.GetMaxValue() != nil {
+	if n.MaxValue() != nil {
 		count++
 	}
-	if n.raw.GetMinValue() != nil {
+	if n.MinValue() != nil {
 		count++
 	}
 	return count
@@ -16550,25 +18448,25 @@ func (n *IdentityColumnInfoNode) NumChildren() int {
 
 func (n *IdentityColumnInfoNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetStartWithValue() != nil {
+	if n.StartWithValue() != nil {
 		if idx == i {
 			return n.StartWithValue()
 		}
 		idx++
 	}
-	if n.raw.GetIncrementByValue() != nil {
+	if n.IncrementByValue() != nil {
 		if idx == i {
 			return n.IncrementByValue()
 		}
 		idx++
 	}
-	if n.raw.GetMaxValue() != nil {
+	if n.MaxValue() != nil {
 		if idx == i {
 			return n.MaxValue()
 		}
 		idx++
 	}
-	if n.raw.GetMinValue() != nil {
+	if n.MinValue() != nil {
 		if idx == i {
 			return n.MinValue()
 		}
@@ -16614,7 +18512,7 @@ func (n *IdentityColumnMaxValueNode) Value() ExpressionNode {
 
 func (n *IdentityColumnMaxValueNode) NumChildren() int {
 	count := 0
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		count++
 	}
 	return count
@@ -16622,7 +18520,7 @@ func (n *IdentityColumnMaxValueNode) NumChildren() int {
 
 func (n *IdentityColumnMaxValueNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		if idx == i {
 			return n.Value()
 		}
@@ -16668,7 +18566,7 @@ func (n *IdentityColumnMinValueNode) Value() ExpressionNode {
 
 func (n *IdentityColumnMinValueNode) NumChildren() int {
 	count := 0
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		count++
 	}
 	return count
@@ -16676,7 +18574,7 @@ func (n *IdentityColumnMinValueNode) NumChildren() int {
 
 func (n *IdentityColumnMinValueNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		if idx == i {
 			return n.Value()
 		}
@@ -16722,7 +18620,7 @@ func (n *IdentityColumnStartWithNode) Value() ExpressionNode {
 
 func (n *IdentityColumnStartWithNode) NumChildren() int {
 	count := 0
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		count++
 	}
 	return count
@@ -16730,7 +18628,7 @@ func (n *IdentityColumnStartWithNode) NumChildren() int {
 
 func (n *IdentityColumnStartWithNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		if idx == i {
 			return n.Value()
 		}
@@ -16789,16 +18687,16 @@ func (n *IfStatementNode) ElseList() *StatementListNode {
 
 func (n *IfStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		count++
 	}
-	if n.raw.GetThenList() != nil {
+	if n.ThenList() != nil {
 		count++
 	}
-	if n.raw.GetElseifClauses() != nil {
+	if n.ElseifClauses() != nil {
 		count++
 	}
-	if n.raw.GetElseList() != nil {
+	if n.ElseList() != nil {
 		count++
 	}
 	return count
@@ -16806,25 +18704,25 @@ func (n *IfStatementNode) NumChildren() int {
 
 func (n *IfStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		if idx == i {
 			return n.Condition()
 		}
 		idx++
 	}
-	if n.raw.GetThenList() != nil {
+	if n.ThenList() != nil {
 		if idx == i {
 			return n.ThenList()
 		}
 		idx++
 	}
-	if n.raw.GetElseifClauses() != nil {
+	if n.ElseifClauses() != nil {
 		if idx == i {
 			return n.ElseifClauses()
 		}
 		idx++
 	}
-	if n.raw.GetElseList() != nil {
+	if n.ElseList() != nil {
 		if idx == i {
 			return n.ElseList()
 		}
@@ -16891,19 +18789,19 @@ func (n *ImportStatementNode) ImportKind() generated.ASTImportStatementEnums_Imp
 
 func (n *ImportStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetStringValue() != nil {
+	if n.StringValue() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
-	if n.raw.GetIntoAlias() != nil {
+	if n.IntoAlias() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -16911,31 +18809,31 @@ func (n *ImportStatementNode) NumChildren() int {
 
 func (n *ImportStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetStringValue() != nil {
+	if n.StringValue() != nil {
 		if idx == i {
 			return n.StringValue()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
 		idx++
 	}
-	if n.raw.GetIntoAlias() != nil {
+	if n.IntoAlias() != nil {
 		if idx == i {
 			return n.IntoAlias()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -16976,6 +18874,10 @@ func (n *InExpressionNode) ParseLocationRange() *generated.ParseLocationRangePro
 }
 func (n *InExpressionNode) expressionNode() {}
 
+func (n *InExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *InExpressionNode) Lhs() ExpressionNode {
 	return wrapExpression(n.raw.GetLhs())
 }
@@ -17006,22 +18908,22 @@ func (n *InExpressionNode) InLocation() *LocationNode {
 
 func (n *InExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLhs() != nil {
+	if n.Lhs() != nil {
 		count++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetInList() != nil {
+	if n.InList() != nil {
 		count++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		count++
 	}
-	if n.raw.GetUnnestExpr() != nil {
+	if n.UnnestExpr() != nil {
 		count++
 	}
-	if n.raw.GetInLocation() != nil {
+	if n.InLocation() != nil {
 		count++
 	}
 	return count
@@ -17029,37 +18931,37 @@ func (n *InExpressionNode) NumChildren() int {
 
 func (n *InExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLhs() != nil {
+	if n.Lhs() != nil {
 		if idx == i {
 			return n.Lhs()
 		}
 		idx++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetInList() != nil {
+	if n.InList() != nil {
 		if idx == i {
 			return n.InList()
 		}
 		idx++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		if idx == i {
 			return n.Query()
 		}
 		idx++
 	}
-	if n.raw.GetUnnestExpr() != nil {
+	if n.UnnestExpr() != nil {
 		if idx == i {
 			return n.UnnestExpr()
 		}
 		idx++
 	}
-	if n.raw.GetInLocation() != nil {
+	if n.InLocation() != nil {
 		if idx == i {
 			return n.InLocation()
 		}
@@ -17154,13 +19056,21 @@ func (n *IndexAllColumnsNode) ParseLocationRange() *generated.ParseLocationRange
 func (n *IndexAllColumnsNode) expressionNode() {}
 func (n *IndexAllColumnsNode) leafNode()       {}
 
+func (n *IndexAllColumnsNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParent().GetParenthesized()
+}
+
+func (n *IndexAllColumnsNode) Image() string {
+	return n.raw.GetParent().GetImage()
+}
+
 func (n *IndexAllColumnsNode) ColumnOptions() *IndexItemListNode {
 	return newIndexItemListNode(n.raw.GetColumnOptions())
 }
 
 func (n *IndexAllColumnsNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnOptions() != nil {
+	if n.ColumnOptions() != nil {
 		count++
 	}
 	return count
@@ -17168,7 +19078,7 @@ func (n *IndexAllColumnsNode) NumChildren() int {
 
 func (n *IndexAllColumnsNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnOptions() != nil {
+	if n.ColumnOptions() != nil {
 		if idx == i {
 			return n.ColumnOptions()
 		}
@@ -17367,12 +19277,91 @@ func (n *InferredTypeColumnSchemaNode) ParseLocationRange() *generated.ParseLoca
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *InferredTypeColumnSchemaNode) TypeParameters() *TypeParameterListNode {
+	return newTypeParameterListNode(n.raw.GetParent().GetTypeParameters())
+}
+
+func (n *InferredTypeColumnSchemaNode) GeneratedColumnInfo() *GeneratedColumnInfoNode {
+	return newGeneratedColumnInfoNode(n.raw.GetParent().GetGeneratedColumnInfo())
+}
+
+func (n *InferredTypeColumnSchemaNode) DefaultExpression() ExpressionNode {
+	return wrapExpression(n.raw.GetParent().GetDefaultExpression())
+}
+
+func (n *InferredTypeColumnSchemaNode) Collate() *CollateNode {
+	return newCollateNode(n.raw.GetParent().GetCollate())
+}
+
+func (n *InferredTypeColumnSchemaNode) Attributes() *ColumnAttributeListNode {
+	return newColumnAttributeListNode(n.raw.GetParent().GetAttributes())
+}
+
+func (n *InferredTypeColumnSchemaNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
 func (n *InferredTypeColumnSchemaNode) NumChildren() int {
 	count := 0
+	if n.TypeParameters() != nil {
+		count++
+	}
+	if n.GeneratedColumnInfo() != nil {
+		count++
+	}
+	if n.DefaultExpression() != nil {
+		count++
+	}
+	if n.Collate() != nil {
+		count++
+	}
+	if n.Attributes() != nil {
+		count++
+	}
+	if n.OptionsList() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *InferredTypeColumnSchemaNode) Child(i int) Node {
+	idx := 0
+	if n.TypeParameters() != nil {
+		if idx == i {
+			return n.TypeParameters()
+		}
+		idx++
+	}
+	if n.GeneratedColumnInfo() != nil {
+		if idx == i {
+			return n.GeneratedColumnInfo()
+		}
+		idx++
+	}
+	if n.DefaultExpression() != nil {
+		if idx == i {
+			return n.DefaultExpression()
+		}
+		idx++
+	}
+	if n.Collate() != nil {
+		if idx == i {
+			return n.Collate()
+		}
+		idx++
+	}
+	if n.Attributes() != nil {
+		if idx == i {
+			return n.Attributes()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -17417,10 +19406,10 @@ func (n *InputOutputClauseNode) Output() *TableElementListNode {
 
 func (n *InputOutputClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetInput() != nil {
+	if n.Input() != nil {
 		count++
 	}
-	if n.raw.GetOutput() != nil {
+	if n.Output() != nil {
 		count++
 	}
 	return count
@@ -17428,13 +19417,13 @@ func (n *InputOutputClauseNode) NumChildren() int {
 
 func (n *InputOutputClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetInput() != nil {
+	if n.Input() != nil {
 		if idx == i {
 			return n.Input()
 		}
 		idx++
 	}
-	if n.raw.GetOutput() != nil {
+	if n.Output() != nil {
 		if idx == i {
 			return n.Output()
 		}
@@ -17474,6 +19463,10 @@ func (n *InputTableArgumentNode) ParseLocationRange() *generated.ParseLocationRa
 	return parseLocationRangeOf(n.raw)
 }
 func (n *InputTableArgumentNode) expressionNode() {}
+
+func (n *InputTableArgumentNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
 
 func (n *InputTableArgumentNode) NumChildren() int {
 	count := 0
@@ -17558,28 +19551,28 @@ func (n *InsertStatementNode) OnConflict() *OnConflictClauseNode {
 
 func (n *InsertStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		count++
 	}
-	if n.raw.GetColumnList() != nil {
+	if n.ColumnList() != nil {
 		count++
 	}
-	if n.raw.GetRows() != nil {
+	if n.Rows() != nil {
 		count++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		count++
 	}
-	if n.raw.GetAssertRowsModified() != nil {
+	if n.AssertRowsModified() != nil {
 		count++
 	}
-	if n.raw.GetReturning() != nil {
+	if n.Returning() != nil {
 		count++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetOnConflict() != nil {
+	if n.OnConflict() != nil {
 		count++
 	}
 	return count
@@ -17587,49 +19580,49 @@ func (n *InsertStatementNode) NumChildren() int {
 
 func (n *InsertStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		if idx == i {
 			return n.TargetPath()
 		}
 		idx++
 	}
-	if n.raw.GetColumnList() != nil {
+	if n.ColumnList() != nil {
 		if idx == i {
 			return n.ColumnList()
 		}
 		idx++
 	}
-	if n.raw.GetRows() != nil {
+	if n.Rows() != nil {
 		if idx == i {
 			return n.Rows()
 		}
 		idx++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		if idx == i {
 			return n.Query()
 		}
 		idx++
 	}
-	if n.raw.GetAssertRowsModified() != nil {
+	if n.AssertRowsModified() != nil {
 		if idx == i {
 			return n.AssertRowsModified()
 		}
 		idx++
 	}
-	if n.raw.GetReturning() != nil {
+	if n.Returning() != nil {
 		if idx == i {
 			return n.Returning()
 		}
 		idx++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetOnConflict() != nil {
+	if n.OnConflict() != nil {
 		if idx == i {
 			return n.OnConflict()
 		}
@@ -17777,6 +19770,14 @@ func (n *IntLiteralNode) ParseLocationRange() *generated.ParseLocationRangeProto
 func (n *IntLiteralNode) expressionNode() {}
 func (n *IntLiteralNode) leafNode()       {}
 
+func (n *IntLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParent().GetParenthesized()
+}
+
+func (n *IntLiteralNode) Image() string {
+	return n.raw.GetParent().GetImage()
+}
+
 func (n *IntLiteralNode) NumChildren() int {
 	count := 0
 	return count
@@ -17818,13 +19819,17 @@ func (n *IntOrUnboundedNode) ParseLocationRange() *generated.ParseLocationRangeP
 }
 func (n *IntOrUnboundedNode) expressionNode() {}
 
+func (n *IntOrUnboundedNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *IntOrUnboundedNode) Bound() ExpressionNode {
 	return wrapExpression(n.raw.GetBound())
 }
 
 func (n *IntOrUnboundedNode) NumChildren() int {
 	count := 0
-	if n.raw.GetBound() != nil {
+	if n.Bound() != nil {
 		count++
 	}
 	return count
@@ -17832,7 +19837,7 @@ func (n *IntOrUnboundedNode) NumChildren() int {
 
 func (n *IntOrUnboundedNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetBound() != nil {
+	if n.Bound() != nil {
 		if idx == i {
 			return n.Bound()
 		}
@@ -17873,6 +19878,10 @@ func (n *IntervalExprNode) ParseLocationRange() *generated.ParseLocationRangePro
 }
 func (n *IntervalExprNode) expressionNode() {}
 
+func (n *IntervalExprNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *IntervalExprNode) IntervalValue() ExpressionNode {
 	return wrapExpression(n.raw.GetIntervalValue())
 }
@@ -17887,13 +19896,13 @@ func (n *IntervalExprNode) DatePartNameTo() *IdentifierNode {
 
 func (n *IntervalExprNode) NumChildren() int {
 	count := 0
-	if n.raw.GetIntervalValue() != nil {
+	if n.IntervalValue() != nil {
 		count++
 	}
-	if n.raw.GetDatePartName() != nil {
+	if n.DatePartName() != nil {
 		count++
 	}
-	if n.raw.GetDatePartNameTo() != nil {
+	if n.DatePartNameTo() != nil {
 		count++
 	}
 	return count
@@ -17901,19 +19910,19 @@ func (n *IntervalExprNode) NumChildren() int {
 
 func (n *IntervalExprNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetIntervalValue() != nil {
+	if n.IntervalValue() != nil {
 		if idx == i {
 			return n.IntervalValue()
 		}
 		idx++
 	}
-	if n.raw.GetDatePartName() != nil {
+	if n.DatePartName() != nil {
 		if idx == i {
 			return n.DatePartName()
 		}
 		idx++
 	}
-	if n.raw.GetDatePartNameTo() != nil {
+	if n.DatePartNameTo() != nil {
 		if idx == i {
 			return n.DatePartNameTo()
 		}
@@ -17959,7 +19968,7 @@ func (n *IntoAliasNode) Identifier() *IdentifierNode {
 
 func (n *IntoAliasNode) NumChildren() int {
 	count := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		count++
 	}
 	return count
@@ -17967,7 +19976,7 @@ func (n *IntoAliasNode) NumChildren() int {
 
 func (n *IntoAliasNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		if idx == i {
 			return n.Identifier()
 		}
@@ -18009,13 +20018,17 @@ func (n *JSONLiteralNode) ParseLocationRange() *generated.ParseLocationRangeProt
 func (n *JSONLiteralNode) expressionNode() {}
 func (n *JSONLiteralNode) leafNode()       {}
 
+func (n *JSONLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParenthesized()
+}
+
 func (n *JSONLiteralNode) StringLiteral() *StringLiteralNode {
 	return newStringLiteralNode(n.raw.GetStringLiteral())
 }
 
 func (n *JSONLiteralNode) NumChildren() int {
 	count := 0
-	if n.raw.GetStringLiteral() != nil {
+	if n.StringLiteral() != nil {
 		count++
 	}
 	return count
@@ -18023,7 +20036,7 @@ func (n *JSONLiteralNode) NumChildren() int {
 
 func (n *JSONLiteralNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetStringLiteral() != nil {
+	if n.StringLiteral() != nil {
 		if idx == i {
 			return n.StringLiteral()
 		}
@@ -18063,6 +20076,10 @@ func (n *JoinNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return parseLocationRangeOf(n.raw)
 }
 func (n *JoinNode) tableExpressionNode() {}
+
+func (n *JoinNode) PostfixOperators() []Node {
+	return wrapPostfixTableOperatorSlice(n.raw.GetParent().GetPostfixOperators())
+}
 
 func (n *JoinNode) Lhs() TableExpressionNode {
 	return wrapTableExpression(n.raw.GetLhs())
@@ -18118,25 +20135,26 @@ func (n *JoinNode) JoinLocation() *LocationNode {
 
 func (n *JoinNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLhs() != nil {
+	count += len(n.PostfixOperators())
+	if n.Lhs() != nil {
 		count++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetRhs() != nil {
+	if n.Rhs() != nil {
 		count++
 	}
-	if n.raw.GetOnClause() != nil {
+	if n.OnClause() != nil {
 		count++
 	}
-	if n.raw.GetUsingClause() != nil {
+	if n.UsingClause() != nil {
 		count++
 	}
-	if n.raw.GetClauseList() != nil {
+	if n.ClauseList() != nil {
 		count++
 	}
-	if n.raw.GetJoinLocation() != nil {
+	if n.JoinLocation() != nil {
 		count++
 	}
 	return count
@@ -18144,43 +20162,50 @@ func (n *JoinNode) NumChildren() int {
 
 func (n *JoinNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLhs() != nil {
+	{
+		s := n.PostfixOperators()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.Lhs() != nil {
 		if idx == i {
 			return n.Lhs()
 		}
 		idx++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetRhs() != nil {
+	if n.Rhs() != nil {
 		if idx == i {
 			return n.Rhs()
 		}
 		idx++
 	}
-	if n.raw.GetOnClause() != nil {
+	if n.OnClause() != nil {
 		if idx == i {
 			return n.OnClause()
 		}
 		idx++
 	}
-	if n.raw.GetUsingClause() != nil {
+	if n.UsingClause() != nil {
 		if idx == i {
 			return n.UsingClause()
 		}
 		idx++
 	}
-	if n.raw.GetClauseList() != nil {
+	if n.ClauseList() != nil {
 		if idx == i {
 			return n.ClauseList()
 		}
 		idx++
 	}
-	if n.raw.GetJoinLocation() != nil {
+	if n.JoinLocation() != nil {
 		if idx == i {
 			return n.JoinLocation()
 		}
@@ -18226,7 +20251,7 @@ func (n *LabelNode) Name() *IdentifierNode {
 
 func (n *LabelNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -18234,7 +20259,7 @@ func (n *LabelNode) NumChildren() int {
 
 func (n *LabelNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -18275,6 +20300,10 @@ func (n *LambdaNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 }
 func (n *LambdaNode) expressionNode() {}
 
+func (n *LambdaNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *LambdaNode) ArgumentList() ExpressionNode {
 	return wrapExpression(n.raw.GetArgumentList())
 }
@@ -18285,10 +20314,10 @@ func (n *LambdaNode) Body() ExpressionNode {
 
 func (n *LambdaNode) NumChildren() int {
 	count := 0
-	if n.raw.GetArgumentList() != nil {
+	if n.ArgumentList() != nil {
 		count++
 	}
-	if n.raw.GetBody() != nil {
+	if n.Body() != nil {
 		count++
 	}
 	return count
@@ -18296,13 +20325,13 @@ func (n *LambdaNode) NumChildren() int {
 
 func (n *LambdaNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetArgumentList() != nil {
+	if n.ArgumentList() != nil {
 		if idx == i {
 			return n.ArgumentList()
 		}
 		idx++
 	}
-	if n.raw.GetBody() != nil {
+	if n.Body() != nil {
 		if idx == i {
 			return n.Body()
 		}
@@ -18343,6 +20372,10 @@ func (n *LikeExpressionNode) ParseLocationRange() *generated.ParseLocationRangeP
 }
 func (n *LikeExpressionNode) expressionNode() {}
 
+func (n *LikeExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *LikeExpressionNode) Lhs() ExpressionNode {
 	return wrapExpression(n.raw.GetLhs())
 }
@@ -18377,25 +20410,25 @@ func (n *LikeExpressionNode) LikeLocation() *LocationNode {
 
 func (n *LikeExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLhs() != nil {
+	if n.Lhs() != nil {
 		count++
 	}
-	if n.raw.GetOp() != nil {
+	if n.Op() != nil {
 		count++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetInList() != nil {
+	if n.InList() != nil {
 		count++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		count++
 	}
-	if n.raw.GetUnnestExpr() != nil {
+	if n.UnnestExpr() != nil {
 		count++
 	}
-	if n.raw.GetLikeLocation() != nil {
+	if n.LikeLocation() != nil {
 		count++
 	}
 	return count
@@ -18403,43 +20436,43 @@ func (n *LikeExpressionNode) NumChildren() int {
 
 func (n *LikeExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLhs() != nil {
+	if n.Lhs() != nil {
 		if idx == i {
 			return n.Lhs()
 		}
 		idx++
 	}
-	if n.raw.GetOp() != nil {
+	if n.Op() != nil {
 		if idx == i {
 			return n.Op()
 		}
 		idx++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetInList() != nil {
+	if n.InList() != nil {
 		if idx == i {
 			return n.InList()
 		}
 		idx++
 	}
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		if idx == i {
 			return n.Query()
 		}
 		idx++
 	}
-	if n.raw.GetUnnestExpr() != nil {
+	if n.UnnestExpr() != nil {
 		if idx == i {
 			return n.UnnestExpr()
 		}
 		idx++
 	}
-	if n.raw.GetLikeLocation() != nil {
+	if n.LikeLocation() != nil {
 		if idx == i {
 			return n.LikeLocation()
 		}
@@ -18529,10 +20562,10 @@ func (n *LimitNode) Expression() ExpressionNode {
 
 func (n *LimitNode) NumChildren() int {
 	count := 0
-	if n.raw.GetAll() != nil {
+	if n.All() != nil {
 		count++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -18540,13 +20573,13 @@ func (n *LimitNode) NumChildren() int {
 
 func (n *LimitNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetAll() != nil {
+	if n.All() != nil {
 		if idx == i {
 			return n.All()
 		}
 		idx++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -18596,10 +20629,10 @@ func (n *LimitOffsetNode) Offset() ExpressionNode {
 
 func (n *LimitOffsetNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLimit() != nil {
+	if n.Limit() != nil {
 		count++
 	}
-	if n.raw.GetOffset() != nil {
+	if n.Offset() != nil {
 		count++
 	}
 	return count
@@ -18607,13 +20640,13 @@ func (n *LimitOffsetNode) NumChildren() int {
 
 func (n *LimitOffsetNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLimit() != nil {
+	if n.Limit() != nil {
 		if idx == i {
 			return n.Limit()
 		}
 		idx++
 	}
-	if n.raw.GetOffset() != nil {
+	if n.Offset() != nil {
 		if idx == i {
 			return n.Offset()
 		}
@@ -18739,6 +20772,14 @@ func (n *MacroBodyNode) ParseLocationRange() *generated.ParseLocationRangeProto 
 func (n *MacroBodyNode) expressionNode() {}
 func (n *MacroBodyNode) leafNode()       {}
 
+func (n *MacroBodyNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParent().GetParenthesized()
+}
+
+func (n *MacroBodyNode) Image() string {
+	return n.raw.GetParent().GetImage()
+}
+
 func (n *MacroBodyNode) NumChildren() int {
 	count := 0
 	return count
@@ -18797,16 +20838,16 @@ func (n *MapTypeNode) Collate() *CollateNode {
 
 func (n *MapTypeNode) NumChildren() int {
 	count := 0
-	if n.raw.GetKeyType() != nil {
+	if n.KeyType() != nil {
 		count++
 	}
-	if n.raw.GetValueType() != nil {
+	if n.ValueType() != nil {
 		count++
 	}
-	if n.raw.GetTypeParameters() != nil {
+	if n.TypeParameters() != nil {
 		count++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		count++
 	}
 	return count
@@ -18814,25 +20855,25 @@ func (n *MapTypeNode) NumChildren() int {
 
 func (n *MapTypeNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetKeyType() != nil {
+	if n.KeyType() != nil {
 		if idx == i {
 			return n.KeyType()
 		}
 		idx++
 	}
-	if n.raw.GetValueType() != nil {
+	if n.ValueType() != nil {
 		if idx == i {
 			return n.ValueType()
 		}
 		idx++
 	}
-	if n.raw.GetTypeParameters() != nil {
+	if n.TypeParameters() != nil {
 		if idx == i {
 			return n.TypeParameters()
 		}
 		idx++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		if idx == i {
 			return n.Collate()
 		}
@@ -18906,28 +20947,28 @@ func (n *MatchRecognizeClauseNode) OptionsList() *OptionsListNode {
 
 func (n *MatchRecognizeClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPartitionBy() != nil {
+	if n.PartitionBy() != nil {
 		count++
 	}
-	if n.raw.GetOrderBy() != nil {
+	if n.OrderBy() != nil {
 		count++
 	}
-	if n.raw.GetMeasures() != nil {
+	if n.Measures() != nil {
 		count++
 	}
-	if n.raw.GetAfterMatchSkipClause() != nil {
+	if n.AfterMatchSkipClause() != nil {
 		count++
 	}
-	if n.raw.GetPattern() != nil {
+	if n.Pattern() != nil {
 		count++
 	}
-	if n.raw.GetPatternVariableDefinitionList() != nil {
+	if n.PatternVariableDefinitionList() != nil {
 		count++
 	}
-	if n.raw.GetOutputAlias() != nil {
+	if n.OutputAlias() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -18935,49 +20976,49 @@ func (n *MatchRecognizeClauseNode) NumChildren() int {
 
 func (n *MatchRecognizeClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPartitionBy() != nil {
+	if n.PartitionBy() != nil {
 		if idx == i {
 			return n.PartitionBy()
 		}
 		idx++
 	}
-	if n.raw.GetOrderBy() != nil {
+	if n.OrderBy() != nil {
 		if idx == i {
 			return n.OrderBy()
 		}
 		idx++
 	}
-	if n.raw.GetMeasures() != nil {
+	if n.Measures() != nil {
 		if idx == i {
 			return n.Measures()
 		}
 		idx++
 	}
-	if n.raw.GetAfterMatchSkipClause() != nil {
+	if n.AfterMatchSkipClause() != nil {
 		if idx == i {
 			return n.AfterMatchSkipClause()
 		}
 		idx++
 	}
-	if n.raw.GetPattern() != nil {
+	if n.Pattern() != nil {
 		if idx == i {
 			return n.Pattern()
 		}
 		idx++
 	}
-	if n.raw.GetPatternVariableDefinitionList() != nil {
+	if n.PatternVariableDefinitionList() != nil {
 		if idx == i {
 			return n.PatternVariableDefinitionList()
 		}
 		idx++
 	}
-	if n.raw.GetOutputAlias() != nil {
+	if n.OutputAlias() != nil {
 		if idx == i {
 			return n.OutputAlias()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -19018,6 +21059,14 @@ func (n *MaxLiteralNode) ParseLocationRange() *generated.ParseLocationRangeProto
 }
 func (n *MaxLiteralNode) expressionNode() {}
 func (n *MaxLiteralNode) leafNode()       {}
+
+func (n *MaxLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParent().GetParenthesized()
+}
+
+func (n *MaxLiteralNode) Image() string {
+	return n.raw.GetParent().GetImage()
+}
 
 func (n *MaxLiteralNode) NumChildren() int {
 	count := 0
@@ -19077,13 +21126,13 @@ func (n *MergeActionNode) ActionType() generated.ASTMergeActionEnums_ActionType 
 
 func (n *MergeActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetInsertColumnList() != nil {
+	if n.InsertColumnList() != nil {
 		count++
 	}
-	if n.raw.GetInsertRow() != nil {
+	if n.InsertRow() != nil {
 		count++
 	}
-	if n.raw.GetUpdateItemList() != nil {
+	if n.UpdateItemList() != nil {
 		count++
 	}
 	return count
@@ -19091,19 +21140,19 @@ func (n *MergeActionNode) NumChildren() int {
 
 func (n *MergeActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetInsertColumnList() != nil {
+	if n.InsertColumnList() != nil {
 		if idx == i {
 			return n.InsertColumnList()
 		}
 		idx++
 	}
-	if n.raw.GetInsertRow() != nil {
+	if n.InsertRow() != nil {
 		if idx == i {
 			return n.InsertRow()
 		}
 		idx++
 	}
-	if n.raw.GetUpdateItemList() != nil {
+	if n.UpdateItemList() != nil {
 		if idx == i {
 			return n.UpdateItemList()
 		}
@@ -19166,19 +21215,19 @@ func (n *MergeStatementNode) WhenClauses() *MergeWhenClauseListNode {
 
 func (n *MergeStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
-	if n.raw.GetTableExpression() != nil {
+	if n.TableExpression() != nil {
 		count++
 	}
-	if n.raw.GetMergeCondition() != nil {
+	if n.MergeCondition() != nil {
 		count++
 	}
-	if n.raw.GetWhenClauses() != nil {
+	if n.WhenClauses() != nil {
 		count++
 	}
 	return count
@@ -19186,31 +21235,31 @@ func (n *MergeStatementNode) NumChildren() int {
 
 func (n *MergeStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		if idx == i {
 			return n.TargetPath()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
 		idx++
 	}
-	if n.raw.GetTableExpression() != nil {
+	if n.TableExpression() != nil {
 		if idx == i {
 			return n.TableExpression()
 		}
 		idx++
 	}
-	if n.raw.GetMergeCondition() != nil {
+	if n.MergeCondition() != nil {
 		if idx == i {
 			return n.MergeCondition()
 		}
 		idx++
 	}
-	if n.raw.GetWhenClauses() != nil {
+	if n.WhenClauses() != nil {
 		if idx == i {
 			return n.WhenClauses()
 		}
@@ -19317,10 +21366,10 @@ func (n *MergeWhenClauseNode) MatchType() generated.ASTMergeWhenClauseEnums_Matc
 
 func (n *MergeWhenClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSearchCondition() != nil {
+	if n.SearchCondition() != nil {
 		count++
 	}
-	if n.raw.GetAction() != nil {
+	if n.Action() != nil {
 		count++
 	}
 	return count
@@ -19328,13 +21377,13 @@ func (n *MergeWhenClauseNode) NumChildren() int {
 
 func (n *MergeWhenClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSearchCondition() != nil {
+	if n.SearchCondition() != nil {
 		if idx == i {
 			return n.SearchCondition()
 		}
 		idx++
 	}
-	if n.raw.GetAction() != nil {
+	if n.Action() != nil {
 		if idx == i {
 			return n.Action()
 		}
@@ -19380,7 +21429,7 @@ func (n *ModelClauseNode) ModelPath() *PathExpressionNode {
 
 func (n *ModelClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetModelPath() != nil {
+	if n.ModelPath() != nil {
 		count++
 	}
 	return count
@@ -19388,7 +21437,7 @@ func (n *ModelClauseNode) NumChildren() int {
 
 func (n *ModelClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetModelPath() != nil {
+	if n.ModelPath() != nil {
 		if idx == i {
 			return n.ModelPath()
 		}
@@ -19439,10 +21488,10 @@ func (n *ModuleStatementNode) OptionsList() *OptionsListNode {
 
 func (n *ModuleStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -19450,13 +21499,13 @@ func (n *ModuleStatementNode) NumChildren() int {
 
 func (n *ModuleStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -19497,6 +21546,10 @@ func (n *NamedArgumentNode) ParseLocationRange() *generated.ParseLocationRangePr
 }
 func (n *NamedArgumentNode) expressionNode() {}
 
+func (n *NamedArgumentNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *NamedArgumentNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
 }
@@ -19507,10 +21560,10 @@ func (n *NamedArgumentNode) Expr() ExpressionNode {
 
 func (n *NamedArgumentNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		count++
 	}
 	return count
@@ -19518,13 +21571,13 @@ func (n *NamedArgumentNode) NumChildren() int {
 
 func (n *NamedArgumentNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		if idx == i {
 			return n.Expr()
 		}
@@ -19578,13 +21631,13 @@ func (n *NewConstructorArgNode) OptionalPathExpression() *PathExpressionNode {
 
 func (n *NewConstructorArgNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetOptionalIdentifier() != nil {
+	if n.OptionalIdentifier() != nil {
 		count++
 	}
-	if n.raw.GetOptionalPathExpression() != nil {
+	if n.OptionalPathExpression() != nil {
 		count++
 	}
 	return count
@@ -19592,19 +21645,19 @@ func (n *NewConstructorArgNode) NumChildren() int {
 
 func (n *NewConstructorArgNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetOptionalIdentifier() != nil {
+	if n.OptionalIdentifier() != nil {
 		if idx == i {
 			return n.OptionalIdentifier()
 		}
 		idx++
 	}
-	if n.raw.GetOptionalPathExpression() != nil {
+	if n.OptionalPathExpression() != nil {
 		if idx == i {
 			return n.OptionalPathExpression()
 		}
@@ -19645,6 +21698,10 @@ func (n *NewConstructorNode) ParseLocationRange() *generated.ParseLocationRangeP
 }
 func (n *NewConstructorNode) expressionNode() {}
 
+func (n *NewConstructorNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *NewConstructorNode) TypeName() *SimpleTypeNode {
 	return newSimpleTypeNode(n.raw.GetTypeName())
 }
@@ -19655,7 +21712,7 @@ func (n *NewConstructorNode) Arguments() []*NewConstructorArgNode {
 
 func (n *NewConstructorNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTypeName() != nil {
+	if n.TypeName() != nil {
 		count++
 	}
 	count += len(n.Arguments())
@@ -19664,7 +21721,7 @@ func (n *NewConstructorNode) NumChildren() int {
 
 func (n *NewConstructorNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTypeName() != nil {
+	if n.TypeName() != nil {
 		if idx == i {
 			return n.TypeName()
 		}
@@ -19753,6 +21810,14 @@ func (n *NullLiteralNode) ParseLocationRange() *generated.ParseLocationRangeProt
 func (n *NullLiteralNode) expressionNode() {}
 func (n *NullLiteralNode) leafNode()       {}
 
+func (n *NullLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParent().GetParenthesized()
+}
+
+func (n *NullLiteralNode) Image() string {
+	return n.raw.GetParent().GetImage()
+}
+
 func (n *NullLiteralNode) NumChildren() int {
 	count := 0
 	return count
@@ -19839,13 +21904,17 @@ func (n *NumericLiteralNode) ParseLocationRange() *generated.ParseLocationRangeP
 func (n *NumericLiteralNode) expressionNode() {}
 func (n *NumericLiteralNode) leafNode()       {}
 
+func (n *NumericLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParenthesized()
+}
+
 func (n *NumericLiteralNode) StringLiteral() *StringLiteralNode {
 	return newStringLiteralNode(n.raw.GetStringLiteral())
 }
 
 func (n *NumericLiteralNode) NumChildren() int {
 	count := 0
-	if n.raw.GetStringLiteral() != nil {
+	if n.StringLiteral() != nil {
 		count++
 	}
 	return count
@@ -19853,7 +21922,7 @@ func (n *NumericLiteralNode) NumChildren() int {
 
 func (n *NumericLiteralNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetStringLiteral() != nil {
+	if n.StringLiteral() != nil {
 		if idx == i {
 			return n.StringLiteral()
 		}
@@ -19899,7 +21968,7 @@ func (n *OnClauseNode) Expression() ExpressionNode {
 
 func (n *OnClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -19907,7 +21976,7 @@ func (n *OnClauseNode) NumChildren() int {
 
 func (n *OnClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -19969,16 +22038,16 @@ func (n *OnConflictClauseNode) UpdateWhereClause() ExpressionNode {
 
 func (n *OnConflictClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetConflictTarget() != nil {
+	if n.ConflictTarget() != nil {
 		count++
 	}
-	if n.raw.GetUniqueConstraintName() != nil {
+	if n.UniqueConstraintName() != nil {
 		count++
 	}
-	if n.raw.GetUpdateItemList() != nil {
+	if n.UpdateItemList() != nil {
 		count++
 	}
-	if n.raw.GetUpdateWhereClause() != nil {
+	if n.UpdateWhereClause() != nil {
 		count++
 	}
 	return count
@@ -19986,25 +22055,25 @@ func (n *OnConflictClauseNode) NumChildren() int {
 
 func (n *OnConflictClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetConflictTarget() != nil {
+	if n.ConflictTarget() != nil {
 		if idx == i {
 			return n.ConflictTarget()
 		}
 		idx++
 	}
-	if n.raw.GetUniqueConstraintName() != nil {
+	if n.UniqueConstraintName() != nil {
 		if idx == i {
 			return n.UniqueConstraintName()
 		}
 		idx++
 	}
-	if n.raw.GetUpdateItemList() != nil {
+	if n.UpdateItemList() != nil {
 		if idx == i {
 			return n.UpdateItemList()
 		}
 		idx++
 	}
-	if n.raw.GetUpdateWhereClause() != nil {
+	if n.UpdateWhereClause() != nil {
 		if idx == i {
 			return n.UpdateWhereClause()
 		}
@@ -20102,10 +22171,10 @@ func (n *OptionsEntryNode) AssignmentOp() generated.ASTOptionsEntryEnums_Assignm
 
 func (n *OptionsEntryNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		count++
 	}
 	return count
@@ -20113,13 +22182,13 @@ func (n *OptionsEntryNode) NumChildren() int {
 
 func (n *OptionsEntryNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		if idx == i {
 			return n.Value()
 		}
@@ -20213,6 +22282,10 @@ func (n *OrExprNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 }
 func (n *OrExprNode) expressionNode() {}
 
+func (n *OrExprNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *OrExprNode) Disjuncts() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetDisjuncts())
 }
@@ -20276,7 +22349,7 @@ func (n *OrderByNode) OrderingExpressions() []*OrderingExpressionNode {
 
 func (n *OrderByNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
 	count += len(n.OrderingExpressions())
@@ -20285,7 +22358,7 @@ func (n *OrderByNode) NumChildren() int {
 
 func (n *OrderByNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
@@ -20354,16 +22427,16 @@ func (n *OrderingExpressionNode) OptionList() *OptionsListNode {
 
 func (n *OrderingExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		count++
 	}
-	if n.raw.GetNullOrder() != nil {
+	if n.NullOrder() != nil {
 		count++
 	}
-	if n.raw.GetOptionList() != nil {
+	if n.OptionList() != nil {
 		count++
 	}
 	return count
@@ -20371,25 +22444,25 @@ func (n *OrderingExpressionNode) NumChildren() int {
 
 func (n *OrderingExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		if idx == i {
 			return n.Collate()
 		}
 		idx++
 	}
-	if n.raw.GetNullOrder() != nil {
+	if n.NullOrder() != nil {
 		if idx == i {
 			return n.NullOrder()
 		}
 		idx++
 	}
-	if n.raw.GetOptionList() != nil {
+	if n.OptionList() != nil {
 		if idx == i {
 			return n.OptionList()
 		}
@@ -20440,10 +22513,10 @@ func (n *ParameterAssignmentNode) Expression() ExpressionNode {
 
 func (n *ParameterAssignmentNode) NumChildren() int {
 	count := 0
-	if n.raw.GetParameter() != nil {
+	if n.Parameter() != nil {
 		count++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -20451,13 +22524,13 @@ func (n *ParameterAssignmentNode) NumChildren() int {
 
 func (n *ParameterAssignmentNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetParameter() != nil {
+	if n.Parameter() != nil {
 		if idx == i {
 			return n.Parameter()
 		}
 		idx++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -20498,6 +22571,10 @@ func (n *ParameterExprNode) ParseLocationRange() *generated.ParseLocationRangePr
 }
 func (n *ParameterExprNode) expressionNode() {}
 
+func (n *ParameterExprNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParenthesized()
+}
+
 func (n *ParameterExprNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
 }
@@ -20508,7 +22585,7 @@ func (n *ParameterExprNode) Position() int {
 
 func (n *ParameterExprNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -20516,7 +22593,7 @@ func (n *ParameterExprNode) NumChildren() int {
 
 func (n *ParameterExprNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -20557,13 +22634,18 @@ func (n *ParenthesizedJoinNode) ParseLocationRange() *generated.ParseLocationRan
 }
 func (n *ParenthesizedJoinNode) tableExpressionNode() {}
 
+func (n *ParenthesizedJoinNode) PostfixOperators() []Node {
+	return wrapPostfixTableOperatorSlice(n.raw.GetParent().GetPostfixOperators())
+}
+
 func (n *ParenthesizedJoinNode) Join() *JoinNode {
 	return newJoinNode(n.raw.GetJoin())
 }
 
 func (n *ParenthesizedJoinNode) NumChildren() int {
 	count := 0
-	if n.raw.GetJoin() != nil {
+	count += len(n.PostfixOperators())
+	if n.Join() != nil {
 		count++
 	}
 	return count
@@ -20571,7 +22653,14 @@ func (n *ParenthesizedJoinNode) NumChildren() int {
 
 func (n *ParenthesizedJoinNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetJoin() != nil {
+	{
+		s := n.PostfixOperators()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.Join() != nil {
 		if idx == i {
 			return n.Join()
 		}
@@ -20621,7 +22710,7 @@ func (n *PartitionByNode) PartitioningExpressions() []ExpressionNode {
 
 func (n *PartitionByNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
 	count += len(n.PartitioningExpressions())
@@ -20630,7 +22719,7 @@ func (n *PartitionByNode) NumChildren() int {
 
 func (n *PartitionByNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
@@ -20731,6 +22820,10 @@ func (n *PathExpressionNode) ParseLocationRange() *generated.ParseLocationRangeP
 }
 func (n *PathExpressionNode) expressionNode() {}
 
+func (n *PathExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParenthesized()
+}
+
 func (n *PathExpressionNode) Names() []*IdentifierNode {
 	return newIdentifierNodeSlice(n.raw.GetNames())
 }
@@ -20794,10 +22887,10 @@ func (n *PipeAggregateNode) WithModifier() *WithModifierNode {
 
 func (n *PipeAggregateNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSelect() != nil {
+	if n.Select() != nil {
 		count++
 	}
-	if n.raw.GetWithModifier() != nil {
+	if n.WithModifier() != nil {
 		count++
 	}
 	return count
@@ -20805,13 +22898,13 @@ func (n *PipeAggregateNode) NumChildren() int {
 
 func (n *PipeAggregateNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSelect() != nil {
+	if n.Select() != nil {
 		if idx == i {
 			return n.Select()
 		}
 		idx++
 	}
-	if n.raw.GetWithModifier() != nil {
+	if n.WithModifier() != nil {
 		if idx == i {
 			return n.WithModifier()
 		}
@@ -20857,7 +22950,7 @@ func (n *PipeAsNode) Alias() *AliasNode {
 
 func (n *PipeAsNode) NumChildren() int {
 	count := 0
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -20865,7 +22958,7 @@ func (n *PipeAsNode) NumChildren() int {
 
 func (n *PipeAsNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -20915,7 +23008,7 @@ func (n *PipeAssertNode) MessageList() []ExpressionNode {
 
 func (n *PipeAssertNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		count++
 	}
 	count += len(n.MessageList())
@@ -20924,7 +23017,7 @@ func (n *PipeAssertNode) NumChildren() int {
 
 func (n *PipeAssertNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		if idx == i {
 			return n.Condition()
 		}
@@ -20977,7 +23070,7 @@ func (n *PipeCallNode) Tvf() *TVFNode {
 
 func (n *PipeCallNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTvf() != nil {
+	if n.Tvf() != nil {
 		count++
 	}
 	return count
@@ -20985,7 +23078,7 @@ func (n *PipeCallNode) NumChildren() int {
 
 func (n *PipeCallNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTvf() != nil {
+	if n.Tvf() != nil {
 		if idx == i {
 			return n.Tvf()
 		}
@@ -21031,7 +23124,7 @@ func (n *PipeCreateTableNode) CreateTableStatement() *CreateTableStatementNode {
 
 func (n *PipeCreateTableNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCreateTableStatement() != nil {
+	if n.CreateTableStatement() != nil {
 		count++
 	}
 	return count
@@ -21039,7 +23132,7 @@ func (n *PipeCreateTableNode) NumChildren() int {
 
 func (n *PipeCreateTableNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCreateTableStatement() != nil {
+	if n.CreateTableStatement() != nil {
 		if idx == i {
 			return n.CreateTableStatement()
 		}
@@ -21165,7 +23258,7 @@ func (n *PipeDropNode) ColumnList() *IdentifierListNode {
 
 func (n *PipeDropNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnList() != nil {
+	if n.ColumnList() != nil {
 		count++
 	}
 	return count
@@ -21173,7 +23266,7 @@ func (n *PipeDropNode) NumChildren() int {
 
 func (n *PipeDropNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnList() != nil {
+	if n.ColumnList() != nil {
 		if idx == i {
 			return n.ColumnList()
 		}
@@ -21219,7 +23312,7 @@ func (n *PipeExportDataNode) ExportDataStatement() *ExportDataStatementNode {
 
 func (n *PipeExportDataNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExportDataStatement() != nil {
+	if n.ExportDataStatement() != nil {
 		count++
 	}
 	return count
@@ -21227,7 +23320,7 @@ func (n *PipeExportDataNode) NumChildren() int {
 
 func (n *PipeExportDataNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExportDataStatement() != nil {
+	if n.ExportDataStatement() != nil {
 		if idx == i {
 			return n.ExportDataStatement()
 		}
@@ -21273,7 +23366,7 @@ func (n *PipeExtendNode) Select() *SelectNode {
 
 func (n *PipeExtendNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSelect() != nil {
+	if n.Select() != nil {
 		count++
 	}
 	return count
@@ -21281,7 +23374,7 @@ func (n *PipeExtendNode) NumChildren() int {
 
 func (n *PipeExtendNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSelect() != nil {
+	if n.Select() != nil {
 		if idx == i {
 			return n.Select()
 		}
@@ -21331,7 +23424,7 @@ func (n *PipeForkNode) SubpipelineList() []*SubpipelineNode {
 
 func (n *PipeForkNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
 	count += len(n.SubpipelineList())
@@ -21340,7 +23433,7 @@ func (n *PipeForkNode) NumChildren() int {
 
 func (n *PipeForkNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
@@ -21397,10 +23490,10 @@ func (n *PipeIfCaseNode) Subpipeline() *SubpipelineNode {
 
 func (n *PipeIfCaseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		count++
 	}
-	if n.raw.GetSubpipeline() != nil {
+	if n.Subpipeline() != nil {
 		count++
 	}
 	return count
@@ -21408,13 +23501,13 @@ func (n *PipeIfCaseNode) NumChildren() int {
 
 func (n *PipeIfCaseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		if idx == i {
 			return n.Condition()
 		}
 		idx++
 	}
-	if n.raw.GetSubpipeline() != nil {
+	if n.Subpipeline() != nil {
 		if idx == i {
 			return n.Subpipeline()
 		}
@@ -21468,11 +23561,11 @@ func (n *PipeIfNode) ElseSubpipeline() *SubpipelineNode {
 
 func (n *PipeIfNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
 	count += len(n.IfCases())
-	if n.raw.GetElseSubpipeline() != nil {
+	if n.ElseSubpipeline() != nil {
 		count++
 	}
 	return count
@@ -21480,7 +23573,7 @@ func (n *PipeIfNode) NumChildren() int {
 
 func (n *PipeIfNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
@@ -21493,7 +23586,7 @@ func (n *PipeIfNode) Child(i int) Node {
 		}
 		idx += len(s)
 	}
-	if n.raw.GetElseSubpipeline() != nil {
+	if n.ElseSubpipeline() != nil {
 		if idx == i {
 			return n.ElseSubpipeline()
 		}
@@ -21539,7 +23632,7 @@ func (n *PipeInsertNode) InsertStatement() *InsertStatementNode {
 
 func (n *PipeInsertNode) NumChildren() int {
 	count := 0
-	if n.raw.GetInsertStatement() != nil {
+	if n.InsertStatement() != nil {
 		count++
 	}
 	return count
@@ -21547,7 +23640,7 @@ func (n *PipeInsertNode) NumChildren() int {
 
 func (n *PipeInsertNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetInsertStatement() != nil {
+	if n.InsertStatement() != nil {
 		if idx == i {
 			return n.InsertStatement()
 		}
@@ -21588,12 +23681,25 @@ func (n *PipeJoinLhsPlaceholderNode) ParseLocationRange() *generated.ParseLocati
 }
 func (n *PipeJoinLhsPlaceholderNode) tableExpressionNode() {}
 
+func (n *PipeJoinLhsPlaceholderNode) PostfixOperators() []Node {
+	return wrapPostfixTableOperatorSlice(n.raw.GetParent().GetPostfixOperators())
+}
+
 func (n *PipeJoinLhsPlaceholderNode) NumChildren() int {
 	count := 0
+	count += len(n.PostfixOperators())
 	return count
 }
 
 func (n *PipeJoinLhsPlaceholderNode) Child(i int) Node {
+	idx := 0
+	{
+		s := n.PostfixOperators()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
 	return nil
 }
 
@@ -21634,7 +23740,7 @@ func (n *PipeJoinNode) Join() *JoinNode {
 
 func (n *PipeJoinNode) NumChildren() int {
 	count := 0
-	if n.raw.GetJoin() != nil {
+	if n.Join() != nil {
 		count++
 	}
 	return count
@@ -21642,7 +23748,7 @@ func (n *PipeJoinNode) NumChildren() int {
 
 func (n *PipeJoinNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetJoin() != nil {
+	if n.Join() != nil {
 		if idx == i {
 			return n.Join()
 		}
@@ -21688,7 +23794,7 @@ func (n *PipeLimitOffsetNode) LimitOffset() *LimitOffsetNode {
 
 func (n *PipeLimitOffsetNode) NumChildren() int {
 	count := 0
-	if n.raw.GetLimitOffset() != nil {
+	if n.LimitOffset() != nil {
 		count++
 	}
 	return count
@@ -21696,7 +23802,7 @@ func (n *PipeLimitOffsetNode) NumChildren() int {
 
 func (n *PipeLimitOffsetNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetLimitOffset() != nil {
+	if n.LimitOffset() != nil {
 		if idx == i {
 			return n.LimitOffset()
 		}
@@ -21746,10 +23852,10 @@ func (n *PipeLogNode) Subpipeline() *SubpipelineNode {
 
 func (n *PipeLogNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetSubpipeline() != nil {
+	if n.Subpipeline() != nil {
 		count++
 	}
 	return count
@@ -21757,13 +23863,13 @@ func (n *PipeLogNode) NumChildren() int {
 
 func (n *PipeLogNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetSubpipeline() != nil {
+	if n.Subpipeline() != nil {
 		if idx == i {
 			return n.Subpipeline()
 		}
@@ -21809,7 +23915,7 @@ func (n *PipeMatchRecognizeNode) MatchRecognize() *MatchRecognizeClauseNode {
 
 func (n *PipeMatchRecognizeNode) NumChildren() int {
 	count := 0
-	if n.raw.GetMatchRecognize() != nil {
+	if n.MatchRecognize() != nil {
 		count++
 	}
 	return count
@@ -21817,7 +23923,7 @@ func (n *PipeMatchRecognizeNode) NumChildren() int {
 
 func (n *PipeMatchRecognizeNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetMatchRecognize() != nil {
+	if n.MatchRecognize() != nil {
 		if idx == i {
 			return n.MatchRecognize()
 		}
@@ -21863,7 +23969,7 @@ func (n *PipeOrderByNode) OrderBy() *OrderByNode {
 
 func (n *PipeOrderByNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOrderBy() != nil {
+	if n.OrderBy() != nil {
 		count++
 	}
 	return count
@@ -21871,7 +23977,7 @@ func (n *PipeOrderByNode) NumChildren() int {
 
 func (n *PipeOrderByNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOrderBy() != nil {
+	if n.OrderBy() != nil {
 		if idx == i {
 			return n.OrderBy()
 		}
@@ -21917,7 +24023,7 @@ func (n *PipePivotNode) PivotClause() *PivotClauseNode {
 
 func (n *PipePivotNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPivotClause() != nil {
+	if n.PivotClause() != nil {
 		count++
 	}
 	return count
@@ -21925,7 +24031,7 @@ func (n *PipePivotNode) NumChildren() int {
 
 func (n *PipePivotNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPivotClause() != nil {
+	if n.PivotClause() != nil {
 		if idx == i {
 			return n.PivotClause()
 		}
@@ -21987,19 +24093,19 @@ func (n *PipeRecursiveUnionNode) Alias() *AliasNode {
 
 func (n *PipeRecursiveUnionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetMetadata() != nil {
+	if n.Metadata() != nil {
 		count++
 	}
-	if n.raw.GetRecursionDepthModifier() != nil {
+	if n.RecursionDepthModifier() != nil {
 		count++
 	}
-	if n.raw.GetInputSubpipeline() != nil {
+	if n.InputSubpipeline() != nil {
 		count++
 	}
-	if n.raw.GetInputSubquery() != nil {
+	if n.InputSubquery() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -22007,31 +24113,31 @@ func (n *PipeRecursiveUnionNode) NumChildren() int {
 
 func (n *PipeRecursiveUnionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetMetadata() != nil {
+	if n.Metadata() != nil {
 		if idx == i {
 			return n.Metadata()
 		}
 		idx++
 	}
-	if n.raw.GetRecursionDepthModifier() != nil {
+	if n.RecursionDepthModifier() != nil {
 		if idx == i {
 			return n.RecursionDepthModifier()
 		}
 		idx++
 	}
-	if n.raw.GetInputSubpipeline() != nil {
+	if n.InputSubpipeline() != nil {
 		if idx == i {
 			return n.InputSubpipeline()
 		}
 		idx++
 	}
-	if n.raw.GetInputSubquery() != nil {
+	if n.InputSubquery() != nil {
 		if idx == i {
 			return n.InputSubquery()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -22081,10 +24187,10 @@ func (n *PipeRenameItemNode) NewName() *IdentifierNode {
 
 func (n *PipeRenameItemNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOldName() != nil {
+	if n.OldName() != nil {
 		count++
 	}
-	if n.raw.GetNewName() != nil {
+	if n.NewName() != nil {
 		count++
 	}
 	return count
@@ -22092,13 +24198,13 @@ func (n *PipeRenameItemNode) NumChildren() int {
 
 func (n *PipeRenameItemNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOldName() != nil {
+	if n.OldName() != nil {
 		if idx == i {
 			return n.OldName()
 		}
 		idx++
 	}
-	if n.raw.GetNewName() != nil {
+	if n.NewName() != nil {
 		if idx == i {
 			return n.NewName()
 		}
@@ -22197,7 +24303,7 @@ func (n *PipeSelectNode) Select() *SelectNode {
 
 func (n *PipeSelectNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSelect() != nil {
+	if n.Select() != nil {
 		count++
 	}
 	return count
@@ -22205,7 +24311,7 @@ func (n *PipeSelectNode) NumChildren() int {
 
 func (n *PipeSelectNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSelect() != nil {
+	if n.Select() != nil {
 		if idx == i {
 			return n.Select()
 		}
@@ -22255,10 +24361,10 @@ func (n *PipeSetItemNode) Expression() ExpressionNode {
 
 func (n *PipeSetItemNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumn() != nil {
+	if n.Column() != nil {
 		count++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -22266,13 +24372,13 @@ func (n *PipeSetItemNode) NumChildren() int {
 
 func (n *PipeSetItemNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumn() != nil {
+	if n.Column() != nil {
 		if idx == i {
 			return n.Column()
 		}
 		idx++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -22375,7 +24481,7 @@ func (n *PipeSetOperationNode) Inputs() []QueryExpressionNode {
 
 func (n *PipeSetOperationNode) NumChildren() int {
 	count := 0
-	if n.raw.GetMetadata() != nil {
+	if n.Metadata() != nil {
 		count++
 	}
 	count += len(n.Inputs())
@@ -22384,7 +24490,7 @@ func (n *PipeSetOperationNode) NumChildren() int {
 
 func (n *PipeSetOperationNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetMetadata() != nil {
+	if n.Metadata() != nil {
 		if idx == i {
 			return n.Metadata()
 		}
@@ -22477,7 +24583,7 @@ func (n *PipeTablesampleNode) Sample() *SampleClauseNode {
 
 func (n *PipeTablesampleNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSample() != nil {
+	if n.Sample() != nil {
 		count++
 	}
 	return count
@@ -22485,7 +24591,7 @@ func (n *PipeTablesampleNode) NumChildren() int {
 
 func (n *PipeTablesampleNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSample() != nil {
+	if n.Sample() != nil {
 		if idx == i {
 			return n.Sample()
 		}
@@ -22535,7 +24641,7 @@ func (n *PipeTeeNode) SubpipelineList() []*SubpipelineNode {
 
 func (n *PipeTeeNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
 	count += len(n.SubpipelineList())
@@ -22544,7 +24650,7 @@ func (n *PipeTeeNode) NumChildren() int {
 
 func (n *PipeTeeNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
@@ -22597,7 +24703,7 @@ func (n *PipeUnpivotNode) UnpivotClause() *UnpivotClauseNode {
 
 func (n *PipeUnpivotNode) NumChildren() int {
 	count := 0
-	if n.raw.GetUnpivotClause() != nil {
+	if n.UnpivotClause() != nil {
 		count++
 	}
 	return count
@@ -22605,7 +24711,7 @@ func (n *PipeUnpivotNode) NumChildren() int {
 
 func (n *PipeUnpivotNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetUnpivotClause() != nil {
+	if n.UnpivotClause() != nil {
 		if idx == i {
 			return n.UnpivotClause()
 		}
@@ -22651,7 +24757,7 @@ func (n *PipeWhereNode) Where() *WhereClauseNode {
 
 func (n *PipeWhereNode) NumChildren() int {
 	count := 0
-	if n.raw.GetWhere() != nil {
+	if n.Where() != nil {
 		count++
 	}
 	return count
@@ -22659,7 +24765,7 @@ func (n *PipeWhereNode) NumChildren() int {
 
 func (n *PipeWhereNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetWhere() != nil {
+	if n.Where() != nil {
 		if idx == i {
 			return n.Where()
 		}
@@ -22705,7 +24811,7 @@ func (n *PipeWindowNode) Select() *SelectNode {
 
 func (n *PipeWindowNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSelect() != nil {
+	if n.Select() != nil {
 		count++
 	}
 	return count
@@ -22713,7 +24819,7 @@ func (n *PipeWindowNode) NumChildren() int {
 
 func (n *PipeWindowNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSelect() != nil {
+	if n.Select() != nil {
 		if idx == i {
 			return n.Select()
 		}
@@ -22759,7 +24865,7 @@ func (n *PipeWithNode) WithClause() *WithClauseNode {
 
 func (n *PipeWithNode) NumChildren() int {
 	count := 0
-	if n.raw.GetWithClause() != nil {
+	if n.WithClause() != nil {
 		count++
 	}
 	return count
@@ -22767,7 +24873,7 @@ func (n *PipeWithNode) NumChildren() int {
 
 func (n *PipeWithNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetWithClause() != nil {
+	if n.WithClause() != nil {
 		if idx == i {
 			return n.WithClause()
 		}
@@ -22825,16 +24931,16 @@ func (n *PivotClauseNode) OutputAlias() *AliasNode {
 
 func (n *PivotClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPivotExpressions() != nil {
+	if n.PivotExpressions() != nil {
 		count++
 	}
-	if n.raw.GetForExpression() != nil {
+	if n.ForExpression() != nil {
 		count++
 	}
-	if n.raw.GetPivotValues() != nil {
+	if n.PivotValues() != nil {
 		count++
 	}
-	if n.raw.GetOutputAlias() != nil {
+	if n.OutputAlias() != nil {
 		count++
 	}
 	return count
@@ -22842,25 +24948,25 @@ func (n *PivotClauseNode) NumChildren() int {
 
 func (n *PivotClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPivotExpressions() != nil {
+	if n.PivotExpressions() != nil {
 		if idx == i {
 			return n.PivotExpressions()
 		}
 		idx++
 	}
-	if n.raw.GetForExpression() != nil {
+	if n.ForExpression() != nil {
 		if idx == i {
 			return n.ForExpression()
 		}
 		idx++
 	}
-	if n.raw.GetPivotValues() != nil {
+	if n.PivotValues() != nil {
 		if idx == i {
 			return n.PivotValues()
 		}
 		idx++
 	}
-	if n.raw.GetOutputAlias() != nil {
+	if n.OutputAlias() != nil {
 		if idx == i {
 			return n.OutputAlias()
 		}
@@ -22963,10 +25069,10 @@ func (n *PivotExpressionNode) Alias() *AliasNode {
 
 func (n *PivotExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -22974,13 +25080,13 @@ func (n *PivotExpressionNode) NumChildren() int {
 
 func (n *PivotExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -23083,10 +25189,10 @@ func (n *PivotValueNode) Alias() *AliasNode {
 
 func (n *PivotValueNode) NumChildren() int {
 	count := 0
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -23094,13 +25200,13 @@ func (n *PivotValueNode) NumChildren() int {
 
 func (n *PivotValueNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		if idx == i {
 			return n.Value()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -23251,10 +25357,10 @@ func (n *PrimaryKeyElementNode) NullOrder() *NullOrderNode {
 
 func (n *PrimaryKeyElementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumn() != nil {
+	if n.Column() != nil {
 		count++
 	}
-	if n.raw.GetNullOrder() != nil {
+	if n.NullOrder() != nil {
 		count++
 	}
 	return count
@@ -23262,13 +25368,13 @@ func (n *PrimaryKeyElementNode) NumChildren() int {
 
 func (n *PrimaryKeyElementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumn() != nil {
+	if n.Column() != nil {
 		if idx == i {
 			return n.Column()
 		}
 		idx++
 	}
-	if n.raw.GetNullOrder() != nil {
+	if n.NullOrder() != nil {
 		if idx == i {
 			return n.NullOrder()
 		}
@@ -23326,13 +25432,13 @@ func (n *PrimaryKeyNode) Enforced() bool {
 
 func (n *PrimaryKeyNode) NumChildren() int {
 	count := 0
-	if n.raw.GetElementList() != nil {
+	if n.ElementList() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		count++
 	}
 	return count
@@ -23340,19 +25446,19 @@ func (n *PrimaryKeyNode) NumChildren() int {
 
 func (n *PrimaryKeyNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetElementList() != nil {
+	if n.ElementList() != nil {
 		if idx == i {
 			return n.ElementList()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
 		idx++
 	}
-	if n.raw.GetConstraintName() != nil {
+	if n.ConstraintName() != nil {
 		if idx == i {
 			return n.ConstraintName()
 		}
@@ -23402,10 +25508,10 @@ func (n *PrivilegeNode) Paths() *PathExpressionListNode {
 
 func (n *PrivilegeNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPrivilegeAction() != nil {
+	if n.PrivilegeAction() != nil {
 		count++
 	}
-	if n.raw.GetPaths() != nil {
+	if n.Paths() != nil {
 		count++
 	}
 	return count
@@ -23413,13 +25519,13 @@ func (n *PrivilegeNode) NumChildren() int {
 
 func (n *PrivilegeNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPrivilegeAction() != nil {
+	if n.PrivilegeAction() != nil {
 		if idx == i {
 			return n.PrivilegeAction()
 		}
 		idx++
 	}
-	if n.raw.GetPaths() != nil {
+	if n.Paths() != nil {
 		if idx == i {
 			return n.Paths()
 		}
@@ -23518,7 +25624,7 @@ func (n *QualifyNode) Expression() ExpressionNode {
 
 func (n *QualifyNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -23526,7 +25632,7 @@ func (n *QualifyNode) NumChildren() int {
 
 func (n *QualifyNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -23572,7 +25678,7 @@ func (n *QuantifierBoundNode) Bound() ExpressionNode {
 
 func (n *QuantifierBoundNode) NumChildren() int {
 	count := 0
-	if n.raw.GetBound() != nil {
+	if n.Bound() != nil {
 		count++
 	}
 	return count
@@ -23580,7 +25686,7 @@ func (n *QuantifierBoundNode) NumChildren() int {
 
 func (n *QuantifierBoundNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetBound() != nil {
+	if n.Bound() != nil {
 		if idx == i {
 			return n.Bound()
 		}
@@ -23621,6 +25727,10 @@ func (n *QueryNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 }
 func (n *QueryNode) queryExpressionNode() {}
 
+func (n *QueryNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *QueryNode) WithClause() *WithClauseNode {
 	return newWithClauseNode(n.raw.GetWithClause())
 }
@@ -23655,20 +25765,20 @@ func (n *QueryNode) LockMode() *LockModeNode {
 
 func (n *QueryNode) NumChildren() int {
 	count := 0
-	if n.raw.GetWithClause() != nil {
+	if n.WithClause() != nil {
 		count++
 	}
-	if n.raw.GetQueryExpr() != nil {
+	if n.QueryExpr() != nil {
 		count++
 	}
-	if n.raw.GetOrderBy() != nil {
+	if n.OrderBy() != nil {
 		count++
 	}
-	if n.raw.GetLimitOffset() != nil {
+	if n.LimitOffset() != nil {
 		count++
 	}
 	count += len(n.PipeOperatorList())
-	if n.raw.GetLockMode() != nil {
+	if n.LockMode() != nil {
 		count++
 	}
 	return count
@@ -23676,25 +25786,25 @@ func (n *QueryNode) NumChildren() int {
 
 func (n *QueryNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetWithClause() != nil {
+	if n.WithClause() != nil {
 		if idx == i {
 			return n.WithClause()
 		}
 		idx++
 	}
-	if n.raw.GetQueryExpr() != nil {
+	if n.QueryExpr() != nil {
 		if idx == i {
 			return n.QueryExpr()
 		}
 		idx++
 	}
-	if n.raw.GetOrderBy() != nil {
+	if n.OrderBy() != nil {
 		if idx == i {
 			return n.OrderBy()
 		}
 		idx++
 	}
-	if n.raw.GetLimitOffset() != nil {
+	if n.LimitOffset() != nil {
 		if idx == i {
 			return n.LimitOffset()
 		}
@@ -23707,7 +25817,7 @@ func (n *QueryNode) Child(i int) Node {
 		}
 		idx += len(s)
 	}
-	if n.raw.GetLockMode() != nil {
+	if n.LockMode() != nil {
 		if idx == i {
 			return n.LockMode()
 		}
@@ -23754,7 +25864,7 @@ func (n *QueryStatementNode) Query() *QueryNode {
 
 func (n *QueryStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		count++
 	}
 	return count
@@ -23762,7 +25872,7 @@ func (n *QueryStatementNode) NumChildren() int {
 
 func (n *QueryStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetQuery() != nil {
+	if n.Query() != nil {
 		if idx == i {
 			return n.Query()
 		}
@@ -23809,7 +25919,7 @@ func (n *RaiseStatementNode) Message() ExpressionNode {
 
 func (n *RaiseStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetMessage() != nil {
+	if n.Message() != nil {
 		count++
 	}
 	return count
@@ -23817,7 +25927,7 @@ func (n *RaiseStatementNode) NumChildren() int {
 
 func (n *RaiseStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetMessage() != nil {
+	if n.Message() != nil {
 		if idx == i {
 			return n.Message()
 		}
@@ -23857,12 +25967,104 @@ func (n *RangeColumnSchemaNode) ParseLocationRange() *generated.ParseLocationRan
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *RangeColumnSchemaNode) TypeParameters() *TypeParameterListNode {
+	return newTypeParameterListNode(n.raw.GetParent().GetParent().GetTypeParameters())
+}
+
+func (n *RangeColumnSchemaNode) GeneratedColumnInfo() *GeneratedColumnInfoNode {
+	return newGeneratedColumnInfoNode(n.raw.GetParent().GetParent().GetGeneratedColumnInfo())
+}
+
+func (n *RangeColumnSchemaNode) DefaultExpression() ExpressionNode {
+	return wrapExpression(n.raw.GetParent().GetParent().GetDefaultExpression())
+}
+
+func (n *RangeColumnSchemaNode) Collate() *CollateNode {
+	return newCollateNode(n.raw.GetParent().GetParent().GetCollate())
+}
+
+func (n *RangeColumnSchemaNode) Attributes() *ColumnAttributeListNode {
+	return newColumnAttributeListNode(n.raw.GetParent().GetParent().GetAttributes())
+}
+
+func (n *RangeColumnSchemaNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetParent().GetOptionsList())
+}
+
+func (n *RangeColumnSchemaNode) ElementSchema() Node {
+	return wrapColumnSchema(n.raw.GetParent().GetElementSchema())
+}
+
 func (n *RangeColumnSchemaNode) NumChildren() int {
 	count := 0
+	if n.TypeParameters() != nil {
+		count++
+	}
+	if n.GeneratedColumnInfo() != nil {
+		count++
+	}
+	if n.DefaultExpression() != nil {
+		count++
+	}
+	if n.Collate() != nil {
+		count++
+	}
+	if n.Attributes() != nil {
+		count++
+	}
+	if n.OptionsList() != nil {
+		count++
+	}
+	if n.ElementSchema() != nil {
+		count++
+	}
 	return count
 }
 
 func (n *RangeColumnSchemaNode) Child(i int) Node {
+	idx := 0
+	if n.TypeParameters() != nil {
+		if idx == i {
+			return n.TypeParameters()
+		}
+		idx++
+	}
+	if n.GeneratedColumnInfo() != nil {
+		if idx == i {
+			return n.GeneratedColumnInfo()
+		}
+		idx++
+	}
+	if n.DefaultExpression() != nil {
+		if idx == i {
+			return n.DefaultExpression()
+		}
+		idx++
+	}
+	if n.Collate() != nil {
+		if idx == i {
+			return n.Collate()
+		}
+		idx++
+	}
+	if n.Attributes() != nil {
+		if idx == i {
+			return n.Attributes()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.ElementSchema() != nil {
+		if idx == i {
+			return n.ElementSchema()
+		}
+		idx++
+	}
 	return nil
 }
 
@@ -23898,6 +26100,10 @@ func (n *RangeLiteralNode) ParseLocationRange() *generated.ParseLocationRangePro
 }
 func (n *RangeLiteralNode) expressionNode() {}
 
+func (n *RangeLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *RangeLiteralNode) Type() *RangeTypeNode {
 	return newRangeTypeNode(n.raw.GetType())
 }
@@ -23908,10 +26114,10 @@ func (n *RangeLiteralNode) RangeValue() *StringLiteralNode {
 
 func (n *RangeLiteralNode) NumChildren() int {
 	count := 0
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		count++
 	}
-	if n.raw.GetRangeValue() != nil {
+	if n.RangeValue() != nil {
 		count++
 	}
 	return count
@@ -23919,13 +26125,13 @@ func (n *RangeLiteralNode) NumChildren() int {
 
 func (n *RangeLiteralNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		if idx == i {
 			return n.Type()
 		}
 		idx++
 	}
-	if n.raw.GetRangeValue() != nil {
+	if n.RangeValue() != nil {
 		if idx == i {
 			return n.RangeValue()
 		}
@@ -23979,13 +26185,13 @@ func (n *RangeTypeNode) Collate() *CollateNode {
 
 func (n *RangeTypeNode) NumChildren() int {
 	count := 0
-	if n.raw.GetElementType() != nil {
+	if n.ElementType() != nil {
 		count++
 	}
-	if n.raw.GetTypeParameters() != nil {
+	if n.TypeParameters() != nil {
 		count++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		count++
 	}
 	return count
@@ -23993,19 +26199,19 @@ func (n *RangeTypeNode) NumChildren() int {
 
 func (n *RangeTypeNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetElementType() != nil {
+	if n.ElementType() != nil {
 		if idx == i {
 			return n.ElementType()
 		}
 		idx++
 	}
-	if n.raw.GetTypeParameters() != nil {
+	if n.TypeParameters() != nil {
 		if idx == i {
 			return n.TypeParameters()
 		}
 		idx++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		if idx == i {
 			return n.Collate()
 		}
@@ -24099,13 +26305,13 @@ func (n *RecursionDepthModifierNode) UpperBound() *IntOrUnboundedNode {
 
 func (n *RecursionDepthModifierNode) NumChildren() int {
 	count := 0
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
-	if n.raw.GetLowerBound() != nil {
+	if n.LowerBound() != nil {
 		count++
 	}
-	if n.raw.GetUpperBound() != nil {
+	if n.UpperBound() != nil {
 		count++
 	}
 	return count
@@ -24113,19 +26319,19 @@ func (n *RecursionDepthModifierNode) NumChildren() int {
 
 func (n *RecursionDepthModifierNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
 		idx++
 	}
-	if n.raw.GetLowerBound() != nil {
+	if n.LowerBound() != nil {
 		if idx == i {
 			return n.LowerBound()
 		}
 		idx++
 	}
-	if n.raw.GetUpperBound() != nil {
+	if n.UpperBound() != nil {
 		if idx == i {
 			return n.UpperBound()
 		}
@@ -24175,7 +26381,7 @@ func (n *RemoveFromRestricteeListClauseNode) RestricteeList() *GranteeListNode {
 
 func (n *RemoveFromRestricteeListClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetRestricteeList() != nil {
+	if n.RestricteeList() != nil {
 		count++
 	}
 	return count
@@ -24183,7 +26389,7 @@ func (n *RemoveFromRestricteeListClauseNode) NumChildren() int {
 
 func (n *RemoveFromRestricteeListClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetRestricteeList() != nil {
+	if n.RestricteeList() != nil {
 		if idx == i {
 			return n.RestricteeList()
 		}
@@ -24237,10 +26443,10 @@ func (n *RenameColumnActionNode) IsIfExists() bool {
 
 func (n *RenameColumnActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		count++
 	}
-	if n.raw.GetNewColumnName() != nil {
+	if n.NewColumnName() != nil {
 		count++
 	}
 	return count
@@ -24248,13 +26454,13 @@ func (n *RenameColumnActionNode) NumChildren() int {
 
 func (n *RenameColumnActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnName() != nil {
+	if n.ColumnName() != nil {
 		if idx == i {
 			return n.ColumnName()
 		}
 		idx++
 	}
-	if n.raw.GetNewColumnName() != nil {
+	if n.NewColumnName() != nil {
 		if idx == i {
 			return n.NewColumnName()
 		}
@@ -24309,13 +26515,13 @@ func (n *RenameStatementNode) NewName() *PathExpressionNode {
 
 func (n *RenameStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		count++
 	}
-	if n.raw.GetOldName() != nil {
+	if n.OldName() != nil {
 		count++
 	}
-	if n.raw.GetNewName() != nil {
+	if n.NewName() != nil {
 		count++
 	}
 	return count
@@ -24323,19 +26529,19 @@ func (n *RenameStatementNode) NumChildren() int {
 
 func (n *RenameStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		if idx == i {
 			return n.Identifier()
 		}
 		idx++
 	}
-	if n.raw.GetOldName() != nil {
+	if n.OldName() != nil {
 		if idx == i {
 			return n.OldName()
 		}
 		idx++
 	}
-	if n.raw.GetNewName() != nil {
+	if n.NewName() != nil {
 		if idx == i {
 			return n.NewName()
 		}
@@ -24381,7 +26587,7 @@ func (n *RenameToClauseNode) NewName() *PathExpressionNode {
 
 func (n *RenameToClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetNewName() != nil {
+	if n.NewName() != nil {
 		count++
 	}
 	return count
@@ -24389,7 +26595,7 @@ func (n *RenameToClauseNode) NumChildren() int {
 
 func (n *RenameToClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetNewName() != nil {
+	if n.NewName() != nil {
 		if idx == i {
 			return n.NewName()
 		}
@@ -24430,13 +26636,27 @@ func (n *RepeatStatementNode) ParseLocationRange() *generated.ParseLocationRange
 }
 func (n *RepeatStatementNode) statementNode() {}
 
+func (n *RepeatStatementNode) Label() *LabelNode {
+	return newLabelNode(n.raw.GetParent().GetLabel())
+}
+
+func (n *RepeatStatementNode) Body() *StatementListNode {
+	return newStatementListNode(n.raw.GetParent().GetBody())
+}
+
 func (n *RepeatStatementNode) UntilClause() *UntilClauseNode {
 	return newUntilClauseNode(n.raw.GetUntilClause())
 }
 
 func (n *RepeatStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetUntilClause() != nil {
+	if n.Label() != nil {
+		count++
+	}
+	if n.Body() != nil {
+		count++
+	}
+	if n.UntilClause() != nil {
 		count++
 	}
 	return count
@@ -24444,7 +26664,19 @@ func (n *RepeatStatementNode) NumChildren() int {
 
 func (n *RepeatStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetUntilClause() != nil {
+	if n.Label() != nil {
+		if idx == i {
+			return n.Label()
+		}
+		idx++
+	}
+	if n.Body() != nil {
+		if idx == i {
+			return n.Body()
+		}
+		idx++
+	}
+	if n.UntilClause() != nil {
 		if idx == i {
 			return n.UntilClause()
 		}
@@ -24490,7 +26722,7 @@ func (n *RepeatableClauseNode) Argument() ExpressionNode {
 
 func (n *RepeatableClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetArgument() != nil {
+	if n.Argument() != nil {
 		count++
 	}
 	return count
@@ -24498,7 +26730,7 @@ func (n *RepeatableClauseNode) NumChildren() int {
 
 func (n *RepeatableClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetArgument() != nil {
+	if n.Argument() != nil {
 		if idx == i {
 			return n.Argument()
 		}
@@ -24548,10 +26780,10 @@ func (n *ReplaceFieldsArgNode) PathExpression() ExpressionNode {
 
 func (n *ReplaceFieldsArgNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetPathExpression() != nil {
+	if n.PathExpression() != nil {
 		count++
 	}
 	return count
@@ -24559,13 +26791,13 @@ func (n *ReplaceFieldsArgNode) NumChildren() int {
 
 func (n *ReplaceFieldsArgNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetPathExpression() != nil {
+	if n.PathExpression() != nil {
 		if idx == i {
 			return n.PathExpression()
 		}
@@ -24606,6 +26838,10 @@ func (n *ReplaceFieldsExpressionNode) ParseLocationRange() *generated.ParseLocat
 }
 func (n *ReplaceFieldsExpressionNode) expressionNode() {}
 
+func (n *ReplaceFieldsExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *ReplaceFieldsExpressionNode) Expr() ExpressionNode {
 	return wrapExpression(n.raw.GetExpr())
 }
@@ -24616,7 +26852,7 @@ func (n *ReplaceFieldsExpressionNode) Arguments() []*ReplaceFieldsArgNode {
 
 func (n *ReplaceFieldsExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		count++
 	}
 	count += len(n.Arguments())
@@ -24625,7 +26861,7 @@ func (n *ReplaceFieldsExpressionNode) NumChildren() int {
 
 func (n *ReplaceFieldsExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		if idx == i {
 			return n.Expr()
 		}
@@ -24682,7 +26918,7 @@ func (n *ReplaceTtlActionNode) IsIfExists() bool {
 
 func (n *ReplaceTtlActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -24690,7 +26926,7 @@ func (n *ReplaceTtlActionNode) NumChildren() int {
 
 func (n *ReplaceTtlActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -24736,7 +26972,7 @@ func (n *RestrictToClauseNode) RestricteeList() *GranteeListNode {
 
 func (n *RestrictToClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetRestricteeList() != nil {
+	if n.RestricteeList() != nil {
 		count++
 	}
 	return count
@@ -24744,7 +26980,7 @@ func (n *RestrictToClauseNode) NumChildren() int {
 
 func (n *RestrictToClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetRestricteeList() != nil {
+	if n.RestricteeList() != nil {
 		if idx == i {
 			return n.RestricteeList()
 		}
@@ -24835,10 +27071,10 @@ func (n *ReturningClauseNode) ActionAlias() *AliasNode {
 
 func (n *ReturningClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSelectList() != nil {
+	if n.SelectList() != nil {
 		count++
 	}
-	if n.raw.GetActionAlias() != nil {
+	if n.ActionAlias() != nil {
 		count++
 	}
 	return count
@@ -24846,13 +27082,13 @@ func (n *ReturningClauseNode) NumChildren() int {
 
 func (n *ReturningClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSelectList() != nil {
+	if n.SelectList() != nil {
 		if idx == i {
 			return n.SelectList()
 		}
 		idx++
 	}
-	if n.raw.GetActionAlias() != nil {
+	if n.ActionAlias() != nil {
 		if idx == i {
 			return n.ActionAlias()
 		}
@@ -24902,7 +27138,7 @@ func (n *RevokeFromClauseNode) IsRevokeFromAll() bool {
 
 func (n *RevokeFromClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetRevokeFromList() != nil {
+	if n.RevokeFromList() != nil {
 		count++
 	}
 	return count
@@ -24910,7 +27146,7 @@ func (n *RevokeFromClauseNode) NumChildren() int {
 
 func (n *RevokeFromClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetRevokeFromList() != nil {
+	if n.RevokeFromList() != nil {
 		if idx == i {
 			return n.RevokeFromList()
 		}
@@ -24969,14 +27205,14 @@ func (n *RevokeStatementNode) GranteeList() *GranteeListNode {
 
 func (n *RevokeStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPrivileges() != nil {
+	if n.Privileges() != nil {
 		count++
 	}
 	count += len(n.TargetTypeParts())
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		count++
 	}
-	if n.raw.GetGranteeList() != nil {
+	if n.GranteeList() != nil {
 		count++
 	}
 	return count
@@ -24984,7 +27220,7 @@ func (n *RevokeStatementNode) NumChildren() int {
 
 func (n *RevokeStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPrivileges() != nil {
+	if n.Privileges() != nil {
 		if idx == i {
 			return n.Privileges()
 		}
@@ -24997,13 +27233,13 @@ func (n *RevokeStatementNode) Child(i int) Node {
 		}
 		idx += len(s)
 	}
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		if idx == i {
 			return n.TargetPath()
 		}
 		idx++
 	}
-	if n.raw.GetGranteeList() != nil {
+	if n.GranteeList() != nil {
 		if idx == i {
 			return n.GranteeList()
 		}
@@ -25137,6 +27373,10 @@ func (n *RowPatternAnchorNode) ParseLocationRange() *generated.ParseLocationRang
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *RowPatternAnchorNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *RowPatternAnchorNode) Anchor() generated.ASTRowPatternAnchorEnums_Anchor {
 	return n.raw.GetAnchor()
 }
@@ -25179,6 +27419,10 @@ func (n *RowPatternOperationNode) String() string { return formatNode(n) }
 
 func (n *RowPatternOperationNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return parseLocationRangeOf(n.raw)
+}
+
+func (n *RowPatternOperationNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
 }
 
 func (n *RowPatternOperationNode) OpType() generated.ASTRowPatternOperationEnums_OperationType {
@@ -25238,6 +27482,10 @@ func (n *RowPatternQuantificationNode) ParseLocationRange() *generated.ParseLoca
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *RowPatternQuantificationNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *RowPatternQuantificationNode) Operand() Node {
 	return wrapRowPatternExpression(n.raw.GetOperand())
 }
@@ -25248,10 +27496,10 @@ func (n *RowPatternQuantificationNode) Quantifier() Node {
 
 func (n *RowPatternQuantificationNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOperand() != nil {
+	if n.Operand() != nil {
 		count++
 	}
-	if n.raw.GetQuantifier() != nil {
+	if n.Quantifier() != nil {
 		count++
 	}
 	return count
@@ -25259,13 +27507,13 @@ func (n *RowPatternQuantificationNode) NumChildren() int {
 
 func (n *RowPatternQuantificationNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOperand() != nil {
+	if n.Operand() != nil {
 		if idx == i {
 			return n.Operand()
 		}
 		idx++
 	}
-	if n.raw.GetQuantifier() != nil {
+	if n.Quantifier() != nil {
 		if idx == i {
 			return n.Quantifier()
 		}
@@ -25305,13 +27553,17 @@ func (n *RowPatternVariableNode) ParseLocationRange() *generated.ParseLocationRa
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *RowPatternVariableNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *RowPatternVariableNode) Name() *IdentifierNode {
 	return newIdentifierNode(n.raw.GetName())
 }
 
 func (n *RowPatternVariableNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
 	return count
@@ -25319,7 +27571,7 @@ func (n *RowPatternVariableNode) NumChildren() int {
 
 func (n *RowPatternVariableNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -25415,10 +27667,10 @@ func (n *RunStatementNode) Arguments() []*NamedArgumentNode {
 
 func (n *RunStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTargetPathExpression() != nil {
+	if n.TargetPathExpression() != nil {
 		count++
 	}
-	if n.raw.GetTargetStringLiteral() != nil {
+	if n.TargetStringLiteral() != nil {
 		count++
 	}
 	count += len(n.Arguments())
@@ -25427,13 +27679,13 @@ func (n *RunStatementNode) NumChildren() int {
 
 func (n *RunStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTargetPathExpression() != nil {
+	if n.TargetPathExpression() != nil {
 		if idx == i {
 			return n.TargetPathExpression()
 		}
 		idx++
 	}
-	if n.raw.GetTargetStringLiteral() != nil {
+	if n.TargetStringLiteral() != nil {
 		if idx == i {
 			return n.TargetStringLiteral()
 		}
@@ -25494,13 +27746,13 @@ func (n *SampleClauseNode) SampleSuffix() *SampleSuffixNode {
 
 func (n *SampleClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSampleMethod() != nil {
+	if n.SampleMethod() != nil {
 		count++
 	}
-	if n.raw.GetSampleSize() != nil {
+	if n.SampleSize() != nil {
 		count++
 	}
-	if n.raw.GetSampleSuffix() != nil {
+	if n.SampleSuffix() != nil {
 		count++
 	}
 	return count
@@ -25508,19 +27760,19 @@ func (n *SampleClauseNode) NumChildren() int {
 
 func (n *SampleClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSampleMethod() != nil {
+	if n.SampleMethod() != nil {
 		if idx == i {
 			return n.SampleMethod()
 		}
 		idx++
 	}
-	if n.raw.GetSampleSize() != nil {
+	if n.SampleSize() != nil {
 		if idx == i {
 			return n.SampleSize()
 		}
 		idx++
 	}
-	if n.raw.GetSampleSuffix() != nil {
+	if n.SampleSuffix() != nil {
 		if idx == i {
 			return n.SampleSuffix()
 		}
@@ -25574,10 +27826,10 @@ func (n *SampleSizeNode) Unit() generated.ASTSampleSizeEnums_Unit {
 
 func (n *SampleSizeNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSize() != nil {
+	if n.Size() != nil {
 		count++
 	}
-	if n.raw.GetPartitionBy() != nil {
+	if n.PartitionBy() != nil {
 		count++
 	}
 	return count
@@ -25585,13 +27837,13 @@ func (n *SampleSizeNode) NumChildren() int {
 
 func (n *SampleSizeNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSize() != nil {
+	if n.Size() != nil {
 		if idx == i {
 			return n.Size()
 		}
 		idx++
 	}
-	if n.raw.GetPartitionBy() != nil {
+	if n.PartitionBy() != nil {
 		if idx == i {
 			return n.PartitionBy()
 		}
@@ -25641,10 +27893,10 @@ func (n *SampleSuffixNode) Repeat() *RepeatableClauseNode {
 
 func (n *SampleSuffixNode) NumChildren() int {
 	count := 0
-	if n.raw.GetWeight() != nil {
+	if n.Weight() != nil {
 		count++
 	}
-	if n.raw.GetRepeat() != nil {
+	if n.Repeat() != nil {
 		count++
 	}
 	return count
@@ -25652,13 +27904,13 @@ func (n *SampleSuffixNode) NumChildren() int {
 
 func (n *SampleSuffixNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetWeight() != nil {
+	if n.Weight() != nil {
 		if idx == i {
 			return n.Weight()
 		}
 		idx++
 	}
-	if n.raw.GetRepeat() != nil {
+	if n.Repeat() != nil {
 		if idx == i {
 			return n.Repeat()
 		}
@@ -25704,7 +27956,7 @@ func (n *ScriptNode) StatementListNode() *StatementListNode {
 
 func (n *ScriptNode) NumChildren() int {
 	count := 0
-	if n.raw.GetStatementListNode() != nil {
+	if n.StatementListNode() != nil {
 		count++
 	}
 	return count
@@ -25712,7 +27964,7 @@ func (n *ScriptNode) NumChildren() int {
 
 func (n *ScriptNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetStatementListNode() != nil {
+	if n.StatementListNode() != nil {
 		if idx == i {
 			return n.StatementListNode()
 		}
@@ -25762,7 +28014,7 @@ func (n *SelectAsNode) AsMode() generated.ASTSelectAsEnums_AsMode {
 
 func (n *SelectAsNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTypeName() != nil {
+	if n.TypeName() != nil {
 		count++
 	}
 	return count
@@ -25770,7 +28022,7 @@ func (n *SelectAsNode) NumChildren() int {
 
 func (n *SelectAsNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTypeName() != nil {
+	if n.TypeName() != nil {
 		if idx == i {
 			return n.TypeName()
 		}
@@ -25824,13 +28076,13 @@ func (n *SelectColumnNode) GroupingItemOrder() *GroupingItemOrderNode {
 
 func (n *SelectColumnNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
-	if n.raw.GetGroupingItemOrder() != nil {
+	if n.GroupingItemOrder() != nil {
 		count++
 	}
 	return count
@@ -25838,19 +28090,19 @@ func (n *SelectColumnNode) NumChildren() int {
 
 func (n *SelectColumnNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
 		idx++
 	}
-	if n.raw.GetGroupingItemOrder() != nil {
+	if n.GroupingItemOrder() != nil {
 		if idx == i {
 			return n.GroupingItemOrder()
 		}
@@ -25944,6 +28196,10 @@ func (n *SelectNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 }
 func (n *SelectNode) queryExpressionNode() {}
 
+func (n *SelectNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *SelectNode) Hint() *HintNode {
 	return newHintNode(n.raw.GetHint())
 }
@@ -25990,34 +28246,34 @@ func (n *SelectNode) WindowClause() *WindowClauseNode {
 
 func (n *SelectNode) NumChildren() int {
 	count := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetWithModifier() != nil {
+	if n.WithModifier() != nil {
 		count++
 	}
-	if n.raw.GetSelectAs() != nil {
+	if n.SelectAs() != nil {
 		count++
 	}
-	if n.raw.GetSelectList() != nil {
+	if n.SelectList() != nil {
 		count++
 	}
-	if n.raw.GetFromClause() != nil {
+	if n.FromClause() != nil {
 		count++
 	}
-	if n.raw.GetWhereClause() != nil {
+	if n.WhereClause() != nil {
 		count++
 	}
-	if n.raw.GetGroupBy() != nil {
+	if n.GroupBy() != nil {
 		count++
 	}
-	if n.raw.GetHaving() != nil {
+	if n.Having() != nil {
 		count++
 	}
-	if n.raw.GetQualify() != nil {
+	if n.Qualify() != nil {
 		count++
 	}
-	if n.raw.GetWindowClause() != nil {
+	if n.WindowClause() != nil {
 		count++
 	}
 	return count
@@ -26025,61 +28281,61 @@ func (n *SelectNode) NumChildren() int {
 
 func (n *SelectNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetWithModifier() != nil {
+	if n.WithModifier() != nil {
 		if idx == i {
 			return n.WithModifier()
 		}
 		idx++
 	}
-	if n.raw.GetSelectAs() != nil {
+	if n.SelectAs() != nil {
 		if idx == i {
 			return n.SelectAs()
 		}
 		idx++
 	}
-	if n.raw.GetSelectList() != nil {
+	if n.SelectList() != nil {
 		if idx == i {
 			return n.SelectList()
 		}
 		idx++
 	}
-	if n.raw.GetFromClause() != nil {
+	if n.FromClause() != nil {
 		if idx == i {
 			return n.FromClause()
 		}
 		idx++
 	}
-	if n.raw.GetWhereClause() != nil {
+	if n.WhereClause() != nil {
 		if idx == i {
 			return n.WhereClause()
 		}
 		idx++
 	}
-	if n.raw.GetGroupBy() != nil {
+	if n.GroupBy() != nil {
 		if idx == i {
 			return n.GroupBy()
 		}
 		idx++
 	}
-	if n.raw.GetHaving() != nil {
+	if n.Having() != nil {
 		if idx == i {
 			return n.Having()
 		}
 		idx++
 	}
-	if n.raw.GetQualify() != nil {
+	if n.Qualify() != nil {
 		if idx == i {
 			return n.Qualify()
 		}
 		idx++
 	}
-	if n.raw.GetWindowClause() != nil {
+	if n.WindowClause() != nil {
 		if idx == i {
 			return n.WindowClause()
 		}
@@ -26120,13 +28376,17 @@ func (n *SequenceArgNode) ParseLocationRange() *generated.ParseLocationRangeProt
 }
 func (n *SequenceArgNode) expressionNode() {}
 
+func (n *SequenceArgNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *SequenceArgNode) SequencePath() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetSequencePath())
 }
 
 func (n *SequenceArgNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSequencePath() != nil {
+	if n.SequencePath() != nil {
 		count++
 	}
 	return count
@@ -26134,7 +28394,7 @@ func (n *SequenceArgNode) NumChildren() int {
 
 func (n *SequenceArgNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSequencePath() != nil {
+	if n.SequencePath() != nil {
 		if idx == i {
 			return n.SequencePath()
 		}
@@ -26184,10 +28444,10 @@ func (n *SetAsActionNode) TextBody() *StringLiteralNode {
 
 func (n *SetAsActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetJsonBody() != nil {
+	if n.JsonBody() != nil {
 		count++
 	}
-	if n.raw.GetTextBody() != nil {
+	if n.TextBody() != nil {
 		count++
 	}
 	return count
@@ -26195,13 +28455,13 @@ func (n *SetAsActionNode) NumChildren() int {
 
 func (n *SetAsActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetJsonBody() != nil {
+	if n.JsonBody() != nil {
 		if idx == i {
 			return n.JsonBody()
 		}
 		idx++
 	}
-	if n.raw.GetTextBody() != nil {
+	if n.TextBody() != nil {
 		if idx == i {
 			return n.TextBody()
 		}
@@ -26247,7 +28507,7 @@ func (n *SetCollateClauseNode) Collate() *CollateNode {
 
 func (n *SetCollateClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		count++
 	}
 	return count
@@ -26255,7 +28515,7 @@ func (n *SetCollateClauseNode) NumChildren() int {
 
 func (n *SetCollateClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		if idx == i {
 			return n.Collate()
 		}
@@ -26508,22 +28768,22 @@ func (n *SetOperationMetadataNode) CorrespondingByColumnList() *ColumnListNode {
 
 func (n *SetOperationMetadataNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOpType() != nil {
+	if n.OpType() != nil {
 		count++
 	}
-	if n.raw.GetAllOrDistinct() != nil {
+	if n.AllOrDistinct() != nil {
 		count++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetColumnMatchMode() != nil {
+	if n.ColumnMatchMode() != nil {
 		count++
 	}
-	if n.raw.GetColumnPropagationMode() != nil {
+	if n.ColumnPropagationMode() != nil {
 		count++
 	}
-	if n.raw.GetCorrespondingByColumnList() != nil {
+	if n.CorrespondingByColumnList() != nil {
 		count++
 	}
 	return count
@@ -26531,37 +28791,37 @@ func (n *SetOperationMetadataNode) NumChildren() int {
 
 func (n *SetOperationMetadataNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOpType() != nil {
+	if n.OpType() != nil {
 		if idx == i {
 			return n.OpType()
 		}
 		idx++
 	}
-	if n.raw.GetAllOrDistinct() != nil {
+	if n.AllOrDistinct() != nil {
 		if idx == i {
 			return n.AllOrDistinct()
 		}
 		idx++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetColumnMatchMode() != nil {
+	if n.ColumnMatchMode() != nil {
 		if idx == i {
 			return n.ColumnMatchMode()
 		}
 		idx++
 	}
-	if n.raw.GetColumnPropagationMode() != nil {
+	if n.ColumnPropagationMode() != nil {
 		if idx == i {
 			return n.ColumnPropagationMode()
 		}
 		idx++
 	}
-	if n.raw.GetCorrespondingByColumnList() != nil {
+	if n.CorrespondingByColumnList() != nil {
 		if idx == i {
 			return n.CorrespondingByColumnList()
 		}
@@ -26602,6 +28862,10 @@ func (n *SetOperationNode) ParseLocationRange() *generated.ParseLocationRangePro
 }
 func (n *SetOperationNode) queryExpressionNode() {}
 
+func (n *SetOperationNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *SetOperationNode) Metadata() *SetOperationMetadataListNode {
 	return newSetOperationMetadataListNode(n.raw.GetMetadata())
 }
@@ -26612,7 +28876,7 @@ func (n *SetOperationNode) Inputs() []QueryExpressionNode {
 
 func (n *SetOperationNode) NumChildren() int {
 	count := 0
-	if n.raw.GetMetadata() != nil {
+	if n.Metadata() != nil {
 		count++
 	}
 	count += len(n.Inputs())
@@ -26621,7 +28885,7 @@ func (n *SetOperationNode) NumChildren() int {
 
 func (n *SetOperationNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetMetadata() != nil {
+	if n.Metadata() != nil {
 		if idx == i {
 			return n.Metadata()
 		}
@@ -26718,7 +28982,7 @@ func (n *SetOptionsActionNode) OptionsList() *OptionsListNode {
 
 func (n *SetOptionsActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -26726,7 +28990,7 @@ func (n *SetOptionsActionNode) NumChildren() int {
 
 func (n *SetOptionsActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -26773,7 +29037,7 @@ func (n *SetTransactionStatementNode) ModeList() *TransactionModeListNode {
 
 func (n *SetTransactionStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetModeList() != nil {
+	if n.ModeList() != nil {
 		count++
 	}
 	return count
@@ -26781,7 +29045,7 @@ func (n *SetTransactionStatementNode) NumChildren() int {
 
 func (n *SetTransactionStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetModeList() != nil {
+	if n.ModeList() != nil {
 		if idx == i {
 			return n.ModeList()
 		}
@@ -26836,13 +29100,13 @@ func (n *ShowStatementNode) OptionalLikeString() *StringLiteralNode {
 
 func (n *ShowStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		count++
 	}
-	if n.raw.GetOptionalName() != nil {
+	if n.OptionalName() != nil {
 		count++
 	}
-	if n.raw.GetOptionalLikeString() != nil {
+	if n.OptionalLikeString() != nil {
 		count++
 	}
 	return count
@@ -26850,19 +29114,19 @@ func (n *ShowStatementNode) NumChildren() int {
 
 func (n *ShowStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		if idx == i {
 			return n.Identifier()
 		}
 		idx++
 	}
-	if n.raw.GetOptionalName() != nil {
+	if n.OptionalName() != nil {
 		if idx == i {
 			return n.OptionalName()
 		}
 		idx++
 	}
-	if n.raw.GetOptionalLikeString() != nil {
+	if n.OptionalLikeString() != nil {
 		if idx == i {
 			return n.OptionalLikeString()
 		}
@@ -26902,13 +29166,55 @@ func (n *SimpleColumnSchemaNode) ParseLocationRange() *generated.ParseLocationRa
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *SimpleColumnSchemaNode) TypeParameters() *TypeParameterListNode {
+	return newTypeParameterListNode(n.raw.GetParent().GetTypeParameters())
+}
+
+func (n *SimpleColumnSchemaNode) GeneratedColumnInfo() *GeneratedColumnInfoNode {
+	return newGeneratedColumnInfoNode(n.raw.GetParent().GetGeneratedColumnInfo())
+}
+
+func (n *SimpleColumnSchemaNode) DefaultExpression() ExpressionNode {
+	return wrapExpression(n.raw.GetParent().GetDefaultExpression())
+}
+
+func (n *SimpleColumnSchemaNode) Collate() *CollateNode {
+	return newCollateNode(n.raw.GetParent().GetCollate())
+}
+
+func (n *SimpleColumnSchemaNode) Attributes() *ColumnAttributeListNode {
+	return newColumnAttributeListNode(n.raw.GetParent().GetAttributes())
+}
+
+func (n *SimpleColumnSchemaNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
 func (n *SimpleColumnSchemaNode) TypeName() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetTypeName())
 }
 
 func (n *SimpleColumnSchemaNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTypeName() != nil {
+	if n.TypeParameters() != nil {
+		count++
+	}
+	if n.GeneratedColumnInfo() != nil {
+		count++
+	}
+	if n.DefaultExpression() != nil {
+		count++
+	}
+	if n.Collate() != nil {
+		count++
+	}
+	if n.Attributes() != nil {
+		count++
+	}
+	if n.OptionsList() != nil {
+		count++
+	}
+	if n.TypeName() != nil {
 		count++
 	}
 	return count
@@ -26916,7 +29222,43 @@ func (n *SimpleColumnSchemaNode) NumChildren() int {
 
 func (n *SimpleColumnSchemaNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTypeName() != nil {
+	if n.TypeParameters() != nil {
+		if idx == i {
+			return n.TypeParameters()
+		}
+		idx++
+	}
+	if n.GeneratedColumnInfo() != nil {
+		if idx == i {
+			return n.GeneratedColumnInfo()
+		}
+		idx++
+	}
+	if n.DefaultExpression() != nil {
+		if idx == i {
+			return n.DefaultExpression()
+		}
+		idx++
+	}
+	if n.Collate() != nil {
+		if idx == i {
+			return n.Collate()
+		}
+		idx++
+	}
+	if n.Attributes() != nil {
+		if idx == i {
+			return n.Attributes()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
+	if n.TypeName() != nil {
 		if idx == i {
 			return n.TypeName()
 		}
@@ -26970,13 +29312,13 @@ func (n *SimpleTypeNode) Collate() *CollateNode {
 
 func (n *SimpleTypeNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTypeName() != nil {
+	if n.TypeName() != nil {
 		count++
 	}
-	if n.raw.GetTypeParameters() != nil {
+	if n.TypeParameters() != nil {
 		count++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		count++
 	}
 	return count
@@ -26984,19 +29326,19 @@ func (n *SimpleTypeNode) NumChildren() int {
 
 func (n *SimpleTypeNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTypeName() != nil {
+	if n.TypeName() != nil {
 		if idx == i {
 			return n.TypeName()
 		}
 		idx++
 	}
-	if n.raw.GetTypeParameters() != nil {
+	if n.TypeParameters() != nil {
 		if idx == i {
 			return n.TypeParameters()
 		}
 		idx++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		if idx == i {
 			return n.Collate()
 		}
@@ -27047,10 +29389,10 @@ func (n *SingleAssignmentNode) Expression() ExpressionNode {
 
 func (n *SingleAssignmentNode) NumChildren() int {
 	count := 0
-	if n.raw.GetVariable() != nil {
+	if n.Variable() != nil {
 		count++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -27058,13 +29400,13 @@ func (n *SingleAssignmentNode) NumChildren() int {
 
 func (n *SingleAssignmentNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetVariable() != nil {
+	if n.Variable() != nil {
 		if idx == i {
 			return n.Variable()
 		}
 		idx++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -27110,7 +29452,7 @@ func (n *SpannerAlterColumnActionNode) ColumnDefinition() *ColumnDefinitionNode 
 
 func (n *SpannerAlterColumnActionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetColumnDefinition() != nil {
+	if n.ColumnDefinition() != nil {
 		count++
 	}
 	return count
@@ -27118,7 +29460,7 @@ func (n *SpannerAlterColumnActionNode) NumChildren() int {
 
 func (n *SpannerAlterColumnActionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetColumnDefinition() != nil {
+	if n.ColumnDefinition() != nil {
 		if idx == i {
 			return n.ColumnDefinition()
 		}
@@ -27172,7 +29514,7 @@ func (n *SpannerInterleaveClauseNode) Action() generated.ASTForeignKeyActionsEnu
 
 func (n *SpannerInterleaveClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTableName() != nil {
+	if n.TableName() != nil {
 		count++
 	}
 	return count
@@ -27180,7 +29522,7 @@ func (n *SpannerInterleaveClauseNode) NumChildren() int {
 
 func (n *SpannerInterleaveClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTableName() != nil {
+	if n.TableName() != nil {
 		if idx == i {
 			return n.TableName()
 		}
@@ -27274,10 +29616,10 @@ func (n *SpannerTableOptionsNode) InterleaveClause() *SpannerInterleaveClauseNod
 
 func (n *SpannerTableOptionsNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPrimaryKey() != nil {
+	if n.PrimaryKey() != nil {
 		count++
 	}
-	if n.raw.GetInterleaveClause() != nil {
+	if n.InterleaveClause() != nil {
 		count++
 	}
 	return count
@@ -27285,13 +29627,13 @@ func (n *SpannerTableOptionsNode) NumChildren() int {
 
 func (n *SpannerTableOptionsNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPrimaryKey() != nil {
+	if n.PrimaryKey() != nil {
 		if idx == i {
 			return n.PrimaryKey()
 		}
 		idx++
 	}
-	if n.raw.GetInterleaveClause() != nil {
+	if n.InterleaveClause() != nil {
 		if idx == i {
 			return n.InterleaveClause()
 		}
@@ -27337,7 +29679,7 @@ func (n *SqlFunctionBodyNode) Expression() ExpressionNode {
 
 func (n *SqlFunctionBodyNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -27345,7 +29687,7 @@ func (n *SqlFunctionBodyNode) NumChildren() int {
 
 func (n *SqlFunctionBodyNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -27448,7 +29790,7 @@ func (n *StarModifiersNode) ReplaceItems() []*StarReplaceItemNode {
 
 func (n *StarModifiersNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExceptList() != nil {
+	if n.ExceptList() != nil {
 		count++
 	}
 	count += len(n.ReplaceItems())
@@ -27457,7 +29799,7 @@ func (n *StarModifiersNode) NumChildren() int {
 
 func (n *StarModifiersNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExceptList() != nil {
+	if n.ExceptList() != nil {
 		if idx == i {
 			return n.ExceptList()
 		}
@@ -27505,6 +29847,14 @@ func (n *StarNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 }
 func (n *StarNode) expressionNode() {}
 func (n *StarNode) leafNode()       {}
+
+func (n *StarNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParent().GetParenthesized()
+}
+
+func (n *StarNode) Image() string {
+	return n.raw.GetParent().GetImage()
+}
 
 func (n *StarNode) NumChildren() int {
 	count := 0
@@ -27556,10 +29906,10 @@ func (n *StarReplaceItemNode) Alias() *IdentifierNode {
 
 func (n *StarReplaceItemNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -27567,13 +29917,13 @@ func (n *StarReplaceItemNode) NumChildren() int {
 
 func (n *StarReplaceItemNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -27614,13 +29964,17 @@ func (n *StarWithModifiersNode) ParseLocationRange() *generated.ParseLocationRan
 }
 func (n *StarWithModifiersNode) expressionNode() {}
 
+func (n *StarWithModifiersNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *StarWithModifiersNode) Modifiers() *StarModifiersNode {
 	return newStarModifiersNode(n.raw.GetModifiers())
 }
 
 func (n *StarWithModifiersNode) NumChildren() int {
 	count := 0
-	if n.raw.GetModifiers() != nil {
+	if n.Modifiers() != nil {
 		count++
 	}
 	return count
@@ -27628,7 +29982,7 @@ func (n *StarWithModifiersNode) NumChildren() int {
 
 func (n *StarWithModifiersNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetModifiers() != nil {
+	if n.Modifiers() != nil {
 		if idx == i {
 			return n.Modifiers()
 		}
@@ -27675,7 +30029,7 @@ func (n *StartBatchStatementNode) BatchType() *IdentifierNode {
 
 func (n *StartBatchStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetBatchType() != nil {
+	if n.BatchType() != nil {
 		count++
 	}
 	return count
@@ -27683,7 +30037,7 @@ func (n *StartBatchStatementNode) NumChildren() int {
 
 func (n *StartBatchStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetBatchType() != nil {
+	if n.BatchType() != nil {
 		if idx == i {
 			return n.BatchType()
 		}
@@ -27791,10 +30145,10 @@ func (n *StatementWithPipeOperatorsNode) PipeOperatorSuffix() *SubpipelineStatem
 
 func (n *StatementWithPipeOperatorsNode) NumChildren() int {
 	count := 0
-	if n.raw.GetStatement() != nil {
+	if n.Statement() != nil {
 		count++
 	}
-	if n.raw.GetPipeOperatorSuffix() != nil {
+	if n.PipeOperatorSuffix() != nil {
 		count++
 	}
 	return count
@@ -27802,13 +30156,13 @@ func (n *StatementWithPipeOperatorsNode) NumChildren() int {
 
 func (n *StatementWithPipeOperatorsNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetStatement() != nil {
+	if n.Statement() != nil {
 		if idx == i {
 			return n.Statement()
 		}
 		idx++
 	}
-	if n.raw.GetPipeOperatorSuffix() != nil {
+	if n.PipeOperatorSuffix() != nil {
 		if idx == i {
 			return n.PipeOperatorSuffix()
 		}
@@ -27849,6 +30203,14 @@ func (n *StringLiteralComponentNode) ParseLocationRange() *generated.ParseLocati
 }
 func (n *StringLiteralComponentNode) expressionNode() {}
 func (n *StringLiteralComponentNode) leafNode()       {}
+
+func (n *StringLiteralComponentNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParent().GetParenthesized()
+}
+
+func (n *StringLiteralComponentNode) Image() string {
+	return n.raw.GetParent().GetImage()
+}
 
 func (n *StringLiteralComponentNode) StringValue() string {
 	return n.raw.GetStringValue()
@@ -27895,6 +30257,10 @@ func (n *StringLiteralNode) ParseLocationRange() *generated.ParseLocationRangePr
 }
 func (n *StringLiteralNode) expressionNode() {}
 func (n *StringLiteralNode) leafNode()       {}
+
+func (n *StringLiteralNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParenthesized()
+}
 
 func (n *StringLiteralNode) Components() []*StringLiteralComponentNode {
 	return newStringLiteralComponentNodeSlice(n.raw.GetComponents())
@@ -27954,6 +30320,10 @@ func (n *StructBracedConstructorNode) ParseLocationRange() *generated.ParseLocat
 }
 func (n *StructBracedConstructorNode) expressionNode() {}
 
+func (n *StructBracedConstructorNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *StructBracedConstructorNode) TypeName() Node {
 	return wrapType(n.raw.GetTypeName())
 }
@@ -27964,10 +30334,10 @@ func (n *StructBracedConstructorNode) BracedConstructor() *BracedConstructorNode
 
 func (n *StructBracedConstructorNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTypeName() != nil {
+	if n.TypeName() != nil {
 		count++
 	}
-	if n.raw.GetBracedConstructor() != nil {
+	if n.BracedConstructor() != nil {
 		count++
 	}
 	return count
@@ -27975,13 +30345,13 @@ func (n *StructBracedConstructorNode) NumChildren() int {
 
 func (n *StructBracedConstructorNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTypeName() != nil {
+	if n.TypeName() != nil {
 		if idx == i {
 			return n.TypeName()
 		}
 		idx++
 	}
-	if n.raw.GetBracedConstructor() != nil {
+	if n.BracedConstructor() != nil {
 		if idx == i {
 			return n.BracedConstructor()
 		}
@@ -28031,10 +30401,10 @@ func (n *StructColumnFieldNode) Schema() Node {
 
 func (n *StructColumnFieldNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetSchema() != nil {
+	if n.Schema() != nil {
 		count++
 	}
 	return count
@@ -28042,13 +30412,13 @@ func (n *StructColumnFieldNode) NumChildren() int {
 
 func (n *StructColumnFieldNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetSchema() != nil {
+	if n.Schema() != nil {
 		if idx == i {
 			return n.Schema()
 		}
@@ -28088,18 +30458,96 @@ func (n *StructColumnSchemaNode) ParseLocationRange() *generated.ParseLocationRa
 	return parseLocationRangeOf(n.raw)
 }
 
+func (n *StructColumnSchemaNode) TypeParameters() *TypeParameterListNode {
+	return newTypeParameterListNode(n.raw.GetParent().GetTypeParameters())
+}
+
+func (n *StructColumnSchemaNode) GeneratedColumnInfo() *GeneratedColumnInfoNode {
+	return newGeneratedColumnInfoNode(n.raw.GetParent().GetGeneratedColumnInfo())
+}
+
+func (n *StructColumnSchemaNode) DefaultExpression() ExpressionNode {
+	return wrapExpression(n.raw.GetParent().GetDefaultExpression())
+}
+
+func (n *StructColumnSchemaNode) Collate() *CollateNode {
+	return newCollateNode(n.raw.GetParent().GetCollate())
+}
+
+func (n *StructColumnSchemaNode) Attributes() *ColumnAttributeListNode {
+	return newColumnAttributeListNode(n.raw.GetParent().GetAttributes())
+}
+
+func (n *StructColumnSchemaNode) OptionsList() *OptionsListNode {
+	return newOptionsListNode(n.raw.GetParent().GetOptionsList())
+}
+
 func (n *StructColumnSchemaNode) StructFields() []*StructColumnFieldNode {
 	return newStructColumnFieldNodeSlice(n.raw.GetStructFields())
 }
 
 func (n *StructColumnSchemaNode) NumChildren() int {
 	count := 0
+	if n.TypeParameters() != nil {
+		count++
+	}
+	if n.GeneratedColumnInfo() != nil {
+		count++
+	}
+	if n.DefaultExpression() != nil {
+		count++
+	}
+	if n.Collate() != nil {
+		count++
+	}
+	if n.Attributes() != nil {
+		count++
+	}
+	if n.OptionsList() != nil {
+		count++
+	}
 	count += len(n.StructFields())
 	return count
 }
 
 func (n *StructColumnSchemaNode) Child(i int) Node {
 	idx := 0
+	if n.TypeParameters() != nil {
+		if idx == i {
+			return n.TypeParameters()
+		}
+		idx++
+	}
+	if n.GeneratedColumnInfo() != nil {
+		if idx == i {
+			return n.GeneratedColumnInfo()
+		}
+		idx++
+	}
+	if n.DefaultExpression() != nil {
+		if idx == i {
+			return n.DefaultExpression()
+		}
+		idx++
+	}
+	if n.Collate() != nil {
+		if idx == i {
+			return n.Collate()
+		}
+		idx++
+	}
+	if n.Attributes() != nil {
+		if idx == i {
+			return n.Attributes()
+		}
+		idx++
+	}
+	if n.OptionsList() != nil {
+		if idx == i {
+			return n.OptionsList()
+		}
+		idx++
+	}
 	{
 		s := n.StructFields()
 		if i < idx+len(s) {
@@ -28151,10 +30599,10 @@ func (n *StructConstructorArgNode) Alias() *AliasNode {
 
 func (n *StructConstructorArgNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -28162,13 +30610,13 @@ func (n *StructConstructorArgNode) NumChildren() int {
 
 func (n *StructConstructorArgNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -28209,6 +30657,10 @@ func (n *StructConstructorWithKeywordNode) ParseLocationRange() *generated.Parse
 }
 func (n *StructConstructorWithKeywordNode) expressionNode() {}
 
+func (n *StructConstructorWithKeywordNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *StructConstructorWithKeywordNode) StructType() *StructTypeNode {
 	return newStructTypeNode(n.raw.GetStructType())
 }
@@ -28219,7 +30671,7 @@ func (n *StructConstructorWithKeywordNode) Fields() []*StructConstructorArgNode 
 
 func (n *StructConstructorWithKeywordNode) NumChildren() int {
 	count := 0
-	if n.raw.GetStructType() != nil {
+	if n.StructType() != nil {
 		count++
 	}
 	count += len(n.Fields())
@@ -28228,7 +30680,7 @@ func (n *StructConstructorWithKeywordNode) NumChildren() int {
 
 func (n *StructConstructorWithKeywordNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetStructType() != nil {
+	if n.StructType() != nil {
 		if idx == i {
 			return n.StructType()
 		}
@@ -28275,6 +30727,10 @@ func (n *StructConstructorWithParensNode) ParseLocationRange() *generated.ParseL
 	return parseLocationRangeOf(n.raw)
 }
 func (n *StructConstructorWithParensNode) expressionNode() {}
+
+func (n *StructConstructorWithParensNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
 
 func (n *StructConstructorWithParensNode) FieldExpressions() []ExpressionNode {
 	return wrapExpressionSlice(n.raw.GetFieldExpressions())
@@ -28339,10 +30795,10 @@ func (n *StructFieldNode) Type() Node {
 
 func (n *StructFieldNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		count++
 	}
 	return count
@@ -28350,13 +30806,13 @@ func (n *StructFieldNode) NumChildren() int {
 
 func (n *StructFieldNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		if idx == i {
 			return n.Type()
 		}
@@ -28411,10 +30867,10 @@ func (n *StructTypeNode) Collate() *CollateNode {
 func (n *StructTypeNode) NumChildren() int {
 	count := 0
 	count += len(n.StructFields())
-	if n.raw.GetTypeParameters() != nil {
+	if n.TypeParameters() != nil {
 		count++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		count++
 	}
 	return count
@@ -28429,13 +30885,13 @@ func (n *StructTypeNode) Child(i int) Node {
 		}
 		idx += len(s)
 	}
-	if n.raw.GetTypeParameters() != nil {
+	if n.TypeParameters() != nil {
 		if idx == i {
 			return n.TypeParameters()
 		}
 		idx++
 	}
-	if n.raw.GetCollate() != nil {
+	if n.Collate() != nil {
 		if idx == i {
 			return n.Collate()
 		}
@@ -28539,7 +30995,7 @@ func (n *SubpipelineStatementNode) Subpipeline() *SubpipelineNode {
 
 func (n *SubpipelineStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSubpipeline() != nil {
+	if n.Subpipeline() != nil {
 		count++
 	}
 	return count
@@ -28547,7 +31003,7 @@ func (n *SubpipelineStatementNode) NumChildren() int {
 
 func (n *SubpipelineStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSubpipeline() != nil {
+	if n.Subpipeline() != nil {
 		if idx == i {
 			return n.Subpipeline()
 		}
@@ -28585,6 +31041,10 @@ func (n *SymbolQuantifierNode) String() string { return formatNode(n) }
 
 func (n *SymbolQuantifierNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 	return parseLocationRangeOf(n.raw)
+}
+
+func (n *SymbolQuantifierNode) IsReluctant() bool {
+	return n.raw.GetParent().GetIsReluctant()
 }
 
 func (n *SymbolQuantifierNode) Symbol() generated.ASTSymbolQuantifierEnums_Symbol {
@@ -28642,10 +31102,10 @@ func (n *SystemVariableAssignmentNode) Expression() ExpressionNode {
 
 func (n *SystemVariableAssignmentNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSystemVariable() != nil {
+	if n.SystemVariable() != nil {
 		count++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -28653,13 +31113,13 @@ func (n *SystemVariableAssignmentNode) NumChildren() int {
 
 func (n *SystemVariableAssignmentNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSystemVariable() != nil {
+	if n.SystemVariable() != nil {
 		if idx == i {
 			return n.SystemVariable()
 		}
 		idx++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -28700,13 +31160,17 @@ func (n *SystemVariableExprNode) ParseLocationRange() *generated.ParseLocationRa
 }
 func (n *SystemVariableExprNode) expressionNode() {}
 
+func (n *SystemVariableExprNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParent().GetParenthesized()
+}
+
 func (n *SystemVariableExprNode) Path() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetPath())
 }
 
 func (n *SystemVariableExprNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPath() != nil {
+	if n.Path() != nil {
 		count++
 	}
 	return count
@@ -28714,7 +31178,7 @@ func (n *SystemVariableExprNode) NumChildren() int {
 
 func (n *SystemVariableExprNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPath() != nil {
+	if n.Path() != nil {
 		if idx == i {
 			return n.Path()
 		}
@@ -28776,19 +31240,19 @@ func (n *TVFArgumentNode) Desc() *DescriptorNode {
 
 func (n *TVFArgumentNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		count++
 	}
-	if n.raw.GetTableClause() != nil {
+	if n.TableClause() != nil {
 		count++
 	}
-	if n.raw.GetModelClause() != nil {
+	if n.ModelClause() != nil {
 		count++
 	}
-	if n.raw.GetConnectionClause() != nil {
+	if n.ConnectionClause() != nil {
 		count++
 	}
-	if n.raw.GetDesc() != nil {
+	if n.Desc() != nil {
 		count++
 	}
 	return count
@@ -28796,31 +31260,31 @@ func (n *TVFArgumentNode) NumChildren() int {
 
 func (n *TVFArgumentNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpr() != nil {
+	if n.Expr() != nil {
 		if idx == i {
 			return n.Expr()
 		}
 		idx++
 	}
-	if n.raw.GetTableClause() != nil {
+	if n.TableClause() != nil {
 		if idx == i {
 			return n.TableClause()
 		}
 		idx++
 	}
-	if n.raw.GetModelClause() != nil {
+	if n.ModelClause() != nil {
 		if idx == i {
 			return n.ModelClause()
 		}
 		idx++
 	}
-	if n.raw.GetConnectionClause() != nil {
+	if n.ConnectionClause() != nil {
 		if idx == i {
 			return n.ConnectionClause()
 		}
 		idx++
 	}
-	if n.raw.GetDesc() != nil {
+	if n.Desc() != nil {
 		if idx == i {
 			return n.Desc()
 		}
@@ -28861,6 +31325,10 @@ func (n *TVFNode) ParseLocationRange() *generated.ParseLocationRangeProto {
 }
 func (n *TVFNode) tableExpressionNode() {}
 
+func (n *TVFNode) PostfixOperators() []Node {
+	return wrapPostfixTableOperatorSlice(n.raw.GetParent().GetPostfixOperators())
+}
+
 func (n *TVFNode) Name() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetName())
 }
@@ -28883,14 +31351,15 @@ func (n *TVFNode) IsLateral() bool {
 
 func (n *TVFNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	count += len(n.PostfixOperators())
+	if n.Name() != nil {
 		count++
 	}
 	count += len(n.ArgumentEntries())
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -28898,7 +31367,14 @@ func (n *TVFNode) NumChildren() int {
 
 func (n *TVFNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	{
+		s := n.PostfixOperators()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
@@ -28911,13 +31387,13 @@ func (n *TVFNode) Child(i int) Node {
 		}
 		idx += len(s)
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -28967,10 +31443,10 @@ func (n *TVFSchemaColumnNode) Type() Node {
 
 func (n *TVFSchemaColumnNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		count++
 	}
 	return count
@@ -28978,13 +31454,13 @@ func (n *TVFSchemaColumnNode) NumChildren() int {
 
 func (n *TVFSchemaColumnNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		if idx == i {
 			return n.Type()
 		}
@@ -29140,10 +31616,10 @@ func (n *TableAndColumnInfoNode) ColumnList() *ColumnListNode {
 
 func (n *TableAndColumnInfoNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTableName() != nil {
+	if n.TableName() != nil {
 		count++
 	}
-	if n.raw.GetColumnList() != nil {
+	if n.ColumnList() != nil {
 		count++
 	}
 	return count
@@ -29151,13 +31627,13 @@ func (n *TableAndColumnInfoNode) NumChildren() int {
 
 func (n *TableAndColumnInfoNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTableName() != nil {
+	if n.TableName() != nil {
 		if idx == i {
 			return n.TableName()
 		}
 		idx++
 	}
-	if n.raw.GetColumnList() != nil {
+	if n.ColumnList() != nil {
 		if idx == i {
 			return n.ColumnList()
 		}
@@ -29198,6 +31674,10 @@ func (n *TableClauseNode) ParseLocationRange() *generated.ParseLocationRangeProt
 }
 func (n *TableClauseNode) queryExpressionNode() {}
 
+func (n *TableClauseNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *TableClauseNode) TablePath() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetTablePath())
 }
@@ -29212,13 +31692,13 @@ func (n *TableClauseNode) WhereClause() *WhereClauseNode {
 
 func (n *TableClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTablePath() != nil {
+	if n.TablePath() != nil {
 		count++
 	}
-	if n.raw.GetTvf() != nil {
+	if n.Tvf() != nil {
 		count++
 	}
-	if n.raw.GetWhereClause() != nil {
+	if n.WhereClause() != nil {
 		count++
 	}
 	return count
@@ -29226,19 +31706,19 @@ func (n *TableClauseNode) NumChildren() int {
 
 func (n *TableClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTablePath() != nil {
+	if n.TablePath() != nil {
 		if idx == i {
 			return n.TablePath()
 		}
 		idx++
 	}
-	if n.raw.GetTvf() != nil {
+	if n.Tvf() != nil {
 		if idx == i {
 			return n.Tvf()
 		}
 		idx++
 	}
-	if n.raw.GetWhereClause() != nil {
+	if n.WhereClause() != nil {
 		if idx == i {
 			return n.WhereClause()
 		}
@@ -29332,6 +31812,10 @@ func (n *TablePathExpressionNode) ParseLocationRange() *generated.ParseLocationR
 }
 func (n *TablePathExpressionNode) tableExpressionNode() {}
 
+func (n *TablePathExpressionNode) PostfixOperators() []Node {
+	return wrapPostfixTableOperatorSlice(n.raw.GetParent().GetPostfixOperators())
+}
+
 func (n *TablePathExpressionNode) PathExpr() *PathExpressionNode {
 	return newPathExpressionNode(n.raw.GetPathExpr())
 }
@@ -29358,22 +31842,23 @@ func (n *TablePathExpressionNode) ForSystemTime() *ForSystemTimeNode {
 
 func (n *TablePathExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPathExpr() != nil {
+	count += len(n.PostfixOperators())
+	if n.PathExpr() != nil {
 		count++
 	}
-	if n.raw.GetUnnestExpr() != nil {
+	if n.UnnestExpr() != nil {
 		count++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
-	if n.raw.GetWithOffset() != nil {
+	if n.WithOffset() != nil {
 		count++
 	}
-	if n.raw.GetForSystemTime() != nil {
+	if n.ForSystemTime() != nil {
 		count++
 	}
 	return count
@@ -29381,37 +31866,44 @@ func (n *TablePathExpressionNode) NumChildren() int {
 
 func (n *TablePathExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPathExpr() != nil {
+	{
+		s := n.PostfixOperators()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.PathExpr() != nil {
 		if idx == i {
 			return n.PathExpr()
 		}
 		idx++
 	}
-	if n.raw.GetUnnestExpr() != nil {
+	if n.UnnestExpr() != nil {
 		if idx == i {
 			return n.UnnestExpr()
 		}
 		idx++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
 		idx++
 	}
-	if n.raw.GetWithOffset() != nil {
+	if n.WithOffset() != nil {
 		if idx == i {
 			return n.WithOffset()
 		}
 		idx++
 	}
-	if n.raw.GetForSystemTime() != nil {
+	if n.ForSystemTime() != nil {
 		if idx == i {
 			return n.ForSystemTime()
 		}
@@ -29452,6 +31944,10 @@ func (n *TableSubqueryNode) ParseLocationRange() *generated.ParseLocationRangePr
 }
 func (n *TableSubqueryNode) tableExpressionNode() {}
 
+func (n *TableSubqueryNode) PostfixOperators() []Node {
+	return wrapPostfixTableOperatorSlice(n.raw.GetParent().GetPostfixOperators())
+}
+
 func (n *TableSubqueryNode) Subquery() *QueryNode {
 	return newQueryNode(n.raw.GetSubquery())
 }
@@ -29466,10 +31962,11 @@ func (n *TableSubqueryNode) IsLateral() bool {
 
 func (n *TableSubqueryNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSubquery() != nil {
+	count += len(n.PostfixOperators())
+	if n.Subquery() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -29477,13 +31974,20 @@ func (n *TableSubqueryNode) NumChildren() int {
 
 func (n *TableSubqueryNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSubquery() != nil {
+	{
+		s := n.PostfixOperators()
+		if i < idx+len(s) {
+			return s[i-idx]
+		}
+		idx += len(s)
+	}
+	if n.Subquery() != nil {
 		if idx == i {
 			return n.Subquery()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -29577,10 +32081,10 @@ func (n *TransactionIsolationLevelNode) Identifier2() *IdentifierNode {
 
 func (n *TransactionIsolationLevelNode) NumChildren() int {
 	count := 0
-	if n.raw.GetIdentifier1() != nil {
+	if n.Identifier1() != nil {
 		count++
 	}
-	if n.raw.GetIdentifier2() != nil {
+	if n.Identifier2() != nil {
 		count++
 	}
 	return count
@@ -29588,13 +32092,13 @@ func (n *TransactionIsolationLevelNode) NumChildren() int {
 
 func (n *TransactionIsolationLevelNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetIdentifier1() != nil {
+	if n.Identifier1() != nil {
 		if idx == i {
 			return n.Identifier1()
 		}
 		idx++
 	}
-	if n.raw.GetIdentifier2() != nil {
+	if n.Identifier2() != nil {
 		if idx == i {
 			return n.Identifier2()
 		}
@@ -29737,7 +32241,7 @@ func (n *TransformClauseNode) SelectList() *SelectListNode {
 
 func (n *TransformClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSelectList() != nil {
+	if n.SelectList() != nil {
 		count++
 	}
 	return count
@@ -29745,7 +32249,7 @@ func (n *TransformClauseNode) NumChildren() int {
 
 func (n *TransformClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSelectList() != nil {
+	if n.SelectList() != nil {
 		if idx == i {
 			return n.SelectList()
 		}
@@ -29796,10 +32300,10 @@ func (n *TruncateStatementNode) Where() ExpressionNode {
 
 func (n *TruncateStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		count++
 	}
-	if n.raw.GetWhere() != nil {
+	if n.Where() != nil {
 		count++
 	}
 	return count
@@ -29807,13 +32311,13 @@ func (n *TruncateStatementNode) NumChildren() int {
 
 func (n *TruncateStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		if idx == i {
 			return n.TargetPath()
 		}
 		idx++
 	}
-	if n.raw.GetWhere() != nil {
+	if n.Where() != nil {
 		if idx == i {
 			return n.Where()
 		}
@@ -29859,7 +32363,7 @@ func (n *TtlClauseNode) Expression() ExpressionNode {
 
 func (n *TtlClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -29867,7 +32371,7 @@ func (n *TtlClauseNode) NumChildren() int {
 
 func (n *TtlClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -29961,6 +32465,10 @@ func (n *UnaryExpressionNode) ParseLocationRange() *generated.ParseLocationRange
 }
 func (n *UnaryExpressionNode) expressionNode() {}
 
+func (n *UnaryExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *UnaryExpressionNode) Operand() ExpressionNode {
 	return wrapExpression(n.raw.GetOperand())
 }
@@ -29971,7 +32479,7 @@ func (n *UnaryExpressionNode) Op() generated.ASTUnaryExpressionEnums_Op {
 
 func (n *UnaryExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOperand() != nil {
+	if n.Operand() != nil {
 		count++
 	}
 	return count
@@ -29979,7 +32487,7 @@ func (n *UnaryExpressionNode) NumChildren() int {
 
 func (n *UnaryExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOperand() != nil {
+	if n.Operand() != nil {
 		if idx == i {
 			return n.Operand()
 		}
@@ -30042,13 +32550,13 @@ func (n *UndropStatementNode) OptionsList() *OptionsListNode {
 
 func (n *UndropStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetForSystemTime() != nil {
+	if n.ForSystemTime() != nil {
 		count++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -30056,19 +32564,19 @@ func (n *UndropStatementNode) NumChildren() int {
 
 func (n *UndropStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetForSystemTime() != nil {
+	if n.ForSystemTime() != nil {
 		if idx == i {
 			return n.ForSystemTime()
 		}
 		idx++
 	}
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -30119,7 +32627,7 @@ func (n *UnnestExpressionNode) ArrayZipMode() *NamedArgumentNode {
 func (n *UnnestExpressionNode) NumChildren() int {
 	count := 0
 	count += len(n.Expressions())
-	if n.raw.GetArrayZipMode() != nil {
+	if n.ArrayZipMode() != nil {
 		count++
 	}
 	return count
@@ -30134,7 +32642,7 @@ func (n *UnnestExpressionNode) Child(i int) Node {
 		}
 		idx += len(s)
 	}
-	if n.raw.GetArrayZipMode() != nil {
+	if n.ArrayZipMode() != nil {
 		if idx == i {
 			return n.ArrayZipMode()
 		}
@@ -30190,13 +32698,13 @@ func (n *UnnestExpressionWithOptAliasAndOffsetNode) OptionalWithOffset() *WithOf
 
 func (n *UnnestExpressionWithOptAliasAndOffsetNode) NumChildren() int {
 	count := 0
-	if n.raw.GetUnnestExpression() != nil {
+	if n.UnnestExpression() != nil {
 		count++
 	}
-	if n.raw.GetOptionalAlias() != nil {
+	if n.OptionalAlias() != nil {
 		count++
 	}
-	if n.raw.GetOptionalWithOffset() != nil {
+	if n.OptionalWithOffset() != nil {
 		count++
 	}
 	return count
@@ -30204,19 +32712,19 @@ func (n *UnnestExpressionWithOptAliasAndOffsetNode) NumChildren() int {
 
 func (n *UnnestExpressionWithOptAliasAndOffsetNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetUnnestExpression() != nil {
+	if n.UnnestExpression() != nil {
 		if idx == i {
 			return n.UnnestExpression()
 		}
 		idx++
 	}
-	if n.raw.GetOptionalAlias() != nil {
+	if n.OptionalAlias() != nil {
 		if idx == i {
 			return n.OptionalAlias()
 		}
 		idx++
 	}
-	if n.raw.GetOptionalWithOffset() != nil {
+	if n.OptionalWithOffset() != nil {
 		if idx == i {
 			return n.OptionalWithOffset()
 		}
@@ -30278,16 +32786,16 @@ func (n *UnpivotClauseNode) NullFilter() generated.ASTUnpivotClauseEnums_NullFil
 
 func (n *UnpivotClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetUnpivotOutputValueColumns() != nil {
+	if n.UnpivotOutputValueColumns() != nil {
 		count++
 	}
-	if n.raw.GetUnpivotOutputNameColumn() != nil {
+	if n.UnpivotOutputNameColumn() != nil {
 		count++
 	}
-	if n.raw.GetUnpivotInItems() != nil {
+	if n.UnpivotInItems() != nil {
 		count++
 	}
-	if n.raw.GetOutputAlias() != nil {
+	if n.OutputAlias() != nil {
 		count++
 	}
 	return count
@@ -30295,25 +32803,25 @@ func (n *UnpivotClauseNode) NumChildren() int {
 
 func (n *UnpivotClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetUnpivotOutputValueColumns() != nil {
+	if n.UnpivotOutputValueColumns() != nil {
 		if idx == i {
 			return n.UnpivotOutputValueColumns()
 		}
 		idx++
 	}
-	if n.raw.GetUnpivotOutputNameColumn() != nil {
+	if n.UnpivotOutputNameColumn() != nil {
 		if idx == i {
 			return n.UnpivotOutputNameColumn()
 		}
 		idx++
 	}
-	if n.raw.GetUnpivotInItems() != nil {
+	if n.UnpivotInItems() != nil {
 		if idx == i {
 			return n.UnpivotInItems()
 		}
 		idx++
 	}
-	if n.raw.GetOutputAlias() != nil {
+	if n.OutputAlias() != nil {
 		if idx == i {
 			return n.OutputAlias()
 		}
@@ -30363,10 +32871,10 @@ func (n *UnpivotInItemLabelNode) IntLabel() *IntLiteralNode {
 
 func (n *UnpivotInItemLabelNode) NumChildren() int {
 	count := 0
-	if n.raw.GetStringLabel() != nil {
+	if n.StringLabel() != nil {
 		count++
 	}
-	if n.raw.GetIntLabel() != nil {
+	if n.IntLabel() != nil {
 		count++
 	}
 	return count
@@ -30374,13 +32882,13 @@ func (n *UnpivotInItemLabelNode) NumChildren() int {
 
 func (n *UnpivotInItemLabelNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetStringLabel() != nil {
+	if n.StringLabel() != nil {
 		if idx == i {
 			return n.StringLabel()
 		}
 		idx++
 	}
-	if n.raw.GetIntLabel() != nil {
+	if n.IntLabel() != nil {
 		if idx == i {
 			return n.IntLabel()
 		}
@@ -30483,10 +32991,10 @@ func (n *UnpivotInItemNode) Alias() *UnpivotInItemLabelNode {
 
 func (n *UnpivotInItemNode) NumChildren() int {
 	count := 0
-	if n.raw.GetUnpivotColumns() != nil {
+	if n.UnpivotColumns() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -30494,13 +33002,13 @@ func (n *UnpivotInItemNode) NumChildren() int {
 
 func (n *UnpivotInItemNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetUnpivotColumns() != nil {
+	if n.UnpivotColumns() != nil {
 		if idx == i {
 			return n.UnpivotColumns()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -30546,7 +33054,7 @@ func (n *UntilClauseNode) Condition() ExpressionNode {
 
 func (n *UntilClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		count++
 	}
 	return count
@@ -30554,7 +33062,7 @@ func (n *UntilClauseNode) NumChildren() int {
 
 func (n *UntilClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		if idx == i {
 			return n.Condition()
 		}
@@ -30595,6 +33103,10 @@ func (n *UpdateConstructorNode) ParseLocationRange() *generated.ParseLocationRan
 }
 func (n *UpdateConstructorNode) expressionNode() {}
 
+func (n *UpdateConstructorNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *UpdateConstructorNode) Function() *FunctionCallNode {
 	return newFunctionCallNode(n.raw.GetFunction())
 }
@@ -30605,10 +33117,10 @@ func (n *UpdateConstructorNode) BracedConstructor() *BracedConstructorNode {
 
 func (n *UpdateConstructorNode) NumChildren() int {
 	count := 0
-	if n.raw.GetFunction() != nil {
+	if n.Function() != nil {
 		count++
 	}
-	if n.raw.GetBracedConstructor() != nil {
+	if n.BracedConstructor() != nil {
 		count++
 	}
 	return count
@@ -30616,13 +33128,13 @@ func (n *UpdateConstructorNode) NumChildren() int {
 
 func (n *UpdateConstructorNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetFunction() != nil {
+	if n.Function() != nil {
 		if idx == i {
 			return n.Function()
 		}
 		idx++
 	}
-	if n.raw.GetBracedConstructor() != nil {
+	if n.BracedConstructor() != nil {
 		if idx == i {
 			return n.BracedConstructor()
 		}
@@ -30733,16 +33245,16 @@ func (n *UpdateItemNode) UpdateStatement() *UpdateStatementNode {
 
 func (n *UpdateItemNode) NumChildren() int {
 	count := 0
-	if n.raw.GetSetValue() != nil {
+	if n.SetValue() != nil {
 		count++
 	}
-	if n.raw.GetInsertStatement() != nil {
+	if n.InsertStatement() != nil {
 		count++
 	}
-	if n.raw.GetDeleteStatement() != nil {
+	if n.DeleteStatement() != nil {
 		count++
 	}
-	if n.raw.GetUpdateStatement() != nil {
+	if n.UpdateStatement() != nil {
 		count++
 	}
 	return count
@@ -30750,25 +33262,25 @@ func (n *UpdateItemNode) NumChildren() int {
 
 func (n *UpdateItemNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetSetValue() != nil {
+	if n.SetValue() != nil {
 		if idx == i {
 			return n.SetValue()
 		}
 		idx++
 	}
-	if n.raw.GetInsertStatement() != nil {
+	if n.InsertStatement() != nil {
 		if idx == i {
 			return n.InsertStatement()
 		}
 		idx++
 	}
-	if n.raw.GetDeleteStatement() != nil {
+	if n.DeleteStatement() != nil {
 		if idx == i {
 			return n.DeleteStatement()
 		}
 		idx++
 	}
-	if n.raw.GetUpdateStatement() != nil {
+	if n.UpdateStatement() != nil {
 		if idx == i {
 			return n.UpdateStatement()
 		}
@@ -30818,10 +33330,10 @@ func (n *UpdateSetValueNode) Value() ExpressionNode {
 
 func (n *UpdateSetValueNode) NumChildren() int {
 	count := 0
-	if n.raw.GetPath() != nil {
+	if n.Path() != nil {
 		count++
 	}
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		count++
 	}
 	return count
@@ -30829,13 +33341,13 @@ func (n *UpdateSetValueNode) NumChildren() int {
 
 func (n *UpdateSetValueNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetPath() != nil {
+	if n.Path() != nil {
 		if idx == i {
 			return n.Path()
 		}
 		idx++
 	}
-	if n.raw.GetValue() != nil {
+	if n.Value() != nil {
 		if idx == i {
 			return n.Value()
 		}
@@ -30914,31 +33426,31 @@ func (n *UpdateStatementNode) Hint() *HintNode {
 
 func (n *UpdateStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		count++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
-	if n.raw.GetOffset() != nil {
+	if n.Offset() != nil {
 		count++
 	}
-	if n.raw.GetUpdateItemList() != nil {
+	if n.UpdateItemList() != nil {
 		count++
 	}
-	if n.raw.GetFromClause() != nil {
+	if n.FromClause() != nil {
 		count++
 	}
-	if n.raw.GetWhere() != nil {
+	if n.Where() != nil {
 		count++
 	}
-	if n.raw.GetAssertRowsModified() != nil {
+	if n.AssertRowsModified() != nil {
 		count++
 	}
-	if n.raw.GetReturning() != nil {
+	if n.Returning() != nil {
 		count++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		count++
 	}
 	return count
@@ -30946,55 +33458,55 @@ func (n *UpdateStatementNode) NumChildren() int {
 
 func (n *UpdateStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTargetPath() != nil {
+	if n.TargetPath() != nil {
 		if idx == i {
 			return n.TargetPath()
 		}
 		idx++
 	}
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
 		idx++
 	}
-	if n.raw.GetOffset() != nil {
+	if n.Offset() != nil {
 		if idx == i {
 			return n.Offset()
 		}
 		idx++
 	}
-	if n.raw.GetUpdateItemList() != nil {
+	if n.UpdateItemList() != nil {
 		if idx == i {
 			return n.UpdateItemList()
 		}
 		idx++
 	}
-	if n.raw.GetFromClause() != nil {
+	if n.FromClause() != nil {
 		if idx == i {
 			return n.FromClause()
 		}
 		idx++
 	}
-	if n.raw.GetWhere() != nil {
+	if n.Where() != nil {
 		if idx == i {
 			return n.Where()
 		}
 		idx++
 	}
-	if n.raw.GetAssertRowsModified() != nil {
+	if n.AssertRowsModified() != nil {
 		if idx == i {
 			return n.AssertRowsModified()
 		}
 		idx++
 	}
-	if n.raw.GetReturning() != nil {
+	if n.Returning() != nil {
 		if idx == i {
 			return n.Returning()
 		}
 		idx++
 	}
-	if n.raw.GetHint() != nil {
+	if n.Hint() != nil {
 		if idx == i {
 			return n.Hint()
 		}
@@ -31102,13 +33614,13 @@ func (n *VariableDeclarationNode) DefaultValue() ExpressionNode {
 
 func (n *VariableDeclarationNode) NumChildren() int {
 	count := 0
-	if n.raw.GetVariableList() != nil {
+	if n.VariableList() != nil {
 		count++
 	}
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		count++
 	}
-	if n.raw.GetDefaultValue() != nil {
+	if n.DefaultValue() != nil {
 		count++
 	}
 	return count
@@ -31116,19 +33628,19 @@ func (n *VariableDeclarationNode) NumChildren() int {
 
 func (n *VariableDeclarationNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetVariableList() != nil {
+	if n.VariableList() != nil {
 		if idx == i {
 			return n.VariableList()
 		}
 		idx++
 	}
-	if n.raw.GetType() != nil {
+	if n.Type() != nil {
 		if idx == i {
 			return n.Type()
 		}
 		idx++
 	}
-	if n.raw.GetDefaultValue() != nil {
+	if n.DefaultValue() != nil {
 		if idx == i {
 			return n.DefaultValue()
 		}
@@ -31231,10 +33743,10 @@ func (n *WhenThenClauseNode) Body() *StatementListNode {
 
 func (n *WhenThenClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		count++
 	}
-	if n.raw.GetBody() != nil {
+	if n.Body() != nil {
 		count++
 	}
 	return count
@@ -31242,13 +33754,13 @@ func (n *WhenThenClauseNode) NumChildren() int {
 
 func (n *WhenThenClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCondition() != nil {
+	if n.Condition() != nil {
 		if idx == i {
 			return n.Condition()
 		}
 		idx++
 	}
-	if n.raw.GetBody() != nil {
+	if n.Body() != nil {
 		if idx == i {
 			return n.Body()
 		}
@@ -31294,7 +33806,7 @@ func (n *WhereClauseNode) Expression() ExpressionNode {
 
 func (n *WhereClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -31302,7 +33814,7 @@ func (n *WhereClauseNode) NumChildren() int {
 
 func (n *WhereClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -31343,13 +33855,27 @@ func (n *WhileStatementNode) ParseLocationRange() *generated.ParseLocationRangeP
 }
 func (n *WhileStatementNode) statementNode() {}
 
+func (n *WhileStatementNode) Label() *LabelNode {
+	return newLabelNode(n.raw.GetParent().GetLabel())
+}
+
+func (n *WhileStatementNode) Body() *StatementListNode {
+	return newStatementListNode(n.raw.GetParent().GetBody())
+}
+
 func (n *WhileStatementNode) Condition() ExpressionNode {
 	return wrapExpression(n.raw.GetCondition())
 }
 
 func (n *WhileStatementNode) NumChildren() int {
 	count := 0
-	if n.raw.GetCondition() != nil {
+	if n.Label() != nil {
+		count++
+	}
+	if n.Body() != nil {
+		count++
+	}
+	if n.Condition() != nil {
 		count++
 	}
 	return count
@@ -31357,7 +33883,19 @@ func (n *WhileStatementNode) NumChildren() int {
 
 func (n *WhileStatementNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetCondition() != nil {
+	if n.Label() != nil {
+		if idx == i {
+			return n.Label()
+		}
+		idx++
+	}
+	if n.Body() != nil {
+		if idx == i {
+			return n.Body()
+		}
+		idx++
+	}
+	if n.Condition() != nil {
 		if idx == i {
 			return n.Condition()
 		}
@@ -31460,10 +33998,10 @@ func (n *WindowDefinitionNode) WindowSpec() *WindowSpecificationNode {
 
 func (n *WindowDefinitionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		count++
 	}
-	if n.raw.GetWindowSpec() != nil {
+	if n.WindowSpec() != nil {
 		count++
 	}
 	return count
@@ -31471,13 +34009,13 @@ func (n *WindowDefinitionNode) NumChildren() int {
 
 func (n *WindowDefinitionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetName() != nil {
+	if n.Name() != nil {
 		if idx == i {
 			return n.Name()
 		}
 		idx++
 	}
-	if n.raw.GetWindowSpec() != nil {
+	if n.WindowSpec() != nil {
 		if idx == i {
 			return n.WindowSpec()
 		}
@@ -31527,7 +34065,7 @@ func (n *WindowFrameExprNode) BoundaryType() generated.ASTWindowFrameExprEnums_B
 
 func (n *WindowFrameExprNode) NumChildren() int {
 	count := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -31535,7 +34073,7 @@ func (n *WindowFrameExprNode) NumChildren() int {
 
 func (n *WindowFrameExprNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -31589,10 +34127,10 @@ func (n *WindowFrameNode) FrameUnit() generated.ASTWindowFrameEnums_FrameUnit {
 
 func (n *WindowFrameNode) NumChildren() int {
 	count := 0
-	if n.raw.GetStartExpr() != nil {
+	if n.StartExpr() != nil {
 		count++
 	}
-	if n.raw.GetEndExpr() != nil {
+	if n.EndExpr() != nil {
 		count++
 	}
 	return count
@@ -31600,13 +34138,13 @@ func (n *WindowFrameNode) NumChildren() int {
 
 func (n *WindowFrameNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetStartExpr() != nil {
+	if n.StartExpr() != nil {
 		if idx == i {
 			return n.StartExpr()
 		}
 		idx++
 	}
-	if n.raw.GetEndExpr() != nil {
+	if n.EndExpr() != nil {
 		if idx == i {
 			return n.EndExpr()
 		}
@@ -31664,16 +34202,16 @@ func (n *WindowSpecificationNode) WindowFrame() *WindowFrameNode {
 
 func (n *WindowSpecificationNode) NumChildren() int {
 	count := 0
-	if n.raw.GetBaseWindowName() != nil {
+	if n.BaseWindowName() != nil {
 		count++
 	}
-	if n.raw.GetPartitionBy() != nil {
+	if n.PartitionBy() != nil {
 		count++
 	}
-	if n.raw.GetOrderBy() != nil {
+	if n.OrderBy() != nil {
 		count++
 	}
-	if n.raw.GetWindowFrame() != nil {
+	if n.WindowFrame() != nil {
 		count++
 	}
 	return count
@@ -31681,25 +34219,25 @@ func (n *WindowSpecificationNode) NumChildren() int {
 
 func (n *WindowSpecificationNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetBaseWindowName() != nil {
+	if n.BaseWindowName() != nil {
 		if idx == i {
 			return n.BaseWindowName()
 		}
 		idx++
 	}
-	if n.raw.GetPartitionBy() != nil {
+	if n.PartitionBy() != nil {
 		if idx == i {
 			return n.PartitionBy()
 		}
 		idx++
 	}
-	if n.raw.GetOrderBy() != nil {
+	if n.OrderBy() != nil {
 		if idx == i {
 			return n.OrderBy()
 		}
 		idx++
 	}
-	if n.raw.GetWindowFrame() != nil {
+	if n.WindowFrame() != nil {
 		if idx == i {
 			return n.WindowFrame()
 		}
@@ -31749,10 +34287,10 @@ func (n *WithClauseEntryNode) AliasedGroupRows() *AliasedGroupRowsNode {
 
 func (n *WithClauseEntryNode) NumChildren() int {
 	count := 0
-	if n.raw.GetAliasedQuery() != nil {
+	if n.AliasedQuery() != nil {
 		count++
 	}
-	if n.raw.GetAliasedGroupRows() != nil {
+	if n.AliasedGroupRows() != nil {
 		count++
 	}
 	return count
@@ -31760,13 +34298,13 @@ func (n *WithClauseEntryNode) NumChildren() int {
 
 func (n *WithClauseEntryNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetAliasedQuery() != nil {
+	if n.AliasedQuery() != nil {
 		if idx == i {
 			return n.AliasedQuery()
 		}
 		idx++
 	}
-	if n.raw.GetAliasedGroupRows() != nil {
+	if n.AliasedGroupRows() != nil {
 		if idx == i {
 			return n.AliasedGroupRows()
 		}
@@ -31869,7 +34407,7 @@ func (n *WithConnectionClauseNode) ConnectionClause() *ConnectionClauseNode {
 
 func (n *WithConnectionClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetConnectionClause() != nil {
+	if n.ConnectionClause() != nil {
 		count++
 	}
 	return count
@@ -31877,7 +34415,7 @@ func (n *WithConnectionClauseNode) NumChildren() int {
 
 func (n *WithConnectionClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetConnectionClause() != nil {
+	if n.ConnectionClause() != nil {
 		if idx == i {
 			return n.ConnectionClause()
 		}
@@ -31918,6 +34456,10 @@ func (n *WithExpressionNode) ParseLocationRange() *generated.ParseLocationRangeP
 }
 func (n *WithExpressionNode) expressionNode() {}
 
+func (n *WithExpressionNode) Parenthesized() bool {
+	return n.raw.GetParent().GetParenthesized()
+}
+
 func (n *WithExpressionNode) Variables() *SelectListNode {
 	return newSelectListNode(n.raw.GetVariables())
 }
@@ -31928,10 +34470,10 @@ func (n *WithExpressionNode) Expression() ExpressionNode {
 
 func (n *WithExpressionNode) NumChildren() int {
 	count := 0
-	if n.raw.GetVariables() != nil {
+	if n.Variables() != nil {
 		count++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		count++
 	}
 	return count
@@ -31939,13 +34481,13 @@ func (n *WithExpressionNode) NumChildren() int {
 
 func (n *WithExpressionNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetVariables() != nil {
+	if n.Variables() != nil {
 		if idx == i {
 			return n.Variables()
 		}
 		idx++
 	}
-	if n.raw.GetExpression() != nil {
+	if n.Expression() != nil {
 		if idx == i {
 			return n.Expression()
 		}
@@ -31995,10 +34537,10 @@ func (n *WithModifierNode) Options() *OptionsListNode {
 
 func (n *WithModifierNode) NumChildren() int {
 	count := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		count++
 	}
-	if n.raw.GetOptions() != nil {
+	if n.Options() != nil {
 		count++
 	}
 	return count
@@ -32006,13 +34548,13 @@ func (n *WithModifierNode) NumChildren() int {
 
 func (n *WithModifierNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetIdentifier() != nil {
+	if n.Identifier() != nil {
 		if idx == i {
 			return n.Identifier()
 		}
 		idx++
 	}
-	if n.raw.GetOptions() != nil {
+	if n.Options() != nil {
 		if idx == i {
 			return n.Options()
 		}
@@ -32058,7 +34600,7 @@ func (n *WithOffsetNode) Alias() *AliasNode {
 
 func (n *WithOffsetNode) NumChildren() int {
 	count := 0
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -32066,7 +34608,7 @@ func (n *WithOffsetNode) NumChildren() int {
 
 func (n *WithOffsetNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}
@@ -32112,7 +34654,7 @@ func (n *WithPartitionColumnsClauseNode) TableElementList() *TableElementListNod
 
 func (n *WithPartitionColumnsClauseNode) NumChildren() int {
 	count := 0
-	if n.raw.GetTableElementList() != nil {
+	if n.TableElementList() != nil {
 		count++
 	}
 	return count
@@ -32120,7 +34662,7 @@ func (n *WithPartitionColumnsClauseNode) NumChildren() int {
 
 func (n *WithPartitionColumnsClauseNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetTableElementList() != nil {
+	if n.TableElementList() != nil {
 		if idx == i {
 			return n.TableElementList()
 		}
@@ -32166,7 +34708,7 @@ func (n *WithReportModifierNode) OptionsList() *OptionsListNode {
 
 func (n *WithReportModifierNode) NumChildren() int {
 	count := 0
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		count++
 	}
 	return count
@@ -32174,7 +34716,7 @@ func (n *WithReportModifierNode) NumChildren() int {
 
 func (n *WithReportModifierNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetOptionsList() != nil {
+	if n.OptionsList() != nil {
 		if idx == i {
 			return n.OptionsList()
 		}
@@ -32220,7 +34762,7 @@ func (n *WithWeightNode) Alias() *AliasNode {
 
 func (n *WithWeightNode) NumChildren() int {
 	count := 0
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		count++
 	}
 	return count
@@ -32228,7 +34770,7 @@ func (n *WithWeightNode) NumChildren() int {
 
 func (n *WithWeightNode) Child(i int) Node {
 	idx := 0
-	if n.raw.GetAlias() != nil {
+	if n.Alias() != nil {
 		if idx == i {
 			return n.Alias()
 		}

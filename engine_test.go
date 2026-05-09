@@ -1353,6 +1353,14 @@ func TestEngine_ParseNext(t *testing.T) {
 			sql:  "CREATE TABLE t1 (id INT64); INSERT INTO t1 VALUES (1); SELECT * FROM t1;",
 			wantParsed: []string{
 				`KindCreateTableStatement
+  KindPathExpression
+    KindIdentifier [t1]
+  KindTableElementList
+    KindColumnDefinition
+      KindIdentifier [id]
+      KindSimpleColumnSchema
+        KindPathExpression
+          KindIdentifier [INT64]
 `,
 				`KindInsertStatement
   KindPathExpression
@@ -2053,18 +2061,22 @@ func TestEngine_Parse(t *testing.T) {
 `,
 		},
 		{
-			// TODO: tighten this case once the AST wrapper exposes
-			// children of CreateTableStatement. DDL support is on the
-			// roadmap, but today the wrapper's String() emits only the
-			// node kind for this statement, so the assertion is a smoke
-			// test confirming the parser routes the DDL to the right
-			// node kind — the column list and column types are not
-			// validated. When child accessors land, replace `want` with
-			// the full subtree (column names, types, etc.) and drop
-			// this TODO.
 			name: "CREATE TABLE DDL",
 			sql:  "CREATE TABLE t1 (id INT64, name STRING)",
 			want: `KindCreateTableStatement
+  KindPathExpression
+    KindIdentifier [t1]
+  KindTableElementList
+    KindColumnDefinition
+      KindIdentifier [id]
+      KindSimpleColumnSchema
+        KindPathExpression
+          KindIdentifier [INT64]
+    KindColumnDefinition
+      KindIdentifier [name]
+      KindSimpleColumnSchema
+        KindPathExpression
+          KindIdentifier [STRING]
 `,
 		},
 		{

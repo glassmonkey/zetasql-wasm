@@ -55,7 +55,7 @@ func (n *{{$node.GoName}}) NumChildren() int {
 {{- if $f.IsSlice}}
 	count += len(n.{{$f.GoName}}())
 {{- else}}
-	if n.raw.Get{{$f.GoName}}() != nil { count++ }
+	if n.{{$f.GoName}}() != nil { count++ }
 {{- end}}
 {{- end}}
 {{- end}}
@@ -76,7 +76,7 @@ func (n *{{$node.GoName}}) Child(i int) Node {
 		idx += len(s)
 	}
 {{- else}}
-	if n.raw.Get{{$f.GoName}}() != nil {
+	if n.{{$f.GoName}}() != nil {
 		if idx == i { return n.{{$f.GoName}}() }
 		idx++
 	}

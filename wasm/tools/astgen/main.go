@@ -369,6 +369,40 @@ func (ctx *analysisContext) classifyNode(md protoreflect.MessageDescriptor) *nod
 		MarkerMethods: markerMethodsForCategory(category),
 	}
 
+	// Walk the parent chain so concrete leaves expose every inherited
+	// data field — Name / TableElementList on CreateTableStmtBase,
+	// IsOrReplace / Scope on CreateStatement, and so on. The proto
+	// `parent` field is conceptually the C++ base class, and the
+	// fields on it belong on the leaf wrapper just as much as the
+	// leaf's own. Ancestors are collected most-base-first so the
+	// generated accessors and child ordering follow the inheritance
+	// chain top-down.
+	chain := []protoreflect.MessageDescriptor{}
+	cur := md
+	for {
+		pf := cur.Fields().ByName("parent")
+		if pf == nil || pf.Kind() != protoreflect.MessageKind {
+			break
+		}
+		next := pf.Message()
+		if next == cur || string(next.FullName()) == string(md.FullName()) {
+			break
+		}
+		chain = append([]protoreflect.MessageDescriptor{next}, chain...)
+		cur = next
+	}
+
+	for i, anc := range chain {
+		// chain[len-1] is the leaf's immediate parent (depth 1).
+		depth := len(chain) - i
+		ctx.appendFields(n, anc, "n.raw"+strings.Repeat(".GetParent()", depth))
+	}
+	ctx.appendFields(n, md, "n.raw")
+
+	return n
+}
+
+func (ctx *analysisContext) appendFields(n *nodeInfo, md protoreflect.MessageDescriptor, accessPrefix string) {
 	fields := md.Fields()
 	for i := range fields.Len() {
 		f := fields.Get(i)
@@ -378,7 +412,7 @@ func (ctx *analysisContext) classifyNode(md protoreflect.MessageDescriptor) *nod
 			continue
 		}
 
-		fi := ctx.classifyField(f)
+		fi := ctx.classifyField(f, accessPrefix)
 		if reservedMethodNames[fi.GoName] {
 			fi.GoName = fi.GoName + "Value"
 		}
@@ -387,14 +421,13 @@ func (ctx *analysisContext) classifyNode(md protoreflect.MessageDescriptor) *nod
 			n.HasChildNode = true
 		}
 	}
-
-	return n
 }
 
-func (ctx *analysisContext) classifyField(fd protoreflect.FieldDescriptor) fieldInfo {
+func (ctx *analysisContext) classifyField(fd protoreflect.FieldDescriptor, accessPrefix string) fieldInfo {
 	fname := string(fd.Name())
 	goName := snakeToPascal(fname)
 	isSlice := fd.IsList()
+	rawGet := fmt.Sprintf("%s.Get%s()", accessPrefix, goName)
 
 	fi := fieldInfo{
 		ProtoName: fname,
@@ -405,17 +438,17 @@ func (ctx *analysisContext) classifyField(fd protoreflect.FieldDescriptor) field
 	switch fd.Kind() {
 	case protoreflect.BoolKind:
 		fi.GoType = "bool"
-		fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+		fi.WrapCall = rawGet
 	case protoreflect.StringKind:
 		fi.GoType = "string"
-		fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+		fi.WrapCall = rawGet
 	case protoreflect.Int32Kind, protoreflect.Int64Kind:
 		fi.GoType = "int"
-		fi.WrapCall = fmt.Sprintf("int(n.raw.Get%s())", goName)
+		fi.WrapCall = "int(" + rawGet + ")"
 	case protoreflect.EnumKind:
 		enumGoName := resolveEnumGoName(fd.Enum())
 		fi.GoType = "generated." + enumGoName
-		fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+		fi.WrapCall = rawGet
 	case protoreflect.MessageKind:
 		msgName := string(fd.Message().Name())
 		if ctx.wrapperSet[msgName] {
@@ -426,33 +459,33 @@ func (ctx *analysisContext) classifyField(fd protoreflect.FieldDescriptor) field
 			fi.IsNode = true
 			if isSlice {
 				fi.GoType = "[]" + iface
-				fi.WrapCall = fmt.Sprintf("wrap%sSlice(n.raw.Get%s())", baseName, goName)
+				fi.WrapCall = fmt.Sprintf("wrap%sSlice(%s)", baseName, rawGet)
 			} else {
 				fi.GoType = iface
-				fi.WrapCall = fmt.Sprintf("wrap%s(n.raw.Get%s())", baseName, goName)
+				fi.WrapCall = fmt.Sprintf("wrap%s(%s)", baseName, rawGet)
 			}
 		} else if ctx.abstractSet[msgName] {
 			// Abstract node reference — not a child node
 			fi.GoType = "any"
-			fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+			fi.WrapCall = rawGet
 		} else if strings.HasPrefix(msgName, "AST") && strings.HasSuffix(msgName, "Proto") {
 			// Concrete node
 			nodeName := protoToNodeName(msgName)
 			fi.IsNode = true
 			if isSlice {
 				fi.GoType = "[]*" + nodeName
-				fi.WrapCall = fmt.Sprintf("new%sSlice(n.raw.Get%s())", nodeName, goName)
+				fi.WrapCall = fmt.Sprintf("new%sSlice(%s)", nodeName, rawGet)
 			} else {
 				fi.GoType = "*" + nodeName
-				fi.WrapCall = fmt.Sprintf("new%s(n.raw.Get%s())", nodeName, goName)
+				fi.WrapCall = fmt.Sprintf("new%s(%s)", nodeName, rawGet)
 			}
 		} else {
 			fi.GoType = "any"
-			fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+			fi.WrapCall = rawGet
 		}
 	default:
 		fi.GoType = "any"
-		fi.WrapCall = fmt.Sprintf("n.raw.Get%s()", goName)
+		fi.WrapCall = rawGet
 	}
 
 	return fi
