@@ -712,14 +712,41 @@ func TestEngine_AnalyzeNext_AdvancesLocation(t *testing.T) {
 // parser AST as Engine.Parse for each statement in a multi-statement
 // SQL string. Reference trees come from Engine.Parse on each statement
 // substring rather than hand-written strings, so a parser format change
-// breaks one place (TestEngine_Parse) instead of two.
+// breaks one place (TestEngine_Parse) instead of two. Triangulated
+// across statement count (2/3), the realistic upstream-failure script
+// (DDL+DML+DQL with trailing semicolon — the exact shape that surfaces
+// as "Expected end of input but got keyword CREATE/INSERT" when fed
+// to single-statement Engine.Parse), and trailing-semicolon presence.
 func TestEngine_ParseNext_AST(t *testing.T) {
 	tests := []struct {
 		name       string
+		sql        string
 		statements []string
 	}{
-		{name: "two literals", statements: []string{"SELECT 1", "SELECT 2"}},
-		{name: "three literals", statements: []string{"SELECT 1", "SELECT 2", "SELECT 3"}},
+		{
+			name:       "two literals",
+			sql:        "SELECT 1; SELECT 2",
+			statements: []string{"SELECT 1", "SELECT 2"},
+		},
+		{
+			name:       "three literals",
+			sql:        "SELECT 1; SELECT 2; SELECT 3",
+			statements: []string{"SELECT 1", "SELECT 2", "SELECT 3"},
+		},
+		{
+			name: "ddl dml dql with trailing semicolon",
+			sql:  "CREATE TABLE t1 (id INT64); INSERT INTO t1 VALUES (1); SELECT * FROM t1;",
+			statements: []string{
+				"CREATE TABLE t1 (id INT64)",
+				"INSERT INTO t1 VALUES (1)",
+				"SELECT * FROM t1",
+			},
+		},
+		{
+			name:       "two selects with trailing semicolon",
+			sql:        "SELECT 1; SELECT 2;",
+			statements: []string{"SELECT 1", "SELECT 2"},
+		},
 	}
 
 	for _, tt := range tests {
@@ -733,7 +760,7 @@ func TestEngine_ParseNext_AST(t *testing.T) {
 				require.NoError(t, err)
 				want[i] = parsed.Root.String()
 			}
-			loc := NewParseResumeLocation(strings.Join(tt.statements, "; "))
+			loc := NewParseResumeLocation(tt.sql)
 
 			// Act
 			var got []string
@@ -789,66 +816,6 @@ func TestEngine_ParseNext_AdvancesLocation(t *testing.T) {
 
 			// Assert
 			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
-// TestEngine_ParseNext_MultipleStatements verifies ParseNext on the
-// realistic multi-statement script pattern from the downstream caller:
-// DDL + DML + DQL connected with semicolons, including a trailing
-// semicolon. This is the exact shape that surfaces as "Expected end of
-// input but got keyword CREATE/INSERT" when fed to single-statement
-// Engine.Parse, so passing here is the contract that closes the gap.
-// Reference trees come from Engine.Parse on each statement substring,
-// keeping the parser-format truth-source single (TestEngine_Parse).
-func TestEngine_ParseNext_MultipleStatements(t *testing.T) {
-	tests := []struct {
-		name       string
-		sql        string
-		statements []string
-	}{
-		{
-			name: "ddl dml dql with trailing semicolon",
-			sql:  "CREATE TABLE t1 (id INT64); INSERT INTO t1 VALUES (1); SELECT * FROM t1;",
-			statements: []string{
-				"CREATE TABLE t1 (id INT64)",
-				"INSERT INTO t1 VALUES (1)",
-				"SELECT * FROM t1",
-			},
-		},
-		{
-			name:       "two selects with trailing semicolon",
-			sql:        "SELECT 1; SELECT 2;",
-			statements: []string{"SELECT 1", "SELECT 2"},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			ctx := t.Context()
-			sut := newTestEngine(t)
-			want := make([]string, len(tt.statements))
-			for i, s := range tt.statements {
-				parsed, err := sut.Parse(ctx, s)
-				require.NoError(t, err)
-				want[i] = parsed.Root.String()
-			}
-			loc := NewParseResumeLocation(tt.sql)
-
-			// Act
-			var got []string
-			for {
-				stmt, more, err := sut.ParseNext(ctx, loc)
-				require.NoError(t, err)
-				got = append(got, stmt.Root.String())
-				if !more {
-					break
-				}
-			}
-
-			// Assert
-			assert.Equal(t, want, got)
 		})
 	}
 }
