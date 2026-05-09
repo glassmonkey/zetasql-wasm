@@ -1268,44 +1268,139 @@ func TestEngine_AnalyzeNext(t *testing.T) {
 	}
 }
 
-// TestEngine_ParseNext_AST verifies that ParseNext returns the same
-// parser AST as Engine.Parse for each statement in a multi-statement
-// SQL string. Reference trees come from Engine.Parse on each statement
-// substring rather than hand-written strings, so a parser format change
-// breaks one place (TestEngine_Parse) instead of two. Triangulated
-// across statement count (2/3), the realistic upstream-failure script
-// (DDL+DML+DQL with trailing semicolon — the exact shape that surfaces
-// as "Expected end of input but got keyword CREATE/INSERT" when fed
-// to single-statement Engine.Parse), and trailing-semicolon presence.
-func TestEngine_ParseNext_AST(t *testing.T) {
+// TestEngine_ParseNext locks the contract Engine.ParseNext provides
+// when consuming a multi-statement SQL string: each iteration returns
+// a populated parser AST, and the ParseResumeLocation has advanced to
+// the end of the input by the time the loop exits. Both observations
+// share the same fixture (engine + ParseResumeLocation) so they live
+// in a single test function — the same fixture-axis split rule that
+// keeps TestEngine_AnalyzeNext unified. Expected AST strings are
+// hardcoded per statement (rather than derived from sut.Parse on each
+// substring) so each case reads as a specification of what each
+// parser AST payload must look like; deriving from another SUT call
+// has a vacuous-green failure mode if both endpoints degenerate to
+// the same empty/identical output.
+//
+// Triangulated across statement count (2/3), the realistic
+// upstream-failure script (DDL+DML+DQL with trailing semicolon — the
+// exact shape that surfaces as "Expected end of input but got keyword
+// CREATE/INSERT" when fed to single-statement Engine.Parse), and
+// trailing-semicolon presence.
+func TestEngine_ParseNext(t *testing.T) {
 	tests := []struct {
 		name       string
 		sql        string
-		statements []string
+		wantParsed []string
+		wantLoc    ParseResumeLocation
 	}{
 		{
-			name:       "two literals",
-			sql:        "SELECT 1; SELECT 2",
-			statements: []string{"SELECT 1", "SELECT 2"},
+			name: "two literals",
+			sql:  "SELECT 1; SELECT 2",
+			wantParsed: []string{
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [1]
+`,
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [2]
+`,
+			},
+			wantLoc: ParseResumeLocation{
+				Input:        "SELECT 1; SELECT 2",
+				BytePosition: int32(len("SELECT 1; SELECT 2")),
+			},
 		},
 		{
-			name:       "three literals",
-			sql:        "SELECT 1; SELECT 2; SELECT 3",
-			statements: []string{"SELECT 1", "SELECT 2", "SELECT 3"},
+			name: "three literals",
+			sql:  "SELECT 1; SELECT 2; SELECT 3",
+			wantParsed: []string{
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [1]
+`,
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [2]
+`,
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [3]
+`,
+			},
+			wantLoc: ParseResumeLocation{
+				Input:        "SELECT 1; SELECT 2; SELECT 3",
+				BytePosition: int32(len("SELECT 1; SELECT 2; SELECT 3")),
+			},
 		},
 		{
 			name: "ddl dml dql with trailing semicolon",
 			sql:  "CREATE TABLE t1 (id INT64); INSERT INTO t1 VALUES (1); SELECT * FROM t1;",
-			statements: []string{
-				"CREATE TABLE t1 (id INT64)",
-				"INSERT INTO t1 VALUES (1)",
-				"SELECT * FROM t1",
+			wantParsed: []string{
+				`KindCreateTableStatement
+`,
+				`KindInsertStatement
+  KindPathExpression
+    KindIdentifier [t1]
+  KindInsertValuesRowList
+    KindInsertValuesRow
+      KindIntLiteral [1]
+`,
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindStar
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [t1]
+`,
+			},
+			wantLoc: ParseResumeLocation{
+				Input:        "CREATE TABLE t1 (id INT64); INSERT INTO t1 VALUES (1); SELECT * FROM t1;",
+				BytePosition: int32(len("CREATE TABLE t1 (id INT64); INSERT INTO t1 VALUES (1); SELECT * FROM t1;")),
 			},
 		},
 		{
-			name:       "two selects with trailing semicolon",
-			sql:        "SELECT 1; SELECT 2;",
-			statements: []string{"SELECT 1", "SELECT 2"},
+			name: "two selects with trailing semicolon",
+			sql:  "SELECT 1; SELECT 2;",
+			wantParsed: []string{
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [1]
+`,
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [2]
+`,
+			},
+			wantLoc: ParseResumeLocation{
+				Input:        "SELECT 1; SELECT 2;",
+				BytePosition: int32(len("SELECT 1; SELECT 2;")),
+			},
 		},
 	}
 
@@ -1314,68 +1409,23 @@ func TestEngine_ParseNext_AST(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
 			sut := newTestEngine(t)
-			want := make([]string, len(tt.statements))
-			for i, s := range tt.statements {
-				parsed, err := sut.Parse(ctx, s)
-				require.NoError(t, err)
-				want[i] = parsed.Root.String()
-			}
 			loc := NewParseResumeLocation(tt.sql)
 
 			// Act
-			var got []string
+			var gotParsed []string
 			for {
 				stmt, more, err := sut.ParseNext(ctx, loc)
 				require.NoError(t, err)
 				require.NotNil(t, stmt.Root, "Root must be populated on each ParseNext call")
-				got = append(got, stmt.Root.String())
+				gotParsed = append(gotParsed, stmt.Root.String())
 				if !more {
 					break
 				}
 			}
 
 			// Assert
-			assert.Equal(t, want, got)
-		})
-	}
-}
-
-// TestEngine_ParseNext_AdvancesLocation verifies that consuming every
-// statement leaves the ParseResumeLocation at the end of input.
-func TestEngine_ParseNext_AdvancesLocation(t *testing.T) {
-	tests := []struct {
-		name string
-		sql  string
-		want *ParseResumeLocation
-	}{
-		{
-			name: "two statements",
-			sql:  "SELECT 1; SELECT 2",
-			want: &ParseResumeLocation{Input: "SELECT 1; SELECT 2", BytePosition: int32(len("SELECT 1; SELECT 2"))},
-		},
-		{
-			name: "three statements",
-			sql:  "SELECT 1; SELECT 2; SELECT 3",
-			want: &ParseResumeLocation{Input: "SELECT 1; SELECT 2; SELECT 3", BytePosition: int32(len("SELECT 1; SELECT 2; SELECT 3"))},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			ctx := t.Context()
-			sut := newTestEngine(t)
-			got := NewParseResumeLocation(tt.sql)
-
-			// Act
-			for more := true; more; {
-				_, m, err := sut.ParseNext(ctx, got)
-				require.NoError(t, err)
-				more = m
-			}
-
-			// Assert
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.wantParsed, gotParsed)
+			assert.Equal(t, tt.wantLoc, *loc)
 		})
 	}
 }
