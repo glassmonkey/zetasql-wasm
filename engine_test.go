@@ -106,27 +106,38 @@ func observeParams(root resolved_ast.Node) []observedParam {
 
 // ----- Tests -----
 
-// TestEngine_Analyze covers both the happy-path resolved-AST shape and
-// invalid-SQL error type for Engine.Analyze. Cases share a single fixture
-// (newTestEngine); errors are flagged in the table via wantErr (type
-// witness) — happy cases set want only, error cases set wantErr only. The
-// error path also asserts that the AnalyzeOutput is nil so a regression
-// that returned a partial output alongside an error would surface
-// (R13 Width).
+// TestEngine_Analyze locks the full Engine.Analyze contract for a
+// single statement: each happy-path case spells out both the parser
+// AST (out.Parsed) and the resolved AST (out.Resolved); each error
+// case names the expected error type and asserts the AnalyzeOutput
+// is nil. Cases share a single fixture (newTestEngine); errors are
+// flagged via wantErr (type witness) — happy cases set wantParsed +
+// wantResolved only, error cases set wantErr only. Both observation
+// axes (Parsed and Resolved) live on the same case so a regression
+// that nils Parsed for one SQL family but not another surfaces in
+// the same run that exercises Resolved-tree shape regressions.
 func TestEngine_Analyze(t *testing.T) {
 	tests := []struct {
-		name    string
-		sql     string
-		cat     *types.SimpleCatalog
-		opts    *AnalyzerOptions // nil → NewAnalyzerOptions()
-		want    string           // happy-path expected AST string; empty when wantErr is set
-		wantErr error            // type witness for error cases; nil for happy path
+		name         string
+		sql          string
+		cat          *types.SimpleCatalog
+		opts         *AnalyzerOptions // nil → NewAnalyzerOptions()
+		wantParsed   string           // parser AST string; empty when wantErr is set
+		wantResolved string           // resolved AST string; empty when wantErr is set
+		wantErr      error            // type witness for error cases; nil for happy path
 	}{
 		{
 			name: "literal",
 			sql:  "SELECT 1",
 			cat:  nil,
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [1]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn $col1
   KindProjectScan
     KindComputedColumn
@@ -138,7 +149,22 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "select columns from users",
 			sql:  "SELECT id, name FROM users",
 			cat:  newUsersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [name]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn id
   KindOutputColumn name
   KindProjectScan
@@ -149,7 +175,24 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "filter scan",
 			sql:  "SELECT id FROM users WHERE id > 1",
 			cat:  newUsersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindWhereClause
+        KindBinaryExpression
+          KindPathExpression
+            KindIdentifier [id]
+          KindIntLiteral [1]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn id
   KindProjectScan
     KindFilterScan
@@ -163,7 +206,23 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "project with addition",
 			sql:  "SELECT id + 1 AS inc FROM users",
 			cat:  newUsersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindBinaryExpression
+            KindPathExpression
+              KindIdentifier [id]
+            KindIntLiteral [1]
+          KindAlias
+            KindIdentifier [inc]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn inc
   KindProjectScan
     KindComputedColumn
@@ -177,7 +236,22 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "function call with column arg",
 			sql:  "SELECT UPPER(name) FROM users",
 			cat:  newUsersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [UPPER]
+            KindPathExpression
+              KindIdentifier [name]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn $col1
   KindProjectScan
     KindComputedColumn
@@ -190,7 +264,41 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "inner join",
 			sql:  "SELECT u.id, o.amount FROM users u JOIN orders o ON u.id = o.user_id",
 			cat:  newUsersOrdersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [u]
+            KindIdentifier [id]
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [o]
+            KindIdentifier [amount]
+      KindFromClause
+        KindJoin
+          KindTablePathExpression
+            KindPathExpression
+              KindIdentifier [users]
+            KindAlias
+              KindIdentifier [u]
+          KindTablePathExpression
+            KindPathExpression
+              KindIdentifier [orders]
+            KindAlias
+              KindIdentifier [o]
+          KindOnClause
+            KindBinaryExpression
+              KindPathExpression
+                KindIdentifier [u]
+                KindIdentifier [id]
+              KindPathExpression
+                KindIdentifier [o]
+                KindIdentifier [user_id]
+          KindLocation
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn id
   KindOutputColumn amount
   KindProjectScan
@@ -206,7 +314,21 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "count aggregation",
 			sql:  "SELECT COUNT(*) FROM users",
 			cat:  newUsersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [COUNT]
+            KindStar
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn $col1
   KindProjectScan
     KindAggregateScan
@@ -219,7 +341,23 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "order by descending",
 			sql:  "SELECT id FROM users ORDER BY id DESC",
 			cat:  newUsersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+    KindOrderBy
+      KindOrderingExpression [DESC]
+        KindPathExpression
+          KindIdentifier [id]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn id
   KindOrderByScan
     KindTableScan users
@@ -229,7 +367,23 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "limit and offset",
 			sql:  "SELECT id FROM users LIMIT 10 OFFSET 5",
 			cat:  newUsersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+    KindLimitOffset
+      KindLimit
+        KindIntLiteral [10]
+      KindIntLiteral [5]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn id
   KindLimitOffsetScan
     KindProjectScan
@@ -242,7 +396,28 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "group by",
 			sql:  "SELECT id, COUNT(*) FROM users GROUP BY id",
 			cat:  newUsersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [COUNT]
+            KindStar
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindGroupBy
+        KindGroupingItem
+          KindPathExpression
+            KindIdentifier [id]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn id
   KindOutputColumn $col2
   KindProjectScan
@@ -256,7 +431,19 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "distinct",
 			sql:  "SELECT DISTINCT name FROM users",
 			cat:  newUsersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect [DISTINCT]
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [name]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn name
   KindAggregateScan
     KindTableScan users
@@ -266,7 +453,33 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "union all",
 			sql:  "SELECT id FROM users UNION ALL SELECT order_id FROM orders",
 			cat:  newUsersOrdersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSetOperation
+      KindSetOperationMetadataList
+        KindSetOperationMetadata
+          KindSetOperationType [UNION]
+          KindSetOperationAllOrDistinct [ALL]
+      KindSelect
+        KindSelectList
+          KindSelectColumn
+            KindPathExpression
+              KindIdentifier [id]
+        KindFromClause
+          KindTablePathExpression
+            KindPathExpression
+              KindIdentifier [users]
+      KindSelect
+        KindSelectList
+          KindSelectColumn
+            KindPathExpression
+              KindIdentifier [order_id]
+        KindFromClause
+          KindTablePathExpression
+            KindPathExpression
+              KindIdentifier [orders]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn id
   KindSetOperationScan
     KindSetOperationItem
@@ -281,7 +494,29 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "CTE single binding",
 			sql:  "WITH x AS (SELECT 1 AS a) SELECT * FROM x",
 			cat:  newBuiltinsCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindWithClause
+      KindWithClauseEntry
+        KindAliasedQuery
+          KindIdentifier [x]
+          KindQuery
+            KindSelect
+              KindSelectList
+                KindSelectColumn
+                  KindIntLiteral [1]
+                  KindAlias
+                    KindIdentifier [a]
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindStar
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [x]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn a
   KindWithScan
     KindProjectScan
@@ -292,7 +527,46 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "CTE chain referencing previous binding",
 			sql:  "WITH a AS (SELECT 1 AS v), b AS (SELECT v * 2 AS v FROM a) SELECT * FROM b",
 			cat:  newBuiltinsCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindWithClause
+      KindWithClauseEntry
+        KindAliasedQuery
+          KindIdentifier [a]
+          KindQuery
+            KindSelect
+              KindSelectList
+                KindSelectColumn
+                  KindIntLiteral [1]
+                  KindAlias
+                    KindIdentifier [v]
+      KindWithClauseEntry
+        KindAliasedQuery
+          KindIdentifier [b]
+          KindQuery
+            KindSelect
+              KindSelectList
+                KindSelectColumn
+                  KindBinaryExpression
+                    KindPathExpression
+                      KindIdentifier [v]
+                    KindIntLiteral [2]
+                  KindAlias
+                    KindIdentifier [v]
+              KindFromClause
+                KindTablePathExpression
+                  KindPathExpression
+                    KindIdentifier [a]
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindStar
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [b]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn v
   KindWithScan
     KindProjectScan
@@ -303,7 +577,19 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "ARRAY literal",
 			sql:  "SELECT [1, 2, 3] AS arr",
 			cat:  newBuiltinsCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindArrayConstructor
+            KindIntLiteral [1]
+            KindIntLiteral [2]
+            KindIntLiteral [3]
+          KindAlias
+            KindIdentifier [arr]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn arr
   KindProjectScan
     KindComputedColumn
@@ -318,7 +604,25 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "ARRAY OFFSET access",
 			sql:  "SELECT [10, 20, 30][OFFSET(1)] AS x",
 			cat:  newBuiltinsCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindArrayElement
+            KindArrayConstructor
+              KindIntLiteral [10]
+              KindIntLiteral [20]
+              KindIntLiteral [30]
+            KindFunctionCall
+              KindPathExpression
+                KindIdentifier [OFFSET]
+              KindIntLiteral [1]
+            KindLocation
+          KindAlias
+            KindIdentifier [x]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn x
   KindProjectScan
     KindComputedColumn
@@ -335,7 +639,25 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "STRUCT named fields",
 			sql:  "SELECT STRUCT(1 AS a, 'x' AS b) AS s",
 			cat:  newBuiltinsCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindStructConstructorWithKeyword
+            KindStructConstructorArg
+              KindIntLiteral [1]
+              KindAlias
+                KindIdentifier [a]
+            KindStructConstructorArg
+              KindStringLiteral [x]
+                KindStringLiteralComponent
+              KindAlias
+                KindIdentifier [b]
+          KindAlias
+            KindIdentifier [s]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn s
   KindProjectScan
     KindComputedColumn
@@ -349,7 +671,31 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "STRUCT field access",
 			sql:  "SELECT s.a FROM (SELECT STRUCT(1 AS a) AS s) AS t",
 			cat:  newBuiltinsCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [s]
+            KindIdentifier [a]
+      KindFromClause
+        KindTableSubquery
+          KindQuery
+            KindSelect
+              KindSelectList
+                KindSelectColumn
+                  KindStructConstructorWithKeyword
+                    KindStructConstructorArg
+                      KindIntLiteral [1]
+                      KindAlias
+                        KindIdentifier [a]
+                  KindAlias
+                    KindIdentifier [s]
+          KindAlias
+            KindIdentifier [t]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn a
   KindProjectScan
     KindComputedColumn
@@ -366,7 +712,25 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "UNNEST as table source",
 			sql:  "SELECT v FROM UNNEST([1, 2, 3]) AS v",
 			cat:  newBuiltinsCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [v]
+      KindFromClause
+        KindTablePathExpression
+          KindUnnestExpression
+            KindExpressionWithOptAlias
+              KindArrayConstructor
+                KindIntLiteral [1]
+                KindIntLiteral [2]
+                KindIntLiteral [3]
+          KindAlias
+            KindIdentifier [v]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn v
   KindProjectScan
     KindArrayScan
@@ -380,7 +744,21 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "CAST",
 			sql:  "SELECT CAST('42' AS INT64) AS x",
 			cat:  newBuiltinsCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindCastExpression
+            KindStringLiteral [42]
+              KindStringLiteralComponent
+            KindSimpleType
+              KindPathExpression
+                KindIdentifier [INT64]
+          KindAlias
+            KindIdentifier [x]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn x
   KindProjectScan
     KindComputedColumn
@@ -392,7 +770,27 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "NOT BETWEEN",
 			sql:  "SELECT id FROM users WHERE NOT id BETWEEN 1 AND 10",
 			cat:  newUsersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindWhereClause
+        KindUnaryExpression
+          KindBetweenExpression
+            KindPathExpression
+              KindIdentifier [id]
+            KindIntLiteral [1]
+            KindIntLiteral [10]
+            KindLocation
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn id
   KindProjectScan
     KindFilterScan
@@ -408,7 +806,24 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "IS NULL predicate",
 			sql:  "SELECT id FROM users WHERE name IS NULL",
 			cat:  newUsersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindWhereClause
+        KindBinaryExpression
+          KindPathExpression
+            KindIdentifier [name]
+          KindNullLiteral [NULL]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn id
   KindProjectScan
     KindFilterScan
@@ -421,7 +836,28 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "CASE expression",
 			sql:  "SELECT CASE WHEN id > 0 THEN 'a' ELSE 'b' END AS lbl FROM users",
 			cat:  newUsersCatalog(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindCaseNoValueExpression
+            KindBinaryExpression
+              KindPathExpression
+                KindIdentifier [id]
+              KindIntLiteral [0]
+            KindStringLiteral [a]
+              KindStringLiteralComponent
+            KindStringLiteral [b]
+              KindStringLiteralComponent
+          KindAlias
+            KindIdentifier [lbl]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn lbl
   KindProjectScan
     KindComputedColumn
@@ -439,7 +875,29 @@ func TestEngine_Analyze(t *testing.T) {
 			sql:  "SELECT SUM(id) OVER (PARTITION BY name) AS s FROM users",
 			cat:  newUsersCatalog(),
 			opts: newAnalyticOpts(),
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindAnalyticFunctionCall
+            KindFunctionCall
+              KindPathExpression
+                KindIdentifier [SUM]
+              KindPathExpression
+                KindIdentifier [id]
+            KindWindowSpecification
+              KindPartitionBy
+                KindPathExpression
+                  KindIdentifier [name]
+          KindAlias
+            KindIdentifier [s]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn s
   KindProjectScan
     KindAnalyticScan
@@ -454,7 +912,25 @@ func TestEngine_Analyze(t *testing.T) {
 				ParameterMode:   ParameterNamed,
 				QueryParameters: map[string]types.Type{"id": types.Int64Type()},
 			},
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindWhereClause
+        KindBinaryExpression
+          KindPathExpression
+            KindIdentifier [id]
+          KindParameterExpr
+            KindIdentifier [id]
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn id
   KindProjectScan
     KindFilterScan
@@ -475,7 +951,28 @@ func TestEngine_Analyze(t *testing.T) {
 					"hi": types.Int64Type(),
 				},
 			},
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindWhereClause
+        KindBetweenExpression
+          KindPathExpression
+            KindIdentifier [id]
+          KindParameterExpr
+            KindIdentifier [lo]
+          KindParameterExpr
+            KindIdentifier [hi]
+          KindLocation
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn id
   KindProjectScan
     KindFilterScan
@@ -502,7 +999,28 @@ func TestEngine_Analyze(t *testing.T) {
 					"ids": &types.ArrayType{ElementType: types.Int64Type()},
 				},
 			},
-			want: `KindQueryStmt
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindWhereClause
+        KindInExpression
+          KindPathExpression
+            KindIdentifier [id]
+          KindUnnestExpression
+            KindExpressionWithOptAlias
+              KindParameterExpr
+                KindIdentifier [ids]
+          KindLocation
+`,
+			wantResolved: `KindQueryStmt
   KindOutputColumn id
   KindProjectScan
     KindFilterScan
@@ -514,7 +1032,8 @@ func TestEngine_Analyze(t *testing.T) {
 		},
 		// Error cases — SQL the analyzer must reject. The contract is
 		// (output == nil, err is *AnalyzeError); both halves are
-		// asserted in the loop body.
+		// asserted in the loop body. wantParsed/wantResolved are left
+		// empty because Analyze returns nil on error.
 		{name: "syntax error: incomplete SELECT", sql: "SELECT", wantErr: &AnalyzeError{}},
 		{name: "table not found", sql: "SELECT id FROM nonexistent", cat: newBuiltinsCatalog(), wantErr: &AnalyzeError{}},
 		{name: "column not found in known table", sql: "SELECT nonexistent FROM users", cat: newUsersCatalog(), wantErr: &AnalyzeError{}},
@@ -545,86 +1064,9 @@ func TestEngine_Analyze(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			assert.Equal(t, tt.want, out.Resolved.String())
-		})
-	}
-}
-
-// TestEngine_Analyze_ParsedAST locks the contract that Engine.Analyze
-// populates AnalyzeOutput.Parsed with the parser AST for the same SQL.
-// The expected AST strings are hardcoded so the test reads as a
-// specification of the parser-AST shape rather than delegating that
-// definition to another SUT method (which would let a regression that
-// nils both endpoints in lock-step still pass). Triangulated across
-// SQL families (literal, table scan, function call) so a regression
-// that nils Parsed for one family but not another surfaces.
-func TestEngine_Analyze_ParsedAST(t *testing.T) {
-	tests := []struct {
-		name string
-		sql  string
-		cat  *types.SimpleCatalog
-		want string
-	}{
-		{
-			name: "literal",
-			sql:  "SELECT 1",
-			cat:  newBuiltinsCatalog(),
-			want: `KindQueryStatement
-  KindQuery
-    KindSelect
-      KindSelectList
-        KindSelectColumn
-          KindIntLiteral [1]
-`,
-		},
-		{
-			name: "table scan with column reference",
-			sql:  "SELECT id FROM users",
-			cat:  newUsersCatalog(),
-			want: `KindQueryStatement
-  KindQuery
-    KindSelect
-      KindSelectList
-        KindSelectColumn
-          KindPathExpression
-            KindIdentifier [id]
-      KindFromClause
-        KindTablePathExpression
-          KindPathExpression
-            KindIdentifier [users]
-`,
-		},
-		{
-			name: "function call",
-			sql:  "SELECT UPPER('x')",
-			cat:  newBuiltinsCatalog(),
-			want: `KindQueryStatement
-  KindQuery
-    KindSelect
-      KindSelectList
-        KindSelectColumn
-          KindFunctionCall
-            KindPathExpression
-              KindIdentifier [UPPER]
-            KindStringLiteral [x]
-              KindStringLiteralComponent
-`,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			ctx := t.Context()
-			sut := newTestEngine(t)
-
-			// Act
-			out, err := sut.Analyze(ctx, tt.sql, tt.cat, NewAnalyzerOptions())
-			require.NoError(t, err)
 			require.NotNil(t, out.Parsed, "AnalyzeOutput.Parsed must be populated")
-
-			// Assert
-			assert.Equal(t, tt.want, out.Parsed.String())
+			assert.Equal(t, tt.wantParsed, out.Parsed.String())
+			assert.Equal(t, tt.wantResolved, out.Resolved.String())
 		})
 	}
 }
