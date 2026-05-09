@@ -1,6 +1,11 @@
 package types
 
-import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
+import (
+	"time"
+
+	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
+	"google.golang.org/protobuf/types/known/timestamppb"
+)
 
 // LiteralValue is the typed Go view of ValueWithTypeProto: a SQL
 // literal value paired with its declared type.
@@ -126,3 +131,101 @@ func convertValue(typ Type, v *generated.ValueProto) any {
 	}
 	return nil
 }
+
+// Typed accessors below let callers pull a Go value out of a
+// LiteralValue without restating the kind→type mapping documented on
+// LiteralValue itself. Each accessor returns (zero, false) on any of
+// these conditions, so callers never have to nil-check or kind-check
+// before dispatching:
+//
+//   - the receiver is nil
+//   - Type is nil
+//   - Type.Kind() does not match the accessor's kind
+//   - Value does not hold the documented Go type for that kind
+//     (which includes the SQL NULL case, where Value is nil)
+//
+// The (T, bool) shape mirrors Go map / type-assertion idioms: the
+// second return is the witness that the first is meaningful.
+
+// asScalar is the shared dispatcher for scalar accessors: it folds the
+// four (zero, false) conditions into one place so each typed accessor
+// stays a one-liner and the contract cannot drift between them.
+func asScalar[T any](v *LiteralValue, k TypeKind) (T, bool) {
+	var zero T
+	if v == nil || v.Type == nil || v.Type.Kind() != k {
+		return zero, false
+	}
+	t, ok := v.Value.(T)
+	if !ok {
+		return zero, false
+	}
+	return t, true
+}
+
+// AsInt32 returns the INT32 value.
+func (v *LiteralValue) AsInt32() (int32, bool) { return asScalar[int32](v, Int32) }
+
+// AsInt64 returns the INT64 value.
+func (v *LiteralValue) AsInt64() (int64, bool) { return asScalar[int64](v, Int64) }
+
+// AsUint32 returns the UINT32 value.
+func (v *LiteralValue) AsUint32() (uint32, bool) { return asScalar[uint32](v, Uint32) }
+
+// AsUint64 returns the UINT64 value.
+func (v *LiteralValue) AsUint64() (uint64, bool) { return asScalar[uint64](v, Uint64) }
+
+// AsBool returns the BOOL value. The second return distinguishes a
+// genuine false from a missing/mismatched value.
+func (v *LiteralValue) AsBool() (bool, bool) { return asScalar[bool](v, Bool) }
+
+// AsFloat returns the FLOAT (float32) value.
+func (v *LiteralValue) AsFloat() (float32, bool) { return asScalar[float32](v, Float) }
+
+// AsDouble returns the DOUBLE (float64) value.
+func (v *LiteralValue) AsDouble() (float64, bool) { return asScalar[float64](v, Double) }
+
+// AsString returns the STRING value.
+func (v *LiteralValue) AsString() (string, bool) { return asScalar[string](v, String) }
+
+// AsBytes returns the BYTES value.
+func (v *LiteralValue) AsBytes() ([]byte, bool) { return asScalar[[]byte](v, Bytes) }
+
+// AsJson returns the JSON value as its serialized string form.
+func (v *LiteralValue) AsJson() (string, bool) { return asScalar[string](v, Json) }
+
+// AsDateDays returns the DATE value as days since 1970-01-01.
+func (v *LiteralValue) AsDateDays() (int32, bool) { return asScalar[int32](v, Date) }
+
+// AsTimeMicros returns the TIME value in ZetaSQL's encoded
+// time-of-day form (the same int64 shape the proto carries).
+func (v *LiteralValue) AsTimeMicros() (int64, bool) { return asScalar[int64](v, Time) }
+
+// AsTimestamp returns the TIMESTAMP value as a time.Time. Callers do
+// not need to import google.golang.org/protobuf/types/known/timestamppb
+// to consume timestamp literals.
+func (v *LiteralValue) AsTimestamp() (time.Time, bool) {
+	ts, ok := asScalar[*timestamppb.Timestamp](v, Timestamp)
+	if !ok || ts == nil {
+		return time.Time{}, false
+	}
+	return ts.AsTime(), true
+}
+
+// AsArray returns the ARRAY value's elements in proto order.
+func (v *LiteralValue) AsArray() (ArrayValue, bool) { return asScalar[ArrayValue](v, Array) }
+
+// AsStruct returns the STRUCT value's fields in proto order. Field
+// names live on the surrounding Type at Type.AsStruct().Fields[i].Name.
+func (v *LiteralValue) AsStruct() (StructValue, bool) { return asScalar[StructValue](v, Struct) }
+
+// AsNumeric returns the NUMERIC value's proto-encoded payload.
+func (v *LiteralValue) AsNumeric() ([]byte, bool) { return asScalar[[]byte](v, Numeric) }
+
+// AsBigNumeric returns the BIGNUMERIC value's proto-encoded payload.
+func (v *LiteralValue) AsBigNumeric() ([]byte, bool) { return asScalar[[]byte](v, BigNumeric) }
+
+// AsInterval returns the INTERVAL value's proto-encoded payload.
+func (v *LiteralValue) AsInterval() ([]byte, bool) { return asScalar[[]byte](v, Interval) }
+
+// AsGeography returns the GEOGRAPHY value's proto-encoded payload.
+func (v *LiteralValue) AsGeography() ([]byte, bool) { return asScalar[[]byte](v, Geography) }
