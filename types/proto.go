@@ -45,7 +45,11 @@ func TypeFromProto(p *generated.TypeProto) (Type, error) {
 		if et == nil {
 			return nil, fmt.Errorf("TypeProto has ENUM kind but no EnumType field")
 		}
-		return NewEnumType(et.GetEnumName())
+		name := et.GetEnumName()
+		if name == "" {
+			return nil, fmt.Errorf("TypeProto has ENUM kind but empty enum_name")
+		}
+		return &EnumType{Name: name}, nil
 	default:
 		if t := TypeFromKind(kind); t != nil {
 			return t, nil

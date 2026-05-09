@@ -14,45 +14,6 @@ import (
 // is a builtin enum the downstream emulator hits via INTERVAL N PART.
 const dateTimestampPartFullName = "zetasql.functions.DateTimestampPart"
 
-func TestNewEnumType(t *testing.T) {
-	tests := []struct {
-		name    string
-		in      string
-		want    *EnumType
-		wantErr bool
-	}{
-		{
-			name: "fully-qualified name yields *EnumType with that name",
-			in:   dateTimestampPartFullName,
-			want: &EnumType{Name: dateTimestampPartFullName},
-		},
-		{
-			name:    "empty name is rejected (no way to dispatch NameOf)",
-			in:      "",
-			want:    nil,
-			wantErr: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			sut := tt.in
-
-			// Act
-			got, err := NewEnumType(sut)
-
-			// Assert
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-			}
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
 // TestEnumType_TypePredicates pins the *EnumType implementation of the
 // Type interface: a single fixture, all six predicate/cast methods
 // observed in one go so a regression in any single method shows up in
@@ -86,6 +47,48 @@ func TestEnumType_ToProto_RoundTrip(t *testing.T) {
 	// Assert
 	assert.NoError(t, err)
 	assert.Equal(t, sut, got)
+}
+
+// TestTypeFromProto_EnumMalformed pins TypeFromProto's two ENUM-side
+// rejection paths so a proto whose ENUM kind is not paired with a
+// usable enum_name surfaces as an error rather than silently produces
+// an *EnumType that NameOf can never resolve. Triangulated across the
+// two distinct missing-field shapes (whole EnumTypeProto absent vs.
+// EnumTypeProto present but enum_name empty) so a regression in either
+// guard shows up in the diff.
+func TestTypeFromProto_EnumMalformed(t *testing.T) {
+	enumKind := generated.TypeKind_TYPE_ENUM
+
+	tests := []struct {
+		name string
+		in   *generated.TypeProto
+	}{
+		{
+			name: "ENUM kind without EnumType field",
+			in:   &generated.TypeProto{TypeKind: &enumKind},
+		},
+		{
+			name: "ENUM kind with empty enum_name",
+			in: &generated.TypeProto{
+				TypeKind: &enumKind,
+				EnumType: &generated.EnumTypeProto{},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := tt.in
+
+			// Act
+			got, err := TypeFromProto(sut)
+
+			// Assert
+			assert.Error(t, err)
+			assert.Nil(t, got)
+		})
+	}
 }
 
 // TestEnumType_NameOf documents the four observable outcomes of

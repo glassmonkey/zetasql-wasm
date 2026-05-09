@@ -1,8 +1,6 @@
 package types
 
 import (
-	"fmt"
-
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 
@@ -10,7 +8,11 @@ import (
 )
 
 // EnumType represents a ZetaSQL ENUM type. Name is the fully-qualified
-// proto enum name (e.g. "zetasql.functions.DateTimestampPart").
+// proto enum name (e.g. "zetasql.functions.DateTimestampPart"). It is
+// public so callers can construct an EnumType with a struct literal;
+// an EnumType with an empty Name still behaves correctly (NameOf
+// returns ("", false)), so there is no constructor-level invariant
+// to enforce.
 //
 // EnumTypeProto on the wire only carries the proto name and an index
 // into the surrounding TypeProto's FileDescriptorSet, not the
@@ -22,17 +24,6 @@ import (
 // descriptor is not linked in resolve to ("", false).
 type EnumType struct {
 	Name string
-}
-
-// NewEnumType creates an EnumType for the given proto enum name. The
-// name must be the fully-qualified proto name (e.g.
-// "zetasql.functions.DateTimestampPart"); empty input is rejected
-// because an EnumType without a name has no way to dispatch NameOf.
-func NewEnumType(name string) (*EnumType, error) {
-	if name == "" {
-		return nil, fmt.Errorf("enum name must not be empty")
-	}
-	return &EnumType{Name: name}, nil
 }
 
 func (t *EnumType) Kind() TypeKind        { return Enum }
