@@ -1380,24 +1380,39 @@ func TestEngine_ParseNext_AdvancesLocation(t *testing.T) {
 	}
 }
 
-// TestEngine_Analyze_CustomFunction verifies that a user-defined
-// scalar function registered in the catalog is resolved to the expected
-// FunctionCall in the AST. Triangulated across function name and group.
-func TestEngine_Analyze_CustomFunction(t *testing.T) {
+// TestEngine_Analyze_CustomFunctions verifies that a user-defined
+// scalar function registered in the catalog is resolved to the
+// expected FunctionCall in the AST, across both fixed-signature and
+// templated (ARG_TYPE_ANY_1) function shapes. Both branches share
+// the same fixture (newTestEngine + a per-case catalog with the
+// declared function appended after the ZetaSQL builtins) and the
+// same observation (the resolved AST string), differing only in how
+// the FunctionArgumentType return/arg shape is built — so per the
+// fixture-axis split rule the two shapes live in one table. The
+// returnType + argTypes fields carry the raw FunctionArgumentType
+// values for each case, letting templated and concrete signatures
+// sit alongside each other without per-branch construction logic in
+// the test body.
+func TestEngine_Analyze_CustomFunctions(t *testing.T) {
+	int64Arg := types.NewFunctionArgumentType(types.Int64Type())
+	any1Arg := types.NewTemplatedFunctionArgumentType(types.ArgTypeAny1)
+
 	tests := []struct {
-		name     string
-		funcName string
-		group    string
-		argCount int
-		sql      string
-		want     string
+		name       string
+		funcName   string
+		group      string
+		returnType *types.FunctionArgumentType
+		argTypes   []*types.FunctionArgumentType
+		sql        string
+		want       string
 	}{
 		{
-			name:     "two int64 args in custom group",
-			funcName: "my_add",
-			group:    "custom",
-			argCount: 2,
-			sql:      "SELECT my_add(1, 2)",
+			name:       "two int64 args in custom group",
+			funcName:   "my_add",
+			group:      "custom",
+			returnType: int64Arg,
+			argTypes:   []*types.FunctionArgumentType{int64Arg, int64Arg},
+			sql:        "SELECT my_add(1, 2)",
 			want: `KindQueryStmt
   KindOutputColumn $col1
   KindProjectScan
@@ -1409,11 +1424,12 @@ func TestEngine_Analyze_CustomFunction(t *testing.T) {
 `,
 		},
 		{
-			name:     "single int64 arg in math group",
-			funcName: "double",
-			group:    "math",
-			argCount: 1,
-			sql:      "SELECT double(7)",
+			name:       "single int64 arg in math group",
+			funcName:   "double",
+			group:      "math",
+			returnType: int64Arg,
+			argTypes:   []*types.FunctionArgumentType{int64Arg},
+			sql:        "SELECT double(7)",
 			want: `KindQueryStmt
   KindOutputColumn $col1
   KindProjectScan
@@ -1423,58 +1439,13 @@ func TestEngine_Analyze_CustomFunction(t *testing.T) {
     KindSingleRowScan
 `,
 		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			ctx := t.Context()
-			cat := types.NewSimpleCatalog("test")
-			cat.AddZetaSQLBuiltinFunctions(nil)
-			argTypes := make([]*types.FunctionArgumentType, tt.argCount)
-			for i := range argTypes {
-				argTypes[i] = types.NewFunctionArgumentType(types.Int64Type())
-			}
-			cat.Functions = append(cat.Functions, types.NewFunction(
-				[]string{tt.funcName},
-				tt.group,
-				types.ScalarMode,
-				[]*types.FunctionSignature{
-					types.NewFunctionSignature(
-						types.NewFunctionArgumentType(types.Int64Type()),
-						argTypes,
-					),
-				},
-			))
-			sut := newTestEngine(t)
-
-			// Act
-			out, err := sut.Analyze(ctx, tt.sql, cat, NewAnalyzerOptions())
-			require.NoError(t, err)
-			got := out.Resolved.String()
-
-			// Assert
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
-// TestEngine_Analyze_TemplatedFunction verifies that a templated
-// (ARG_TYPE_ANY_1) function is resolved with concrete argument types
-// inferred from the call site.
-func TestEngine_Analyze_TemplatedFunction(t *testing.T) {
-	tests := []struct {
-		name     string
-		funcName string
-		group    string
-		sql      string
-		want     string
-	}{
 		{
-			name:     "identity in custom group",
-			funcName: "identity",
-			group:    "custom",
-			sql:      "SELECT identity(42)",
+			name:       "Templated identity in custom group",
+			funcName:   "identity",
+			group:      "custom",
+			returnType: any1Arg,
+			argTypes:   []*types.FunctionArgumentType{any1Arg},
+			sql:        "SELECT identity(42)",
 			want: `KindQueryStmt
   KindOutputColumn $col1
   KindProjectScan
@@ -1485,10 +1456,12 @@ func TestEngine_Analyze_TemplatedFunction(t *testing.T) {
 `,
 		},
 		{
-			name:     "negate in math group",
-			funcName: "negate",
-			group:    "math",
-			sql:      "SELECT negate(7)",
+			name:       "Templated negate in math group",
+			funcName:   "negate",
+			group:      "math",
+			returnType: any1Arg,
+			argTypes:   []*types.FunctionArgumentType{any1Arg},
+			sql:        "SELECT negate(7)",
 			want: `KindQueryStmt
   KindOutputColumn $col1
   KindProjectScan
@@ -1511,12 +1484,7 @@ func TestEngine_Analyze_TemplatedFunction(t *testing.T) {
 				tt.group,
 				types.ScalarMode,
 				[]*types.FunctionSignature{
-					types.NewFunctionSignature(
-						types.NewTemplatedFunctionArgumentType(types.ArgTypeAny1),
-						[]*types.FunctionArgumentType{
-							types.NewTemplatedFunctionArgumentType(types.ArgTypeAny1),
-						},
-					),
+					types.NewFunctionSignature(tt.returnType, tt.argTypes),
 				},
 			))
 			sut := newTestEngine(t)
@@ -1524,10 +1492,9 @@ func TestEngine_Analyze_TemplatedFunction(t *testing.T) {
 			// Act
 			out, err := sut.Analyze(ctx, tt.sql, cat, NewAnalyzerOptions())
 			require.NoError(t, err)
-			got := out.Resolved.String()
 
 			// Assert
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.want, out.Resolved.String())
 		})
 	}
 }
