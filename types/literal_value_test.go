@@ -182,27 +182,34 @@ func TestWrapLiteralValue(t *testing.T) {
 	}
 }
 
-// accessorResult bundles the (got, ok) pair every typed accessor
-// returns. Wrapping the pair in a single struct lets the tests do one
-// assert.Equal per case (avoiding Assertion Roulette) and makes the
-// failing diff show both halves of the contract together.
-type accessorResult struct {
-	Got any
-	OK  bool
-}
-
-// accessorCase carries every fixture a typed-accessor test needs in
-// one row: the accessor's matching Type and a Type for the kind-
-// mismatch axis, a happy-path Value and the want it produces, a
-// wrong-Go-type Value for the value-type-mismatch axis, the zero
-// return for any contract violation, and a call that exercises the
-// accessor and returns the (got, ok) pair as accessorResult so every
-// row can share one signature.
+// accessorCase pins one typed accessor's contract on a single row.
+// Each field corresponds to one axis the accessor's contract is
+// checked on:
 //
-// Holding all of this in the row (instead of looking it up through
-// helpers keyed off accessor name or kind) keeps the row itself the
-// single source of truth: adding an accessor means adding one row,
-// and there is no helper switch to forget to update.
+//	typ         The Type the accessor dispatches on (Type.Kind() must
+//	            match for the accessor to return a real value).
+//	happyValue  A Value of the Go type the accessor expects, paired
+//	            with typ. Feeding (typ, happyValue) into a LiteralValue
+//	            is the canonical happy input.
+//	happyWant   The value the accessor must return for that input,
+//	            with ok=true.
+//	wrongTyp    Any Type whose Kind() differs from typ.Kind(). Used
+//	            for the kind-mismatch axis: the surrounding Type lies,
+//	            so the accessor must reject with (zero, false).
+//	wrongValue  A Value whose Go type does not match what the accessor
+//	            expects, kept under the correct typ. Used for the
+//	            value-shape-mismatch axis (which subsumes SQL NULL,
+//	            since Value=nil fails the type assertion the same way).
+//	zero        The accessor's documented zero return — what every
+//	            (zero, false) case must produce.
+//	call        Invokes the accessor on the supplied LiteralValue and
+//	            returns its (got, ok) pair widened to (any, bool) so
+//	            every row shares one signature.
+//
+// Holding all of this in the row keeps the table the single source
+// of truth: adding an accessor means adding one row that pins every
+// axis at once, and HappyPath and ContractViolation will both pick
+// it up automatically.
 type accessorCase struct {
 	name       string
 	typ        Type
@@ -211,12 +218,14 @@ type accessorCase struct {
 	happyWant  any
 	wrongValue any
 	zero       any
-	call       func(*LiteralValue) accessorResult
+	call       func(*LiteralValue) (any, bool)
 }
 
-// allAccessors enumerates every typed accessor on LiteralValue. The
-// HappyPath and ContractViolation tests both iterate this list so a
-// newly added accessor is forced into both axes by adding one row.
+// allAccessors enumerates every typed accessor on LiteralValue. Read
+// as a spec table: each row says "if typ matches and Value is
+// happyValue, the accessor returns happyWant with ok=true; if any of
+// the four (zero, false) conditions hold instead, it returns zero
+// with ok=false."
 func allAccessors() []accessorCase {
 	timestampFixture := timestamppb.New(time.Date(2026, 5, 10, 12, 0, 0, 0, time.UTC))
 	return []accessorCase{
@@ -224,119 +233,80 @@ func allAccessors() []accessorCase {
 			name: "AsInt32", typ: Int32Type(), wrongTyp: Int64Type(),
 			happyValue: int32(7), happyWant: int32(7),
 			wrongValue: "not-int32", zero: int32(0),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsInt32()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsInt32() },
 		},
 		{
 			name: "AsInt64", typ: Int64Type(), wrongTyp: Int32Type(),
 			happyValue: int64(42), happyWant: int64(42),
 			wrongValue: "not-int64", zero: int64(0),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsInt64()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsInt64() },
 		},
 		{
 			name: "AsUint32", typ: Uint32Type(), wrongTyp: Int64Type(),
 			happyValue: uint32(7), happyWant: uint32(7),
 			wrongValue: "not-uint32", zero: uint32(0),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsUint32()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsUint32() },
 		},
 		{
 			name: "AsUint64", typ: Uint64Type(), wrongTyp: Int64Type(),
 			happyValue: uint64(42), happyWant: uint64(42),
 			wrongValue: "not-uint64", zero: uint64(0),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsUint64()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsUint64() },
 		},
 		{
 			name: "AsBool", typ: BoolType(), wrongTyp: Int64Type(),
 			happyValue: true, happyWant: true,
 			wrongValue: int64(1), zero: false,
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsBool()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsBool() },
 		},
 		{
 			name: "AsFloat", typ: FloatType(), wrongTyp: Int64Type(),
 			happyValue: float32(1.5), happyWant: float32(1.5),
 			wrongValue: float64(1), zero: float32(0),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsFloat()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsFloat() },
 		},
 		{
 			name: "AsDouble", typ: DoubleType(), wrongTyp: Int64Type(),
 			happyValue: float64(2.5), happyWant: float64(2.5),
 			wrongValue: float32(1), zero: float64(0),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsDouble()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsDouble() },
 		},
 		{
 			name: "AsString", typ: StringType(), wrongTyp: Int64Type(),
 			happyValue: "hello", happyWant: "hello",
 			wrongValue: []byte("not-string"), zero: "",
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsString()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsString() },
 		},
 		{
 			name: "AsBytes", typ: BytesType(), wrongTyp: Int64Type(),
 			happyValue: []byte{0x01, 0x02}, happyWant: []byte{0x01, 0x02},
 			wrongValue: "not-bytes", zero: ([]byte)(nil),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsBytes()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsBytes() },
 		},
 		{
 			name: "AsJson", typ: JsonType(), wrongTyp: Int64Type(),
 			happyValue: `{"k":1}`, happyWant: `{"k":1}`,
 			wrongValue: []byte("not-json"), zero: "",
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsJson()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsJson() },
 		},
 		{
 			name: "AsDateDays", typ: DateType(), wrongTyp: Int64Type(),
 			happyValue: int32(20000), happyWant: int32(20000),
 			wrongValue: int64(1), zero: int32(0),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsDateDays()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsDateDays() },
 		},
 		{
 			name: "AsTimeMicros", typ: TimeType(), wrongTyp: Int64Type(),
 			happyValue: int64(123456789), happyWant: int64(123456789),
 			wrongValue: int32(1), zero: int64(0),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsTimeMicros()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsTimeMicros() },
 		},
 		{
 			name: "AsTimestamp", typ: TimestampType(), wrongTyp: Int64Type(),
 			happyValue: timestampFixture,
 			happyWant:  time.Date(2026, 5, 10, 12, 0, 0, 0, time.UTC),
 			wrongValue: int64(1), zero: time.Time{},
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsTimestamp()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsTimestamp() },
 		},
 		{
 			name:       "AsArray",
@@ -345,10 +315,7 @@ func allAccessors() []accessorCase {
 			happyValue: ArrayValue{{Type: Int64Type(), Value: int64(1)}},
 			happyWant:  ArrayValue{{Type: Int64Type(), Value: int64(1)}},
 			wrongValue: "not-array", zero: (ArrayValue)(nil),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsArray()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsArray() },
 		},
 		{
 			name:       "AsStruct",
@@ -357,83 +324,75 @@ func allAccessors() []accessorCase {
 			happyValue: StructValue{{Type: Int64Type(), Value: int64(1)}},
 			happyWant:  StructValue{{Type: Int64Type(), Value: int64(1)}},
 			wrongValue: "not-struct", zero: (StructValue)(nil),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsStruct()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsStruct() },
 		},
 		{
 			name: "AsNumeric", typ: NumericType(), wrongTyp: Int64Type(),
 			happyValue: []byte{0xAA}, happyWant: []byte{0xAA},
 			wrongValue: "not-bytes", zero: ([]byte)(nil),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsNumeric()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsNumeric() },
 		},
 		{
 			name: "AsBigNumeric", typ: BigNumericType(), wrongTyp: Int64Type(),
 			happyValue: []byte{0xBB}, happyWant: []byte{0xBB},
 			wrongValue: "not-bytes", zero: ([]byte)(nil),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsBigNumeric()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsBigNumeric() },
 		},
 		{
 			name: "AsInterval", typ: IntervalType(), wrongTyp: Int64Type(),
 			happyValue: []byte{0xCC}, happyWant: []byte{0xCC},
 			wrongValue: "not-bytes", zero: ([]byte)(nil),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsInterval()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsInterval() },
 		},
 		{
 			name: "AsGeography", typ: GeographyType(), wrongTyp: Int64Type(),
 			happyValue: []byte{0xDD}, happyWant: []byte{0xDD},
 			wrongValue: "not-bytes", zero: ([]byte)(nil),
-			call: func(v *LiteralValue) accessorResult {
-				g, ok := v.AsGeography()
-				return accessorResult{Got: g, OK: ok}
-			},
+			call: func(v *LiteralValue) (any, bool) { return v.AsGeography() },
 		},
 	}
 }
 
-// TestLiteralValue_TypedAccessors_HappyPath checks that every accessor
-// returns the documented Go value with ok=true when the LiteralValue
-// is well-formed for that kind. Composite kinds use a one-element
-// fixture so the assertion is on the accessor's own contract, not on
-// recursive wrapping (which TestWrapLiteralValue already covers).
+// TestLiteralValue_TypedAccessors_HappyPath pins the positive half
+// of every typed accessor's contract: when the surrounding
+// LiteralValue's Type matches the accessor's kind and Value carries
+// the documented Go type, the accessor returns that value with
+// ok=true. Composite kinds use a one-element fixture so the
+// observation is on this accessor's own contract, not on recursive
+// wrapping (which TestWrapLiteralValue already covers).
 func TestLiteralValue_TypedAccessors_HappyPath(t *testing.T) {
 	for _, c := range allAccessors() {
 		t.Run(c.name, func(t *testing.T) {
 			// Arrange
 			sut := &LiteralValue{Type: c.typ, Value: c.happyValue}
-			want := accessorResult{Got: c.happyWant, OK: true}
 
 			// Act
-			got := c.call(sut)
+			got, ok := c.call(sut)
 
 			// Assert
-			assert.Equal(t, want, got)
+			assert.True(t, ok)
+			assert.Equal(t, c.happyWant, got)
 		})
 	}
 }
 
-// TestLiteralValue_TypedAccessors_ContractViolation enumerates the
-// four "(zero, false)" conditions documented on the typed-accessor
-// block — nil receiver, nil Type, kind mismatch, and value-shape
-// mismatch (which subsumes SQL NULL, since Value=nil fails the type
-// assertion) — and asserts every accessor honours each one. The list
-// of accessors is shared with the HappyPath test so a new accessor
-// must satisfy both axes.
+// TestLiteralValue_TypedAccessors_ContractViolation pins the four
+// "(zero, false)" conditions that hold for every typed accessor
+// regardless of kind:
+//
+//   - nil receiver — calling on a nil *LiteralValue;
+//   - nil Type — Type is missing entirely;
+//   - kind mismatch — Type carries a different kind from the
+//     accessor's;
+//   - value type mismatch — Type matches but Value's Go type does
+//     not (this also covers SQL NULL: Value=nil fails the type
+//     assertion the same way).
+//
+// Sharing allAccessors() with the HappyPath test forces a newly
+// added accessor to be exercised on both axes by a single new row.
 func TestLiteralValue_TypedAccessors_ContractViolation(t *testing.T) {
 	for _, c := range allAccessors() {
 		t.Run(c.name, func(t *testing.T) {
-			want := accessorResult{Got: c.zero, OK: false}
-
 			violations := []struct {
 				name string
 				in   *LiteralValue
@@ -450,10 +409,11 @@ func TestLiteralValue_TypedAccessors_ContractViolation(t *testing.T) {
 					sut := v.in
 
 					// Act
-					got := c.call(sut)
+					got, ok := c.call(sut)
 
 					// Assert
-					assert.Equal(t, want, got)
+					assert.False(t, ok)
+					assert.Equal(t, c.zero, got)
 				})
 			}
 		})
