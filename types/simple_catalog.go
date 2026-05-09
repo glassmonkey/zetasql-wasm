@@ -13,28 +13,19 @@ import (
 var ErrNotFound = errors.New("not found")
 
 // SimpleCatalog represents a ZetaSQL catalog containing tables, functions, and sub-catalogs.
+// ZetaSQL built-in functions are loaded automatically by Engine.Analyze, with
+// the analyzer's LanguageOptions reflected, so callers do not need to register
+// them manually.
 type SimpleCatalog struct {
-	Name           string
-	Tables         []*SimpleTable
-	Functions      []*Function
-	SubCatalogs    []*SimpleCatalog
-	BuiltinOptions *generated.ZetaSQLBuiltinFunctionOptionsProto
+	Name        string
+	Tables      []*SimpleTable
+	Functions   []*Function
+	SubCatalogs []*SimpleCatalog
 }
 
 // NewSimpleCatalog creates a SimpleCatalog with the given name.
 func NewSimpleCatalog(name string) *SimpleCatalog {
 	return &SimpleCatalog{Name: name}
-}
-
-// AddZetaSQLBuiltinFunctions signals that built-in ZetaSQL functions should be
-// loaded on the WASM side. Pass nil for default behavior (load all builtins);
-// nil is normalized to an empty options proto so the C++ side can distinguish
-// "load builtins with defaults" from "do not load builtins" (BuiltinOptions == nil).
-func (c *SimpleCatalog) AddZetaSQLBuiltinFunctions(opts *generated.ZetaSQLBuiltinFunctionOptionsProto) {
-	if opts == nil {
-		opts = &generated.ZetaSQLBuiltinFunctionOptionsProto{}
-	}
-	c.BuiltinOptions = opts
 }
 
 // FindTable looks up a table by name path, descending through sub-catalogs
@@ -127,9 +118,6 @@ func (c *SimpleCatalog) ToProto() *generated.SimpleCatalogProto {
 	}
 	for _, fn := range c.Functions {
 		p.CustomFunction = append(p.CustomFunction, fn.ToProto())
-	}
-	if c.BuiltinOptions != nil {
-		p.BuiltinFunctionOptions = c.BuiltinOptions
 	}
 	return p
 }

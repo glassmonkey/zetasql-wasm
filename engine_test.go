@@ -24,7 +24,6 @@ func newTestEngine(t *testing.T) *Engine {
 
 func newUsersCatalog() *types.SimpleCatalog {
 	cat := types.NewSimpleCatalog("test")
-	cat.AddZetaSQLBuiltinFunctions(nil)
 	cat.Tables = append(cat.Tables, types.NewSimpleTable("users",
 		types.NewSimpleColumn("users", "id", types.Int64Type()),
 		types.NewSimpleColumn("users", "name", types.StringType()),
@@ -42,13 +41,12 @@ func newUsersOrdersCatalog() *types.SimpleCatalog {
 	return cat
 }
 
-// newBuiltinsCatalog returns a catalog with only the ZetaSQL builtin
-// functions registered (no tables). Use this for SELECT queries that do not
-// reference any table but do use builtin functions like CAST, COUNT, etc.
+// newBuiltinsCatalog returns an empty catalog (no tables, no user functions).
+// Use this for SELECT queries that do not reference any table but do use
+// builtin functions like CAST, COUNT, etc. — Engine.Analyze loads ZetaSQL
+// builtins automatically, so an empty catalog is sufficient.
 func newBuiltinsCatalog() *types.SimpleCatalog {
-	cat := types.NewSimpleCatalog("test")
-	cat.AddZetaSQLBuiltinFunctions(nil)
-	return cat
+	return types.NewSimpleCatalog("test")
 }
 
 // newAnalyticOpts returns AnalyzerOptions with the FEATURE_ANALYTIC_FUNCTIONS
@@ -1528,7 +1526,6 @@ func TestEngine_Analyze_CustomFunctions(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
 			cat := types.NewSimpleCatalog("test")
-			cat.AddZetaSQLBuiltinFunctions(nil)
 			cat.Functions = append(cat.Functions, types.NewFunction(
 				[]string{tt.funcName},
 				tt.group,

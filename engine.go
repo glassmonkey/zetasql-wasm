@@ -341,10 +341,21 @@ func (e *Engine) callAnalyze(
 ) (*generated.AnalyzeResponse, *generated.AnyASTStatementProto, error) {
 	if cat != nil {
 		request.SimpleCatalog = cat.ToProto()
+	} else {
+		request.SimpleCatalog = &generated.SimpleCatalogProto{}
 	}
 	if opts != nil {
 		request.Options = opts.toProto()
 	}
+	// ZetaSQL built-in functions (+, =, COUNT, CAST, ...) are required for
+	// almost any real query, so they are always loaded. LanguageOptions is
+	// shared with the analyzer so the loaded builtin set matches the SQL
+	// dialect (PRODUCT_INTERNAL vs PRODUCT_EXTERNAL, feature flags, ...).
+	builtinOpts := &generated.ZetaSQLBuiltinFunctionOptionsProto{}
+	if opts != nil && opts.Language != nil {
+		builtinOpts.LanguageOptions = opts.Language.toProto()
+	}
+	request.SimpleCatalog.BuiltinFunctionOptions = builtinOpts
 
 	requestBytes, err := proto.Marshal(request)
 	if err != nil {

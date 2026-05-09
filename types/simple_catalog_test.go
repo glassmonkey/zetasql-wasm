@@ -24,14 +24,13 @@ func TestSimpleCatalogToProto(t *testing.T) {
 			},
 		},
 		{
-			name: "catalog with table and builtins",
+			name: "catalog with table",
 			catalog: func() *SimpleCatalog {
 				cat := NewSimpleCatalog("main")
 				cat.Tables = append(cat.Tables, NewSimpleTable("users",
 					NewSimpleColumn("users", "id", Int64Type()),
 					NewSimpleColumn("users", "name", StringType()),
 				))
-				cat.AddZetaSQLBuiltinFunctions(nil)
 				return cat
 			}(),
 			want: &generated.SimpleCatalogProto{
@@ -56,7 +55,6 @@ func TestSimpleCatalogToProto(t *testing.T) {
 						},
 					},
 				},
-				BuiltinFunctionOptions: &generated.ZetaSQLBuiltinFunctionOptionsProto{},
 			},
 		},
 		{
