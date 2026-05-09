@@ -339,9 +339,37 @@ func (e *Engine) callAnalyze(
 	cat *types.SimpleCatalog,
 	opts *AnalyzerOptions,
 ) (*generated.AnalyzeResponse, *generated.AnyASTStatementProto, error) {
-	if cat != nil {
-		request.SimpleCatalog = cat.ToProto()
+	// Synthesize a default catalog when the caller passes nil so the rest
+	// of the pipeline always sees a real *types.SimpleCatalog and the WASM
+	// bridge takes a single proto-driven path.
+	if cat == nil {
+		cat = types.NewSimpleCatalog("default")
 	}
+	// Attach ZetaSQL built-in functions (+, =, COUNT, CAST, ...) to the
+	// catalog. LanguageOptions is shared with the analyzer so the loaded
+	// builtin set matches the SQL dialect (PRODUCT_INTERNAL vs
+	// PRODUCT_EXTERNAL, feature flags, ...).
+	catProto := cat.ToProto()
+	builtinOpts := &generated.ZetaSQLBuiltinFunctionOptionsProto{}
+	if opts != nil && opts.Language != nil {
+		builtinOpts.LanguageOptions = opts.Language.toProto()
+	} else {
+		// Populate with an empty LanguageOptionsProto rather than leaving
+		// it unset. Sending BuiltinFunctionOptions with language_options
+		// unset triggers a deterministic WASM OOB inside the C++ analyzer
+		// on Linux x64 wazero — observed as a trap at .$39380 on every
+		// happy-path Analyze call, escalating to a host SIGSEGV in
+		// runtime.memmove after roughly eleven iterations. macOS wazero
+		// is unaffected. The C++ root cause is unidentified: the embedded
+		// WASM has its name section stripped, so .$39380 cannot be
+		// resolved without a debug rebuild. If this re-emerges after a
+		// wazero / WASM / zetasql upgrade, retry with language_options
+		// unset to confirm whether the same trigger is back before
+		// digging further.
+		builtinOpts.LanguageOptions = &generated.LanguageOptionsProto{}
+	}
+	catProto.BuiltinFunctionOptions = builtinOpts
+	request.SimpleCatalog = catProto
 	if opts != nil {
 		request.Options = opts.toProto()
 	}
