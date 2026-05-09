@@ -1028,6 +1028,67 @@ func TestEngine_Analyze(t *testing.T) {
         KindParameter
 `,
 		},
+		// ENUM literal cases — EXTRACT(<part> FROM <date|timestamp>) is
+		// the simplest SQL surface that surfaces a DateTimestampPart
+		// enum literal in the resolved tree. The dump suffix " DAY" /
+		// " HOUR" comes from format.go resolving the proto enum number
+		// through types.WrapLiteralValue → AsEnumName, so these cases
+		// also lock the wasm-bridge → wrap → protoregistry path that
+		// bigquery-emulator's INTERVAL N PART code walks. Triangulated
+		// across DAY (DateTimestampPart=3) and HOUR (=7) so a regression
+		// that hard-coded a single name still fails.
+		{
+			name: "EXTRACT(DAY FROM DATE) surfaces DAY enum literal",
+			sql:  "SELECT EXTRACT(DAY FROM DATE '2024-01-15')",
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindExtractExpression
+            KindPathExpression
+              KindIdentifier [DAY]
+            KindDateOrTimeLiteral
+              KindStringLiteral [2024-01-15]
+                KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:$extract
+        KindLiteral
+        KindLiteral DAY
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "EXTRACT(HOUR FROM TIMESTAMP) surfaces HOUR enum literal",
+			sql:  "SELECT EXTRACT(HOUR FROM TIMESTAMP '2024-01-15 03:00:00+00')",
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindExtractExpression
+            KindPathExpression
+              KindIdentifier [HOUR]
+            KindDateOrTimeLiteral
+              KindStringLiteral [2024-01-15 03:00:00+00]
+                KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:$extract
+        KindLiteral
+        KindLiteral HOUR
+    KindSingleRowScan
+`,
+		},
 		// Error cases — SQL the analyzer must reject. The contract is
 		// (output == nil, err is *AnalyzeError); both halves are
 		// asserted in the loop body. wantParsed/wantResolved are left

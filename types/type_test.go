@@ -13,6 +13,7 @@ import (
 func TestTypeInterfaceDispatch(t *testing.T) {
 	arr, _ := NewArrayType(Int64Type())
 	st, _ := NewStructType([]*StructField{NewStructField("x", Int64Type())})
+	en := &EnumType{Name: "zetasql.functions.DateTimestampPart"}
 
 	tests := []struct {
 		name       string
@@ -20,16 +21,19 @@ func TestTypeInterfaceDispatch(t *testing.T) {
 		wantKind   TypeKind
 		wantArray  bool
 		wantStruct bool
+		wantEnum   bool
 	}{
-		{"scalar", Int64Type(), Int64, false, false},
-		{"array", arr, Array, true, false},
-		{"struct", st, Struct, false, true},
+		{"scalar", Int64Type(), Int64, false, false, false},
+		{"array", arr, Array, true, false, false},
+		{"struct", st, Struct, false, true, false},
+		{"enum", en, Enum, false, false, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.wantKind, tt.typ.Kind())
 			assert.Equal(t, tt.wantArray, tt.typ.IsArray())
 			assert.Equal(t, tt.wantStruct, tt.typ.IsStruct())
+			assert.Equal(t, tt.wantEnum, tt.typ.IsEnum())
 		})
 	}
 }

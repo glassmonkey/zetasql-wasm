@@ -9,8 +9,10 @@ type Type interface {
 	Kind() TypeKind
 	IsArray() bool
 	IsStruct() bool
+	IsEnum() bool
 	AsArray() *ArrayType
 	AsStruct() *StructType
+	AsEnum() *EnumType
 	ToProto() *generated.TypeProto
 }
 
@@ -22,8 +24,10 @@ type scalarType struct {
 func (t *scalarType) Kind() TypeKind        { return t.kind }
 func (t *scalarType) IsArray() bool         { return false }
 func (t *scalarType) IsStruct() bool        { return false }
+func (t *scalarType) IsEnum() bool          { return false }
 func (t *scalarType) AsArray() *ArrayType   { return nil }
 func (t *scalarType) AsStruct() *StructType { return nil }
+func (t *scalarType) AsEnum() *EnumType     { return nil }
 func (t *scalarType) ToProto() *generated.TypeProto {
 	k := t.kind.toProto()
 	return &generated.TypeProto{TypeKind: &k}
