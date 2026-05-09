@@ -192,11 +192,12 @@ type accessorResult struct {
 }
 
 // accessorCase carries every fixture a typed-accessor test needs in
-// one row: the accessor's kind and matching Type, a happy-path Value
-// and the want it produces, a wrong-Go-type Value for the value-type-
-// mismatch axis, the zero return for any contract violation, a
-// distinct Type for the kind-mismatch axis, and a boxed call that
-// erases the per-accessor return type so all rows share one signature.
+// one row: the accessor's matching Type and a Type for the kind-
+// mismatch axis, a happy-path Value and the want it produces, a
+// wrong-Go-type Value for the value-type-mismatch axis, the zero
+// return for any contract violation, and a call that exercises the
+// accessor and returns the (got, ok) pair as accessorResult so every
+// row can share one signature.
 //
 // Holding all of this in the row (instead of looking it up through
 // helpers keyed off accessor name or kind) keeps the row itself the
@@ -213,8 +214,6 @@ type accessorCase struct {
 	call       func(*LiteralValue) accessorResult
 }
 
-func box(g any, ok bool) accessorResult { return accessorResult{Got: g, OK: ok} }
-
 // allAccessors enumerates every typed accessor on LiteralValue. The
 // HappyPath and ContractViolation tests both iterate this list so a
 // newly added accessor is forced into both axes by adding one row.
@@ -225,80 +224,119 @@ func allAccessors() []accessorCase {
 			name: "AsInt32", typ: Int32Type(), wrongTyp: Int64Type(),
 			happyValue: int32(7), happyWant: int32(7),
 			wrongValue: "not-int32", zero: int32(0),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsInt32()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsInt32()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsInt64", typ: Int64Type(), wrongTyp: Int32Type(),
 			happyValue: int64(42), happyWant: int64(42),
 			wrongValue: "not-int64", zero: int64(0),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsInt64()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsInt64()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsUint32", typ: Uint32Type(), wrongTyp: Int64Type(),
 			happyValue: uint32(7), happyWant: uint32(7),
 			wrongValue: "not-uint32", zero: uint32(0),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsUint32()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsUint32()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsUint64", typ: Uint64Type(), wrongTyp: Int64Type(),
 			happyValue: uint64(42), happyWant: uint64(42),
 			wrongValue: "not-uint64", zero: uint64(0),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsUint64()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsUint64()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsBool", typ: BoolType(), wrongTyp: Int64Type(),
 			happyValue: true, happyWant: true,
 			wrongValue: int64(1), zero: false,
-			call: func(v *LiteralValue) accessorResult { return box(v.AsBool()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsBool()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsFloat", typ: FloatType(), wrongTyp: Int64Type(),
 			happyValue: float32(1.5), happyWant: float32(1.5),
 			wrongValue: float64(1), zero: float32(0),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsFloat()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsFloat()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsDouble", typ: DoubleType(), wrongTyp: Int64Type(),
 			happyValue: float64(2.5), happyWant: float64(2.5),
 			wrongValue: float32(1), zero: float64(0),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsDouble()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsDouble()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsString", typ: StringType(), wrongTyp: Int64Type(),
 			happyValue: "hello", happyWant: "hello",
 			wrongValue: []byte("not-string"), zero: "",
-			call: func(v *LiteralValue) accessorResult { return box(v.AsString()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsString()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsBytes", typ: BytesType(), wrongTyp: Int64Type(),
 			happyValue: []byte{0x01, 0x02}, happyWant: []byte{0x01, 0x02},
 			wrongValue: "not-bytes", zero: ([]byte)(nil),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsBytes()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsBytes()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsJson", typ: JsonType(), wrongTyp: Int64Type(),
 			happyValue: `{"k":1}`, happyWant: `{"k":1}`,
 			wrongValue: []byte("not-json"), zero: "",
-			call: func(v *LiteralValue) accessorResult { return box(v.AsJson()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsJson()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsDateDays", typ: DateType(), wrongTyp: Int64Type(),
 			happyValue: int32(20000), happyWant: int32(20000),
 			wrongValue: int64(1), zero: int32(0),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsDateDays()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsDateDays()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsTimeMicros", typ: TimeType(), wrongTyp: Int64Type(),
 			happyValue: int64(123456789), happyWant: int64(123456789),
 			wrongValue: int32(1), zero: int64(0),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsTimeMicros()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsTimeMicros()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsTimestamp", typ: TimestampType(), wrongTyp: Int64Type(),
 			happyValue: timestampFixture,
 			happyWant:  time.Date(2026, 5, 10, 12, 0, 0, 0, time.UTC),
 			wrongValue: int64(1), zero: time.Time{},
-			call: func(v *LiteralValue) accessorResult { return box(v.AsTimestamp()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsTimestamp()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name:       "AsArray",
@@ -307,7 +345,10 @@ func allAccessors() []accessorCase {
 			happyValue: ArrayValue{{Type: Int64Type(), Value: int64(1)}},
 			happyWant:  ArrayValue{{Type: Int64Type(), Value: int64(1)}},
 			wrongValue: "not-array", zero: (ArrayValue)(nil),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsArray()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsArray()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name:       "AsStruct",
@@ -316,31 +357,46 @@ func allAccessors() []accessorCase {
 			happyValue: StructValue{{Type: Int64Type(), Value: int64(1)}},
 			happyWant:  StructValue{{Type: Int64Type(), Value: int64(1)}},
 			wrongValue: "not-struct", zero: (StructValue)(nil),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsStruct()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsStruct()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsNumeric", typ: NumericType(), wrongTyp: Int64Type(),
 			happyValue: []byte{0xAA}, happyWant: []byte{0xAA},
 			wrongValue: "not-bytes", zero: ([]byte)(nil),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsNumeric()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsNumeric()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsBigNumeric", typ: BigNumericType(), wrongTyp: Int64Type(),
 			happyValue: []byte{0xBB}, happyWant: []byte{0xBB},
 			wrongValue: "not-bytes", zero: ([]byte)(nil),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsBigNumeric()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsBigNumeric()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsInterval", typ: IntervalType(), wrongTyp: Int64Type(),
 			happyValue: []byte{0xCC}, happyWant: []byte{0xCC},
 			wrongValue: "not-bytes", zero: ([]byte)(nil),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsInterval()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsInterval()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 		{
 			name: "AsGeography", typ: GeographyType(), wrongTyp: Int64Type(),
 			happyValue: []byte{0xDD}, happyWant: []byte{0xDD},
 			wrongValue: "not-bytes", zero: ([]byte)(nil),
-			call: func(v *LiteralValue) accessorResult { return box(v.AsGeography()) },
+			call: func(v *LiteralValue) accessorResult {
+				g, ok := v.AsGeography()
+				return accessorResult{Got: g, OK: ok}
+			},
 		},
 	}
 }
