@@ -233,6 +233,97 @@ func (e *Engine) AnalyzeNext(
 	return output, more, nil
 }
 
+// ParseNext parses the next statement from a multi-statement SQL string,
+// using the given ParseResumeLocation to track position. Returns the
+// parsed statement, whether more statements remain, and any error. Call
+// repeatedly with the same ParseResumeLocation until it returns false.
+// Symmetric to AnalyzeNext but skips semantic analysis.
+func (e *Engine) ParseNext(
+	ctx context.Context,
+	loc *ParseResumeLocation,
+) (*Statement, bool, error) {
+	request := &generated.ParseRequest{
+		Target: &generated.ParseRequest_ParseResumeLocation{
+			ParseResumeLocation: &generated.ParseResumeLocationProto{
+				Input:        &loc.Input,
+				BytePosition: &loc.BytePosition,
+			},
+		},
+	}
+	requestBytes, err := proto.Marshal(request)
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to marshal ParseRequest: %w", err)
+	}
+
+	mallocFn := e.module.ExportedFunction("malloc")
+	freeFn := e.module.ExportedFunction("free")
+	parseNextFn := e.module.ExportedFunction("parse_next_statement_proto")
+	freeProtoBuffer := e.module.ExportedFunction("free_proto_buffer")
+
+	reqSize := uint64(len(requestBytes))
+	results, err := mallocFn.Call(ctx, reqSize)
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to allocate memory: %w", err)
+	}
+	reqPtr := results[0]
+	defer func() { _, _ = freeFn.Call(ctx, reqPtr) }()
+
+	if !e.module.Memory().Write(uint32(reqPtr), requestBytes) {
+		return nil, false, fmt.Errorf("failed to write request to WASM memory")
+	}
+
+	results, err = parseNextFn.Call(ctx, reqPtr, reqSize)
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to call parse_next_statement_proto: %w", err)
+	}
+	resultPtr := results[0]
+	defer func() { _, _ = freeProtoBuffer.Call(ctx, resultPtr) }()
+
+	mem := e.module.Memory()
+	sizeBytes, ok := mem.Read(uint32(resultPtr), 4)
+	if !ok {
+		return nil, false, fmt.Errorf("failed to read size from WASM memory")
+	}
+	size := binary.LittleEndian.Uint32(sizeBytes)
+
+	dataBytes, ok := mem.Read(uint32(resultPtr)+4, size)
+	if !ok {
+		return nil, false, fmt.Errorf("failed to read data from WASM memory")
+	}
+
+	if msg := wasm.ParseResultMessage(dataBytes); msg != "" {
+		return nil, false, &ParseError{Message: msg}
+	}
+
+	response := &generated.ParseResponse{}
+	if err := proto.Unmarshal(dataBytes, response); err != nil {
+		return nil, false, fmt.Errorf("failed to unmarshal ParseResponse: %w", err)
+	}
+
+	parsedProto := response.GetParsedStatement()
+	if parsedProto == nil {
+		return nil, false, fmt.Errorf("ParseResponse contains no parsed_statement")
+	}
+
+	if response.ResumeBytePosition != nil {
+		loc.BytePosition = response.GetResumeBytePosition()
+	} else {
+		loc.BytePosition = int32(len(loc.Input))
+	}
+
+	parsedBytes, err := proto.Marshal(parsedProto)
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to re-marshal parsed statement: %w", err)
+	}
+	root, err := ast.StatementFromBytes(parsedBytes)
+	if err != nil {
+		return nil, false, err
+	}
+
+	more := int(loc.BytePosition) < len(loc.Input)
+	return &Statement{SQL: loc.Input, Root: root}, more, nil
+}
+
 // callAnalyze sends an AnalyzeRequest to the WASM bridge and returns the
 // resolved response together with the parser AST proto. The bridge frames
 // the success payload as

@@ -545,6 +545,64 @@ void* analyze_statement_proto(const void* request_ptr, uint32_t request_size) {
     return pack_analyze_payload(parsed_bytes, response_bytes);
 }
 
+// Parse the next statement from a multi-statement SQL string using a
+// ParseResumeLocation. Used by Go's Engine.ParseNext for incremental
+// parsing of scripts. Unlike analyze_statement_proto, this runs only
+// the parser without semantic analysis, so no catalog or analyzer
+// options are read from the request.
+//
+// request_ptr: pointer to serialized ParseRequest proto bytes
+// request_size: size of the request bytes
+// Returns: pointer to [uint32 size][ParseResponse proto bytes] on
+// success, or [uint32 size][error string] on failure (the Go side
+// distinguishes the two via the same magic-prefix protocol used by
+// every other proto endpoint).
+EMSCRIPTEN_KEEPALIVE
+void* parse_next_statement_proto(const void* request_ptr, uint32_t request_size) {
+    zetasql::local_service::ParseRequest request;
+    if (!request.ParseFromArray(request_ptr, request_size)) {
+        return pack_error("Failed to parse ParseRequest proto");
+    }
+
+    if (!request.has_parse_resume_location()) {
+        return pack_error("ParseRequest must contain parse_resume_location");
+    }
+
+    const std::string& sql = request.parse_resume_location().input();
+    zetasql::ParseResumeLocation resume_location =
+        zetasql::ParseResumeLocation::FromStringView(sql);
+    resume_location.set_byte_position(
+        request.parse_resume_location().byte_position());
+
+    zetasql::ParserOptions parser_options;
+    std::unique_ptr<zetasql::ParserOutput> parser_output;
+    bool at_end_of_input = false;
+    absl::Status status = zetasql::ParseNextStatement(
+        &resume_location, parser_options, &parser_output, &at_end_of_input);
+    if (!status.ok()) {
+        return pack_error(status.ToString());
+    }
+
+    zetasql::AnyASTStatementProto parsed_proto;
+    absl::Status parsed_status = zetasql::ParseTreeSerializer::Serialize(
+        parser_output->statement(), &parsed_proto);
+    if (!parsed_status.ok()) {
+        return pack_error("Failed to serialize parsed AST: " +
+                          parsed_status.ToString());
+    }
+
+    zetasql::local_service::ParseResponse response;
+    *response.mutable_parsed_statement() = parsed_proto;
+    response.set_resume_byte_position(resume_location.byte_position());
+
+    std::string response_bytes;
+    if (!response.SerializeToString(&response_bytes)) {
+        return pack_error("Failed to serialize ParseResponse");
+    }
+
+    return pack_proto(response_bytes);
+}
+
 // Free memory
 EMSCRIPTEN_KEEPALIVE
 void free_string(char* ptr) {
