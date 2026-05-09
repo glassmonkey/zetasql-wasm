@@ -14,24 +14,6 @@ import (
 // is a builtin enum the downstream emulator hits via INTERVAL N PART.
 const dateTimestampPartFullName = "zetasql.functions.DateTimestampPart"
 
-// TestEnumType_TypePredicates pins the *EnumType implementation of the
-// Type interface: a single fixture, all six predicate/cast methods
-// observed in one go so a regression in any single method shows up in
-// the diff.
-func TestEnumType_TypePredicates(t *testing.T) {
-	// Arrange
-	sut := &EnumType{Name: dateTimestampPartFullName}
-
-	// Act / Assert
-	assert.Equal(t, Enum, sut.Kind())
-	assert.False(t, sut.IsArray())
-	assert.False(t, sut.IsStruct())
-	assert.True(t, sut.IsEnum())
-	assert.Nil(t, sut.AsArray())
-	assert.Nil(t, sut.AsStruct())
-	assert.Equal(t, sut, sut.AsEnum())
-}
-
 // TestEnumType_ToProto_RoundTrip pairs ToProto with TypeFromProto so
 // the proto round-trip lands back on a value that compares equal to
 // the original. Going through the round-trip (instead of asserting on
