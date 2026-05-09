@@ -40,6 +40,12 @@ func TypeFromProto(p *generated.TypeProto) (Type, error) {
 			fields[i] = NewStructField(pf.GetFieldName(), ft)
 		}
 		return NewStructType(fields)
+	case Enum:
+		et := p.GetEnumType()
+		if et == nil {
+			return nil, fmt.Errorf("TypeProto has ENUM kind but no EnumType field")
+		}
+		return NewEnumType(et.GetEnumName())
 	default:
 		if t := TypeFromKind(kind); t != nil {
 			return t, nil

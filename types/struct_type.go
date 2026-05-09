@@ -6,8 +6,8 @@ import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 //
 // Type can be nil. The most common path producing nil Type is WrapType
 // from a proto whose field used a kind WrapType does not yet model
-// (ENUM, PROTO, EXTENDED). NewStructField does not reject nil Type;
-// callers iterating Fields should be ready to see it.
+// (PROTO, EXTENDED). NewStructField does not reject nil Type; callers
+// iterating Fields should be ready to see it.
 type StructField struct {
 	Name string
 	Type Type
@@ -35,8 +35,10 @@ func NewStructType(fields []*StructField) (*StructType, error) {
 func (t *StructType) Kind() TypeKind        { return Struct }
 func (t *StructType) IsArray() bool         { return false }
 func (t *StructType) IsStruct() bool        { return true }
+func (t *StructType) IsEnum() bool          { return false }
 func (t *StructType) AsArray() *ArrayType   { return nil }
 func (t *StructType) AsStruct() *StructType { return t }
+func (t *StructType) AsEnum() *EnumType     { return nil }
 
 func (t *StructType) ToProto() *generated.TypeProto {
 	k := Struct.toProto()

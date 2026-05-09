@@ -21,15 +21,17 @@ import (
 //	DATE                                  int32 (days since 1970-01-01)
 //	TIME                                  int64 (encoded time-of-day)
 //	TIMESTAMP                             *timestamppb.Timestamp
+//	ENUM                                  int32 (proto enum number;
+//	                                      Type.AsEnum().NameOf resolves it)
 //	ARRAY                                 ArrayValue (recursive)
 //	STRUCT                                StructValue (recursive)
 //	NULL (proto: empty oneof)             nil
 //
 // Kinds whose proto representation is a nested proto message that is
 // not yet wrapped (DATETIME, TIMESTAMP_PICOS, RANGE, MAP, TOKENLIST,
-// UUID), and the kinds WrapType itself does not yet model (ENUM,
-// PROTO, EXTENDED), currently come back with Value=nil. The wrap
-// surface will grow as actual callers ask for them.
+// UUID), and the kinds WrapType itself does not yet model (PROTO,
+// EXTENDED), currently come back with Value=nil. The wrap surface
+// will grow as actual callers ask for them.
 type LiteralValue struct {
 	Type  Type
 	Value any
@@ -105,6 +107,8 @@ func convertValue(typ Type, v *generated.ValueProto) any {
 		return v.GetJsonValue()
 	case Interval:
 		return v.GetIntervalValue()
+	case Enum:
+		return v.GetEnumValue()
 	case Array:
 		elemType := typ.AsArray().ElementType
 		ps := v.GetArrayValue().GetElement()
@@ -229,3 +233,23 @@ func (v *LiteralValue) AsInterval() ([]byte, bool) { return asScalar[[]byte](v, 
 
 // AsGeography returns the GEOGRAPHY value's proto-encoded payload.
 func (v *LiteralValue) AsGeography() ([]byte, bool) { return asScalar[[]byte](v, Geography) }
+
+// AsEnumNumber returns the ENUM value's proto enum number. Use
+// AsEnumName when the human-readable name is what the caller actually
+// wants — most call sites do.
+func (v *LiteralValue) AsEnumNumber() (int32, bool) { return asScalar[int32](v, Enum) }
+
+// AsEnumName returns the ENUM value's declared name (e.g. "DAY" for
+// DateTimestampPart=3) by dispatching through Type.AsEnum().NameOf.
+// Returns ("", false) under any of the typed-accessor contract
+// violations (nil receiver / nil Type / kind mismatch / value type
+// mismatch / SQL NULL) and additionally when the enum descriptor is
+// not registered in protoregistry.GlobalTypes or the number is
+// undefined for this enum.
+func (v *LiteralValue) AsEnumName() (string, bool) {
+	n, ok := asScalar[int32](v, Enum)
+	if !ok {
+		return "", false
+	}
+	return v.Type.AsEnum().NameOf(n)
+}

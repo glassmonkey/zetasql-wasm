@@ -8,19 +8,23 @@ import (
 )
 
 // TestWrapType covers the read-side wrap contract: scalar kinds return
-// the package singleton, ARRAY / STRUCT recurse, ENUM / PROTO / EXTENDED
-// surface as nil (documented gap), and an array of an unsupported kind
-// collapses the whole array to nil while a struct preserves field names
-// even when individual field types are unsupported. Triangulated across
-// nil input, two scalar kinds, two compound shapes, an unsupported kind,
-// and the asymmetric array-vs-struct fallback so a future regression in
-// any one branch shows up in the diff.
+// the package singleton, ARRAY / STRUCT recurse, ENUM lifts to
+// *EnumType, PROTO / EXTENDED surface as nil (documented gap), and an
+// array of an unsupported kind collapses the whole array to nil while
+// a struct preserves field names even when individual field types are
+// unsupported. Triangulated across nil input, two scalar kinds, two
+// compound shapes, an enum (now wrapped), an unsupported kind, and the
+// asymmetric array-vs-struct fallback so a future regression in any
+// one branch shows up in the diff.
 func TestWrapType(t *testing.T) {
 	int64Kind := generated.TypeKind_TYPE_INT64
 	stringKind := generated.TypeKind_TYPE_STRING
 	arrayKind := generated.TypeKind_TYPE_ARRAY
 	structKind := generated.TypeKind_TYPE_STRUCT
 	enumKind := generated.TypeKind_TYPE_ENUM
+	protoKind := generated.TypeKind_TYPE_PROTO
+
+	enumType := &generated.EnumTypeProto{EnumName: ptr("zetasql.functions.DateTimestampPart")}
 
 	tests := []struct {
 		name string
@@ -82,18 +86,28 @@ func TestWrapType(t *testing.T) {
 			want: &StructType{Fields: []*StructField{}},
 		},
 		{
-			name: "ENUM returns nil (documented gap)",
+			name: "ENUM with enum_name lifts to *EnumType",
+			in:   &generated.TypeProto{TypeKind: &enumKind, EnumType: enumType},
+			want: &EnumType{Name: "zetasql.functions.DateTimestampPart"},
+		},
+		{
+			name: "ENUM with no enum_name returns nil (malformed proto)",
 			in:   &generated.TypeProto{TypeKind: &enumKind},
 			want: nil,
 		},
 		{
-			name: "ARRAY of ENUM collapses to nil (element type unsupported)",
+			name: "ARRAY of ENUM wraps recursively",
 			in: &generated.TypeProto{
 				TypeKind: &arrayKind,
 				ArrayType: &generated.ArrayTypeProto{
-					ElementType: &generated.TypeProto{TypeKind: &enumKind},
+					ElementType: &generated.TypeProto{TypeKind: &enumKind, EnumType: enumType},
 				},
 			},
+			want: &ArrayType{ElementType: &EnumType{Name: "zetasql.functions.DateTimestampPart"}},
+		},
+		{
+			name: "PROTO returns nil (documented gap)",
+			in:   &generated.TypeProto{TypeKind: &protoKind},
 			want: nil,
 		},
 		{
@@ -103,7 +117,7 @@ func TestWrapType(t *testing.T) {
 				StructType: &generated.StructTypeProto{
 					Field: []*generated.StructFieldProto{
 						{FieldName: ptr("ok"), FieldType: &generated.TypeProto{TypeKind: &int64Kind}},
-						{FieldName: ptr("dropped"), FieldType: &generated.TypeProto{TypeKind: &enumKind}},
+						{FieldName: ptr("dropped"), FieldType: &generated.TypeProto{TypeKind: &protoKind}},
 					},
 				},
 			},

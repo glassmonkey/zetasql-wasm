@@ -12,16 +12,18 @@ import (
 // TestWrapLiteralValue covers the read-side contract end to end:
 // nil-on-nil, NULL semantics (proto oneof unset → Value=nil), scalar
 // dispatch round-tripping a representative set of primitive kinds,
-// ARRAY recursion, STRUCT recursion, and the documented gap kinds
-// (DATETIME has a Type but no wrappable Value yet) plus a defensive
-// case for malformed STRUCT input.
+// ARRAY recursion, STRUCT recursion, ENUM literals (proto enum number
+// surfaces as int32), and the documented gap kinds (DATETIME has a
+// Type but no wrappable Value yet) plus a defensive case for
+// malformed STRUCT input.
 //
-// Triangulation across nil / NULL / two scalars / two compounds / one
-// gap / one defensive case so a regression in any single dispatch
-// branch shows up in the diff.
+// Triangulation across nil / NULL / two scalars / two compounds / an
+// enum / one gap / one defensive case so a regression in any single
+// dispatch branch shows up in the diff.
 func TestWrapLiteralValue(t *testing.T) {
 	arrayKind := generated.TypeKind_TYPE_ARRAY
 	structKind := generated.TypeKind_TYPE_STRUCT
+	enumKind := generated.TypeKind_TYPE_ENUM
 
 	// typeOf returns a fresh *generated.TypeProto for the given scalar
 	// kind on each call. A factory (rather than function-scope shared
@@ -124,6 +126,24 @@ func TestWrapLiteralValue(t *testing.T) {
 					{Type: Int64Type(), Value: int64(42)},
 					{Type: StringType(), Value: "x"},
 				},
+			},
+		},
+		{
+			name: "ENUM DateTimestampPart=DAY (3) yields Value=int32(3)",
+			in: &generated.ValueWithTypeProto{
+				Type: &generated.TypeProto{
+					TypeKind: &enumKind,
+					EnumType: &generated.EnumTypeProto{
+						EnumName: ptr("zetasql.functions.DateTimestampPart"),
+					},
+				},
+				Value: &generated.ValueProto{
+					Value: &generated.ValueProto_EnumValue{EnumValue: 3},
+				},
+			},
+			want: &LiteralValue{
+				Type:  &EnumType{Name: "zetasql.functions.DateTimestampPart"},
+				Value: int32(3),
 			},
 		},
 		{
@@ -316,6 +336,24 @@ func TestLiteralValue_TypedAccessors_HappyPath(t *testing.T) {
 			want: []byte{0xDD},
 			call: func(v *LiteralValue) (any, bool) { return v.AsGeography() },
 		},
+		{
+			name: "AsEnumNumber",
+			in: &LiteralValue{
+				Type:  &EnumType{Name: "zetasql.functions.DateTimestampPart"},
+				Value: int32(3),
+			},
+			want: int32(3),
+			call: func(v *LiteralValue) (any, bool) { return v.AsEnumNumber() },
+		},
+		{
+			name: "AsEnumName resolves DAY via protoregistry",
+			in: &LiteralValue{
+				Type:  &EnumType{Name: "zetasql.functions.DateTimestampPart"},
+				Value: int32(3),
+			},
+			want: "DAY",
+			call: func(v *LiteralValue) (any, bool) { return v.AsEnumName() },
+		},
 	}
 
 	for _, tt := range tests {
@@ -455,6 +493,22 @@ func TestLiteralValue_TypedAccessors_ContractViolation(t *testing.T) {
 			wrongValue: "not-bytes", zero: ([]byte)(nil),
 			call: func(v *LiteralValue) (any, bool) { return v.AsGeography() },
 		},
+		{
+			name:       "AsEnumNumber",
+			typ:        &EnumType{Name: "zetasql.functions.DateTimestampPart"},
+			wrongTyp:   Int64Type(),
+			wrongValue: "not-int32",
+			zero:       int32(0),
+			call:       func(v *LiteralValue) (any, bool) { return v.AsEnumNumber() },
+		},
+		{
+			name:       "AsEnumName",
+			typ:        &EnumType{Name: "zetasql.functions.DateTimestampPart"},
+			wrongTyp:   Int64Type(),
+			wrongValue: "not-int32",
+			zero:       "",
+			call:       func(v *LiteralValue) (any, bool) { return v.AsEnumName() },
+		},
 	}
 
 	for _, a := range accessors {
@@ -503,4 +557,53 @@ func TestLiteralValue_AsTimestamp_TypedNilPointer(t *testing.T) {
 	// Assert
 	assert.False(t, ok)
 	assert.Equal(t, time.Time{}, got)
+}
+
+// TestLiteralValue_AsEnumName_NameOfFailure covers the AsEnumName
+// failure modes that AsEnumNumber (which stops at asScalar) cannot
+// reach: kind matches and Value is a valid int32, but the descriptor
+// lookup or value-by-number lookup fails. The number/typed-accessor
+// contract is already pinned by the shared ContractViolation table;
+// this test pins the NameOf-specific fall-throughs.
+func TestLiteralValue_AsEnumName_NameOfFailure(t *testing.T) {
+	tests := []struct {
+		name string
+		in   *LiteralValue
+	}{
+		{
+			name: "registered enum but undefined number",
+			in: &LiteralValue{
+				Type:  &EnumType{Name: "zetasql.functions.DateTimestampPart"},
+				Value: int32(9999),
+			},
+		},
+		{
+			name: "unregistered enum name",
+			in: &LiteralValue{
+				Type:  &EnumType{Name: "no.such.Enum"},
+				Value: int32(1),
+			},
+		},
+		{
+			name: "empty enum name",
+			in: &LiteralValue{
+				Type:  &EnumType{Name: ""},
+				Value: int32(1),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := tt.in
+
+			// Act
+			got, ok := sut.AsEnumName()
+
+			// Assert
+			assert.False(t, ok)
+			assert.Equal(t, "", got)
+		})
+	}
 }

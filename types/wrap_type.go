@@ -9,15 +9,19 @@ import "github.com/glassmonkey/zetasql-wasm/wasm/generated"
 //   - Scalar kinds — returns the singleton from scalarTypes (same value
 //     Int64Type, StringType, etc. return), zero allocations.
 //   - ARRAY — recurses on the element type. If the element type is not
-//     wrappable (e.g. an array of ENUM today), the whole array maps to
+//     wrappable (e.g. an array of PROTO today), the whole array maps to
 //     nil because an array's identity is its element type.
 //   - STRUCT — recurses field-by-field. A field whose Type is not
 //     wrappable becomes a *StructField with Type=nil; the field name is
 //     still preserved so callers iterating field names get full coverage.
 //     When the result is a *StructType, Fields is non-nil (possibly
 //     empty) so callers can range without a nil-check.
+//   - ENUM — returns *EnumType carrying the proto enum's full name.
+//     A proto whose EnumTypeProto carries no enum_name is treated as
+//     malformed and maps to nil; without a name there is no way to
+//     dispatch NameOf later.
 //
-// ENUM, PROTO, and EXTENDED return nil today: those kinds reference an
+// PROTO and EXTENDED return nil today: those kinds reference an
 // external descriptor or extension type that types.Type does not model
 // on the read side yet. Callers needing them inspect the proto directly
 // until the wrap surface grows.
@@ -46,6 +50,12 @@ func WrapType(p *generated.TypeProto) Type {
 			}
 		}
 		return &StructType{Fields: fields}
+	case Enum:
+		name := p.GetEnumType().GetEnumName()
+		if name == "" {
+			return nil
+		}
+		return &EnumType{Name: name}
 	}
 	return nil
 }
