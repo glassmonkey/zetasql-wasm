@@ -340,22 +340,25 @@ func (e *Engine) callAnalyze(
 	opts *AnalyzerOptions,
 ) (*generated.AnalyzeResponse, *generated.AnyASTStatementProto, error) {
 	if cat != nil {
-		request.SimpleCatalog = cat.ToProto()
-	} else {
-		request.SimpleCatalog = &generated.SimpleCatalogProto{}
+		// Attach ZetaSQL built-in functions (+, =, COUNT, CAST, ...) to the
+		// caller's catalog. LanguageOptions is shared with the analyzer so
+		// the loaded builtin set matches the SQL dialect (PRODUCT_INTERNAL
+		// vs PRODUCT_EXTERNAL, feature flags, ...).
+		catProto := cat.ToProto()
+		builtinOpts := &generated.ZetaSQLBuiltinFunctionOptionsProto{}
+		if opts != nil && opts.Language != nil {
+			builtinOpts.LanguageOptions = opts.Language.toProto()
+		}
+		catProto.BuiltinFunctionOptions = builtinOpts
+		request.SimpleCatalog = catProto
 	}
+	// When cat == nil the WASM bridge falls back to a default catalog with
+	// all ZetaSQL builtins loaded; do not synthesize an empty SimpleCatalog
+	// here, as the proto-driven path produced different WASM behaviour on
+	// Linux that the in-bridge fallback does not.
 	if opts != nil {
 		request.Options = opts.toProto()
 	}
-	// ZetaSQL built-in functions (+, =, COUNT, CAST, ...) are required for
-	// almost any real query, so they are always loaded. LanguageOptions is
-	// shared with the analyzer so the loaded builtin set matches the SQL
-	// dialect (PRODUCT_INTERNAL vs PRODUCT_EXTERNAL, feature flags, ...).
-	builtinOpts := &generated.ZetaSQLBuiltinFunctionOptionsProto{}
-	if opts != nil && opts.Language != nil {
-		builtinOpts.LanguageOptions = opts.Language.toProto()
-	}
-	request.SimpleCatalog.BuiltinFunctionOptions = builtinOpts
 
 	requestBytes, err := proto.Marshal(request)
 	if err != nil {
