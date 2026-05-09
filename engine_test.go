@@ -57,17 +57,6 @@ func newAnalyticOpts() *AnalyzerOptions {
 	return &AnalyzerOptions{Language: lang}
 }
 
-// newBigQueryFunctionExtensionsOpts returns AnalyzerOptions with the
-// language feature set required to resolve BigQuery extension scalar
-// functions (LAST_DAY, INITCAP, ..., STRING(json)). Used by
-// TestEngine_Analyze_BigQueryFunctionExtensions and any other test that
-// exercises a BigQuery-only function.
-func newBigQueryFunctionExtensionsOpts() *AnalyzerOptions {
-	lang := NewLanguageOptions()
-	lang.EnableBigQueryFunctionExtensions()
-	return &AnalyzerOptions{Language: lang}
-}
-
 // newQueryStmtAnalyzerOptions builds AnalyzerOptions configured to
 // accept top-level QUERY statements — the only statement kind the
 // parameter-flow integration tests need. Returns a fresh instance per
@@ -1552,17 +1541,23 @@ func TestEngine_Analyze_CustomFunctions(t *testing.T) {
 `,
 		},
 		{
+			// Function name "double" is reserved by the auto-applied
+			// BigQuery extension feature set: FEATURE_JSON_VALUE_EXTRACTION_FUNCTIONS
+			// registers DOUBLE(json) as the FLOAT64-from-json alias.
+			// Picking a non-overlapping name keeps this case focused on
+			// "single int64 arg in a non-default group" without colliding
+			// with the analyzer's BigQuery-extension surface.
 			name:       "single int64 arg in math group",
-			funcName:   "double",
+			funcName:   "twice",
 			group:      "math",
 			returnType: int64Arg,
 			argTypes:   []*types.FunctionArgumentType{int64Arg},
-			sql:        "SELECT double(7)",
+			sql:        "SELECT twice(7)",
 			want: `KindQueryStmt
   KindOutputColumn $col1
   KindProjectScan
     KindComputedColumn
-      KindFunctionCall math:double
+      KindFunctionCall math:twice
         KindLiteral 7
     KindSingleRowScan
 `,
@@ -2542,16 +2537,18 @@ func TestEngine_Parse(t *testing.T) {
 	}
 }
 
-// TestEngine_Analyze_BigQueryFunctionExtensions locks the contract that
-// LanguageOptions.EnableBigQueryFunctionExtensions opens up: with that
-// helper applied to AnalyzerOptions, every listed BigQuery-only scalar
-// function resolves through the auto-loaded catalog. wantResolved spells
-// out the resolved AST for each case so the function name produced by
-// alias resolution (SUBSTRING → substr, REGEXP_SUBSTR → regexp_extract)
-// and any extra arguments the analyzer injects (FLOAT64(json) gets a
-// trailing "round" wide_number_mode literal) are pinned, not just the
-// fact that resolution succeeds.
-func TestEngine_Analyze_BigQueryFunctionExtensions(t *testing.T) {
+// TestEngine_Analyze_BigQueryFunctions locks the contract that
+// Engine.Analyze resolves BigQuery extension scalar functions out of
+// the box, with no caller-side opt-in. zetasql-wasm targets BigQuery
+// compatibility, so the catalog auto-load (#53) is paired in
+// callAnalyze with a BigQuery-extension LanguageFeature set applied to
+// every Analyze call — the cases here pass nil AnalyzerOptions and
+// still resolve every listed function. wantResolved spells out the
+// resolved AST so alias resolution (SUBSTRING -> substr, REGEXP_SUBSTR
+// -> regexp_extract) and analyzer-injected arguments (FLOAT64(json)
+// gets a trailing "round" wide_number_mode literal) are pinned, not
+// just the fact that resolution succeeds.
+func TestEngine_Analyze_BigQueryFunctions(t *testing.T) {
 	tests := []struct {
 		name         string
 		sql          string
@@ -2716,10 +2713,9 @@ func TestEngine_Analyze_BigQueryFunctionExtensions(t *testing.T) {
 			ctx := t.Context()
 			sut := newTestEngine(t)
 			cat := newBuiltinsCatalog()
-			opts := newBigQueryFunctionExtensionsOpts()
 
 			// Act
-			out, err := sut.Analyze(ctx, tt.sql, cat, opts)
+			out, err := sut.Analyze(ctx, tt.sql, cat, nil)
 
 			// Assert
 			require.NoError(t, err)

@@ -52,6 +52,12 @@ const (
 	FeatureV12WeekWithWeekday  LanguageFeature = LanguageFeature(generated.LanguageFeature_FEATURE_V_1_2_WEEK_WITH_WEEKDAY)
 )
 
+// V_1_4 features.
+const (
+	FeatureV14AliasesForStringAndDateFunctions LanguageFeature = LanguageFeature(generated.LanguageFeature_FEATURE_V_1_4_ALIASES_FOR_STRING_AND_DATE_FUNCTIONS)
+	FeatureV14JsonMoreValueExtractionFunctions LanguageFeature = LanguageFeature(generated.LanguageFeature_FEATURE_V_1_4_JSON_MORE_VALUE_EXTRACTION_FUNCTIONS)
+)
+
 // V_1_3 features.
 const (
 	FeatureV13AdditionalStringFunctions   LanguageFeature = LanguageFeature(generated.LanguageFeature_FEATURE_V_1_3_ADDITIONAL_STRING_FUNCTIONS)
