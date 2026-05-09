@@ -4,7 +4,6 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
 	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/google/go-cmp/cmp"
@@ -314,22 +313,23 @@ func TestAnalyzerOptions_NamedQueryParameters_AnalyzerIntegration(t *testing.T) 
 		params                    map[string]types.Type
 		allowUndeclaredParameters bool
 		sql                       string
-		// wantParam is the observable shape of the resolved tree's
-		// first ParameterNode. Ignored when wantErr is non-nil.
-		wantParam observedParam
-		wantErr   error
+		// wantParams is the observable sequence of every ParameterNode
+		// in the resolved tree, in tree-walk order. Ignored when
+		// wantErr is non-nil.
+		wantParams []observedParam
+		wantErr    error
 	}{
 		{
-			name:      "INT64 parameter @id resolves to declared INT64",
-			params:    map[string]types.Type{"id": types.Int64Type()},
-			sql:       "SELECT @id",
-			wantParam: observedParam{TypeKind: generated.TypeKind_TYPE_INT64},
+			name:       "INT64 parameter @id resolves to declared INT64",
+			params:     map[string]types.Type{"id": types.Int64Type()},
+			sql:        "SELECT @id",
+			wantParams: []observedParam{{TypeKind: generated.TypeKind_TYPE_INT64}},
 		},
 		{
-			name:      "STRING parameter @label resolves to declared STRING",
-			params:    map[string]types.Type{"label": types.StringType()},
-			sql:       "SELECT @label",
-			wantParam: observedParam{TypeKind: generated.TypeKind_TYPE_STRING},
+			name:       "STRING parameter @label resolves to declared STRING",
+			params:     map[string]types.Type{"label": types.StringType()},
+			sql:        "SELECT @label",
+			wantParams: []observedParam{{TypeKind: generated.TypeKind_TYPE_STRING}},
 		},
 		{
 			name:    "undeclared @nope rejected under strict mode",
@@ -350,13 +350,13 @@ func TestAnalyzerOptions_NamedQueryParameters_AnalyzerIntegration(t *testing.T) 
 			// in permissive mode but flags IsUntyped so callers can
 			// tell it apart from a declared INT64 (asserted on the
 			// next case as well).
-			wantParam: observedParam{TypeKind: generated.TypeKind_TYPE_INT64, IsUntyped: true},
+			wantParams: []observedParam{{TypeKind: generated.TypeKind_TYPE_INT64, IsUntyped: true}},
 		},
 		{
 			name:                      "AllowUndeclaredParameters resolves @label as untyped INT64",
 			allowUndeclaredParameters: true,
 			sql:                       "SELECT @label",
-			wantParam:                 observedParam{TypeKind: generated.TypeKind_TYPE_INT64, IsUntyped: true},
+			wantParams:                []observedParam{{TypeKind: generated.TypeKind_TYPE_INT64, IsUntyped: true}},
 		},
 	}
 
@@ -364,14 +364,14 @@ func TestAnalyzerOptions_NamedQueryParameters_AnalyzerIntegration(t *testing.T) 
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			a := newTestEngine(t)
+			sut := newTestEngine(t)
 			opts := newQueryStmtAnalyzerOptions()
 			opts.ParameterMode = ParameterNamed
 			opts.QueryParameters = tt.params
 			opts.AllowUndeclaredParameters = tt.allowUndeclaredParameters
 
 			// Act
-			got, err := a.Analyze(ctx, tt.sql, nil, opts)
+			got, err := sut.Analyze(ctx, tt.sql, nil, opts)
 
 			// Assert
 			if tt.wantErr != nil {
@@ -381,17 +381,7 @@ func TestAnalyzerOptions_NamedQueryParameters_AnalyzerIntegration(t *testing.T) 
 			}
 			require.NoError(t, err)
 			require.NotNil(t, got)
-			stmt, ok := got.Resolved.(*resolved_ast.QueryStmtNode)
-			require.True(t, ok, "Resolved is %T, want *resolved_ast.QueryStmtNode", got.Resolved)
-			var param *resolved_ast.ParameterNode
-			_ = resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
-				if p, ok := n.(*resolved_ast.ParameterNode); ok && param == nil {
-					param = p
-				}
-				return nil
-			})
-			require.NotNil(t, param, "expected a ParameterNode in resolved tree")
-			assert.Equal(t, tt.wantParam, observeParam(param))
+			assert.Equal(t, tt.wantParams, observeParams(got.Resolved))
 		})
 	}
 }

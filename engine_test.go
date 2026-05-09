@@ -71,18 +71,37 @@ func newQueryStmtAnalyzerOptions() *AnalyzerOptions {
 
 // observedParam is the projection of *resolved_ast.ParameterNode the
 // parameter-flow integration tests assert on — the resolved type kind
-// and whether the analyzer marked the parameter untyped. Combining
-// both into one tuple keeps each happy case to a single assert.Equal.
+// and whether the analyzer marked the parameter untyped. The full
+// *ParameterNode carries internal location/parent information that
+// would make a direct equality assertion sensitive to fields the test
+// does not actually care about; projecting to this two-field tuple
+// keeps the assertion focused on the parameter-resolution contract.
 type observedParam struct {
 	TypeKind  generated.TypeKind
 	IsUntyped bool
 }
 
-func observeParam(p *resolved_ast.ParameterNode) observedParam {
-	return observedParam{
-		TypeKind:  p.Type().GetTypeKind(),
-		IsUntyped: p.IsUntyped(),
-	}
+// observeParams walks the resolved tree and returns one observedParam
+// per ParameterNode in tree-walk order. Returning every node (rather
+// than only the first match) lets each test case assert on the full
+// sequence as a single slice equality: a regression that mistypes the
+// second positional parameter shows up as a slice diff instead of
+// slipping past a first-match probe. Having a single observe helper
+// (rather than singular/all variants) removes the discretionary call
+// at each test site that would otherwise be a recurring source of
+// false-negative tests.
+func observeParams(root resolved_ast.Node) []observedParam {
+	var got []observedParam
+	_ = resolved_ast.Walk(root, func(n resolved_ast.Node) error {
+		if p, ok := n.(*resolved_ast.ParameterNode); ok {
+			got = append(got, observedParam{
+				TypeKind:  p.Type().GetTypeKind(),
+				IsUntyped: p.IsUntyped(),
+			})
+		}
+		return nil
+	})
+	return got
 }
 
 // ----- Tests -----
@@ -531,24 +550,66 @@ func TestEngine_Analyze(t *testing.T) {
 	}
 }
 
-// TestEngine_Analyze_ParsedAST locks the contract this PR introduces at
-// the engine front door: Engine.Analyze returns, in AnalyzeOutput.Parsed,
-// the same parser AST that Engine.Parse would produce for the same SQL.
-// The reference tree comes from Engine.Parse rather than a hand-written
-// string so the parser format itself stays a single source of truth in
-// TestEngine_Parse — a parser format change breaks one place, not two.
-// Triangulated across SQL families (literal, table scan, function call)
-// so a regression that nils Parsed for one family but not another
-// surfaces.
+// TestEngine_Analyze_ParsedAST locks the contract that Engine.Analyze
+// populates AnalyzeOutput.Parsed with the parser AST for the same SQL.
+// The expected AST strings are hardcoded so the test reads as a
+// specification of the parser-AST shape rather than delegating that
+// definition to another SUT method (which would let a regression that
+// nils both endpoints in lock-step still pass). Triangulated across
+// SQL families (literal, table scan, function call) so a regression
+// that nils Parsed for one family but not another surfaces.
 func TestEngine_Analyze_ParsedAST(t *testing.T) {
 	tests := []struct {
 		name string
 		sql  string
 		cat  *types.SimpleCatalog
+		want string
 	}{
-		{name: "literal", sql: "SELECT 1", cat: newBuiltinsCatalog()},
-		{name: "table scan with column reference", sql: "SELECT id FROM users", cat: newUsersCatalog()},
-		{name: "function call", sql: "SELECT UPPER('x')", cat: newBuiltinsCatalog()},
+		{
+			name: "literal",
+			sql:  "SELECT 1",
+			cat:  newBuiltinsCatalog(),
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [1]
+`,
+		},
+		{
+			name: "table scan with column reference",
+			sql:  "SELECT id FROM users",
+			cat:  newUsersCatalog(),
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+`,
+		},
+		{
+			name: "function call",
+			sql:  "SELECT UPPER('x')",
+			cat:  newBuiltinsCatalog(),
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [UPPER]
+            KindStringLiteral [x]
+              KindStringLiteralComponent
+`,
+		},
 	}
 
 	for _, tt := range tests {
@@ -556,36 +617,184 @@ func TestEngine_Analyze_ParsedAST(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
 			sut := newTestEngine(t)
-			parsed, err := sut.Parse(ctx, tt.sql)
-			require.NoError(t, err)
-			want := parsed.Root.String()
 
 			// Act
 			out, err := sut.Analyze(ctx, tt.sql, tt.cat, NewAnalyzerOptions())
 			require.NoError(t, err)
 			require.NotNil(t, out.Parsed, "AnalyzeOutput.Parsed must be populated")
-			got := out.Parsed.String()
 
 			// Assert
-			assert.Equal(t, want, got)
+			assert.Equal(t, tt.want, out.Parsed.String())
 		})
 	}
 }
 
-// TestEngine_AnalyzeNext_ParsedAST locks the same parser-AST contract on
-// the multi-statement bridge path. The path uses ParseNextStatement +
-// AnalyzeStatementFromParserOutputUnowned in C++, separate wiring from
-// the single-statement path, so a regression that nils Parsed only here
-// would slip past the single-statement case above. Reference trees come
-// from Engine.Parse on each statement substring rather than hand-written
-// strings, for the same single-source-of-truth reason as above.
-func TestEngine_AnalyzeNext_ParsedAST(t *testing.T) {
+// TestEngine_AnalyzeNext locks the contract Engine.AnalyzeNext provides
+// when consuming a multi-statement SQL string: each iteration returns a
+// populated Parsed AST and Resolved AST, and the ParseResumeLocation
+// has advanced to the end of the input by the time the loop exits. All
+// three observations share the same fixture (engine, default
+// AnalyzerOptions, joined ParseResumeLocation) so they live in a single
+// test function — splitting them per observation axis would create the
+// "where do I add the next case" decision the fixture-axis split rule
+// is designed to prevent.
+func TestEngine_AnalyzeNext(t *testing.T) {
 	tests := []struct {
-		name       string
-		statements []string
+		name         string
+		statements   []string
+		cat          *types.SimpleCatalog // nil → analyzer uses no catalog
+		wantParsed   []string
+		wantResolved []string
+		wantLoc      ParseResumeLocation
 	}{
-		{name: "two literals", statements: []string{"SELECT 1", "SELECT 2"}},
-		{name: "three literals", statements: []string{"SELECT 1", "SELECT 2", "SELECT 3"}},
+		{
+			name:       "two literals",
+			statements: []string{"SELECT 1", "SELECT 2"},
+			wantParsed: []string{
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [1]
+`,
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [2]
+`,
+			},
+			wantResolved: []string{
+				`KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindLiteral 1
+    KindSingleRowScan
+`,
+				`KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindLiteral 2
+    KindSingleRowScan
+`,
+			},
+			wantLoc: ParseResumeLocation{
+				Input:        "SELECT 1; SELECT 2",
+				BytePosition: int32(len("SELECT 1; SELECT 2")),
+			},
+		},
+		{
+			name:       "three literals",
+			statements: []string{"SELECT 1", "SELECT 2", "SELECT 3"},
+			wantParsed: []string{
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [1]
+`,
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [2]
+`,
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindIntLiteral [3]
+`,
+			},
+			wantResolved: []string{
+				`KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindLiteral 1
+    KindSingleRowScan
+`,
+				`KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindLiteral 2
+    KindSingleRowScan
+`,
+				`KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindLiteral 3
+    KindSingleRowScan
+`,
+			},
+			wantLoc: ParseResumeLocation{
+				Input:        "SELECT 1; SELECT 2; SELECT 3",
+				BytePosition: int32(len("SELECT 1; SELECT 2; SELECT 3")),
+			},
+		},
+		{
+			// Statements of different lengths and SQL families exercise
+			// the multi-statement bridge's `;` boundary detection and
+			// cumulative BytePosition arithmetic on input shapes that
+			// the literal-only cases above do not reach.
+			name:       "function call then arithmetic",
+			statements: []string{"SELECT UPPER('hi')", "SELECT 1 + 2"},
+			cat:        newBuiltinsCatalog(),
+			wantParsed: []string{
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [UPPER]
+            KindStringLiteral [hi]
+              KindStringLiteralComponent
+`,
+				`KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindBinaryExpression
+            KindIntLiteral [1]
+            KindIntLiteral [2]
+`,
+			},
+			wantResolved: []string{
+				`KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:upper
+        KindLiteral "hi"
+    KindSingleRowScan
+`,
+				`KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:$add
+        KindLiteral 1
+        KindLiteral 2
+    KindSingleRowScan
+`,
+			},
+			wantLoc: ParseResumeLocation{
+				Input:        "SELECT UPPER('hi'); SELECT 1 + 2",
+				BytePosition: int32(len("SELECT UPPER('hi'); SELECT 1 + 2")),
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -593,117 +802,26 @@ func TestEngine_AnalyzeNext_ParsedAST(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
 			sut := newTestEngine(t)
-			want := make([]string, len(tt.statements))
-			for i, s := range tt.statements {
-				parsed, err := sut.Parse(ctx, s)
-				require.NoError(t, err)
-				want[i] = parsed.Root.String()
-			}
-			loc := NewParseResumeLocation(strings.Join(tt.statements, "; "))
 			opts := NewAnalyzerOptions()
+			loc := NewParseResumeLocation(strings.Join(tt.statements, "; "))
 
 			// Act
-			var got []string
+			var gotParsed, gotResolved []string
 			for {
-				out, more, err := sut.AnalyzeNext(ctx, loc, nil, opts)
+				out, more, err := sut.AnalyzeNext(ctx, loc, tt.cat, opts)
 				require.NoError(t, err)
 				require.NotNil(t, out.Parsed, "Parsed must be populated on each AnalyzeNext call")
-				got = append(got, out.Parsed.String())
+				gotParsed = append(gotParsed, out.Parsed.String())
+				gotResolved = append(gotResolved, out.Resolved.String())
 				if !more {
 					break
 				}
 			}
 
 			// Assert
-			assert.Equal(t, want, got)
-		})
-	}
-}
-
-// TestEngine_AnalyzeNext_AST verifies that AnalyzeNext resolves each
-// statement in a multi-statement SQL string. The contract being locked is
-// "AnalyzeNext per statement equals Engine.Analyze of that statement",
-// expressed by deriving the want trees from single-statement Analyze
-// calls rather than hand-written AST format strings — a resolved-AST
-// format change then breaks one place (TestEngine_Analyze) instead of
-// two.
-func TestEngine_AnalyzeNext_AST(t *testing.T) {
-	tests := []struct {
-		name       string
-		statements []string
-	}{
-		{name: "two literals", statements: []string{"SELECT 100", "SELECT 200"}},
-		{name: "three literals", statements: []string{"SELECT 1", "SELECT 2", "SELECT 3"}},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			ctx := t.Context()
-			sut := newTestEngine(t)
-			opts := NewAnalyzerOptions()
-			want := make([]string, len(tt.statements))
-			for i, s := range tt.statements {
-				out, err := sut.Analyze(ctx, s, nil, opts)
-				require.NoError(t, err)
-				want[i] = out.Resolved.String()
-			}
-			loc := NewParseResumeLocation(strings.Join(tt.statements, "; "))
-
-			// Act
-			var got []string
-			for {
-				out, more, err := sut.AnalyzeNext(ctx, loc, nil, opts)
-				require.NoError(t, err)
-				got = append(got, out.Resolved.String())
-				if !more {
-					break
-				}
-			}
-
-			// Assert
-			assert.Equal(t, want, got)
-		})
-	}
-}
-
-// TestEngine_AnalyzeNext_AdvancesLocation verifies that consuming
-// every statement leaves the ParseResumeLocation at the end of input.
-func TestEngine_AnalyzeNext_AdvancesLocation(t *testing.T) {
-	tests := []struct {
-		name string
-		sql  string
-		want *ParseResumeLocation
-	}{
-		{
-			name: "two statements",
-			sql:  "SELECT 1; SELECT 2",
-			want: &ParseResumeLocation{Input: "SELECT 1; SELECT 2", BytePosition: int32(len("SELECT 1; SELECT 2"))},
-		},
-		{
-			name: "three statements",
-			sql:  "SELECT 1; SELECT 2; SELECT 3",
-			want: &ParseResumeLocation{Input: "SELECT 1; SELECT 2; SELECT 3", BytePosition: int32(len("SELECT 1; SELECT 2; SELECT 3"))},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			ctx := t.Context()
-			sut := newTestEngine(t)
-			got := NewParseResumeLocation(tt.sql)
-			opts := NewAnalyzerOptions()
-
-			// Act
-			for more := true; more; {
-				_, m, err := sut.AnalyzeNext(ctx, got, nil, opts)
-				require.NoError(t, err)
-				more = m
-			}
-
-			// Assert
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.wantParsed, gotParsed)
+			assert.Equal(t, tt.wantResolved, gotResolved)
+			assert.Equal(t, tt.wantLoc, *loc)
 		})
 	}
 }
@@ -987,28 +1105,33 @@ func TestEngine_Analyze_TemplatedFunction(t *testing.T) {
 //     two `?` used) reject.
 //
 // (got, err) is checked in both halves: an error case carries a nil
-// output, a happy case carries a non-nil output whose first
-// ParameterNode payload (TypeKind + IsUntyped) is observed via
-// observeParam.
+// output, a happy case carries a non-nil output whose full
+// ParameterNode sequence (one entry per `?`, in tree-walk order) is
+// observed via observeParams. Asserting on the entire sequence
+// rather than only the first match guards against a regression that
+// would mistype a non-first positional parameter.
 func TestEngine_Analyze_PositionalParameter(t *testing.T) {
 	tests := []struct {
-		name      string
-		params    []types.Type
-		sql       string
-		wantParam observedParam
-		wantErr   error
+		name       string
+		params     []types.Type
+		sql        string
+		wantParams []observedParam
+		wantErr    error
 	}{
 		{
-			name:      "single INT64 positional in WHERE",
-			params:    []types.Type{types.Int64Type()},
-			sql:       "SELECT id FROM users WHERE id = ?",
-			wantParam: observedParam{TypeKind: generated.TypeKind_TYPE_INT64},
+			name:       "single INT64 positional in WHERE",
+			params:     []types.Type{types.Int64Type()},
+			sql:        "SELECT id FROM users WHERE id = ?",
+			wantParams: []observedParam{{TypeKind: generated.TypeKind_TYPE_INT64}},
 		},
 		{
-			name:      "two positionals (STRING, INT64) in WHERE — first resolves to STRING",
-			params:    []types.Type{types.StringType(), types.Int64Type()},
-			sql:       "SELECT id FROM users WHERE name = ? AND id = ?",
-			wantParam: observedParam{TypeKind: generated.TypeKind_TYPE_STRING},
+			name:   "two positionals (STRING, INT64) in WHERE",
+			params: []types.Type{types.StringType(), types.Int64Type()},
+			sql:    "SELECT id FROM users WHERE name = ? AND id = ?",
+			wantParams: []observedParam{
+				{TypeKind: generated.TypeKind_TYPE_STRING},
+				{TypeKind: generated.TypeKind_TYPE_INT64},
+			},
 		},
 		{
 			name:    "no positionals declared but SQL uses one",
@@ -1027,14 +1150,14 @@ func TestEngine_Analyze_PositionalParameter(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ctx := t.Context()
-			a := newTestEngine(t)
+			sut := newTestEngine(t)
 			cat := newUsersCatalog()
 			opts := newQueryStmtAnalyzerOptions()
 			opts.ParameterMode = ParameterPositional
 			opts.PositionalQueryParameters = tt.params
 
 			// Act
-			got, err := a.Analyze(ctx, tt.sql, cat, opts)
+			got, err := sut.Analyze(ctx, tt.sql, cat, opts)
 
 			// Assert
 			if tt.wantErr != nil {
@@ -1044,17 +1167,7 @@ func TestEngine_Analyze_PositionalParameter(t *testing.T) {
 			}
 			require.NoError(t, err)
 			require.NotNil(t, got)
-			stmt, ok := got.Resolved.(*resolved_ast.QueryStmtNode)
-			require.True(t, ok, "Resolved is %T, want *resolved_ast.QueryStmtNode", got.Resolved)
-			var param *resolved_ast.ParameterNode
-			_ = resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
-				if p, ok := n.(*resolved_ast.ParameterNode); ok && param == nil {
-					param = p
-				}
-				return nil
-			})
-			require.NotNil(t, param, "expected a ParameterNode in resolved tree")
-			assert.Equal(t, tt.wantParam, observeParam(param))
+			assert.Equal(t, tt.wantParams, observeParams(got.Resolved))
 		})
 	}
 }
@@ -1414,11 +1527,15 @@ func TestEngine_Parse(t *testing.T) {
 `,
 		},
 		{
-			// Smoke test only: the AST wrapper does not yet expose children
-			// of CreateTableStatement, so String() returns just the kind. This
-			// confirms the parser routes the DDL to the right node kind but
-			// does not validate the column list. Tighten when the wrapper
-			// gains child accessors for this kind.
+			// TODO: tighten this case once the AST wrapper exposes
+			// children of CreateTableStatement. DDL support is on the
+			// roadmap, but today the wrapper's String() emits only the
+			// node kind for this statement, so the assertion is a smoke
+			// test confirming the parser routes the DDL to the right
+			// node kind — the column list and column types are not
+			// validated. When child accessors land, replace `want` with
+			// the full subtree (column names, types, etc.) and drop
+			// this TODO.
 			name: "CREATE TABLE DDL",
 			sql:  "CREATE TABLE t1 (id INT64, name STRING)",
 			want: `KindCreateTableStatement
