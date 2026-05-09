@@ -116,6 +116,28 @@ func (o *LanguageOptions) EnableMaximumLanguageFeaturesForDevelopment() {
 	}
 }
 
+// EnableBigQueryFunctionExtensions enables the language features that gate
+// the BigQuery-only scalar functions ZetaSQL ships behind feature flags. With
+// this set, an analyzer paired with a SimpleCatalog auto-loaded by Engine.Analyze
+// resolves at minimum:
+//
+//	LAST_DAY, INITCAP, INSTR, SUBSTRING (alias of SUBSTR), SOUNDEX,
+//	REGEXP_SUBSTR (alias of REGEXP_EXTRACT), TRANSLATE,
+//	JSON_TYPE, INT64(json), FLOAT64(json), BOOL(json), STRING(json)
+//
+// The set is the minimum required by these functions, identified by dropping
+// each feature in turn and checking which of the SQL above stops resolving.
+// Other LanguageFeature flags (DATE_TIME_CONSTRUCTORS, ALIASES_FOR_STRING_AND_DATE_FUNCTIONS,
+// JSON_MORE_VALUE_EXTRACTION_FUNCTIONS, ...) cover BigQuery surfaces beyond
+// these functions and are intentionally left for callers to opt into.
+func (o *LanguageOptions) EnableBigQueryFunctionExtensions() {
+	o.EnableLanguageFeature(FeatureV12CivilTime)
+	o.EnableLanguageFeature(FeatureV13AdditionalStringFunctions)
+	o.EnableLanguageFeature(FeatureV13AllowRegexpExtractOptionals)
+	o.EnableLanguageFeature(FeatureJsonType)
+	o.EnableLanguageFeature(FeatureJsonValueExtractionFunctions)
+}
+
 // EnableReservableKeyword sets whether a keyword is reserved.
 func (o *LanguageOptions) EnableReservableKeyword(keyword string, enable bool) {
 	if enable {

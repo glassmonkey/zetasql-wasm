@@ -57,6 +57,17 @@ func newAnalyticOpts() *AnalyzerOptions {
 	return &AnalyzerOptions{Language: lang}
 }
 
+// newBigQueryFunctionExtensionsOpts returns AnalyzerOptions with the
+// language feature set required to resolve BigQuery extension scalar
+// functions (LAST_DAY, INITCAP, ..., STRING(json)). Used by
+// TestEngine_Analyze_BigQueryFunctionExtensions and any other test that
+// exercises a BigQuery-only function.
+func newBigQueryFunctionExtensionsOpts() *AnalyzerOptions {
+	lang := NewLanguageOptions()
+	lang.EnableBigQueryFunctionExtensions()
+	return &AnalyzerOptions{Language: lang}
+}
+
 // newQueryStmtAnalyzerOptions builds AnalyzerOptions configured to
 // accept top-level QUERY statements — the only statement kind the
 // parameter-flow integration tests need. Returns a fresh instance per
@@ -2531,3 +2542,188 @@ func TestEngine_Parse(t *testing.T) {
 	}
 }
 
+// TestEngine_Analyze_BigQueryFunctionExtensions locks the contract that
+// LanguageOptions.EnableBigQueryFunctionExtensions opens up: with that
+// helper applied to AnalyzerOptions, every listed BigQuery-only scalar
+// function resolves through the auto-loaded catalog. wantResolved spells
+// out the resolved AST for each case so the function name produced by
+// alias resolution (SUBSTRING → substr, REGEXP_SUBSTR → regexp_extract)
+// and any extra arguments the analyzer injects (FLOAT64(json) gets a
+// trailing "round" wide_number_mode literal) are pinned, not just the
+// fact that resolution succeeds.
+func TestEngine_Analyze_BigQueryFunctionExtensions(t *testing.T) {
+	tests := []struct {
+		name         string
+		sql          string
+		wantResolved string
+	}{
+		{
+			name: "LAST_DAY",
+			sql:  "SELECT LAST_DAY(DATE '2025-01-01')",
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:last_day
+        KindLiteral
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "INITCAP",
+			sql:  "SELECT INITCAP('hello world')",
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:initcap
+        KindLiteral "hello world"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "INSTR",
+			sql:  "SELECT INSTR('hello', 'l')",
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:instr
+        KindLiteral "hello"
+        KindLiteral "l"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "SUBSTRING resolves to substr",
+			sql:  "SELECT SUBSTRING('hello', 1, 3)",
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:substr
+        KindLiteral "hello"
+        KindLiteral 1
+        KindLiteral 3
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "SOUNDEX",
+			sql:  "SELECT SOUNDEX('hello')",
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:soundex
+        KindLiteral "hello"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "REGEXP_SUBSTR resolves to regexp_extract",
+			sql:  "SELECT REGEXP_SUBSTR('hello', 'l+')",
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:regexp_extract
+        KindLiteral "hello"
+        KindLiteral "l+"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "TRANSLATE",
+			sql:  "SELECT TRANSLATE('hello', 'el', 'ip')",
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:translate
+        KindLiteral "hello"
+        KindLiteral "el"
+        KindLiteral "ip"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "JSON_TYPE",
+			sql:  `SELECT JSON_TYPE(JSON '{"a":1}')`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:json_type
+        KindLiteral
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "INT64 from JSON",
+			sql:  `SELECT INT64(JSON '1')`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:int64
+        KindLiteral
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "FLOAT64 from JSON",
+			sql:  `SELECT FLOAT64(JSON '1.5')`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:float64
+        KindLiteral
+        KindLiteral "round"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "BOOL from JSON",
+			sql:  `SELECT BOOL(JSON 'true')`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:bool
+        KindLiteral
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "STRING from JSON",
+			sql:  `SELECT STRING(JSON '"x"')`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:string
+        KindLiteral
+    KindSingleRowScan
+`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			ctx := t.Context()
+			sut := newTestEngine(t)
+			cat := newBuiltinsCatalog()
+			opts := newBigQueryFunctionExtensionsOpts()
+
+			// Act
+			out, err := sut.Analyze(ctx, tt.sql, cat, opts)
+
+			// Assert
+			require.NoError(t, err)
+			assert.Equal(t, tt.wantResolved, out.Resolved.String())
+		})
+	}
+}
