@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 )
 
@@ -69,6 +70,14 @@ func nodeScalar(n Node) string {
 			return " " + fr.Name
 		}
 	case *LiteralNode:
+		// ENUM literals carry only an int32 number on the wire; the
+		// human-readable name lives on the surrounding Type. Resolve via
+		// the wrap surface so the dump shows "DAY" instead of an empty
+		// scalar suffix; fall back to literalScalar when the type is not
+		// an ENUM or descriptor lookup fails.
+		if name, ok := types.WrapLiteralValue(v.Value()).AsEnumName(); ok {
+			return " " + name
+		}
 		return literalScalar(v.Value().GetValue())
 	case *ColumnRefNode:
 		if col := v.Column(); col != nil {
