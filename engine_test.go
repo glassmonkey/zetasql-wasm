@@ -2104,6 +2104,68 @@ func TestEngine_Parse(t *testing.T) {
         KindStringLiteralComponent
 `,
 		},
+		// CREATE TABLE flag triangulation. IsOrReplace, IsIfNotExists,
+		// and Scope live on the depth-2 ancestor (CreateStatement) of
+		// CreateTableStatement; nodeScalar surfaces them as bracketed
+		// annotations on the KindCreateTableStatement line so the
+		// inherited-field contract is observable through the same tree
+		// String() path the rest of the suite uses.
+		{
+			name: "CREATE OR REPLACE TABLE",
+			sql:  "CREATE OR REPLACE TABLE t1 (id INT64)",
+			want: `KindCreateTableStatement [OR REPLACE]
+  KindPathExpression
+    KindIdentifier [t1]
+  KindTableElementList
+    KindColumnDefinition
+      KindIdentifier [id]
+      KindSimpleColumnSchema
+        KindPathExpression
+          KindIdentifier [INT64]
+`,
+		},
+		{
+			name: "CREATE TABLE IF NOT EXISTS",
+			sql:  "CREATE TABLE IF NOT EXISTS t1 (id INT64)",
+			want: `KindCreateTableStatement [IF NOT EXISTS]
+  KindPathExpression
+    KindIdentifier [t1]
+  KindTableElementList
+    KindColumnDefinition
+      KindIdentifier [id]
+      KindSimpleColumnSchema
+        KindPathExpression
+          KindIdentifier [INT64]
+`,
+		},
+		{
+			name: "CREATE TEMPORARY TABLE",
+			sql:  "CREATE TEMPORARY TABLE t1 (id INT64)",
+			want: `KindCreateTableStatement [TEMPORARY]
+  KindPathExpression
+    KindIdentifier [t1]
+  KindTableElementList
+    KindColumnDefinition
+      KindIdentifier [id]
+      KindSimpleColumnSchema
+        KindPathExpression
+          KindIdentifier [INT64]
+`,
+		},
+		{
+			name: "CREATE OR REPLACE TEMPORARY TABLE (combined flags)",
+			sql:  "CREATE OR REPLACE TEMPORARY TABLE t1 (id INT64)",
+			want: `KindCreateTableStatement [TEMPORARY, OR REPLACE]
+  KindPathExpression
+    KindIdentifier [t1]
+  KindTableElementList
+    KindColumnDefinition
+      KindIdentifier [id]
+      KindSimpleColumnSchema
+        KindPathExpression
+          KindIdentifier [INT64]
+`,
+		},
 		{
 			name: "CTE with single binding",
 			sql:  "WITH x AS (SELECT 1 AS a) SELECT * FROM x",
