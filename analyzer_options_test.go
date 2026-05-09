@@ -4,12 +4,10 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
 	"github.com/glassmonkey/zetasql-wasm/types"
 	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/testing/protocmp"
 )
@@ -288,112 +286,6 @@ func TestAnalyzerOptions_Clone_doesNotShareLanguagePointer(t *testing.T) {
 		Keywords: map[string]bool{"QUALIFY": true},
 	}
 	assert.Equal(t, want, got)
-}
-
-// TestAnalyzerOptions_NamedQueryParameters_AnalyzerIntegration covers
-// the named-parameter analyzer path end to end: the wire fields
-// QueryParameters / ParameterMode / AllowUndeclaredParameters all
-// round-trip through the WASM bridge into the C++ AnalyzerOptions and
-// shape the analyzer's strict-vs-permissive decision.
-//
-// Triangulated across:
-//   - declared @id (INT64) and @label (STRING) resolve cleanly,
-//   - undeclared @nope rejects under the strict default,
-//   - the same @nope is accepted when AllowUndeclaredParameters=true.
-//
-// The (got, err) tuple is checked in both halves: an error case
-// carries a nil output, a happy case carries a non-nil output.
-//
-// Regression for the v0.5.0 emulator boot bug — `SELECT @id` failed
-// analysis with "Query parameter 'X' not found" because the Go wrap
-// had no QueryParameters field and the WASM bridge dropped the proto
-// fields even when populated.
-func TestAnalyzerOptions_NamedQueryParameters_AnalyzerIntegration(t *testing.T) {
-	tests := []struct {
-		name                      string
-		params                    map[string]types.Type
-		allowUndeclaredParameters bool
-		sql                       string
-		// wantParam is the observable shape of the resolved tree's
-		// first ParameterNode. Ignored when wantErr is non-nil.
-		wantParam observedParam
-		wantErr   error
-	}{
-		{
-			name:      "INT64 parameter @id resolves to declared INT64",
-			params:    map[string]types.Type{"id": types.Int64Type()},
-			sql:       "SELECT @id",
-			wantParam: observedParam{TypeKind: generated.TypeKind_TYPE_INT64},
-		},
-		{
-			name:      "STRING parameter @label resolves to declared STRING",
-			params:    map[string]types.Type{"label": types.StringType()},
-			sql:       "SELECT @label",
-			wantParam: observedParam{TypeKind: generated.TypeKind_TYPE_STRING},
-		},
-		{
-			name:    "undeclared @nope rejected under strict mode",
-			sql:     "SELECT @nope",
-			wantErr: &AnalyzeError{},
-		},
-		{
-			name:    "@id declared but @other referenced",
-			params:  map[string]types.Type{"id": types.Int64Type()},
-			sql:     "SELECT @other",
-			wantErr: &AnalyzeError{},
-		},
-		{
-			name:                      "AllowUndeclaredParameters resolves @nope as untyped INT64",
-			allowUndeclaredParameters: true,
-			sql:                       "SELECT @nope",
-			// Analyzer assigns the default INT64 to undeclared params
-			// in permissive mode but flags IsUntyped so callers can
-			// tell it apart from a declared INT64 (asserted on the
-			// next case as well).
-			wantParam: observedParam{TypeKind: generated.TypeKind_TYPE_INT64, IsUntyped: true},
-		},
-		{
-			name:                      "AllowUndeclaredParameters resolves @label as untyped INT64",
-			allowUndeclaredParameters: true,
-			sql:                       "SELECT @label",
-			wantParam:                 observedParam{TypeKind: generated.TypeKind_TYPE_INT64, IsUntyped: true},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Arrange
-			ctx := t.Context()
-			a := newTestEngine(t)
-			opts := newQueryStmtAnalyzerOptions()
-			opts.ParameterMode = ParameterNamed
-			opts.QueryParameters = tt.params
-			opts.AllowUndeclaredParameters = tt.allowUndeclaredParameters
-
-			// Act
-			got, err := a.Analyze(ctx, tt.sql, nil, opts)
-
-			// Assert
-			if tt.wantErr != nil {
-				assert.IsType(t, tt.wantErr, err)
-				assert.Nil(t, got)
-				return
-			}
-			require.NoError(t, err)
-			require.NotNil(t, got)
-			stmt, ok := got.Resolved.(*resolved_ast.QueryStmtNode)
-			require.True(t, ok, "Resolved is %T, want *resolved_ast.QueryStmtNode", got.Resolved)
-			var param *resolved_ast.ParameterNode
-			_ = resolved_ast.Walk(stmt, func(n resolved_ast.Node) error {
-				if p, ok := n.(*resolved_ast.ParameterNode); ok && param == nil {
-					param = p
-				}
-				return nil
-			})
-			require.NotNil(t, param, "expected a ParameterNode in resolved tree")
-			assert.Equal(t, tt.wantParam, observeParam(param))
-		})
-	}
 }
 
 // TestAnalyzerOptions_Clone_doesNotShareQueryParameters verifies that
