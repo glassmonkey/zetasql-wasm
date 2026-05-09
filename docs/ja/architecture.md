@@ -300,7 +300,7 @@ bazel build \
 ### Emscripten設定
 
 - **最適化レベル**: `-O3` (サイズとパフォーマンスのバランス)
-- **エクスポート関数**: parse_statement, analyze_statement
+- **エクスポート関数**: parse_statement, parse_statement_proto, parse_next_statement_proto, analyze_statement_proto
 - **モジュール化**: MODULARIZE=1（複数インスタンス対応）
 
 ### ビルド成果物

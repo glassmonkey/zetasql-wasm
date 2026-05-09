@@ -308,7 +308,7 @@ bazel build \
 ### Emscripten Settings
 
 - **Optimization level**: `-O3` (balance between size and performance)
-- **Exported functions**: parse_statement, analyze_statement
+- **Exported functions**: parse_statement, parse_statement_proto, parse_next_statement_proto, analyze_statement_proto
 - **Modularization**: MODULARIZE=1 (support for multiple instances)
 
 ### Build Artifacts

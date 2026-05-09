@@ -174,14 +174,6 @@ void* parse_statement_proto(const char* sql) {
     return result;
 }
 
-// SQL analysis (catalog support to be implemented in the future if needed)
-EMSCRIPTEN_KEEPALIVE
-char* analyze_statement(const char* sql) {
-    // TODO: Receive and analyze catalog information
-    // Currently only returns parse results
-    return parse_statement(sql);
-}
-
 // Helper: pack error into [size][data] format
 static void* pack_error(const std::string& error_msg) {
     std::string error = "Error: " + error_msg;
