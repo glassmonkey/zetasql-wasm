@@ -3,6 +3,8 @@ package ast
 import (
 	"fmt"
 	"strings"
+
+	"github.com/glassmonkey/zetasql-wasm/wasm/generated"
 )
 
 // formatNode returns the canonical multi-line string representation of the
@@ -52,6 +54,36 @@ func nodeScalar(n Node) string {
 		return " [" + v.Value().String() + "]"
 	case *SetOperationTypeNode:
 		return " [" + v.Value().String() + "]"
+	case *CreateTableStatementNode:
+		return createStatementScalar(v.Scope(), v.IsOrReplace(), v.IsIfNotExists())
 	}
 	return ""
+}
+
+// createStatementScalar renders the inherited create-statement flags
+// (Scope, IsOrReplace, IsIfNotExists) as a bracketed annotation suitable
+// for a node-tree String() suffix. Returns the empty string when every
+// flag is at its default so vanilla CREATE TABLE keeps the no-suffix
+// output. Multiple flags combine with ", " in the order Scope, OR
+// REPLACE, IF NOT EXISTS so the rendering is stable.
+func createStatementScalar(scope generated.ASTCreateStatementEnums_Scope, isOrReplace, isIfNotExists bool) string {
+	var parts []string
+	switch scope {
+	case generated.ASTCreateStatementEnums_PRIVATE:
+		parts = append(parts, "PRIVATE")
+	case generated.ASTCreateStatementEnums_PUBLIC:
+		parts = append(parts, "PUBLIC")
+	case generated.ASTCreateStatementEnums_TEMPORARY:
+		parts = append(parts, "TEMPORARY")
+	}
+	if isOrReplace {
+		parts = append(parts, "OR REPLACE")
+	}
+	if isIfNotExists {
+		parts = append(parts, "IF NOT EXISTS")
+	}
+	if len(parts) == 0 {
+		return ""
+	}
+	return " [" + strings.Join(parts, ", ") + "]"
 }
