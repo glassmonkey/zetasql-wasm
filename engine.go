@@ -493,23 +493,35 @@ func buildOutput(response *generated.AnalyzeResponse, parsedProto *generated.Any
 
 // buildAnalyzeRequestOptions returns the AnalyzerOptionsProto Engine.Analyze
 // hands to the WASM bridge plus the LanguageOptionsProto used to load the
-// catalog's builtin functions. Both share a single LanguageOptions instance
-// so the analyzer and the catalog never see diverging feature sets. The
-// caller's opts is read but never modified: opts.Language is cloned before
-// the BigQuery extension features are layered on top, so zetasql-wasm's
-// BigQuery default contract applies regardless of what the caller passed
-// (or whether they passed anything at all).
+// catalog's builtin functions. The two protos share a single LanguageOptions
+// instance so the analyzer and the catalog never see diverging feature sets.
+//
+// The caller's opts is read but never modified: each clone hands back an
+// independent instance, then the BigQuery default-contract features are
+// layered on that copy.
 func buildAnalyzeRequestOptions(opts *AnalyzerOptions) (*generated.AnalyzerOptionsProto, *generated.LanguageOptionsProto) {
-	eff := AnalyzerOptions{}
-	if opts != nil {
-		eff = *opts
-	}
-	lang := NewLanguageOptions()
+	// Step 1: build the effective LanguageOptions. Clone the caller's
+	// Language (or start fresh when nil), then layer the BigQuery
+	// default contract on top.
+	language := NewLanguageOptions()
 	if opts != nil && opts.Language != nil {
-		lang = opts.Language.clone()
+		language = opts.Language.clone()
 	}
-	lang.enableBigQueryExtensions()
-	eff.Language = lang
-	analyzerProto := eff.toProto()
+	language.enableBigQueryExtensions()
+
+	// Step 2: build the effective AnalyzerOptions. Clone the caller's
+	// opts (or start fresh when nil) so other fields — query parameters,
+	// parameter mode, parse-location record type — survive untouched,
+	// then attach the LanguageOptions from Step 1.
+	analyzer := NewAnalyzerOptions()
+	if opts != nil {
+		analyzer = opts.Clone()
+	}
+	analyzer.Language = language
+
+	// Step 3: serialize once. Both return values point at the same
+	// nested LanguageOptionsProto so the catalog and analyzer sides of
+	// the request cannot drift.
+	analyzerProto := analyzer.toProto()
 	return analyzerProto, analyzerProto.GetLanguageOptions()
 }
