@@ -348,9 +348,9 @@ func (e *Engine) callAnalyze(
 
 	// One LanguageOptions drives both builtin loading and analyzer
 	// behavior so the catalog and analyzer can never see diverging
-	// feature sets (e.g. LAST_DAY loaded but DATETIME rejected). A
-	// populated LanguageOptionsProto on builtinOpts is also a hard
-	// requirement, not tidiness: leaving language_options unset
+	// feature sets (e.g. LAST_DAY loaded but DATETIME rejected). The
+	// populated LanguageOptionsProto on BuiltinFunctionOptions is a
+	// hard requirement, not tidiness: leaving language_options unset
 	// triggered a deterministic WASM OOB inside the C++ analyzer on
 	// Linux x64 wazero — observed as a trap at .$39380 escalating to a
 	// host SIGSEGV in runtime.memmove after roughly eleven iterations.
@@ -359,20 +359,13 @@ func (e *Engine) callAnalyze(
 	// rebuild. If this re-emerges after a wazero / WASM / zetasql
 	// upgrade, retry with language_options unset to confirm whether the
 	// same trigger is back before digging further.
-	lang := effectiveLanguageOptions(opts)
-
+	optsProto, langProto := buildAnalyzeRequestOptions(opts)
 	catProto := cat.ToProto()
 	catProto.BuiltinFunctionOptions = &generated.ZetaSQLBuiltinFunctionOptionsProto{
-		LanguageOptions: lang.toProto(),
+		LanguageOptions: langProto,
 	}
 	request.SimpleCatalog = catProto
-
-	effectiveOpts := AnalyzerOptions{}
-	if opts != nil {
-		effectiveOpts = *opts
-	}
-	effectiveOpts.Language = lang
-	request.Options = effectiveOpts.toProto()
+	request.Options = optsProto
 
 	requestBytes, err := proto.Marshal(request)
 	if err != nil {
@@ -498,17 +491,25 @@ func buildOutput(response *generated.AnalyzeResponse, parsedProto *generated.Any
 	return out, nil
 }
 
-// effectiveLanguageOptions returns the LanguageOptions Engine.Analyze
-// uses for both catalog builtin loading and analyzer behavior. It clones
-// opts.Language (or a fresh default when opts is nil) and layers the
-// BigQuery extension feature set on top, so the caller's opts is never
-// modified. zetasql-wasm targets BigQuery compatibility, so BigQuery
-// extensions are part of the default contract rather than an opt-in.
-func effectiveLanguageOptions(opts *AnalyzerOptions) *LanguageOptions {
+// buildAnalyzeRequestOptions returns the AnalyzerOptionsProto Engine.Analyze
+// hands to the WASM bridge plus the LanguageOptionsProto used to load the
+// catalog's builtin functions. Both share a single LanguageOptions instance
+// so the analyzer and the catalog never see diverging feature sets. The
+// caller's opts is read but never modified: opts.Language is cloned before
+// the BigQuery extension features are layered on top, so zetasql-wasm's
+// BigQuery default contract applies regardless of what the caller passed
+// (or whether they passed anything at all).
+func buildAnalyzeRequestOptions(opts *AnalyzerOptions) (*generated.AnalyzerOptionsProto, *generated.LanguageOptionsProto) {
+	eff := AnalyzerOptions{}
+	if opts != nil {
+		eff = *opts
+	}
 	lang := NewLanguageOptions()
 	if opts != nil && opts.Language != nil {
 		lang = opts.Language.clone()
 	}
 	lang.enableBigQueryExtensions()
-	return lang
+	eff.Language = lang
+	analyzerProto := eff.toProto()
+	return analyzerProto, analyzerProto.GetLanguageOptions()
 }
