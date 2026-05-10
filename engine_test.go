@@ -57,6 +57,29 @@ func newAnalyticOpts() *AnalyzerOptions {
 	return &AnalyzerOptions{Language: lang}
 }
 
+// newIsDistinctOpts returns AnalyzerOptions with FEATURE_V_1_3_IS_DISTINCT
+// enabled, the language feature that gates the IS DISTINCT FROM /
+// IS NOT DISTINCT FROM grammar in the parser. Without it the parser
+// rejects the syntax before the resolver sees the catalog's
+// $is_distinct_from / $is_not_distinct_from functions.
+func newIsDistinctOpts() *AnalyzerOptions {
+	lang := NewLanguageOptions()
+	lang.EnableLanguageFeature(FeatureV13IsDistinct)
+	return &AnalyzerOptions{Language: lang}
+}
+
+// newQualifyOpts returns AnalyzerOptions with FEATURE_V_1_3_QUALIFY +
+// FEATURE_ANALYTIC_FUNCTIONS enabled. QUALIFY needs the syntax feature
+// to be parsed and the analytic feature for the OVER clause it routes
+// through; ZetaSQL also requires QUALIFY to be paired with
+// WHERE/GROUP BY/HAVING (the test SQL therefore includes WHERE).
+func newQualifyOpts() *AnalyzerOptions {
+	lang := NewLanguageOptions()
+	lang.EnableLanguageFeature(FeatureV13Qualify)
+	lang.EnableLanguageFeature(FeatureAnalyticFunctions)
+	return &AnalyzerOptions{Language: lang}
+}
+
 // newQueryStmtAnalyzerOptions builds AnalyzerOptions configured to
 // accept top-level QUERY statements — the only statement kind the
 // parameter-flow integration tests need. Returns a fresh instance per
@@ -1407,6 +1430,86 @@ func TestEngine_Analyze(t *testing.T) {
       KindFunctionCall ZetaSQL:string
         KindLiteral
     KindSingleRowScan
+`,
+		},
+		// V_1_3 syntax features that the parser gates on LanguageOptions.
+		// callAnalyze copies the analyzer's LanguageOptions onto
+		// ParserOptions, so passing the per-feature opts here is enough
+		// to flip the parser into the right mode. These cases also pin
+		// the resolver-side dispatch: IS DISTINCT FROM resolves to
+		// $is_distinct_from, QUALIFY routes through an AnalyticScan +
+		// FilterScan pair sitting on top of the WHERE-side FilterScan.
+		{
+			name: "IS DISTINCT FROM resolves to $is_distinct_from",
+			sql:  "SELECT 1 IS DISTINCT FROM 2",
+			cat:  newBuiltinsCatalog(),
+			opts: newIsDistinctOpts(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindBinaryExpression
+            KindIntLiteral [1]
+            KindIntLiteral [2]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:$is_distinct_from
+        KindLiteral 1
+        KindLiteral 2
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "QUALIFY routes through AnalyticScan + FilterScan",
+			sql:  "SELECT id FROM users WHERE id > 0 QUALIFY ROW_NUMBER() OVER (ORDER BY id) = 1",
+			cat:  newUsersCatalog(),
+			opts: newQualifyOpts(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindWhereClause
+        KindBinaryExpression
+          KindPathExpression
+            KindIdentifier [id]
+          KindIntLiteral [0]
+      KindQualify
+        KindBinaryExpression
+          KindAnalyticFunctionCall
+            KindFunctionCall
+              KindPathExpression
+                KindIdentifier [ROW_NUMBER]
+            KindWindowSpecification
+              KindOrderBy
+                KindOrderingExpression [UNSPECIFIED]
+                  KindPathExpression
+                    KindIdentifier [id]
+          KindIntLiteral [1]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn id
+  KindProjectScan
+    KindFilterScan
+      KindAnalyticScan
+        KindFilterScan
+          KindTableScan users
+          KindFunctionCall ZetaSQL:$greater
+            KindColumnRef id
+            KindLiteral 0
+      KindFunctionCall ZetaSQL:$equal
+        KindColumnRef $analytic1
+        KindLiteral 1
 `,
 		},
 		// Error cases — SQL the analyzer must reject. The contract is
