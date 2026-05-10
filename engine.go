@@ -345,36 +345,25 @@ func (e *Engine) callAnalyze(
 	if cat == nil {
 		cat = types.NewSimpleCatalog("default")
 	}
-	// Synthesize a single LanguageOptions used both to load the catalog's
-	// builtin functions and to drive the analyzer. zetasql-wasm targets
-	// BigQuery compatibility, so the BigQuery extension feature set is
-	// always layered on top of whatever the caller provided — caller
-	// instances are clone-then-mutated so the caller's LanguageOptions
-	// stays unchanged. Synthesizing both sides from the same instance
-	// also avoids a load-bearing footgun where catalog and analyzer would
-	// otherwise see different feature sets (e.g. catalog has LAST_DAY
-	// loaded but analyzer rejects DATETIME types).
-	//
-	// An empty LanguageOptionsProto on builtinOpts is a hard requirement,
-	// not a tidiness choice: leaving language_options unset triggered a
-	// deterministic WASM OOB inside the C++ analyzer on Linux x64 wazero
-	// — observed as a trap at .$39380 on every happy-path Analyze call,
-	// escalating to a host SIGSEGV in runtime.memmove after roughly
-	// eleven iterations. macOS wazero is unaffected. The C++ root cause
-	// is unidentified: the embedded WASM has its name section stripped,
-	// so .$39380 cannot be resolved without a debug rebuild. If this
-	// re-emerges after a wazero / WASM / zetasql upgrade, retry with
-	// language_options unset to confirm whether the same trigger is
-	// back before digging further.
-	effectiveLang := NewLanguageOptions()
-	if opts != nil && opts.Language != nil {
-		effectiveLang = opts.Language.clone()
-	}
-	effectiveLang.enableBigQueryFunctionExtensions()
+
+	// One LanguageOptions drives both builtin loading and analyzer
+	// behavior so the catalog and analyzer can never see diverging
+	// feature sets (e.g. LAST_DAY loaded but DATETIME rejected). A
+	// populated LanguageOptionsProto on builtinOpts is also a hard
+	// requirement, not tidiness: leaving language_options unset
+	// triggered a deterministic WASM OOB inside the C++ analyzer on
+	// Linux x64 wazero — observed as a trap at .$39380 escalating to a
+	// host SIGSEGV in runtime.memmove after roughly eleven iterations.
+	// macOS wazero was unaffected and the embedded WASM has its name
+	// section stripped, so .$39380 cannot be resolved without a debug
+	// rebuild. If this re-emerges after a wazero / WASM / zetasql
+	// upgrade, retry with language_options unset to confirm whether the
+	// same trigger is back before digging further.
+	lang := effectiveLanguageOptions(opts)
 
 	catProto := cat.ToProto()
 	catProto.BuiltinFunctionOptions = &generated.ZetaSQLBuiltinFunctionOptionsProto{
-		LanguageOptions: effectiveLang.toProto(),
+		LanguageOptions: lang.toProto(),
 	}
 	request.SimpleCatalog = catProto
 
@@ -382,7 +371,7 @@ func (e *Engine) callAnalyze(
 	if opts != nil {
 		effectiveOpts = *opts
 	}
-	effectiveOpts.Language = effectiveLang
+	effectiveOpts.Language = lang
 	request.Options = effectiveOpts.toProto()
 
 	requestBytes, err := proto.Marshal(request)
@@ -507,4 +496,19 @@ func buildOutput(response *generated.AnalyzeResponse, parsedProto *generated.Any
 		out.Parsed = parsed
 	}
 	return out, nil
+}
+
+// effectiveLanguageOptions returns the LanguageOptions Engine.Analyze
+// uses for both catalog builtin loading and analyzer behavior. It clones
+// opts.Language (or a fresh default when opts is nil) and layers the
+// BigQuery extension feature set on top, so the caller's opts is never
+// modified. zetasql-wasm targets BigQuery compatibility, so BigQuery
+// extensions are part of the default contract rather than an opt-in.
+func effectiveLanguageOptions(opts *AnalyzerOptions) *LanguageOptions {
+	lang := NewLanguageOptions()
+	if opts != nil && opts.Language != nil {
+		lang = opts.Language.clone()
+	}
+	lang.enableBigQueryFunctionExtensions()
+	return lang
 }
