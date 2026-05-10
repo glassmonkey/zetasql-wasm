@@ -509,6 +509,6 @@ func effectiveLanguageOptions(opts *AnalyzerOptions) *LanguageOptions {
 	if opts != nil && opts.Language != nil {
 		lang = opts.Language.clone()
 	}
-	lang.enableBigQueryFunctionExtensions()
+	lang.enableBigQueryExtensions()
 	return lang
 }

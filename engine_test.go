@@ -49,37 +49,6 @@ func newBuiltinsCatalog() *types.SimpleCatalog {
 	return types.NewSimpleCatalog("test")
 }
 
-// newAnalyticOpts returns AnalyzerOptions with the FEATURE_ANALYTIC_FUNCTIONS
-// language feature enabled. Required for OVER (...) window expressions.
-func newAnalyticOpts() *AnalyzerOptions {
-	lang := NewLanguageOptions()
-	lang.EnableLanguageFeature(FeatureAnalyticFunctions)
-	return &AnalyzerOptions{Language: lang}
-}
-
-// newIsDistinctOpts returns AnalyzerOptions with FEATURE_V_1_3_IS_DISTINCT
-// enabled, the language feature that gates the IS DISTINCT FROM /
-// IS NOT DISTINCT FROM grammar in the parser. Without it the parser
-// rejects the syntax before the resolver sees the catalog's
-// $is_distinct_from / $is_not_distinct_from functions.
-func newIsDistinctOpts() *AnalyzerOptions {
-	lang := NewLanguageOptions()
-	lang.EnableLanguageFeature(FeatureV13IsDistinct)
-	return &AnalyzerOptions{Language: lang}
-}
-
-// newQualifyOpts returns AnalyzerOptions with FEATURE_V_1_3_QUALIFY +
-// FEATURE_ANALYTIC_FUNCTIONS enabled. QUALIFY needs the syntax feature
-// to be parsed and the analytic feature for the OVER clause it routes
-// through; ZetaSQL also requires QUALIFY to be paired with
-// WHERE/GROUP BY/HAVING (the test SQL therefore includes WHERE).
-func newQualifyOpts() *AnalyzerOptions {
-	lang := NewLanguageOptions()
-	lang.EnableLanguageFeature(FeatureV13Qualify)
-	lang.EnableLanguageFeature(FeatureAnalyticFunctions)
-	return &AnalyzerOptions{Language: lang}
-}
-
 // newQueryStmtAnalyzerOptions builds AnalyzerOptions configured to
 // accept top-level QUERY statements — the only statement kind the
 // parameter-flow integration tests need. Returns a fresh instance per
@@ -895,7 +864,6 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "window function with PARTITION BY",
 			sql:  "SELECT SUM(id) OVER (PARTITION BY name) AS s FROM users",
 			cat:  newUsersCatalog(),
-			opts: newAnalyticOpts(),
 			wantParsed: `KindQueryStatement
   KindQuery
     KindSelect
@@ -1432,18 +1400,16 @@ func TestEngine_Analyze(t *testing.T) {
     KindSingleRowScan
 `,
 		},
-		// V_1_3 syntax features that the parser gates on LanguageOptions.
-		// callAnalyze copies the analyzer's LanguageOptions onto
-		// ParserOptions, so passing the per-feature opts here is enough
-		// to flip the parser into the right mode. These cases also pin
-		// the resolver-side dispatch: IS DISTINCT FROM resolves to
-		// $is_distinct_from, QUALIFY routes through an AnalyticScan +
-		// FilterScan pair sitting on top of the WHERE-side FilterScan.
+		// V_1_3 syntax features. Both IS DISTINCT FROM and QUALIFY are
+		// part of the BigQuery surface zetasql-wasm enables by default,
+		// so opts stays nil. These cases also pin the resolver-side
+		// dispatch: IS DISTINCT FROM resolves to $is_distinct_from, and
+		// QUALIFY routes through an AnalyticScan + FilterScan pair
+		// sitting on top of the WHERE-side FilterScan.
 		{
 			name: "IS DISTINCT FROM resolves to $is_distinct_from",
 			sql:  "SELECT 1 IS DISTINCT FROM 2",
 			cat:  newBuiltinsCatalog(),
-			opts: newIsDistinctOpts(),
 			wantParsed: `KindQueryStatement
   KindQuery
     KindSelect
@@ -1467,7 +1433,6 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "QUALIFY routes through AnalyticScan + FilterScan",
 			sql:  "SELECT id FROM users WHERE id > 0 QUALIFY ROW_NUMBER() OVER (ORDER BY id) = 1",
 			cat:  newUsersCatalog(),
-			opts: newQualifyOpts(),
 			wantParsed: `KindQueryStatement
   KindQuery
     KindSelect
