@@ -49,14 +49,6 @@ func newBuiltinsCatalog() *types.SimpleCatalog {
 	return types.NewSimpleCatalog("test")
 }
 
-// newAnalyticOpts returns AnalyzerOptions with the FEATURE_ANALYTIC_FUNCTIONS
-// language feature enabled. Required for OVER (...) window expressions.
-func newAnalyticOpts() *AnalyzerOptions {
-	lang := NewLanguageOptions()
-	lang.EnableLanguageFeature(FeatureAnalyticFunctions)
-	return &AnalyzerOptions{Language: lang}
-}
-
 // newQueryStmtAnalyzerOptions builds AnalyzerOptions configured to
 // accept top-level QUERY statements — the only statement kind the
 // parameter-flow integration tests need. Returns a fresh instance per
@@ -872,7 +864,6 @@ func TestEngine_Analyze(t *testing.T) {
 			name: "window function with PARTITION BY",
 			sql:  "SELECT SUM(id) OVER (PARTITION BY name) AS s FROM users",
 			cat:  newUsersCatalog(),
-			opts: newAnalyticOpts(),
 			wantParsed: `KindQueryStatement
   KindQuery
     KindSelect
@@ -1407,6 +1398,83 @@ func TestEngine_Analyze(t *testing.T) {
       KindFunctionCall ZetaSQL:string
         KindLiteral
     KindSingleRowScan
+`,
+		},
+		// V_1_3 syntax features. Both IS DISTINCT FROM and QUALIFY are
+		// part of the BigQuery surface zetasql-wasm enables by default,
+		// so opts stays nil. These cases also pin the resolver-side
+		// dispatch: IS DISTINCT FROM resolves to $is_distinct_from, and
+		// QUALIFY routes through an AnalyticScan + FilterScan pair
+		// sitting on top of the WHERE-side FilterScan.
+		{
+			name: "IS DISTINCT FROM resolves to $is_distinct_from",
+			sql:  "SELECT 1 IS DISTINCT FROM 2",
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindBinaryExpression
+            KindIntLiteral [1]
+            KindIntLiteral [2]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:$is_distinct_from
+        KindLiteral 1
+        KindLiteral 2
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "QUALIFY routes through AnalyticScan + FilterScan",
+			sql:  "SELECT id FROM users WHERE id > 0 QUALIFY ROW_NUMBER() OVER (ORDER BY id) = 1",
+			cat:  newUsersCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindWhereClause
+        KindBinaryExpression
+          KindPathExpression
+            KindIdentifier [id]
+          KindIntLiteral [0]
+      KindQualify
+        KindBinaryExpression
+          KindAnalyticFunctionCall
+            KindFunctionCall
+              KindPathExpression
+                KindIdentifier [ROW_NUMBER]
+            KindWindowSpecification
+              KindOrderBy
+                KindOrderingExpression [UNSPECIFIED]
+                  KindPathExpression
+                    KindIdentifier [id]
+          KindIntLiteral [1]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn id
+  KindProjectScan
+    KindFilterScan
+      KindAnalyticScan
+        KindFilterScan
+          KindTableScan users
+          KindFunctionCall ZetaSQL:$greater
+            KindColumnRef id
+            KindLiteral 0
+      KindFunctionCall ZetaSQL:$equal
+        KindColumnRef $analytic1
+        KindLiteral 1
 `,
 		},
 		// Error cases — SQL the analyzer must reject. The contract is
