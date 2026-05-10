@@ -451,8 +451,13 @@ void* analyze_statement_proto(const void* request_ptr, uint32_t request_size) {
     }
 
     // Parser options track the analyzer's language settings so the parser
-    // accepts every construct the analyzer is configured to resolve.
+    // accepts every construct the analyzer is configured to resolve. Without
+    // copying options.language() into ParserOptions the parser falls back to
+    // a default LanguageOptions, which silently rejects feature-gated syntax
+    // (QUALIFY, IS DISTINCT FROM, ...) at parse time even when the caller
+    // enabled the corresponding LanguageFeature on AnalyzerOptions.
     zetasql::ParserOptions parser_options;
+    parser_options.set_language_options(options.language());
 
     // Run parser then analyzer. Doing so explicitly (instead of letting
     // AnalyzeStatement parse internally) keeps the ParserOutput alive past
