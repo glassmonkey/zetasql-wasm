@@ -934,11 +934,11 @@ func TestEngine_Analyze(t *testing.T) {
   KindOutputColumn id
   KindProjectScan
     KindFilterScan
+      KindAnalyticScan
+        KindTableScan users
       KindFunctionCall ZetaSQL:$greater
         KindColumnRef $analytic1
         KindLiteral 1
-      KindAnalyticScan
-        KindTableScan users
 `,
 		},
 		{
