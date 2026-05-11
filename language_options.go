@@ -133,8 +133,7 @@ func (o *LanguageOptions) EnableMaximumLanguageFeaturesForDevelopment() {
 //
 //	OVER (...) analytic windows             (FEATURE_ANALYTIC_FUNCTIONS)
 //	IS DISTINCT FROM / IS NOT DISTINCT FROM (FEATURE_V_1_3_IS_DISTINCT)
-//	QUALIFY clause                          (FEATURE_V_1_3_QUALIFY +
-//	                                         keyword reserved — see body)
+//	QUALIFY clause                          (FEATURE_V_1_3_QUALIFY)
 //
 // The function-side minimum-load-bearing five (CIVIL_TIME,
 // ADDITIONAL_STRING_FUNCTIONS, ALLOW_REGEXP_EXTRACT_OPTIONALS, JSON_TYPE,
