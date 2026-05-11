@@ -160,6 +160,16 @@ func (o *LanguageOptions) enableBigQueryExtensions() {
 	o.EnableLanguageFeature(FeatureJsonValueExtractionFunctions)
 	o.EnableLanguageFeature(FeatureV14AliasesForStringAndDateFunctions)
 	o.EnableLanguageFeature(FeatureV14JsonMoreValueExtractionFunctions)
+	// Reserve QUALIFY so the parser accepts the clause without a
+	// companion WHERE/GROUP BY/HAVING. zetasql/parser/zetasql.tm
+	// gates the standalone form on the keyword's reserved/nonreserved
+	// status (see comment at opt_clauses_following_from): standalone
+	// QUALIFY is only valid via the qualify_clause_reserved branch;
+	// the nonreserved branch falls into the pivot_or_unpivot_clause
+	// fallback that emits "QUALIFY clause must be used in conjunction
+	// with WHERE or GROUP BY or HAVING clause". BigQuery production
+	// accepts standalone QUALIFY, so the BigQuery contract reserves it.
+	o.EnableReservableKeyword("QUALIFY", true)
 }
 
 // EnableReservableKeyword sets whether a keyword is reserved.

@@ -894,6 +894,94 @@ func TestEngine_Analyze(t *testing.T) {
 `,
 		},
 		{
+			// Standalone QUALIFY (no companion WHERE/GROUP BY/HAVING).
+			// Regression-protects the QUALIFY keyword reservation in
+			// enableBigQueryExtensions — without that the parser
+			// rejects this shape. Grammar detail is in the production
+			// body comment. Issue #64.
+			name: "standalone QUALIFY with ROW_NUMBER (issue #64)",
+			sql:  "SELECT id FROM users QUALIFY ROW_NUMBER() OVER (ORDER BY id) > 1",
+			cat:  newUsersCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindQualify
+        KindBinaryExpression
+          KindAnalyticFunctionCall
+            KindFunctionCall
+              KindPathExpression
+                KindIdentifier [ROW_NUMBER]
+            KindWindowSpecification
+              KindOrderBy
+                KindOrderingExpression [UNSPECIFIED]
+                  KindPathExpression
+                    KindIdentifier [id]
+          KindIntLiteral [1]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn id
+  KindProjectScan
+    KindFilterScan
+      KindAnalyticScan
+        KindTableScan users
+      KindFunctionCall ZetaSQL:$greater
+        KindColumnRef $analytic1
+        KindLiteral 1
+`,
+		},
+		{
+			// Triangulation axis: different window function (RANK vs
+			// ROW_NUMBER), different ordering direction (DESC vs
+			// unspecified), different comparator (= vs >). Forces the
+			// fix to handle the general standalone-QUALIFY shape rather
+			// than the specific shape of the first case.
+			name: "standalone QUALIFY with RANK and DESC ordering (issue #64)",
+			sql:  "SELECT name FROM users QUALIFY RANK() OVER (ORDER BY id DESC) = 1",
+			cat:  newUsersCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [name]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindQualify
+        KindBinaryExpression
+          KindAnalyticFunctionCall
+            KindFunctionCall
+              KindPathExpression
+                KindIdentifier [RANK]
+            KindWindowSpecification
+              KindOrderBy
+                KindOrderingExpression [DESC]
+                  KindPathExpression
+                    KindIdentifier [id]
+          KindIntLiteral [1]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn name
+  KindProjectScan
+    KindFilterScan
+      KindAnalyticScan
+        KindTableScan users
+      KindFunctionCall ZetaSQL:$equal
+        KindColumnRef $analytic1
+        KindLiteral 1
+`,
+		},
+		{
 			name: "named query parameter in WHERE",
 			sql:  "SELECT id FROM users WHERE id = @id",
 			cat:  newUsersCatalog(),
