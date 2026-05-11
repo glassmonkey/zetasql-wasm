@@ -895,15 +895,14 @@ func TestEngine_Analyze(t *testing.T) {
 		},
 		{
 			// Standalone QUALIFY — no companion WHERE / GROUP BY / HAVING.
-			// BigQuery production accepts this shape, but stock ZetaSQL's
-			// resolver enforces "QUALIFY must coexist with WHERE / GROUP BY
-			// / HAVING" even when the QUALIFY language feature is enabled.
-			// Issue #64 tracks the resolver-side relaxation. This case is
-			// the goal probe: it must produce a non-nil resolved AST once
-			// the patch lands; before the patch it fails the assertion
-			// with AnalyzeError carrying the upstream "must be used in
-			// conjunction with..." message.
-			name: "standalone QUALIFY without WHERE/GROUP BY/HAVING (issue #64)",
+			// BigQuery production accepts this shape; stock ZetaSQL
+			// rejects it at parse time when QUALIFY is nonreserved (the
+			// grammar's pivot_or_unpivot_clause fallback emits "QUALIFY
+			// clause must be used in conjunction with WHERE or GROUP BY
+			// or HAVING clause"). enableBigQueryExtensions() reserves
+			// QUALIFY so the qualify_clause_reserved branch fires.
+			// Issue #64.
+			name: "standalone QUALIFY with ROW_NUMBER (issue #64)",
 			sql:  "SELECT id FROM users QUALIFY ROW_NUMBER() OVER (ORDER BY id) > 1",
 			cat:  newUsersCatalog(),
 			wantParsed: `KindQueryStatement
@@ -937,6 +936,50 @@ func TestEngine_Analyze(t *testing.T) {
       KindAnalyticScan
         KindTableScan users
       KindFunctionCall ZetaSQL:$greater
+        KindColumnRef $analytic1
+        KindLiteral 1
+`,
+		},
+		{
+			// Triangulates the standalone-QUALIFY contract with a
+			// different window function (RANK), a DESC ordering, and an
+			// equality predicate — so an implementation that special-
+			// cased ROW_NUMBER / > 1 to pass the first case still has
+			// to handle the general shape.
+			name: "standalone QUALIFY with RANK and DESC ordering (issue #64)",
+			sql:  "SELECT name FROM users QUALIFY RANK() OVER (ORDER BY id DESC) = 1",
+			cat:  newUsersCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [name]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindQualify
+        KindBinaryExpression
+          KindAnalyticFunctionCall
+            KindFunctionCall
+              KindPathExpression
+                KindIdentifier [RANK]
+            KindWindowSpecification
+              KindOrderBy
+                KindOrderingExpression [DESC]
+                  KindPathExpression
+                    KindIdentifier [id]
+          KindIntLiteral [1]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn name
+  KindProjectScan
+    KindFilterScan
+      KindAnalyticScan
+        KindTableScan users
+      KindFunctionCall ZetaSQL:$equal
         KindColumnRef $analytic1
         KindLiteral 1
 `,
