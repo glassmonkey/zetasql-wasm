@@ -32,6 +32,11 @@ extern "C" {
 // ref: https://github.com/emscripten-core/emscripten/blob/main/system/lib/libc/crt1_reactor.c
 extern void __wasm_call_ctors();
 
+// Forward declarations for the [size][data] result-packing helpers, defined
+// after the proto-bound entrypoints so the entrypoints can call them.
+static void* pack_error(const std::string& error_msg);
+static void* pack_proto(const std::string& serialized);
+
 // Must be called by the host before any function that depends on C++ global state
 // (e.g., AnalyzerOptions relies on abseil globals — without this, CHECK fails and aborts).
 EMSCRIPTEN_KEEPALIVE
@@ -123,55 +128,46 @@ char* parse_statement(const char* sql) {
 // Uses ParseStatement + ParseTreeSerializer (does NOT require AnalyzeStatement)
 // Returns: pointer to struct { size: uint32, data: uint8[] }
 EMSCRIPTEN_KEEPALIVE
-void* parse_statement_proto(const char* sql) {
-    std::string sql_str(sql);
+void* parse_statement_proto(const void* request_ptr, uint32_t request_size) {
+    zetasql::local_service::ParseRequest request;
+    if (!request.ParseFromArray(request_ptr, request_size)) {
+        return pack_error("Failed to parse ParseRequest proto");
+    }
+    if (!request.has_sql_statement()) {
+        return pack_error("ParseRequest must contain sql_statement");
+    }
+    const std::string& sql = request.sql_statement();
+
+    // Forward LanguageOptions from the request to ParserOptions so the
+    // parser honors feature gates (QUALIFY, IS DISTINCT FROM, ...). Without
+    // this the parser would run with default LanguageOptions and reject
+    // BigQuery-shaped SQL even though the caller enabled the right flags.
     zetasql::ParserOptions parser_options;
+    if (request.has_options()) {
+        parser_options.set_language_options(
+            zetasql::LanguageOptions(request.options()));
+    }
 
     std::unique_ptr<zetasql::ParserOutput> parser_output;
     absl::Status status = zetasql::ParseStatement(
-        sql_str, parser_options, &parser_output);
-
+        sql, parser_options, &parser_output);
     if (!status.ok()) {
-        std::string error = "Error: " + status.ToString();
-        uint32_t size = error.size();
-        void* result = malloc(sizeof(uint32_t) + size + 1);
-        memcpy(result, &size, sizeof(uint32_t));
-        memcpy((char*)result + sizeof(uint32_t), error.c_str(), size + 1);
-        return result;
+        return pack_error(status.ToString());
     }
 
-    // Serialize Parse Tree AST to proto using ParseTreeSerializer
     zetasql::AnyASTStatementProto proto;
     absl::Status serialize_status = zetasql::ParseTreeSerializer::Serialize(
         parser_output->statement(), &proto);
-
     if (!serialize_status.ok()) {
-        std::string error = "Error serializing: " + serialize_status.ToString();
-        uint32_t size = error.size();
-        void* result = malloc(sizeof(uint32_t) + size + 1);
-        memcpy(result, &size, sizeof(uint32_t));
-        memcpy((char*)result + sizeof(uint32_t), error.c_str(), size + 1);
-        return result;
+        return pack_error(
+            "Failed to serialize parsed AST: " + serialize_status.ToString());
     }
 
-    // Serialize proto to bytes
     std::string serialized;
     if (!proto.SerializeToString(&serialized)) {
-        std::string error = "Error: Failed to serialize proto";
-        uint32_t size = error.size();
-        void* result = malloc(sizeof(uint32_t) + size + 1);
-        memcpy(result, &size, sizeof(uint32_t));
-        memcpy((char*)result + sizeof(uint32_t), error.c_str(), size + 1);
-        return result;
+        return pack_error("Failed to serialize proto");
     }
-
-    // Allocate memory for size + data
-    uint32_t size = serialized.size();
-    void* result = malloc(sizeof(uint32_t) + size);
-    memcpy(result, &size, sizeof(uint32_t));
-    memcpy((char*)result + sizeof(uint32_t), serialized.data(), size);
-
-    return result;
+    return pack_proto(serialized);
 }
 
 // Helper: pack error into [size][data] format
@@ -571,7 +567,14 @@ void* parse_next_statement_proto(const void* request_ptr, uint32_t request_size)
     resume_location.set_byte_position(
         request.parse_resume_location().byte_position());
 
+    // Forward LanguageOptions to ParserOptions for the same reason
+    // parse_statement_proto does — without it BigQuery-shaped SQL
+    // (QUALIFY, IS DISTINCT FROM, ...) is rejected at parse time.
     zetasql::ParserOptions parser_options;
+    if (request.has_options()) {
+        parser_options.set_language_options(
+            zetasql::LanguageOptions(request.options()));
+    }
     std::unique_ptr<zetasql::ParserOutput> parser_output;
     bool at_end_of_input = false;
     absl::Status status = zetasql::ParseNextStatement(

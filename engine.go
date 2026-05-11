@@ -123,26 +123,33 @@ func (e *Engine) Close(ctx context.Context) error {
 // Parse parses a SQL statement and returns the AST. Returns a
 // *ParseError if the SQL is syntactically invalid.
 func (e *Engine) Parse(ctx context.Context, sql string) (*Statement, error) {
-	malloc := e.module.ExportedFunction("malloc")
-	free := e.module.ExportedFunction("free")
+	request := &generated.ParseRequest{
+		Target:  &generated.ParseRequest_SqlStatement{SqlStatement: sql},
+		Options: parseRequestLanguageOptions(),
+	}
+	requestBytes, err := proto.Marshal(request)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal ParseRequest: %w", err)
+	}
+
+	mallocFn := e.module.ExportedFunction("malloc")
+	freeFn := e.module.ExportedFunction("free")
 	parseProtoFunc := e.module.ExportedFunction("parse_statement_proto")
 	freeProtoBuffer := e.module.ExportedFunction("free_proto_buffer")
 
-	sqlBytes := []byte(sql)
-	sqlLen := uint64(len(sqlBytes) + 1)
-
-	results, err := malloc.Call(ctx, sqlLen)
+	reqSize := uint64(len(requestBytes))
+	results, err := mallocFn.Call(ctx, reqSize)
 	if err != nil {
 		return nil, fmt.Errorf("failed to allocate memory: %w", err)
 	}
-	sqlPtr := results[0]
-	defer func() { _, _ = free.Call(ctx, sqlPtr) }()
+	reqPtr := results[0]
+	defer func() { _, _ = freeFn.Call(ctx, reqPtr) }()
 
-	if !e.module.Memory().Write(uint32(sqlPtr), append(sqlBytes, 0)) {
-		return nil, fmt.Errorf("failed to write SQL to WASM memory")
+	if !e.module.Memory().Write(uint32(reqPtr), requestBytes) {
+		return nil, fmt.Errorf("failed to write request to WASM memory")
 	}
 
-	results, err = parseProtoFunc.Call(ctx, sqlPtr)
+	results, err = parseProtoFunc.Call(ctx, reqPtr, reqSize)
 	if err != nil {
 		return nil, fmt.Errorf("failed to call parse function: %w", err)
 	}
@@ -249,6 +256,7 @@ func (e *Engine) ParseNext(
 				BytePosition: &loc.BytePosition,
 			},
 		},
+		Options: parseRequestLanguageOptions(),
 	}
 	requestBytes, err := proto.Marshal(request)
 	if err != nil {
@@ -489,6 +497,19 @@ func buildOutput(response *generated.AnalyzeResponse, parsedProto *generated.Any
 		out.Parsed = parsed
 	}
 	return out, nil
+}
+
+// parseRequestLanguageOptions returns the LanguageOptionsProto attached
+// to ParseRequest so the WASM bridge can forward it to ParserOptions.
+// Engine.Parse and Engine.ParseNext do not take an AnalyzerOptions
+// argument, but the parser still has to know which BigQuery-shaped
+// constructs to accept (QUALIFY, IS DISTINCT FROM, ...). Reusing the
+// same default contract Engine.Analyze applies (via
+// buildAnalyzeRequestOptions) keeps the parse-only and analyze paths
+// from drifting.
+func parseRequestLanguageOptions() *generated.LanguageOptionsProto {
+	_, language := buildAnalyzeRequestOptions(nil)
+	return language
 }
 
 // buildAnalyzeRequestOptions returns the AnalyzerOptionsProto Engine.Analyze
