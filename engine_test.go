@@ -894,14 +894,11 @@ func TestEngine_Analyze(t *testing.T) {
 `,
 		},
 		{
-			// Standalone QUALIFY — no companion WHERE / GROUP BY / HAVING.
-			// BigQuery production accepts this shape; stock ZetaSQL
-			// rejects it at parse time when QUALIFY is nonreserved (the
-			// grammar's pivot_or_unpivot_clause fallback emits "QUALIFY
-			// clause must be used in conjunction with WHERE or GROUP BY
-			// or HAVING clause"). enableBigQueryExtensions() reserves
-			// QUALIFY so the qualify_clause_reserved branch fires.
-			// Issue #64.
+			// Standalone QUALIFY (no companion WHERE/GROUP BY/HAVING).
+			// Regression-protects the QUALIFY keyword reservation in
+			// enableBigQueryExtensions — without that the parser
+			// rejects this shape. Grammar detail is in the production
+			// body comment. Issue #64.
 			name: "standalone QUALIFY with ROW_NUMBER (issue #64)",
 			sql:  "SELECT id FROM users QUALIFY ROW_NUMBER() OVER (ORDER BY id) > 1",
 			cat:  newUsersCatalog(),
@@ -941,11 +938,11 @@ func TestEngine_Analyze(t *testing.T) {
 `,
 		},
 		{
-			// Triangulates the standalone-QUALIFY contract with a
-			// different window function (RANK), a DESC ordering, and an
-			// equality predicate — so an implementation that special-
-			// cased ROW_NUMBER / > 1 to pass the first case still has
-			// to handle the general shape.
+			// Triangulation axis: different window function (RANK vs
+			// ROW_NUMBER), different ordering direction (DESC vs
+			// unspecified), different comparator (= vs >). Forces the
+			// fix to handle the general standalone-QUALIFY shape rather
+			// than the specific shape of the first case.
 			name: "standalone QUALIFY with RANK and DESC ordering (issue #64)",
 			sql:  "SELECT name FROM users QUALIFY RANK() OVER (ORDER BY id DESC) = 1",
 			cat:  newUsersCatalog(),
