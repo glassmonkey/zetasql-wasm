@@ -894,6 +894,54 @@ func TestEngine_Analyze(t *testing.T) {
 `,
 		},
 		{
+			// Standalone QUALIFY — no companion WHERE / GROUP BY / HAVING.
+			// BigQuery production accepts this shape, but stock ZetaSQL's
+			// resolver enforces "QUALIFY must coexist with WHERE / GROUP BY
+			// / HAVING" even when the QUALIFY language feature is enabled.
+			// Issue #64 tracks the resolver-side relaxation. This case is
+			// the goal probe: it must produce a non-nil resolved AST once
+			// the patch lands; before the patch it fails the assertion
+			// with AnalyzeError carrying the upstream "must be used in
+			// conjunction with..." message.
+			name: "standalone QUALIFY without WHERE/GROUP BY/HAVING (issue #64)",
+			sql:  "SELECT id FROM users QUALIFY ROW_NUMBER() OVER (ORDER BY id) > 1",
+			cat:  newUsersCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindQualify
+        KindBinaryExpression
+          KindAnalyticFunctionCall
+            KindFunctionCall
+              KindPathExpression
+                KindIdentifier [ROW_NUMBER]
+            KindWindowSpecification
+              KindOrderBy
+                KindOrderingExpression [UNSPECIFIED]
+                  KindPathExpression
+                    KindIdentifier [id]
+          KindIntLiteral [1]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn id
+  KindProjectScan
+    KindFilterScan
+      KindFunctionCall ZetaSQL:$greater
+        KindColumnRef $analytic1
+        KindLiteral 1
+      KindAnalyticScan
+        KindTableScan users
+`,
+		},
+		{
 			name: "named query parameter in WHERE",
 			sql:  "SELECT id FROM users WHERE id = @id",
 			cat:  newUsersCatalog(),
