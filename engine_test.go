@@ -2895,6 +2895,59 @@ func TestEngine_Parse(t *testing.T) {
             KindIdentifier [users]
 `,
 		},
+		// V_1_3 BigQuery syntax. Engine.Analyze already accepts both
+		// (covered in TestEngine_Analyze); Engine.Parse should accept
+		// them too, because the parser-only path is what bigquery-emulator
+		// reaches first when it pre-checks SQL before running analysis.
+		// zetasql-wasm targets BigQuery compatibility so the parser sees
+		// the same default LanguageOptions Engine.Analyze layers, with no
+		// caller opt-in required.
+		{
+			name: "BigQuery IS DISTINCT FROM",
+			sql:  "SELECT 1 IS DISTINCT FROM 2",
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindBinaryExpression
+            KindIntLiteral [1]
+            KindIntLiteral [2]
+`,
+		},
+		{
+			name: "BigQuery QUALIFY clause",
+			sql:  "SELECT id FROM users WHERE id > 0 QUALIFY ROW_NUMBER() OVER (ORDER BY id) = 1",
+			want: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindPathExpression
+            KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+      KindWhereClause
+        KindBinaryExpression
+          KindPathExpression
+            KindIdentifier [id]
+          KindIntLiteral [0]
+      KindQualify
+        KindBinaryExpression
+          KindAnalyticFunctionCall
+            KindFunctionCall
+              KindPathExpression
+                KindIdentifier [ROW_NUMBER]
+            KindWindowSpecification
+              KindOrderBy
+                KindOrderingExpression [UNSPECIFIED]
+                  KindPathExpression
+                    KindIdentifier [id]
+          KindIntLiteral [1]
+`,
+		},
 		{name: "incomplete SELECT", sql: "SELECT", wantErr: &ParseError{}},
 		{name: "missing select list", sql: "SELECT FROM users", wantErr: &ParseError{}},
 		{name: "unmatched right paren", sql: "SELECT 1) FROM users", wantErr: &ParseError{}},
