@@ -147,16 +147,49 @@ func TestWrapLiteralValue(t *testing.T) {
 			},
 		},
 		{
-			name: "DATETIME has a Type but Value is nil (nested-proto kind not yet wrapped)",
+			name: "DATETIME = 2026-05-10 12:34:56.123456789 (proto Datetime message wrapped)",
 			in: &generated.ValueWithTypeProto{
 				Type: typeOf(generated.TypeKind_TYPE_DATETIME),
 				Value: &generated.ValueProto{
 					Value: &generated.ValueProto_DatetimeValue{
-						DatetimeValue: &generated.ValueProto_Datetime{},
+						DatetimeValue: &generated.ValueProto_Datetime{
+							// Packed64DatetimeSeconds for 2026-05-10 12:34:56.
+							BitFieldDatetimeSeconds: ptr(int64(
+								(2026 << 26) | (5 << 22) | (10 << 17) |
+									(12 << 12) | (34 << 6) | 56,
+							)),
+							Nanos: ptr(int32(123456789)),
+						},
 					},
 				},
 			},
-			want: &LiteralValue{Type: DatetimeType(), Value: nil},
+			want: &LiteralValue{
+				Type: DatetimeType(),
+				Value: &generated.ValueProto_Datetime{
+					BitFieldDatetimeSeconds: ptr(int64(
+						(2026 << 26) | (5 << 22) | (10 << 17) |
+							(12 << 12) | (34 << 6) | 56,
+					)),
+					Nanos: ptr(int32(123456789)),
+				},
+			},
+		},
+		{
+			name: "TIME = 12:34:56.123456789 (Packed64TimeNanos bit field wrapped)",
+			in: &generated.ValueWithTypeProto{
+				Type: typeOf(generated.TypeKind_TYPE_TIME),
+				Value: &generated.ValueProto{
+					Value: &generated.ValueProto_TimeValue{
+						// Packed64TimeNanos: ((hour<<12)|(min<<6)|sec) << 30 | nano
+						TimeValue: ((int64(12) << 12) | (int64(34) << 6) | 56) << 30 |
+							123456789,
+					},
+				},
+			},
+			want: &LiteralValue{
+				Type: TimeType(),
+				Value: ((int64(12) << 12) | (int64(34) << 6) | 56) << 30 | 123456789,
+			},
 		},
 		{
 			name: "STRUCT with mismatched field count yields Value=nil (defensive)",
@@ -287,6 +320,29 @@ func TestLiteralValue_TypedAccessors_HappyPath(t *testing.T) {
 			in:   &LiteralValue{Type: TimeType(), Value: int64(123456789)},
 			want: int64(123456789),
 			call: func(v *LiteralValue) (any, bool) { return v.AsTimeMicros() },
+		},
+		{
+			name: "AsTimeOfDay decodes Packed64TimeNanos 12:34:56.123456789",
+			in: &LiteralValue{
+				Type:  TimeType(),
+				Value: ((int64(12) << 12) | (int64(34) << 6) | 56) << 30 | 123456789,
+			},
+			want: time.Date(1, time.January, 1, 12, 34, 56, 123456789, time.UTC),
+			call: func(v *LiteralValue) (any, bool) { return v.AsTimeOfDay() },
+		},
+		{
+			name: "AsDatetime decodes Packed64DatetimeSeconds + Nanos 2026-05-10 12:34:56.123456789",
+			in: &LiteralValue{
+				Type: DatetimeType(),
+				Value: &generated.ValueProto_Datetime{
+					BitFieldDatetimeSeconds: ptr(int64(
+						(2026 << 26) | (5 << 22) | (10 << 17) | (12 << 12) | (34 << 6) | 56,
+					)),
+					Nanos: ptr(int32(123456789)),
+				},
+			},
+			want: time.Date(2026, time.May, 10, 12, 34, 56, 123456789, time.UTC),
+			call: func(v *LiteralValue) (any, bool) { return v.AsDatetime() },
 		},
 		{
 			name: "AsTimestamp",
@@ -457,6 +513,16 @@ func TestLiteralValue_TypedAccessors_ContractViolation(t *testing.T) {
 			call: func(v *LiteralValue) (any, bool) { return v.AsTimeMicros() },
 		},
 		{
+			name: "AsTimeOfDay", typ: TimeType(), wrongTyp: Int64Type(),
+			wrongValue: "not-int64", zero: time.Time{},
+			call: func(v *LiteralValue) (any, bool) { return v.AsTimeOfDay() },
+		},
+		{
+			name: "AsDatetime", typ: DatetimeType(), wrongTyp: Int64Type(),
+			wrongValue: int64(1), zero: time.Time{},
+			call: func(v *LiteralValue) (any, bool) { return v.AsDatetime() },
+		},
+		{
 			name: "AsTimestamp", typ: TimestampType(), wrongTyp: Int64Type(),
 			wrongValue: int64(1), zero: time.Time{},
 			call: func(v *LiteralValue) (any, bool) { return v.AsTimestamp() },
@@ -540,23 +606,195 @@ func TestLiteralValue_TypedAccessors_ContractViolation(t *testing.T) {
 	}
 }
 
-// TestLiteralValue_AsTimestamp_TypedNilPointer covers a case the
-// generic accessor contract cannot express: even when Value is a
-// genuine *timestamppb.Timestamp (so the type assertion succeeds),
-// a nil pointer must still be reported as (zero, false) because
-// AsTime on a nil receiver would otherwise panic. Kept as a separate
-// test so the AsTimestamp wrapping path is the only thing under
-// observation.
-func TestLiteralValue_AsTimestamp_TypedNilPointer(t *testing.T) {
-	// Arrange
-	sut := &LiteralValue{Type: TimestampType(), Value: (*timestamppb.Timestamp)(nil)}
+// TestLiteralValue_TypedNilPointer pins the guard that accessors
+// returning a time.Time apply on top of asScalar: a *typed* nil
+// pointer (the Value's dynamic type matches the accessor's expected
+// pointer type, but the pointer itself is nil) is reported as
+// (zero, false). asScalar alone cannot reject this case because the
+// type assertion succeeds on a typed nil, and proto-go's generated
+// Get* methods are nil-safe and return zeroes — without the explicit
+// `X == nil` guard, the accessor would silently return a normalized
+// time.Date(0, 0, 0, ...) with ok=true instead of (zero, false).
+//
+// Every accessor that returns a time.Time over a proto pointer Value
+// shares this guard; the table lists them so a new accessor of the
+// same shape only needs one row, and a regression in any guard shows
+// up as one specific row failing.
+func TestLiteralValue_TypedNilPointer(t *testing.T) {
+	tests := []struct {
+		name string
+		sut  *LiteralValue
+		call func(*LiteralValue) (time.Time, bool)
+	}{
+		{
+			name: "AsTimestamp on (*timestamppb.Timestamp)(nil)",
+			sut:  &LiteralValue{Type: TimestampType(), Value: (*timestamppb.Timestamp)(nil)},
+			call: func(v *LiteralValue) (time.Time, bool) { return v.AsTimestamp() },
+		},
+		{
+			name: "AsDatetime on (*generated.ValueProto_Datetime)(nil)",
+			sut:  &LiteralValue{Type: DatetimeType(), Value: (*generated.ValueProto_Datetime)(nil)},
+			call: func(v *LiteralValue) (time.Time, bool) { return v.AsDatetime() },
+		},
+	}
 
-	// Act
-	got, ok := sut.AsTimestamp()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := tt.sut
 
-	// Assert
-	assert.False(t, ok)
-	assert.Equal(t, time.Time{}, got)
+			// Act
+			got, ok := tt.call(sut)
+
+			// Assert
+			assert.False(t, ok)
+			assert.Equal(t, time.Time{}, got)
+		})
+	}
+}
+
+// TestLiteralValue_AsDatetime_DecodesPacked64DatetimeSeconds documents
+// the proto encoding the accessor consumes:
+//
+//	BitFieldDatetimeSeconds (int64) holds a Packed64DatetimeSeconds
+//	bit field (civil_time.h):
+//	  bits 0-5    second (6 bits)
+//	  bits 6-11   minute (6 bits)
+//	  bits 12-16  hour   (5 bits)
+//	  bits 17-21  day    (5 bits)
+//	  bits 22-25  month  (4 bits)
+//	  bits 26-39  year   (14 bits)
+//	Nanos (int32) carries the nanosecond fraction in a separate field,
+//	NOT packed into the int64.
+//
+// The cases triangulate this contract: every component decodes from
+// the right bit window, Nanos rides as its own field (not multiplied
+// into microseconds), and the high year / max-second boundaries do
+// not lose bits. A regression in any shift / mask in the decoder
+// shows up as one specific row failing.
+func TestLiteralValue_AsDatetime_DecodesPacked64DatetimeSeconds(t *testing.T) {
+	packSeconds := func(year, month, day, hour, minute, second int64) int64 {
+		return (year << 26) | (month << 22) | (day << 17) |
+			(hour << 12) | (minute << 6) | second
+	}
+
+	tests := []struct {
+		name string
+		dt   *generated.ValueProto_Datetime
+		want time.Time
+	}{
+		{
+			name: "midnight 0001-01-01 (Go zero-ish, all components at min) with Nanos=0",
+			dt: &generated.ValueProto_Datetime{
+				BitFieldDatetimeSeconds: ptr(packSeconds(1, 1, 1, 0, 0, 0)),
+				Nanos:                   ptr(int32(0)),
+			},
+			want: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			name: "2026-05-10 12:34:56 with Nanos=123456789 (Nanos rides as separate field)",
+			dt: &generated.ValueProto_Datetime{
+				BitFieldDatetimeSeconds: ptr(packSeconds(2026, 5, 10, 12, 34, 56)),
+				Nanos:                   ptr(int32(123456789)),
+			},
+			want: time.Date(2026, time.May, 10, 12, 34, 56, 123456789, time.UTC),
+		},
+		{
+			name: "max year 9999-12-31 23:59:59 with Nanos=999999999 (14-bit year, no truncation)",
+			dt: &generated.ValueProto_Datetime{
+				BitFieldDatetimeSeconds: ptr(packSeconds(9999, 12, 31, 23, 59, 59)),
+				Nanos:                   ptr(int32(999999999)),
+			},
+			want: time.Date(9999, time.December, 31, 23, 59, 59, 999999999, time.UTC),
+		},
+		{
+			name: "Nanos field absent (proto Get* returns 0) decodes to zero nanoseconds",
+			dt: &generated.ValueProto_Datetime{
+				BitFieldDatetimeSeconds: ptr(packSeconds(2026, 5, 10, 12, 34, 56)),
+				Nanos:                   nil,
+			},
+			want: time.Date(2026, time.May, 10, 12, 34, 56, 0, time.UTC),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := &LiteralValue{Type: DatetimeType(), Value: tt.dt}
+
+			// Act
+			got, ok := sut.AsDatetime()
+
+			// Assert
+			assert.True(t, ok)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+// TestLiteralValue_AsTimeOfDay_DecodesPacked64TimeNanos documents the
+// proto encoding the accessor consumes:
+//
+//	time_value (int64) holds a Packed64TimeNanos bit field
+//	(civil_time.h):
+//	  bits 0-29   nanosecond (30 bits)
+//	  bits 30-35  second     (6 bits)
+//	  bits 36-41  minute     (6 bits)
+//	  bits 42-46  hour       (5 bits)
+//	Unlike DATETIME the nanos are packed INTO the int64, not carried
+//	as a separate field — so the decoder must use the 30-bit
+//	NanosShift, not the 20-bit MicrosShift that some legacy decoders
+//	use.
+//
+// The date portion of the returned time.Time is fixed to the Go zero
+// date (year=1, month=January, day=1) in UTC; callers that only
+// consume the time-of-day components (e.g. format with
+// "15:04:05.999999999") get the right answer.
+func TestLiteralValue_AsTimeOfDay_DecodesPacked64TimeNanos(t *testing.T) {
+	packNanos := func(hour, minute, second, nano int64) int64 {
+		return (((hour << 12) | (minute << 6) | second) << 30) | nano
+	}
+
+	tests := []struct {
+		name string
+		bits int64
+		want time.Time
+	}{
+		{
+			name: "00:00:00.000000000 (all zero bits)",
+			bits: packNanos(0, 0, 0, 0),
+			want: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			name: "12:34:56.123456789 (mid-range with non-zero nanos)",
+			bits: packNanos(12, 34, 56, 123456789),
+			want: time.Date(1, time.January, 1, 12, 34, 56, 123456789, time.UTC),
+		},
+		{
+			name: "23:59:59.999999999 (max time-of-day, 30-bit nanos at boundary)",
+			bits: packNanos(23, 59, 59, 999999999),
+			want: time.Date(1, time.January, 1, 23, 59, 59, 999999999, time.UTC),
+		},
+		{
+			name: "00:00:00.000000001 (smallest nano, isolates nanos low bit)",
+			bits: packNanos(0, 0, 0, 1),
+			want: time.Date(1, time.January, 1, 0, 0, 0, 1, time.UTC),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := &LiteralValue{Type: TimeType(), Value: tt.bits}
+
+			// Act
+			got, ok := sut.AsTimeOfDay()
+
+			// Assert
+			assert.True(t, ok)
+			assert.Equal(t, tt.want, got)
+		})
+	}
 }
 
 // TestLiteralValue_AsEnumName_NameOfFailure covers the AsEnumName

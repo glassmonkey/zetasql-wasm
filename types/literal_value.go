@@ -19,7 +19,10 @@ import (
 //	BYTES / GEOGRAPHY / NUMERIC /
 //	BIGNUMERIC / INTERVAL                 []byte (proto-encoded payload)
 //	DATE                                  int32 (days since 1970-01-01)
-//	TIME                                  int64 (encoded time-of-day)
+//	TIME                                  int64 (Packed64TimeNanos bit field;
+//	                                      see civil_time.h)
+//	DATETIME                              *generated.ValueProto_Datetime
+//	                                      (Packed64DatetimeSeconds + Nanos)
 //	TIMESTAMP                             *timestamppb.Timestamp
 //	ENUM                                  int32 (proto enum number;
 //	                                      Type.AsEnum().NameOf resolves it)
@@ -28,10 +31,10 @@ import (
 //	NULL (proto: empty oneof)             nil
 //
 // Kinds whose proto representation is a nested proto message that is
-// not yet wrapped (DATETIME, TIMESTAMP_PICOS, RANGE, MAP, TOKENLIST,
-// UUID), and the kinds WrapType itself does not yet model (PROTO,
-// EXTENDED), currently come back with Value=nil. The wrap surface
-// will grow as actual callers ask for them.
+// not yet wrapped (TIMESTAMP_PICOS, RANGE, MAP, TOKENLIST, UUID), and
+// the kinds WrapType itself does not yet model (PROTO, EXTENDED),
+// currently come back with Value=nil. The wrap surface will grow as
+// actual callers ask for them.
 type LiteralValue struct {
 	Type  Type
 	Value any
@@ -95,6 +98,8 @@ func convertValue(typ Type, v *generated.ValueProto) any {
 		return v.GetDateValue()
 	case Time:
 		return v.GetTimeValue()
+	case Datetime:
+		return v.GetDatetimeValue()
 	case Timestamp:
 		return v.GetTimestampValue()
 	case Geography:
@@ -202,7 +207,79 @@ func (v *LiteralValue) AsDateDays() (int32, bool) { return asScalar[int32](v, Da
 
 // AsTimeMicros returns the TIME value in ZetaSQL's encoded
 // time-of-day form (the same int64 shape the proto carries).
+//
+// The encoding is Packed64TimeNanos (see civil_time.h): the low 30
+// bits hold the nanosecond fraction and the next 17 bits hold a
+// hour/minute/second tri-field. Callers that want a Go time.Time
+// instead of the raw bit field should use AsTimeOfDay, which hides
+// this encoding.
 func (v *LiteralValue) AsTimeMicros() (int64, bool) { return asScalar[int64](v, Time) }
+
+// civil_time.h packed bit-field constants for the SECOND/MINUTE/HOUR/
+// DAY/MONTH/YEAR tri-fields that ZetaSQL reuses across the
+// Packed64DatetimeSeconds and Packed64TimeNanos encodings.
+const (
+	civilTimeSecondShift = 0
+	civilTimeMinuteShift = 6
+	civilTimeHourShift   = 12
+	civilTimeDayShift    = 17
+	civilTimeMonthShift  = 22
+	civilTimeYearShift   = 26
+
+	civilTimeSecondMask = 0x3F   // 6 bits
+	civilTimeMinuteMask = 0x3F   // 6 bits
+	civilTimeHourMask   = 0x1F   // 5 bits
+	civilTimeDayMask    = 0x1F   // 5 bits
+	civilTimeMonthMask  = 0xF    // 4 bits
+	civilTimeYearMask   = 0x3FFF // 14 bits
+
+	civilTimeNanosShift = 30
+	civilTimeNanosMask  = 0x3FFFFFFF // 30 bits
+)
+
+// AsTimeOfDay returns the TIME value as a time.Time, decoding the
+// Packed64TimeNanos bit field that the proto carries. Only the
+// hour/minute/second/nanosecond components are meaningful; the date
+// portion is fixed to the Go zero date (year=1, month=January, day=1)
+// in UTC so callers that only consume the time-of-day components
+// (e.g. format with "15:04:05.999999999") get the right answer.
+//
+// Callers that need the raw int64 bit field for round-tripping or
+// custom decoding should use AsTimeMicros instead.
+func (v *LiteralValue) AsTimeOfDay() (time.Time, bool) {
+	bits, ok := asScalar[int64](v, Time)
+	if !ok {
+		return time.Time{}, false
+	}
+	u := uint64(bits)
+	nano := int(u & civilTimeNanosMask)
+	hms := u >> civilTimeNanosShift
+	hour := int((hms >> civilTimeHourShift) & civilTimeHourMask)
+	minute := int((hms >> civilTimeMinuteShift) & civilTimeMinuteMask)
+	second := int((hms >> civilTimeSecondShift) & civilTimeSecondMask)
+	return time.Date(1, time.January, 1, hour, minute, second, nano, time.UTC), true
+}
+
+// AsDatetime returns the DATETIME value as a time.Time, decoding the
+// Packed64DatetimeSeconds + Nanos pair that the proto carries. The
+// returned time is in UTC; DATETIME has no time-zone semantics in
+// ZetaSQL, so UTC is used as a neutral carrier (mirroring the choice
+// made for AsTimestamp on a TIMESTAMP literal with no zone offset).
+func (v *LiteralValue) AsDatetime() (time.Time, bool) {
+	dt, ok := asScalar[*generated.ValueProto_Datetime](v, Datetime)
+	if !ok || dt == nil {
+		return time.Time{}, false
+	}
+	u := uint64(dt.GetBitFieldDatetimeSeconds())
+	year := int((u >> civilTimeYearShift) & civilTimeYearMask)
+	month := int((u >> civilTimeMonthShift) & civilTimeMonthMask)
+	day := int((u >> civilTimeDayShift) & civilTimeDayMask)
+	hour := int((u >> civilTimeHourShift) & civilTimeHourMask)
+	minute := int((u >> civilTimeMinuteShift) & civilTimeMinuteMask)
+	second := int((u >> civilTimeSecondShift) & civilTimeSecondMask)
+	nano := int(dt.GetNanos())
+	return time.Date(year, time.Month(month), day, hour, minute, second, nano, time.UTC), true
+}
 
 // AsTimestamp returns the TIMESTAMP value as a time.Time. Callers do
 // not need to import google.golang.org/protobuf/types/known/timestamppb
