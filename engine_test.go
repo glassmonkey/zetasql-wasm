@@ -795,6 +795,44 @@ func TestEngine_Analyze(t *testing.T) {
     KindSingleRowScan
 `,
 		},
+		// Pins the analyzer's deferred-runtime contract for invalid
+		// literal casts: when the constant fold would fail
+		// (StringToNumeric("apple") returns kInvalidArgument), zetasql
+		// 2025.x deliberately abandons the fold and leaves a
+		// ResolvedCast for runtime evaluation instead of producing an
+		// analyze-time error
+		// (zetasql/analyzer/resolver_expr.cc, ResolveExplicitCast,
+		// ShouldTryCastConstantFold branch). Downstream callers --
+		// the emulator's SQLite runtime is the immediate one -- depend
+		// on this shape to surface the BigQuery-style wording via
+		// types.CastValueError at runtime. If upstream ever reverts to
+		// reject-at-analyze, the wantResolved tree gains an analyze
+		// error and this test fires before downstream silently breaks.
+		{
+			name: "CAST of unparseable string literal is deferred to runtime",
+			sql:  `SELECT CAST("apple" AS INT64)`,
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindCastExpression
+            KindStringLiteral [apple]
+              KindStringLiteralComponent
+            KindSimpleType
+              KindPathExpression
+                KindIdentifier [INT64]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindCast
+        KindLiteral "apple"
+    KindSingleRowScan
+`,
+		},
 		{
 			name: "NOT BETWEEN",
 			sql:  "SELECT id FROM users WHERE NOT id BETWEEN 1 AND 10",
