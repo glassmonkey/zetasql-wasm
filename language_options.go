@@ -134,6 +134,7 @@ func (o *LanguageOptions) EnableMaximumLanguageFeaturesForDevelopment() {
 //	OVER (...) analytic windows             (FEATURE_ANALYTIC_FUNCTIONS)
 //	IS DISTINCT FROM / IS NOT DISTINCT FROM (FEATURE_V_1_3_IS_DISTINCT)
 //	QUALIFY clause                          (FEATURE_V_1_3_QUALIFY)
+//	FROM my-dashed-project.ds.t             (FEATURE_V_1_3_ALLOW_DASHES_IN_TABLE_NAME)
 //
 // The function-side minimum-load-bearing five (CIVIL_TIME,
 // ADDITIONAL_STRING_FUNCTIONS, ALLOW_REGEXP_EXTRACT_OPTIONALS, JSON_TYPE,
@@ -143,7 +144,10 @@ func (o *LanguageOptions) EnableMaximumLanguageFeaturesForDevelopment() {
 // JSON_MORE_VALUE_EXTRACTION_FUNCTIONS) were added on the recommendation
 // of the downstream bigquery-emulator. IS_DISTINCT and QUALIFY are
 // included because both are standard BigQuery query syntax that callers
-// should not have to opt into for this fork.
+// should not have to opt into for this fork. ALLOW_DASHES_IN_TABLE_NAME
+// is included so the parser accepts unquoted dashed project identifiers
+// such as `my-dashed-project.ds.t`, matching BigQuery's table-name
+// syntax (downstream bigquery-emulator issue #57).
 //
 // Other commonly-needed BigQuery features (NUMERIC, BIGNUMERIC, INTERVAL,
 // TIMESTAMP_NANOS, NAMED_ARGUMENTS, V_1_3 date constructors / arithmetics
@@ -160,6 +164,7 @@ func (o *LanguageOptions) enableBigQueryExtensions() {
 	o.EnableLanguageFeature(FeatureJsonValueExtractionFunctions)
 	o.EnableLanguageFeature(FeatureV14AliasesForStringAndDateFunctions)
 	o.EnableLanguageFeature(FeatureV14JsonMoreValueExtractionFunctions)
+	o.EnableLanguageFeature(FeatureV13AllowDashesInTableName)
 	// Reserve QUALIFY so the parser accepts the clause without a
 	// companion WHERE/GROUP BY/HAVING. zetasql/parser/zetasql.tm
 	// gates the standalone form on the keyword's reserved/nonreserved
