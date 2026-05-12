@@ -97,3 +97,81 @@ func TestParseLocationRange_GeneratedDelegate(t *testing.T) {
 
 	assert.Equal(t, loc, got)
 }
+
+// TestParseLocationOf locks the public ParseLocationOf contract: handed
+// any Node, extract the (Start, End) byte range without leaking the proto
+// type to callers. Cases triangulate the happy path with two different
+// ranges to force the impl to actually read the per-node values, plus
+// edge cases for an unset range and a Node that does not carry parse
+// location (the structural-interface assertion miss).
+func TestParseLocationOf(t *testing.T) {
+	tests := []struct {
+		name string
+		node Node
+		want ParseLocation
+		ok   bool
+	}{
+		{
+			name: "identifier carries range",
+			node: newIdentifierNode(&generated.ASTIdentifierProto{
+				Parent: &generated.ASTExpressionProto{
+					Parent: &generated.ASTNodeProto{
+						ParseLocationRange: &generated.ParseLocationRangeProto{
+							Start: ptr(int32(3)),
+							End:   ptr(int32(9)),
+						},
+					},
+				},
+			}),
+			want: ParseLocation{Start: 3, End: 9},
+			ok:   true,
+		},
+		{
+			// Triangulation axis: different byte range so an impl that
+			// hard-coded (3, 9) to pass the first case still has to read
+			// the per-node values.
+			name: "identifier carries a different range",
+			node: newIdentifierNode(&generated.ASTIdentifierProto{
+				Parent: &generated.ASTExpressionProto{
+					Parent: &generated.ASTNodeProto{
+						ParseLocationRange: &generated.ParseLocationRangeProto{
+							Start: ptr(int32(42)),
+							End:   ptr(int32(57)),
+						},
+					},
+				},
+			}),
+			want: ParseLocation{Start: 42, End: 57},
+			ok:   true,
+		},
+		{
+			name: "identifier with no range returns ok=false",
+			node: newIdentifierNode(&generated.ASTIdentifierProto{
+				Parent: &generated.ASTExpressionProto{
+					Parent: &generated.ASTNodeProto{},
+				},
+			}),
+			want: ParseLocation{},
+			ok:   false,
+		},
+		{
+			name: "broken parent chain returns ok=false",
+			node: newIdentifierNode(&generated.ASTIdentifierProto{Parent: nil}),
+			want: ParseLocation{},
+			ok:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := tt.node
+
+			// Act
+			got, ok := ParseLocationOf(sut)
+
+			// Assert
+			assert.Equal(t, tt.ok, ok)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
