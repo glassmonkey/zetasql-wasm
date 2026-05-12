@@ -2,6 +2,7 @@ package zetasql
 
 import (
 	"context"
+	"errors"
 	"os"
 	"strings"
 	"sync"
@@ -1849,6 +1850,56 @@ func TestEngine_Analyze(t *testing.T) {
 			require.NotNil(t, out.Parsed, "AnalyzeOutput.Parsed must be populated")
 			assert.Equal(t, tt.wantParsed, out.Parsed.String())
 			assert.Equal(t, tt.wantResolved, out.Resolved.String())
+		})
+	}
+}
+
+// TestEngine_Analyze_PopulatesCastValueErrorLocation pins the
+// analyzer-side population of CastValueError.Line / Col when
+// RejectInvalidLiteralCasts is on. The corresponding cases in
+// TestEngine_Analyze pin the error TYPE via assert.IsType, but the
+// type witness does not reach the Line / Col fields -- a regression
+// that left those zero would still pass the type check and would
+// silently drop the [at L:C] suffix the surface error depends on.
+// This test recovers the typed error via errors.As and asserts the
+// full struct, including the multi-line case where Line > 1.
+func TestEngine_Analyze_PopulatesCastValueErrorLocation(t *testing.T) {
+	cases := []struct {
+		name string
+		sql  string
+		want types.CastValueError
+	}{
+		{
+			name: "single-line source: column 13 of line 1",
+			sql:  `SELECT CAST("apple" AS INT64)`,
+			want: types.CastValueError{Value: "apple", ToType: types.Int64, Line: 1, Col: 13},
+		},
+		{
+			name: "multi-line source: column 8 of line 2",
+			sql:  "SELECT\n  CAST(\"apple\" AS INT64)",
+			want: types.CastValueError{Value: "apple", ToType: types.Int64, Line: 2, Col: 8},
+		},
+		{
+			name: "second CAST in same line: column adjusts past the first cast",
+			sql:  `SELECT CAST("42" AS INT64), CAST("apple" AS INT64)`,
+			want: types.CastValueError{Value: "apple", ToType: types.Int64, Line: 1, Col: 34},
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Arrange
+			ctx := t.Context()
+			sut := newTestEngine(t)
+			opts := &AnalyzerOptions{RejectInvalidLiteralCasts: true}
+
+			// Act
+			out, err := sut.Analyze(ctx, tc.sql, newBuiltinsCatalog(), opts)
+
+			// Assert
+			require.Nil(t, out, "AnalyzeOutput must be nil when the gate fires")
+			var got *types.CastValueError
+			require.True(t, errors.As(err, &got), "err must be *CastValueError, got %T (%v)", err, err)
+			assert.Equal(t, tc.want, *got)
 		})
 	}
 }

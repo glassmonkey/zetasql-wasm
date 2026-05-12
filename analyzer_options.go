@@ -63,7 +63,8 @@ type AnalyzerOptions struct {
 	// RejectInvalidLiteralCasts opts into BigQuery-compatible strict
 	// cast checking at analyze time. When true, Engine.Analyze walks
 	// the resolved AST after analysis and returns a
-	// *types.CastValueError instead of the deferred resolved tree
+	// *types.CastValueError (with Value, ToType, and the literal's
+	// Line / Col populated) instead of the deferred resolved tree
 	// when it finds a ResolvedCast whose source is a STRING literal
 	// that cannot be parsed as the target type.
 	//
@@ -72,6 +73,14 @@ type AnalyzerOptions struct {
 	// (see types.CastValueError doc for the upstream rationale).
 	// Callers that target BigQuery semantics -- where the equivalent
 	// CAST fails before execution -- set this to true.
+	//
+	// Side effect: when this is true and ParseLocationRecordType is
+	// left nil, the engine auto-promotes ParseLocationRecordType to
+	// FullNodeScope so the C++ analyzer attaches the parse locations
+	// the gate needs to populate Line / Col. Callers that set
+	// ParseLocationRecordType explicitly keep their choice; opting
+	// down to None silently produces zero Line / Col and the short
+	// fallback wording on the returned error.
 	//
 	// This flag is Go-side only; it does not affect the C++ analyzer
 	// and is therefore not propagated through toProto.
