@@ -796,18 +796,23 @@ func TestEngine_Analyze(t *testing.T) {
 `,
 		},
 		// Pins the analyzer's deferred-runtime contract for invalid
-		// literal casts: when the constant fold would fail
-		// (StringToNumeric("apple") returns kInvalidArgument), zetasql
+		// literal casts: when the constant fold would fail, zetasql
 		// 2025.x deliberately abandons the fold and leaves a
 		// ResolvedCast for runtime evaluation instead of producing an
 		// analyze-time error
 		// (zetasql/analyzer/resolver_expr.cc, ResolveExplicitCast,
-		// ShouldTryCastConstantFold branch). Downstream callers --
-		// the emulator's SQLite runtime is the immediate one -- depend
-		// on this shape to surface the BigQuery-style wording via
-		// types.CastValueError at runtime. If upstream ever reverts to
-		// reject-at-analyze, the wantResolved tree gains an analyze
-		// error and this test fires before downstream silently breaks.
+		// ShouldTryCastConstantFold branch).  Upstream defers on two
+		// failure modes -- kInvalidArgument (non-numeric input) and
+		// kOutOfRange (input parses but overflows the target) -- so
+		// the contract needs at least one case per failure mode: a
+		// future upstream split that re-rejects one code while
+		// keeping the other would otherwise slip through with a
+		// single case. Downstream callers -- the emulator's SQLite
+		// runtime is the immediate one -- depend on the shape to
+		// surface the BigQuery-style wording via types.CastValueError
+		// at runtime. If upstream ever reverts to reject-at-analyze,
+		// the wantResolved tree gains an analyze error and these
+		// cases fire before downstream silently breaks.
 		{
 			name: "CAST of unparseable string literal is deferred to runtime",
 			sql:  `SELECT CAST("apple" AS INT64)`,
@@ -830,6 +835,31 @@ func TestEngine_Analyze(t *testing.T) {
     KindComputedColumn
       KindCast
         KindLiteral "apple"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "CAST of an int64-overflowing string literal is deferred to runtime",
+			sql:  `SELECT CAST("99999999999999999999" AS INT64)`,
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindCastExpression
+            KindStringLiteral [99999999999999999999]
+              KindStringLiteralComponent
+            KindSimpleType
+              KindPathExpression
+                KindIdentifier [INT64]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindCast
+        KindLiteral "99999999999999999999"
     KindSingleRowScan
 `,
 		},
