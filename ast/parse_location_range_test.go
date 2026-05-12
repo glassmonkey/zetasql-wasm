@@ -163,10 +163,13 @@ func TestParseLocationOf(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
 			sut := tt.node
 
+			// Act
 			got, ok := ParseLocationOf(sut)
 
+			// Assert
 			assert.Equal(t, tt.ok, ok)
 			assert.Equal(t, tt.want, got)
 		})
