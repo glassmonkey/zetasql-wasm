@@ -198,7 +198,16 @@ func (e *Engine) Analyze(
 	if err != nil {
 		return nil, err
 	}
-	return buildOutput(response, parsedProto)
+	output, err := buildOutput(response, parsedProto)
+	if err != nil {
+		return nil, err
+	}
+	if opts != nil && opts.RejectInvalidLiteralCasts {
+		if err := rejectInvalidLiteralCasts(output); err != nil {
+			return nil, err
+		}
+	}
+	return output, nil
 }
 
 // AnalyzeNext analyzes the next statement from a multi-statement SQL
@@ -235,6 +244,11 @@ func (e *Engine) AnalyzeNext(
 	output, err := buildOutput(response, parsedProto)
 	if err != nil {
 		return nil, false, err
+	}
+	if opts != nil && opts.RejectInvalidLiteralCasts {
+		if err := rejectInvalidLiteralCasts(output); err != nil {
+			return nil, false, err
+		}
 	}
 	more := int(loc.BytePosition) < len(loc.Input)
 	return output, more, nil

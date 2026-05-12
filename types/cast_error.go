@@ -6,10 +6,18 @@ import (
 )
 
 // CastValueError is the canonical ZetaSQL runtime cast failure error.
-// ZetaSQL's analyzer defers value-level cast failures to runtime
-// evaluation, so downstream evaluators own the failure surface;
-// constructing this error keeps the wording aligned with BigQuery
-// instead of leaking the host language's conversion detail.
+// Two callers construct it:
+//
+//   - Engine.Analyze itself, when AnalyzerOptions.RejectInvalidLiteralCasts
+//     is set and the resolved AST contains a ResolvedCast whose source
+//     is a STRING literal that cannot be parsed as the target type.
+//     This opt-in surfaces BigQuery's analyze-time-reject behavior on
+//     top of upstream ZetaSQL's defer-to-runtime resolution.
+//   - Downstream evaluators that execute a resolved AST without the
+//     analyze-time gate (the bigquery-emulator's SQLite runtime is
+//     the immediate one) construct it themselves at the runtime
+//     cast point, so the failure wording stays aligned with BigQuery
+//     instead of leaking the host language's conversion detail.
 //
 // Mirrors the layout of AnalyzeError: public fields, Error() builds
 // the surface text. Callers can therefore use errors.As to recover
