@@ -59,6 +59,23 @@ type AnalyzerOptions struct {
 	ParameterMode             ParameterMode
 	QueryParameters           map[string]types.Type
 	PositionalQueryParameters []types.Type
+
+	// RejectInvalidLiteralCasts opts into BigQuery-compatible strict
+	// cast checking at analyze time. When true, Engine.Analyze walks
+	// the resolved AST after analysis and returns a
+	// *types.CastValueError instead of the deferred resolved tree
+	// when it finds a ResolvedCast whose source is a STRING literal
+	// that cannot be parsed as the target type.
+	//
+	// Default false matches upstream ZetaSQL 2025.x, which
+	// deliberately leaves such casts unfolded for runtime evaluation
+	// (see types.CastValueError doc for the upstream rationale).
+	// Callers that target BigQuery semantics -- where the equivalent
+	// CAST fails before execution -- set this to true.
+	//
+	// This flag is Go-side only; it does not affect the C++ analyzer
+	// and is therefore not propagated through toProto.
+	RejectInvalidLiteralCasts bool
 }
 
 // NewAnalyzerOptions creates AnalyzerOptions with default settings.
@@ -75,6 +92,7 @@ func (o *AnalyzerOptions) Clone() *AnalyzerOptions {
 	clone := &AnalyzerOptions{
 		AllowUndeclaredParameters: o.AllowUndeclaredParameters,
 		ParameterMode:             o.ParameterMode,
+		RejectInvalidLiteralCasts: o.RejectInvalidLiteralCasts,
 	}
 	if o.Language != nil {
 		clone.Language = o.Language.clone()

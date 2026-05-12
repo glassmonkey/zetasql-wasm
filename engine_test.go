@@ -795,6 +795,121 @@ func TestEngine_Analyze(t *testing.T) {
     KindSingleRowScan
 `,
 		},
+		// Pins the analyzer's deferred-runtime contract for invalid
+		// literal casts: when the constant fold would fail, zetasql
+		// 2025.x deliberately abandons the fold and leaves a
+		// ResolvedCast for runtime evaluation instead of producing an
+		// analyze-time error
+		// (zetasql/analyzer/resolver_expr.cc, ResolveExplicitCast,
+		// ShouldTryCastConstantFold branch).  Upstream defers on two
+		// failure modes -- kInvalidArgument (non-numeric input) and
+		// kOutOfRange (input parses but overflows the target) -- so
+		// the contract needs at least one case per failure mode: a
+		// future upstream split that re-rejects one code while
+		// keeping the other would otherwise slip through with a
+		// single case. Downstream callers -- the emulator's SQLite
+		// runtime is the immediate one -- depend on the shape to
+		// surface the BigQuery-style wording via types.CastValueError
+		// at runtime. If upstream ever reverts to reject-at-analyze,
+		// the wantResolved tree gains an analyze error and these
+		// cases fire before downstream silently breaks.
+		{
+			name: "CAST of unparseable string literal is deferred to runtime",
+			sql:  `SELECT CAST("apple" AS INT64)`,
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindCastExpression
+            KindStringLiteral [apple]
+              KindStringLiteralComponent
+            KindSimpleType
+              KindPathExpression
+                KindIdentifier [INT64]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindCast
+        KindLiteral "apple"
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "CAST of an int64-overflowing string literal is deferred to runtime",
+			sql:  `SELECT CAST("99999999999999999999" AS INT64)`,
+			cat:  newBuiltinsCatalog(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindCastExpression
+            KindStringLiteral [99999999999999999999]
+              KindStringLiteralComponent
+            KindSimpleType
+              KindPathExpression
+                KindIdentifier [INT64]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindCast
+        KindLiteral "99999999999999999999"
+    KindSingleRowScan
+`,
+		},
+		// RejectInvalidLiteralCasts opt-in. The default (no flag)
+		// cases above pin the upstream-aligned defer-to-runtime
+		// shape; the cases below pin the BigQuery-compatible
+		// analyze-time-reject shape that the flag enables. Both
+		// failure modes (kInvalidArgument from non-numeric input,
+		// kOutOfRange from a value beyond the target range) need
+		// their own case so a future regression that gates only
+		// one of them shows up here.
+		{
+			name: "RejectInvalidLiteralCasts: unparseable string literal returns *CastValueError",
+			sql:  `SELECT CAST("apple" AS INT64)`,
+			cat:  newBuiltinsCatalog(),
+			opts: &AnalyzerOptions{RejectInvalidLiteralCasts: true},
+			wantErr: &types.CastValueError{},
+		},
+		{
+			name: "RejectInvalidLiteralCasts: int64-overflowing string literal returns *CastValueError",
+			sql:  `SELECT CAST("99999999999999999999" AS INT64)`,
+			cat:  newBuiltinsCatalog(),
+			opts: &AnalyzerOptions{RejectInvalidLiteralCasts: true},
+			wantErr: &types.CastValueError{},
+		},
+		{
+			name: "RejectInvalidLiteralCasts: SAFE_CAST of unparseable string is exempt from the gate",
+			sql:  `SELECT SAFE_CAST("apple" AS INT64)`,
+			cat:  newBuiltinsCatalog(),
+			opts: &AnalyzerOptions{RejectInvalidLiteralCasts: true},
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindCastExpression
+            KindStringLiteral [apple]
+              KindStringLiteralComponent
+            KindSimpleType
+              KindPathExpression
+                KindIdentifier [INT64]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindLiteral NULL
+    KindSingleRowScan
+`,
+		},
 		{
 			name: "NOT BETWEEN",
 			sql:  "SELECT id FROM users WHERE NOT id BETWEEN 1 AND 10",
