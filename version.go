@@ -1,3 +1,3 @@
 package zetasql
 
-const Version = "0.11.3"
+const Version = "0.12.0"
