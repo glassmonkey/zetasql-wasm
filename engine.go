@@ -185,6 +185,13 @@ func (e *Engine) Parse(ctx context.Context, sql string) (*Statement, error) {
 
 // Analyze performs semantic analysis on a SQL statement. Returns an
 // *AnalyzeError if the SQL is semantically invalid.
+//
+// Before reaching the C++ resolver the SQL is run through the
+// source-rewriting passes in the ast package (currently:
+// RewriteNamedTimezoneLiterals, which adapts named-IANA TIMESTAMP
+// literals to the numeric-offset form the bundled WASM accepts).
+// Skipping the extra parse on inputs that cannot trigger any pass
+// keeps the common case free of overhead — see preprocessForAnalyze.
 func (e *Engine) Analyze(
 	ctx context.Context,
 	sql string,
@@ -193,7 +200,7 @@ func (e *Engine) Analyze(
 ) (*AnalyzeOutput, error) {
 	request := &generated.AnalyzeRequest{
 		Target: &generated.AnalyzeRequest_SqlStatement{
-			SqlStatement: sql,
+			SqlStatement: e.preprocessForAnalyze(ctx, sql),
 		},
 	}
 	response, parsedProto, err := e.callAnalyze(ctx, request, cat, opts)
@@ -210,6 +217,23 @@ func (e *Engine) Analyze(
 		}
 	}
 	return output, nil
+}
+
+// preprocessForAnalyze runs the ast package's source-rewriting passes
+// on sql so the C++ resolver gets input it can handle. A cheap text
+// gate ("/" must appear) skips the extra parser invocation when the
+// SQL cannot contain a named-zone literal — the only pass currently
+// gated this way. Parse failures fall through with the original sql
+// so the downstream callAnalyze can surface its native diagnostic.
+func (e *Engine) preprocessForAnalyze(ctx context.Context, sql string) string {
+	if !strings.Contains(sql, "/") {
+		return sql
+	}
+	stmt, err := e.Parse(ctx, sql)
+	if err != nil {
+		return sql
+	}
+	return ast.RewriteNamedTimezoneLiterals(stmt.Root, sql)
 }
 
 // AnalyzeNext analyzes the next statement from a multi-statement SQL

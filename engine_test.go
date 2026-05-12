@@ -1719,6 +1719,94 @@ func TestEngine_Analyze(t *testing.T) {
         KindLiteral 1
 `,
 		},
+		// TIMESTAMP literals carrying an IANA-named zone (e.g.
+		// "America/Los_Angeles") would otherwise be rejected by the
+		// bundled WASM resolver because the build ships without
+		// tzdata. Engine.Analyze pre-processes the SQL through
+		// ast.RewriteNamedTimezoneLiterals which substitutes the
+		// numeric offset Go's time package computes for the wall
+		// time. The KindStringLiteral payload in the parsed AST
+		// surfaces the rewritten content, so a wrong offset would
+		// show up as a diff here. The cases below cover the wire-up,
+		// FORMAT-nested literals, and the right-to-left batch path
+		// that fires when more than one literal appears in one
+		// statement; the unparseable-zone and edge-format cases sit
+		// at the unit level in ast/rewrite_named_timezone_test.go
+		// where the case explosion is cheaper.
+		{
+			name: "TIMESTAMP literal with named zone — rewritten to numeric offset",
+			sql:  `SELECT TIMESTAMP "2015-09-01 12:34:56 America/Los_Angeles"`,
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindDateOrTimeLiteral
+            KindStringLiteral [2015-09-01 12:34:56-07:00]
+              KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindLiteral
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "named-zone TIMESTAMP nested in FORMAT() — rewritten in place",
+			sql:  `SELECT FORMAT('%t', TIMESTAMP "2015-09-01 12:34:56 America/Los_Angeles")`,
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindFunctionCall
+            KindPathExpression
+              KindIdentifier [FORMAT]
+            KindStringLiteral [%t]
+              KindStringLiteralComponent
+            KindDateOrTimeLiteral
+              KindStringLiteral [2015-09-01 12:34:56-07:00]
+                KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:format
+        KindLiteral "%t"
+        KindLiteral
+    KindSingleRowScan
+`,
+		},
+		{
+			name: "two named-zone TIMESTAMP literals — both rewritten right-to-left",
+			sql:  `SELECT TIMESTAMP "2015-09-01 12:34:56 America/Los_Angeles", TIMESTAMP "2015-01-01 12:34:56 Asia/Tokyo"`,
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindDateOrTimeLiteral
+            KindStringLiteral [2015-09-01 12:34:56-07:00]
+              KindStringLiteralComponent
+        KindSelectColumn
+          KindDateOrTimeLiteral
+            KindStringLiteral [2015-01-01 12:34:56+09:00]
+              KindStringLiteralComponent
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindOutputColumn $col2
+  KindProjectScan
+    KindComputedColumn
+      KindLiteral
+    KindComputedColumn
+      KindLiteral
+    KindSingleRowScan
+`,
+		},
 		// Error cases — SQL the analyzer must reject. The contract is
 		// (output == nil, err is *AnalyzeError); both halves are
 		// asserted in the loop body. wantParsed/wantResolved are left
@@ -1731,6 +1819,11 @@ func TestEngine_Analyze(t *testing.T) {
 		{name: "wrong argument count", sql: "SELECT LENGTH() FROM users", cat: newUsersCatalog(), wantErr: &AnalyzeError{}},
 		{name: "ungrouped column with aggregate", sql: "SELECT id, COUNT(*) FROM users", cat: newUsersCatalog(), wantErr: &AnalyzeError{}},
 		{name: "syntax error reaching analyzer", sql: "SELECT * FROM", wantErr: &AnalyzeError{}},
+		// Named-zone TIMESTAMP literal whose zone Go cannot resolve:
+		// the rewriter falls through unchanged so the C++ analyzer
+		// surfaces its native "Invalid TIMESTAMP literal" diagnostic
+		// — not a silently coerced wrong value.
+		{name: "named-zone TIMESTAMP with unresolvable zone — analyzer surfaces native error", sql: `SELECT TIMESTAMP "2015-09-01 12:34:56 Bogus/Place"`, wantErr: &AnalyzeError{}},
 	}
 
 	for _, tt := range tests {
