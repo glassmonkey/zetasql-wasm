@@ -48,3 +48,50 @@ func stepToParent(refl protoreflect.Message) protoreflect.Message {
 	}
 	return refl.Get(field).Message()
 }
+
+// ParseLocation is the byte range [Start, End) of the source SQL fragment
+// from which a parser AST node was produced. Both ends are byte offsets
+// into the original SQL string, suitable for slicing — e.g. for
+// re-analysing a sub-statement of a script block.
+type ParseLocation struct {
+	Start int32
+	End   int32
+}
+
+// parseLocator is the structural shape every auto-generated AST node
+// implements (each concrete *XxxNode has a ParseLocationRange method
+// that delegates to parseLocationRangeOf). Keeping the assertion
+// unexported lets ParseLocationOf surface a proto-free API on the
+// Node interface side while reusing the per-node implementation.
+type parseLocator interface {
+	ParseLocationRange() *generated.ParseLocationRangeProto
+}
+
+// ParseLocationOf returns the source byte range from which n was parsed.
+// The second return is false when n has no parse_location_range — either
+// because it is a synthesised node that did not originate from any source
+// text, or because the wire form arrived with the field unset (the parent
+// chain broke before ASTNodeProto).
+//
+// Sliceable example: a caller holding the original SQL string can extract
+// just the sub-statement that produced n with
+//
+//	loc, ok := ast.ParseLocationOf(n)
+//	if ok {
+//	    sub := sql[loc.Start:loc.End]
+//	}
+//
+// This is what bigquery-emulator's parseScript uses to re-analyze a
+// sub-statement of a BEGIN…END block without re-parsing the wrapping
+// block (which would re-create the unsupported BeginEndBlock root).
+func ParseLocationOf(n Node) (ParseLocation, bool) {
+	locator, ok := n.(parseLocator)
+	if !ok {
+		return ParseLocation{}, false
+	}
+	r := locator.ParseLocationRange()
+	if r == nil {
+		return ParseLocation{}, false
+	}
+	return ParseLocation{Start: r.GetStart(), End: r.GetEnd()}, true
+}
