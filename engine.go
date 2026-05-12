@@ -198,9 +198,14 @@ func (e *Engine) Analyze(
 	cat *types.SimpleCatalog,
 	opts *AnalyzerOptions,
 ) (*AnalyzeOutput, error) {
+	// resolverSQL is what the C++ resolver actually sees and what its
+	// parse-location offsets point into; the source-rewriting pass may
+	// shift positions relative to the caller's sql, so pass this same
+	// string to rejectInvalidLiteralCasts below.
+	resolverSQL := e.preprocessForAnalyze(ctx, sql)
 	request := &generated.AnalyzeRequest{
 		Target: &generated.AnalyzeRequest_SqlStatement{
-			SqlStatement: e.preprocessForAnalyze(ctx, sql),
+			SqlStatement: resolverSQL,
 		},
 	}
 	response, parsedProto, err := e.callAnalyze(ctx, request, cat, opts)
@@ -212,7 +217,7 @@ func (e *Engine) Analyze(
 		return nil, err
 	}
 	if opts != nil && opts.RejectInvalidLiteralCasts {
-		if err := rejectInvalidLiteralCasts(output); err != nil {
+		if err := rejectInvalidLiteralCasts(output, resolverSQL); err != nil {
 			return nil, err
 		}
 	}
@@ -272,7 +277,7 @@ func (e *Engine) AnalyzeNext(
 		return nil, false, err
 	}
 	if opts != nil && opts.RejectInvalidLiteralCasts {
-		if err := rejectInvalidLiteralCasts(output); err != nil {
+		if err := rejectInvalidLiteralCasts(output, loc.Input); err != nil {
 			return nil, false, err
 		}
 	}
@@ -580,6 +585,18 @@ func buildAnalyzeRequestOptions(opts *AnalyzerOptions) (*generated.AnalyzerOptio
 	}
 	analyzer.Language = language
 
+	// RejectInvalidLiteralCasts needs the C++ analyzer to attach parse
+	// locations to resolved nodes so the [at L:C] suffix on the
+	// returned *types.CastValueError can be populated. Auto-promote
+	// ParseLocationRecordType to FullNodeScope when the gate is on
+	// and the caller did not pick one; an explicit non-nil value is
+	// left alone so callers can still opt down to CodeSearch or None
+	// if they take responsibility for the consequences.
+	if analyzer.RejectInvalidLiteralCasts && analyzer.ParseLocationRecordType == nil {
+		p := ParseLocationRecordFullNodeScope
+		analyzer.ParseLocationRecordType = &p
+	}
+
 	// Step 3: serialize once. Both return values point at the same
 	// nested LanguageOptionsProto so the catalog and analyzer sides of
 	// the request cannot drift.
@@ -592,6 +609,12 @@ func buildAnalyzeRequestOptions(opts *AnalyzerOptions) (*generated.AnalyzerOptio
 // source is a STRING literal that cannot be parsed as the target
 // type. Returns nil when no such cast is present.
 //
+// sql is the SQL string the C++ resolver actually parsed (i.e. the
+// post-preprocess version for Engine.Analyze; ParseResumeLocation
+// Input for Engine.AnalyzeNext). The literal's ParseLocationRange
+// offsets index into this string and feed Line / Col on the returned
+// error so the surface error carries BigQuery's [at L:C] suffix.
+//
 // Reached only when AnalyzerOptions.RejectInvalidLiteralCasts is
 // true, matching BigQuery's analyze-time-reject behavior on top of
 // upstream ZetaSQL's defer-to-runtime resolution. SAFE_CAST
@@ -599,7 +622,7 @@ func buildAnalyzeRequestOptions(opts *AnalyzerOptions) (*generated.AnalyzerOptio
 // NULL on failure rather than error. Currently handles INT64
 // targets only; other numeric targets will be added as call sites
 // require them.
-func rejectInvalidLiteralCasts(out *AnalyzeOutput) error {
+func rejectInvalidLiteralCasts(out *AnalyzeOutput, sql string) error {
 	return resolved_ast.Walk(out.Resolved, func(n resolved_ast.Node) error {
 		cast, ok := n.(*resolved_ast.CastNode)
 		if !ok || cast.ReturnNullOnError() {
@@ -624,8 +647,33 @@ func rejectInvalidLiteralCasts(out *AnalyzeOutput) error {
 		if _, err := castStringToInt64(s); err == nil {
 			return nil
 		}
-		return &types.CastValueError{Value: s, ToType: types.Int64}
+		line, col := byteOffsetToLineColumn(sql, int(lit.ParseLocationRange().GetStart()))
+		return &types.CastValueError{
+			Value:  s,
+			ToType: types.Int64,
+			Line:   line,
+			Col:    col,
+		}
 	})
+}
+
+// byteOffsetToLineColumn turns a 0-indexed byte offset into the
+// 1-indexed line/column pair used by BigQuery's [at L:C] error
+// suffix. Out-of-range offsets clamp to (1, 1) so the caller still
+// gets a positive position rather than a slice-index panic.
+func byteOffsetToLineColumn(sql string, offset int) (int, int) {
+	if offset < 0 || offset > len(sql) {
+		return 1, 1
+	}
+	line := 1
+	lineStart := 0
+	for i := 0; i < offset; i++ {
+		if sql[i] == '\n' {
+			line++
+			lineStart = i + 1
+		}
+	}
+	return line, offset - lineStart + 1
 }
 
 // castStringToInt64 mirrors BigQuery's CAST(string AS INT64)

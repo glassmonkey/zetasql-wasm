@@ -8,17 +8,25 @@ import (
 	"github.com/glassmonkey/zetasql-wasm/types"
 )
 
-// TestCastValueError_Error pins the canonical ZetaSQL runtime cast
-// failure wording. Downstream evaluators (the emulator's SQLite
-// runtime, any other consumer) must produce identical text so that
-// the failure surface stays consistent with BigQuery across the
-// ecosystem.
+// TestCastValueError_Error pins the canonical ZetaSQL cast failure
+// wording on both the short (no Line/Col) and rich (Line/Col set)
+// forms. Downstream evaluators (the emulator's SQLite runtime, any
+// other consumer) must produce identical text so that the failure
+// surface stays consistent with BigQuery across the ecosystem.
+//
+// The short form is what a runtime construction (Line == Col == 0)
+// produces; the rich form is what Engine.Analyze emits when
+// AnalyzerOptions.RejectInvalidLiteralCasts populates Line and Col
+// from the literal's parse location, and matches the BigQuery
+// analyze-time-reject wording byte-for-byte (INVALID_ARGUMENT prefix
+// plus the [at L:C] suffix).
 func TestCastValueError_Error(t *testing.T) {
 	cases := []struct {
 		name string
 		err  *types.CastValueError
 		want string
 	}{
+		// --- short form: no parse location (runtime construction) ---
 		{
 			name: "string literal as source",
 			err:  &types.CastValueError{Value: "apple", ToType: types.Int64},
@@ -53,6 +61,33 @@ func TestCastValueError_Error(t *testing.T) {
 			name: "NUMERIC target renders in message",
 			err:  &types.CastValueError{Value: "apple", ToType: types.Numeric},
 			want: `Could not cast value "apple" to type NUMERIC`,
+		},
+		// --- rich form: parse location set (analyze-time gate) ---
+		{
+			name: "Line and Col set produces BigQuery-style INVALID_ARGUMENT prefix and [at L:C] suffix",
+			err:  &types.CastValueError{Value: "apple", ToType: types.Int64, Line: 1, Col: 13},
+			want: `INVALID_ARGUMENT: Could not cast literal "apple" to type INT64 [at 1:13]`,
+		},
+		{
+			name: "rich form across multiple lines",
+			err:  &types.CastValueError{Value: "apple", ToType: types.Int64, Line: 2, Col: 8},
+			want: `INVALID_ARGUMENT: Could not cast literal "apple" to type INT64 [at 2:8]`,
+		},
+		{
+			name: "rich form for DOUBLE target",
+			err:  &types.CastValueError{Value: "apple", ToType: types.Double, Line: 1, Col: 13},
+			want: `INVALID_ARGUMENT: Could not cast literal "apple" to type DOUBLE [at 1:13]`,
+		},
+		// --- partial-location edge: one of Line/Col is zero ---
+		{
+			name: "Line set but Col zero falls back to short form",
+			err:  &types.CastValueError{Value: "apple", ToType: types.Int64, Line: 1, Col: 0},
+			want: `Could not cast value "apple" to type INT64`,
+		},
+		{
+			name: "Col set but Line zero falls back to short form",
+			err:  &types.CastValueError{Value: "apple", ToType: types.Int64, Line: 0, Col: 13},
+			want: `Could not cast value "apple" to type INT64`,
 		},
 	}
 	for _, tc := range cases {
