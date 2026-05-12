@@ -4,7 +4,7 @@ go 1.26.2
 
 require (
 	github.com/google/go-cmp v0.7.0
-	github.com/tetratelabs/wazero v1.8.2
+	github.com/tetratelabs/wazero v1.10.1
 	google.golang.org/protobuf v1.36.11
 )
 
