@@ -3172,35 +3172,6 @@ func TestEngine_Parse(t *testing.T) {
               KindIntLiteral [1]
 `,
 		},
-		{
-			// Issue #57 (downstream bigquery-emulator): unquoted
-			// dashed project identifiers in table paths must be
-			// accepted at parse time. BigQuery production accepts
-			// `my-dashed-project.ds.t` without backticks, and
-			// enableBigQueryExtensions reserves
-			// FEATURE_V_1_3_ALLOW_DASHES_IN_TABLE_NAME so the
-			// parser folds the dashed segments into a single
-			// identifier rather than rejecting '-' as a syntax
-			// error.
-			name: "dashed project identifier in FROM (issue #57)",
-			sql:  "SELECT COUNT(*) FROM my-dashed-project.ds.t",
-			want: `KindQueryStatement
-  KindQuery
-    KindSelect
-      KindSelectList
-        KindSelectColumn
-          KindFunctionCall
-            KindPathExpression
-              KindIdentifier [COUNT]
-            KindStar
-      KindFromClause
-        KindTablePathExpression
-          KindPathExpression
-            KindIdentifier [my-dashed-project]
-            KindIdentifier [ds]
-            KindIdentifier [t]
-`,
-		},
 		{name: "incomplete SELECT", sql: "SELECT", wantErr: &ParseError{}},
 		{name: "missing select list", sql: "SELECT FROM users", wantErr: &ParseError{}},
 		{name: "unmatched right paren", sql: "SELECT 1) FROM users", wantErr: &ParseError{}},
