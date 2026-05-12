@@ -124,8 +124,10 @@ char* parse_statement(const char* sql) {
     return strdup(result.c_str());
 }
 
-// Parse SQL and return serialized Parse Tree AST proto bytes
-// Uses ParseStatement + ParseTreeSerializer (does NOT require AnalyzeStatement)
+// Parse SQL and return serialized Parse Tree AST proto bytes.
+// Uses ParseNextScriptStatement + ParseTreeSerializer (does NOT
+// require AnalyzeStatement). The script-mode parser is a strict
+// superset of single-statement parsing; see the body comment.
 // Returns: pointer to struct { size: uint32, data: uint8[] }
 EMSCRIPTEN_KEEPALIVE
 void* parse_statement_proto(const void* request_ptr, uint32_t request_size) {
@@ -148,9 +150,22 @@ void* parse_statement_proto(const void* request_ptr, uint32_t request_size) {
             zetasql::LanguageOptions(request.options()));
     }
 
+    // Use the script-mode parser even for the single-shot entry: per
+    // upstream parser.h:316-324, ParseNextScriptStatement is a strict
+    // superset of ParseStatement — it accepts every construct
+    // ParseStatement accepts AND returns top-level script constructs
+    // (BEGIN...END, IF...END IF, WHILE...END WHILE, ...) as a single
+    // ASTStatement subclass. Using the script-aware entry everywhere
+    // means callers do not have to declare whether their input is a
+    // script or a standalone statement; the parser figures it out from
+    // the input. A fresh ParseResumeLocation gives us one-shot
+    // semantics matching the legacy ParseStatement contract.
+    zetasql::ParseResumeLocation resume_location =
+        zetasql::ParseResumeLocation::FromStringView(sql);
     std::unique_ptr<zetasql::ParserOutput> parser_output;
-    absl::Status status = zetasql::ParseStatement(
-        sql, parser_options, &parser_output);
+    bool at_end_of_input = false;
+    absl::Status status = zetasql::ParseNextScriptStatement(
+        &resume_location, parser_options, &parser_output, &at_end_of_input);
     if (!status.ok()) {
         return pack_error(status.ToString());
     }
@@ -472,8 +487,10 @@ void* analyze_statement_proto(const void* request_ptr, uint32_t request_size) {
         resume_location.set_byte_position(
             request.parse_resume_location().byte_position());
 
+        // Script-mode parser: see parse_statement_proto's comment for
+        // why every parse path runs through ParseNextScriptStatement.
         bool at_end_of_input = false;
-        status = zetasql::ParseNextStatement(
+        status = zetasql::ParseNextScriptStatement(
             &resume_location, parser_options, &parser_output,
             &at_end_of_input);
         if (!status.ok()) {
@@ -488,7 +505,12 @@ void* analyze_statement_proto(const void* request_ptr, uint32_t request_size) {
         }
         resume_byte_position = resume_location.byte_position();
     } else {
-        status = zetasql::ParseStatement(sql, parser_options, &parser_output);
+        // Script-mode parser: see parse_statement_proto's comment.
+        zetasql::ParseResumeLocation resume_location =
+            zetasql::ParseResumeLocation::FromStringView(sql);
+        bool at_end_of_input = false;
+        status = zetasql::ParseNextScriptStatement(
+            &resume_location, parser_options, &parser_output, &at_end_of_input);
         if (!status.ok()) {
             return pack_error(status.ToString());
         }
@@ -575,9 +597,10 @@ void* parse_next_statement_proto(const void* request_ptr, uint32_t request_size)
         parser_options.set_language_options(
             zetasql::LanguageOptions(request.options()));
     }
+    // Script-mode parser: see parse_statement_proto's comment.
     std::unique_ptr<zetasql::ParserOutput> parser_output;
     bool at_end_of_input = false;
-    absl::Status status = zetasql::ParseNextStatement(
+    absl::Status status = zetasql::ParseNextScriptStatement(
         &resume_location, parser_options, &parser_output, &at_end_of_input);
     if (!status.ok()) {
         return pack_error(status.ToString());

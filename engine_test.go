@@ -1945,6 +1945,40 @@ func TestEngine_ParseNext(t *testing.T) {
 				BytePosition: int32(len("SELECT 1; SELECT 2;")),
 			},
 		},
+		{
+			// Issue #66: a BEGIN-END block is one script-level
+			// statement, not two queries. ParseNextScriptStatement
+			// returns the whole block as a single ASTStatement
+			// subclass; the iterator stops after one yield even though
+			// the source contains two inner queries. This is the
+			// downstream contract that lets bigquery-emulator's
+			// analyzer.go unpack the block via type-switch on
+			// *parsed_ast.BeginEndBlockNode rather than re-parsing the
+			// inner SQL.
+			name: "begin-end block yields one statement (issue #66)",
+			sql:  "BEGIN SELECT 1; SELECT 2; END;",
+			wantParsed: []string{
+				`KindBeginEndBlock
+  KindStatementList
+    KindQueryStatement
+      KindQuery
+        KindSelect
+          KindSelectList
+            KindSelectColumn
+              KindIntLiteral [1]
+    KindQueryStatement
+      KindQuery
+        KindSelect
+          KindSelectList
+            KindSelectColumn
+              KindIntLiteral [2]
+`,
+			},
+			wantLoc: ParseResumeLocation{
+				Input:        "BEGIN SELECT 1; SELECT 2; END;",
+				BytePosition: int32(len("BEGIN SELECT 1; SELECT 2; END;")),
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -3034,6 +3068,69 @@ func TestEngine_Parse(t *testing.T) {
                   KindPathExpression
                     KindIdentifier [id]
           KindIntLiteral [1]
+`,
+		},
+		{
+			// Issue #64 follow-up: BEGIN-END script blocks were
+			// rejected at parse time because the bridge invoked the
+			// single-statement parser. Switching to
+			// ParseNextScriptStatement (a documented strict superset)
+			// lets the parser return script constructs as a single
+			// ASTStatement subclass — here, an ASTBeginEndBlockNode
+			// whose StatementList holds the inner queries.
+			name: "begin-end script block with one inner statement (issue #66)",
+			sql:  "BEGIN\n  SELECT 1;\nEND;",
+			want: `KindBeginEndBlock
+  KindStatementList
+    KindQueryStatement
+      KindQuery
+        KindSelect
+          KindSelectList
+            KindSelectColumn
+              KindIntLiteral [1]
+`,
+		},
+		{
+			// Triangulation axis: same construct, but the inner
+			// StatementList carries two QueryStatement children rather
+			// than one. Forces the fix to handle the general
+			// nested-list shape rather than the one-child shape of the
+			// first case.
+			name: "begin-end script block with two inner statements (issue #66)",
+			sql:  "BEGIN SELECT 1; SELECT 2; END;",
+			want: `KindBeginEndBlock
+  KindStatementList
+    KindQueryStatement
+      KindQuery
+        KindSelect
+          KindSelectList
+            KindSelectColumn
+              KindIntLiteral [1]
+    KindQueryStatement
+      KindQuery
+        KindSelect
+          KindSelectList
+            KindSelectColumn
+              KindIntLiteral [2]
+`,
+		},
+		{
+			// Triangulation axis: different script construct. IF
+			// blocks share the script-mode parser entry but produce a
+			// different root node (ASTIfStatementNode), so this case
+			// exercises that the bridge accepts script statements
+			// beyond just BEGIN-END.
+			name: "if-end-if script block (issue #66)",
+			sql:  "IF TRUE THEN SELECT 1; END IF;",
+			want: `KindIfStatement
+  KindBooleanLiteral [TRUE]
+  KindStatementList
+    KindQueryStatement
+      KindQuery
+        KindSelect
+          KindSelectList
+            KindSelectColumn
+              KindIntLiteral [1]
 `,
 		},
 		{name: "incomplete SELECT", sql: "SELECT", wantErr: &ParseError{}},
