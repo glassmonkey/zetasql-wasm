@@ -2,15 +2,17 @@ package types_test
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/types"
 )
 
-// TestCastValueError pins the canonical ZetaSQL runtime cast failure
-// wording. Downstream evaluators (the emulator's SQLite runtime, any
-// other consumer) must produce identical text so that the failure
-// surface stays consistent with BigQuery across the ecosystem.
+// TestCastValueError_Error pins the canonical ZetaSQL runtime cast
+// failure wording. Downstream evaluators (the emulator's SQLite
+// runtime, any other consumer) must produce identical text so that
+// the failure surface stays consistent with BigQuery across the
+// ecosystem.
 func TestCastValueError_Error(t *testing.T) {
 	cases := []struct {
 		name string
@@ -43,12 +45,12 @@ func TestCastValueError_Error(t *testing.T) {
 			want: `Could not cast value 1.5 to type INT64`,
 		},
 		{
-			name: "target type kind name comes from TypeKind.String()",
+			name: "DOUBLE target renders in message",
 			err:  &types.CastValueError{Value: "apple", ToType: types.Double},
 			want: `Could not cast value "apple" to type DOUBLE`,
 		},
 		{
-			name: "numeric target",
+			name: "NUMERIC target renders in message",
 			err:  &types.CastValueError{Value: "apple", ToType: types.Numeric},
 			want: `Could not cast value "apple" to type NUMERIC`,
 		},
@@ -66,25 +68,50 @@ func TestCastValueError_Error(t *testing.T) {
 	}
 }
 
-// TestCastValueErrorIsRecoverable pins the typed-error contract: a
-// downstream caller that wraps the failure (e.g. adding row/column
-// context) can still recover the original Value and ToType via
-// errors.As. This is the load-bearing reason for choosing a typed
-// error over a fmt.Errorf string.
+// TestCastValueError_RecoverableViaErrorsAs pins the typed-error
+// contract: a downstream caller that wraps the failure (adding row/
+// column context, joining with sibling errors, etc.) can still
+// recover the original Value and ToType via errors.As. This is the
+// load-bearing reason for choosing a typed error over fmt.Errorf,
+// so the table covers each wrap pattern an emulator-style caller
+// realistically uses.
 func TestCastValueError_RecoverableViaErrorsAs(t *testing.T) {
-	// Arrange
 	original := &types.CastValueError{Value: "apple", ToType: types.Int64}
-	wrapped := errors.Join(errors.New("at column foo"), original)
 
-	// Act
-	var got *types.CastValueError
-	ok := errors.As(wrapped, &got)
-
-	// Assert
-	if !ok {
-		t.Fatalf("errors.As did not recover *CastValueError from %v", wrapped)
+	cases := []struct {
+		name string
+		err  error
+	}{
+		{
+			name: "direct typed error without wrapping",
+			err:  original,
+		},
+		{
+			name: "wrapped via fmt.Errorf %w",
+			err:  fmt.Errorf("at row 42: %w", original),
+		},
+		{
+			name: "double-wrapped via fmt.Errorf %w",
+			err:  fmt.Errorf("query failed: %w", fmt.Errorf("at row 42: %w", original)),
+		},
+		{
+			name: "joined via errors.Join with a sibling error",
+			err:  errors.Join(errors.New("at column foo"), original),
+		},
 	}
-	if got.Value != "apple" || got.ToType != types.Int64 {
-		t.Errorf("recovered fields mismatch: got Value=%v ToType=%v", got.Value, got.ToType)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Act
+			var got *types.CastValueError
+			ok := errors.As(tc.err, &got)
+
+			// Assert
+			if !ok {
+				t.Fatalf("errors.As did not recover *CastValueError from %v", tc.err)
+			}
+			if *got != *original {
+				t.Errorf("recovered fields mismatch\n want: %+v\n  got: %+v", *original, *got)
+			}
+		})
 	}
 }
