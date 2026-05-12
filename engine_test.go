@@ -1,7 +1,10 @@
 package zetasql
 
 import (
+	"context"
+	"os"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/glassmonkey/zetasql-wasm/resolved_ast"
@@ -13,13 +16,49 @@ import (
 
 // ----- Test helpers (shared across the package's _test.go files) -----
 
+var (
+	sharedEngineOnce sync.Once
+	sharedEngine     *Engine
+	sharedEngineErr  error
+)
+
+// newTestEngine returns the package-shared Engine instance. Constructing
+// the engine compiles + instantiates the ZetaSQL WASM module and runs
+// the C++ global constructors (init_module), which together dominate
+// the per-case wall-clock when paid for every t.Run. The engine is
+// created once (sync.Once) and closed in TestMain after the suite
+// finishes, so every TestEngine_* sub-test reuses the same instance.
+//
+// Safety invariants the shared fixture relies on:
+//
+//   - wazero's api.Module is not safe for concurrent use, so callers
+//     must remain sequential. This package has no t.Parallel() and
+//     CI runs `go test` with the default per-package single-threaded
+//     execution, which keeps this invariant intact.
+//   - Engine.Parse / Analyze / AnalyzeNext / ParseNext do not retain
+//     state across calls (each call serializes its inputs into the
+//     WASM heap, invokes the export, and pulls the result back), so
+//     sequential reuse across sub-tests is well-defined. Per-test
+//     state (AnalyzerOptions, catalogs) is passed explicitly on each
+//     call and never lives on Engine.
 func newTestEngine(t *testing.T) *Engine {
 	t.Helper()
-	ctx := t.Context()
-	e, err := New(ctx)
-	require.NoError(t, err)
-	t.Cleanup(func() { _ = e.Close(ctx) })
-	return e
+	sharedEngineOnce.Do(func() {
+		sharedEngine, sharedEngineErr = New(context.Background())
+	})
+	require.NoError(t, sharedEngineErr)
+	return sharedEngine
+}
+
+// TestMain closes the package-shared engine after all tests finish so
+// the underlying wazero runtime is released even though newTestEngine
+// no longer registers a per-test t.Cleanup.
+func TestMain(m *testing.M) {
+	code := m.Run()
+	if sharedEngine != nil {
+		_ = sharedEngine.Close(context.Background())
+	}
+	os.Exit(code)
 }
 
 func newUsersCatalog() *types.SimpleCatalog {
