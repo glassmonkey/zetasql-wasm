@@ -84,4 +84,10 @@ func TestStructTypeRoundTrip(t *testing.T) {
 	}
 }
 
-func ptr(s string) *string { return &s }
+// ptr is a test helper that returns a pointer to its argument. It is
+// generic so a single helper covers every proto field whose generated
+// Go type is `*T` (e.g. `*string` for FieldName, `*int64` for
+// BitFieldDatetimeSeconds, `*int32` for Nanos). Callers rely on Go
+// type inference: `ptr("a")` produces `*string`, `ptr(int64(42))`
+// produces `*int64`, etc.
+func ptr[T any](v T) *T { return &v }

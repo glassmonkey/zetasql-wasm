@@ -37,8 +37,6 @@ func TestWrapLiteralValue(t *testing.T) {
 	stringLit := func(s string) *generated.ValueProto {
 		return &generated.ValueProto{Value: &generated.ValueProto_StringValue{StringValue: s}}
 	}
-	i64ptr := func(v int64) *int64 { return &v }
-	i32ptr := func(v int32) *int32 { return &v }
 
 	tests := []struct {
 		name string
@@ -156,11 +154,11 @@ func TestWrapLiteralValue(t *testing.T) {
 					Value: &generated.ValueProto_DatetimeValue{
 						DatetimeValue: &generated.ValueProto_Datetime{
 							// Packed64DatetimeSeconds for 2026-05-10 12:34:56.
-							BitFieldDatetimeSeconds: i64ptr(
+							BitFieldDatetimeSeconds: ptr(int64(
 								(2026 << 26) | (5 << 22) | (10 << 17) |
 									(12 << 12) | (34 << 6) | 56,
-							),
-							Nanos: i32ptr(123456789),
+							)),
+							Nanos: ptr(int32(123456789)),
 						},
 					},
 				},
@@ -168,11 +166,11 @@ func TestWrapLiteralValue(t *testing.T) {
 			want: &LiteralValue{
 				Type: DatetimeType(),
 				Value: &generated.ValueProto_Datetime{
-					BitFieldDatetimeSeconds: i64ptr(
+					BitFieldDatetimeSeconds: ptr(int64(
 						(2026 << 26) | (5 << 22) | (10 << 17) |
 							(12 << 12) | (34 << 6) | 56,
-					),
-					Nanos: i32ptr(123456789),
+					)),
+					Nanos: ptr(int32(123456789)),
 				},
 			},
 		},
@@ -337,11 +335,10 @@ func TestLiteralValue_TypedAccessors_HappyPath(t *testing.T) {
 			in: &LiteralValue{
 				Type: DatetimeType(),
 				Value: &generated.ValueProto_Datetime{
-					BitFieldDatetimeSeconds: func() *int64 {
-						v := int64((2026 << 26) | (5 << 22) | (10 << 17) | (12 << 12) | (34 << 6) | 56)
-						return &v
-					}(),
-					Nanos: func() *int32 { v := int32(123456789); return &v }(),
+					BitFieldDatetimeSeconds: ptr(int64(
+						(2026 << 26) | (5 << 22) | (10 << 17) | (12 << 12) | (34 << 6) | 56,
+					)),
+					Nanos: ptr(int32(123456789)),
 				},
 			},
 			want: time.Date(2026, time.May, 10, 12, 34, 56, 123456789, time.UTC),
@@ -609,39 +606,51 @@ func TestLiteralValue_TypedAccessors_ContractViolation(t *testing.T) {
 	}
 }
 
-// TestLiteralValue_AsTimestamp_TypedNilPointer covers a case the
-// generic accessor contract cannot express: even when Value is a
-// genuine *timestamppb.Timestamp (so the type assertion succeeds),
-// a nil pointer must still be reported as (zero, false) because
-// AsTime on a nil receiver would otherwise panic. Kept as a separate
-// test so the AsTimestamp wrapping path is the only thing under
-// observation.
-func TestLiteralValue_AsTimestamp_TypedNilPointer(t *testing.T) {
-	// Arrange
-	sut := &LiteralValue{Type: TimestampType(), Value: (*timestamppb.Timestamp)(nil)}
+// TestLiteralValue_TypedNilPointer pins the guard that accessors
+// returning a time.Time apply on top of asScalar: a *typed* nil
+// pointer (the Value's dynamic type matches the accessor's expected
+// pointer type, but the pointer itself is nil) is reported as
+// (zero, false). asScalar alone cannot reject this case because the
+// type assertion succeeds on a typed nil, and proto-go's generated
+// Get* methods are nil-safe and return zeroes — without the explicit
+// `X == nil` guard, the accessor would silently return a normalized
+// time.Date(0, 0, 0, ...) with ok=true instead of (zero, false).
+//
+// Every accessor that returns a time.Time over a proto pointer Value
+// shares this guard; the table lists them so a new accessor of the
+// same shape only needs one row, and a regression in any guard shows
+// up as one specific row failing.
+func TestLiteralValue_TypedNilPointer(t *testing.T) {
+	tests := []struct {
+		name string
+		sut  *LiteralValue
+		call func(*LiteralValue) (time.Time, bool)
+	}{
+		{
+			name: "AsTimestamp on (*timestamppb.Timestamp)(nil)",
+			sut:  &LiteralValue{Type: TimestampType(), Value: (*timestamppb.Timestamp)(nil)},
+			call: func(v *LiteralValue) (time.Time, bool) { return v.AsTimestamp() },
+		},
+		{
+			name: "AsDatetime on (*generated.ValueProto_Datetime)(nil)",
+			sut:  &LiteralValue{Type: DatetimeType(), Value: (*generated.ValueProto_Datetime)(nil)},
+			call: func(v *LiteralValue) (time.Time, bool) { return v.AsDatetime() },
+		},
+	}
 
-	// Act
-	got, ok := sut.AsTimestamp()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			sut := tt.sut
 
-	// Assert
-	assert.False(t, ok)
-	assert.Equal(t, time.Time{}, got)
-}
+			// Act
+			got, ok := tt.call(sut)
 
-// TestLiteralValue_AsDatetime_TypedNilPointer mirrors the AsTimestamp
-// nil-pointer guard: the type assertion to *generated.ValueProto_Datetime
-// succeeds on a typed nil, so the accessor must reject it explicitly
-// before calling Get* on it.
-func TestLiteralValue_AsDatetime_TypedNilPointer(t *testing.T) {
-	// Arrange
-	sut := &LiteralValue{Type: DatetimeType(), Value: (*generated.ValueProto_Datetime)(nil)}
-
-	// Act
-	got, ok := sut.AsDatetime()
-
-	// Assert
-	assert.False(t, ok)
-	assert.Equal(t, time.Time{}, got)
+			// Assert
+			assert.False(t, ok)
+			assert.Equal(t, time.Time{}, got)
+		})
+	}
 }
 
 // TestLiteralValue_AsDatetime_DecodesPacked64DatetimeSeconds documents
@@ -668,8 +677,6 @@ func TestLiteralValue_AsDatetime_DecodesPacked64DatetimeSeconds(t *testing.T) {
 		return (year << 26) | (month << 22) | (day << 17) |
 			(hour << 12) | (minute << 6) | second
 	}
-	i64ptr := func(v int64) *int64 { return &v }
-	i32ptr := func(v int32) *int32 { return &v }
 
 	tests := []struct {
 		name string
@@ -679,31 +686,31 @@ func TestLiteralValue_AsDatetime_DecodesPacked64DatetimeSeconds(t *testing.T) {
 		{
 			name: "midnight 0001-01-01 (Go zero-ish, all components at min) with Nanos=0",
 			dt: &generated.ValueProto_Datetime{
-				BitFieldDatetimeSeconds: i64ptr(packSeconds(1, 1, 1, 0, 0, 0)),
-				Nanos:                   i32ptr(0),
+				BitFieldDatetimeSeconds: ptr(packSeconds(1, 1, 1, 0, 0, 0)),
+				Nanos:                   ptr(int32(0)),
 			},
 			want: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC),
 		},
 		{
 			name: "2026-05-10 12:34:56 with Nanos=123456789 (Nanos rides as separate field)",
 			dt: &generated.ValueProto_Datetime{
-				BitFieldDatetimeSeconds: i64ptr(packSeconds(2026, 5, 10, 12, 34, 56)),
-				Nanos:                   i32ptr(123456789),
+				BitFieldDatetimeSeconds: ptr(packSeconds(2026, 5, 10, 12, 34, 56)),
+				Nanos:                   ptr(int32(123456789)),
 			},
 			want: time.Date(2026, time.May, 10, 12, 34, 56, 123456789, time.UTC),
 		},
 		{
 			name: "max year 9999-12-31 23:59:59 with Nanos=999999999 (14-bit year, no truncation)",
 			dt: &generated.ValueProto_Datetime{
-				BitFieldDatetimeSeconds: i64ptr(packSeconds(9999, 12, 31, 23, 59, 59)),
-				Nanos:                   i32ptr(999999999),
+				BitFieldDatetimeSeconds: ptr(packSeconds(9999, 12, 31, 23, 59, 59)),
+				Nanos:                   ptr(int32(999999999)),
 			},
 			want: time.Date(9999, time.December, 31, 23, 59, 59, 999999999, time.UTC),
 		},
 		{
 			name: "Nanos field absent (proto Get* returns 0) decodes to zero nanoseconds",
 			dt: &generated.ValueProto_Datetime{
-				BitFieldDatetimeSeconds: i64ptr(packSeconds(2026, 5, 10, 12, 34, 56)),
+				BitFieldDatetimeSeconds: ptr(packSeconds(2026, 5, 10, 12, 34, 56)),
 				Nanos:                   nil,
 			},
 			want: time.Date(2026, time.May, 10, 12, 34, 56, 0, time.UTC),
