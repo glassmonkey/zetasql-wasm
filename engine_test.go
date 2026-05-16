@@ -1819,13 +1819,26 @@ func TestEngine_Analyze(t *testing.T) {
     KindSingleRowScan
 `,
 		},
-		// FeatureV13ConcatMixedTypes ON: the analyzer auto-coerces
-		// non-STRING/BYTES arguments of `||` to STRING. Paired with
-		// the "concat operator with mixed types rejected when feature off"
-		// error case below, this triangulates the contract that the
-		// new feature flag unlocks.
+		// FeatureV13ConcatMixedTypes triangulation. Two analyzer code paths
+		// need to be pinned independently because they emit different
+		// resolved-tree shapes:
+		//
+		//   1. literal-fold path — both operands are constants, so the
+		//      analyzer folds the non-STRING literal into a STRING
+		//      literal at analyze time. No KindCast appears.
+		//   2. column-cast path — at least one operand is a column
+		//      reference, so the analyzer cannot constant-fold and
+		//      instead wraps the non-STRING operand in a KindCast.
+		//      This is the path real callers exercise (e.g. dbt SQL of
+		//      the form "prefix-" || some_int_column).
+		//
+		// Pinning only the literal case would leave the column-cast
+		// emission unobserved at this layer. The paired "concat operator
+		// with mixed types rejected when feature off" error case below
+		// completes the gate triangulation (feature flag is what unlocks
+		// both paths, not something else).
 		{
-			name: "concat operator with mixed types accepted when feature on",
+			name: "concat operator with mixed-type literals folded to STRING when feature on",
 			sql:  `SELECT "abc" || 123`,
 			cat:  nil,
 			opts: newAnalyzerOptionsWithConcatMixedTypes(),
@@ -1847,6 +1860,37 @@ func TestEngine_Analyze(t *testing.T) {
         KindLiteral "abc"
         KindLiteral "123"
     KindSingleRowScan
+`,
+		},
+		{
+			name: "concat operator with mixed-type column wrapped in KindCast when feature on",
+			sql:  `SELECT name || id FROM users`,
+			cat:  newUsersCatalog(),
+			opts: newAnalyzerOptionsWithConcatMixedTypes(),
+			wantParsed: `KindQueryStatement
+  KindQuery
+    KindSelect
+      KindSelectList
+        KindSelectColumn
+          KindBinaryExpression
+            KindPathExpression
+              KindIdentifier [name]
+            KindPathExpression
+              KindIdentifier [id]
+      KindFromClause
+        KindTablePathExpression
+          KindPathExpression
+            KindIdentifier [users]
+`,
+			wantResolved: `KindQueryStmt
+  KindOutputColumn $col1
+  KindProjectScan
+    KindComputedColumn
+      KindFunctionCall ZetaSQL:concat
+        KindColumnRef name
+        KindCast
+          KindColumnRef id
+    KindTableScan users
 `,
 		},
 		// Error cases — SQL the analyzer must reject. The contract is
