@@ -63,6 +63,7 @@ const (
 	FeatureV13AdditionalStringFunctions   LanguageFeature = LanguageFeature(generated.LanguageFeature_FEATURE_V_1_3_ADDITIONAL_STRING_FUNCTIONS)
 	FeatureV13AllowDashesInTableName      LanguageFeature = LanguageFeature(generated.LanguageFeature_FEATURE_V_1_3_ALLOW_DASHES_IN_TABLE_NAME)
 	FeatureV13AllowRegexpExtractOptionals LanguageFeature = LanguageFeature(generated.LanguageFeature_FEATURE_V_1_3_ALLOW_REGEXP_EXTRACT_OPTIONALS)
+	FeatureV13ConcatMixedTypes            LanguageFeature = LanguageFeature(generated.LanguageFeature_FEATURE_V_1_3_CONCAT_MIXED_TYPES)
 	FeatureV13DateArithmetics             LanguageFeature = LanguageFeature(generated.LanguageFeature_FEATURE_V_1_3_DATE_ARITHMETICS)
 	FeatureV13DateTimeConstructors        LanguageFeature = LanguageFeature(generated.LanguageFeature_FEATURE_V_1_3_DATE_TIME_CONSTRUCTORS)
 	FeatureV13DecimalAlias                LanguageFeature = LanguageFeature(generated.LanguageFeature_FEATURE_V_1_3_DECIMAL_ALIAS)
